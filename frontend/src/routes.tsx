@@ -1,14 +1,14 @@
-import { RouteObject } from "react-router-dom";
+import { RouteObject } from 'react-router-dom'
 
-import { authRoutes } from "./features/auth/routes";
+import { authRoutes } from './features/auth/routes'
 
 export const routes: RouteObject[] = [
   {
-    path: "/",
+    path: '/',
     element: <h1>Home</h1>,
   },
   {
-    path: "/auth",
+    path: '/auth',
     children: authRoutes,
   },
-];
+]

@@ -1,0 +1,21 @@
+name: Lint & Format FE source code
+
+on: [push]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Install packages
+        run: npm ci
+        working-directory: ./frontend
+
+      - name: Prettier
+        run: npm run format
+        working-directory: ./frontend
+
+      - name: Lint
+        run: npm run lint
+        working-directory: ./frontend

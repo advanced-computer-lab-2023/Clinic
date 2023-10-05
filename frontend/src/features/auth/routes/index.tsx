@@ -1,14 +1,14 @@
-import { RouteObject } from "react-router-dom";
-import { Login } from "./Login";
-import { Register } from "./Register";
+import { RouteObject } from 'react-router-dom'
+import { Login } from './Login'
+import { Register } from './Register'
 
 export const authRoutes: RouteObject[] = [
   {
-    path: "login",
+    path: 'login',
     element: <Login />,
   },
   {
-    path: "register",
+    path: 'register',
     element: <Register />,
   },
-];
+]

@@ -1,8 +1,8 @@
-import { Router } from "express";
+import { Router } from 'express'
 
-import { login, register } from "./app/controllers/auth";
+import { login, register } from './app/controllers/auth'
 
-export const router = Router();
+export const router = Router()
 
-router.get("/login", login);
-router.get("/register", register);
+router.get('/login', login)
+router.get('/register', register)

@@ -1,4 +1,4 @@
-import Button from "@mui/material/Button";
+import Button from '@mui/material/Button'
 
 export const Login = () => {
   return (
@@ -6,5 +6,5 @@ export const Login = () => {
       <h1>Login</h1>
       <Button variant="contained">Contained</Button>
     </div>
-  );
-};
+  )
+}
