@@ -3,16 +3,16 @@ const Schema = mongoose.Schema;
 
 const patientSchema = new Schema(
   {
-    Username: { type: String, required: true },
-    Password: { type: String, required: true },
-    Name: { type: String, required: true },
-    Email: { type: String, required: true },
-    MobileNumber: { type: String, required: true },
-    DateOfBirth: { type: Date, required: true },
-    Gender: { type: String, required: true },
-    EmergencyContact: {
-      Name: { type: String, required: true },
-      MobileNumber: { type: String, required: true },
+    username: { type: String, required: true },
+    password: { type: String, required: true },
+    name: { type: String, required: true },
+    email: { type: String, required: true },
+    mobileNumber: { type: String, required: true },
+    dateOfBirth: { type: Date, required: true },
+    gender: { type: String, required: true },
+    emergencyContact: {
+      name: { type: String, required: true },
+      mobileNumber: { type: String, required: true },
     },
   },
   { timestamps: true }
