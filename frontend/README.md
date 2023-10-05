@@ -1,7 +1,9 @@
 # 3rd Parties Used & Their NPM Packages
+
 > **Important**
 >
 > Keep this list updated when we add or remove a 3rd party library so that we can we have a reference.
+
 - [React](https://reactjs.org/docs/getting-started.html) => `react react-dom`
 - [React Router](https://reactrouter.com/web/guides/quick-start) => `react-router-dom localforage match-sorter sort-by`
 - [MUI](https://mui.com/material-ui/getting-started/) => `@mui/material @emotion/react @emotion/styled`
@@ -9,6 +11,7 @@
 - [Fontsource](https://fontsource.org/docs/getting-started) => `@fontsource/roboto`
 
 ## Folder Structure
+
 ```
 src
 |

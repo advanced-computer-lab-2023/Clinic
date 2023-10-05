@@ -1,5 +1,5 @@
-import mongoose from "mongoose";
-const Schema = mongoose.Schema;
+import mongoose from 'mongoose'
+const Schema = mongoose.Schema
 
 const patientSchema = new Schema(
   {
@@ -16,7 +16,7 @@ const patientSchema = new Schema(
     },
   },
   { timestamps: true }
-);
+)
 
-const PatientModel = mongoose.model("Patient", patientSchema);
-export { PatientModel };
+const PatientModel = mongoose.model('Patient', patientSchema)
+export { PatientModel }
