@@ -1,0 +1,22 @@
+name: Lint & Format BE source code
+
+on: [push]
+
+jobs:
+  test:
+    name: Check the source code
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Install packages
+        run: npm ci
+        working-directory: ./backend
+
+      - name: Prettier
+        run: npm run format
+        working-directory: ./backend
+
+      - name: Lint
+        run: npm run lint
+        working-directory: ./backend
