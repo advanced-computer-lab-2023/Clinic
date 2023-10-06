@@ -3,8 +3,8 @@ import {
   NotAuthenticatedError,
   NotAuthorizedError,
   TokenError,
-} from '../errors/authErrors'
-import { isAdmin, verifyJWTToken } from '../services/auth'
+} from '../errors/auth.errors'
+import { isAdmin, verifyJWTToken } from '../services/auth.service'
 
 export async function authenticate(
   req: Request,

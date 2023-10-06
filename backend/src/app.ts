@@ -1,8 +1,8 @@
 import express from 'express'
 import { router } from './routes'
 import mongoose from 'mongoose'
-import { authenticate } from './app/middlewares/auth'
-import { errorHandler } from './app/middlewares/errorHandler'
+import { authenticate } from './app/middlewares/auth.middleware'
+import { errorHandler } from './app/middlewares/errorHandler.middleware'
 import { asyncWrapper } from './app/utils/asyncWrapper'
 
 const app = express()

@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-import { type Admin } from '../types/admin'
+import { type Admin } from '../types/admin.types'
 
 const Schema = mongoose.Schema
 

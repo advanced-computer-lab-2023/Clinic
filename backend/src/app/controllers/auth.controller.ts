@@ -1,9 +1,9 @@
 import { Router } from 'express'
 import { asyncWrapper } from '../utils/asyncWrapper'
-import { login, register } from '../services/auth'
-import type { User } from '../types/user'
-import { validate } from '../middlewares/validation'
-import { UserValidator } from '../validators/userValidator'
+import { login, register } from '../services/auth.service'
+import type { User } from '../types/user.types'
+import { validate } from '../middlewares/validation.middleware'
+import { UserValidator } from '../validators/user.validator'
 
 export const authRouter = Router()
 

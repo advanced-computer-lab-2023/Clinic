@@ -1,11 +1,11 @@
 import { Router } from 'express'
 import { asyncWrapper } from '../utils/asyncWrapper'
-import { DoctorModel } from '../models/doctorModel'
-import { UserModel } from '../models/userModel'
-import { DoctorStatus } from '../types/doctor'
-import { allowAuthenticated } from '../middlewares/auth'
+import { DoctorModel } from '../models/doctor.model'
+import { UserModel } from '../models/user.model'
+import { DoctorStatus } from '../types/doctor.types'
+import { allowAuthenticated } from '../middlewares/auth.middleware'
 import { APIError } from '../errors'
-import { AdminModel } from '../models/adminModel'
+import { AdminModel } from '../models/admin.model'
 
 /**
  * This is a controller that has some helper endpoints for debugging purposes.

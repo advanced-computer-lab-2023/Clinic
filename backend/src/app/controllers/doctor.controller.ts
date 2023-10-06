@@ -1,8 +1,8 @@
 import { Router } from 'express'
 
-import { getPendingDoctorRequests } from '../services/doctors'
+import { getPendingDoctorRequests } from '../services/doctor.service'
 import { asyncWrapper } from '../utils/asyncWrapper'
-import { allowAdmins } from '../middlewares/auth'
+import { allowAdmins } from '../middlewares/auth.middleware'
 
 export const doctorsRouter = Router()
 
