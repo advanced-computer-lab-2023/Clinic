@@ -16,7 +16,7 @@ import {
 export const authRouter = Router()
 
 authRouter.post(
-  '/register',
+  '/register-patient',
   validate(RegisterRequestValidator),
   asyncWrapper<RegisterRequest>(async (req, res) => {
     const token = await register(req.body)
