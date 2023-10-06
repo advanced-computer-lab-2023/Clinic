@@ -9,9 +9,8 @@ export const RegisterRequestValidator = zod.object({
   dateOfBirth: zod.coerce.date(),
   gender: zod.string().min(3).max(255),
   emergencyContact: zod.object({
-    emergencyContactName: zod.string().min(3).max(255),
+    name: zod.string().min(3).max(255),
     mobileNumber: zod.string().min(10).max(10),
-    // relation: zod.string().min(3).max(255),
   }),
 })
 

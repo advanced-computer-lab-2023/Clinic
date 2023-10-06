@@ -9,6 +9,7 @@ import {
 import { APIError } from '../errors'
 import { AdminModel } from '../models/admin.model'
 import { type RegisterRequest } from '../types/auth.types'
+import { PatientModel } from '../models/patient.model'
 
 const jwtSecret = process.env.JWT_TOKEN ?? 'secret'
 const bcryptSalt = process.env.BCRYPT_SALT ?? '$2b$10$13bXTGGukQXsCf5hokNe2u'
@@ -39,17 +40,43 @@ export async function login(
 }
 
 export async function register(request: RegisterRequest): Promise<string> {
+  const {
+    username,
+    name,
+    email,
+    password,
+    dateOfBirth,
+    gender,
+    mobileNumber,
+    emergencyContact: {
+      name: emergencyContactName,
+      mobileNumber: emergencyMobileNumber,
+    },
+  } = request
   if (await isUsernameTaken(request.username)) {
     throw new UsernameAlreadyTakenError()
   }
-
   const hashedPassword = await bcrypt.hash(request.password, bcryptSalt)
 
   const newUser = await UserModel.create({
     username: request.username,
     password: hashedPassword,
   })
-
+  await newUser.save()
+  const newPatient = await PatientModel.create({
+    username,
+    name,
+    email,
+    password,
+    dateOfBirth,
+    gender,
+    mobileNumber,
+    emergencyContact: {
+      name: emergencyContactName,
+      mobileNumber: emergencyMobileNumber,
+    },
+  })
+  await newPatient.save()
   return await generateJWTToken(new JwtPayload(newUser.username))
 }
 

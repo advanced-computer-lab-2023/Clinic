@@ -12,7 +12,7 @@ const patientSchema = new Schema(
     dateOfBirth: { type: Date, required: true },
     gender: { type: String, required: true },
     emergencyContact: {
-      emergencyContactName: { type: String, required: true },
+      name: { type: String, required: true },
       mobileNumber: { type: String, required: true },
     },
   },
