@@ -41,6 +41,9 @@ export function allowAuthenticated(
   res: Response,
   next: NextFunction
 ): void {
+  // if (req.username == null) {
+  //   throw new NotAuthenticatedError()
+  // }
   next()
 }
 
