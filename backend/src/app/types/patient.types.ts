@@ -14,4 +14,6 @@ export class PatientResponseBase {
   ) {}
 }
 
-export class GetPatientResponse extends PatientResponseBase {}
+export class GetPatientResponse {
+  constructor(public patients: PatientResponseBase[]) {}
+}
