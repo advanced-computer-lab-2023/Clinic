@@ -49,3 +49,12 @@ export async function isUsernameLinkedToDoctorWithId(
 
   return doctor.user.username === username
 }
+
+// fetches approved doctors only
+export async function getAllDoctors(): Promise<DoctorDocumentWithUser[]> {
+  const models = await DoctorModel.find({
+    requestStatus: 'approved',
+  }).populate<{ user: UserDocument }>('user')
+
+  return models
+}

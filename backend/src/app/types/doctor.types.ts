@@ -20,7 +20,12 @@ export class DoctorResponseBase {
   ) {}
 }
 
+// Used for getting pending doctors and for getting approved doctors
 export class GetPendingDoctorsResponse {
+  constructor(public doctors: DoctorResponseBase[]) {}
+}
+
+export class GetApprovedDoctorsResponse {
   constructor(public doctors: DoctorResponseBase[]) {}
 }
 
