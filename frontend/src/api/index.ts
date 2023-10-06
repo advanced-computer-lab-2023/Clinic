@@ -20,6 +20,10 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (r) => r,
   (e) => {
+    if (e.response.status === 401) {
+      console.log(localStorage.getItem('token'))
+    }
+
     return Promise.reject(e.response.data)
   }
 )

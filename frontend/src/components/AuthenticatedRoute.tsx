@@ -4,6 +4,7 @@ import { Navigate } from 'react-router-dom'
 
 /**
  * A route that requires authentication.
+ * @param requiredUserType If provided, the user must have this type to view the route.
  */
 export function AuthenticatedRoute({
   children,

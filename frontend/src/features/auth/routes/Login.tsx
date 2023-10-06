@@ -1,22 +1,16 @@
 import { login } from '@/api/auth'
+import { useAlerts } from '@/hooks/alerts'
 import { useAuth } from '@/hooks/auth'
+import { Alert } from '@/providers/AlertsProvider'
 import { LoginRequest } from '@/types/auth.types'
 import { LoginRequestValidator } from '@/validators/user.validator'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ArrowForward } from '@mui/icons-material'
-import {
-  Alert,
-  Button,
-  Card,
-  CardContent,
-  Grid,
-  TextField,
-} from '@mui/material'
-import { useState } from 'react'
+import { Button, Card, CardContent, Grid, TextField } from '@mui/material'
+import { useMutation } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
 
 export const Login = () => {
-  const [error, setError] = useState<string | null>(null)
   const {
     register,
     handleSubmit,
@@ -24,31 +18,23 @@ export const Login = () => {
   } = useForm<LoginRequest>({
     resolver: zodResolver(LoginRequestValidator),
   })
-
   const { refreshUser } = useAuth()
-
-  const onSubmit = async (data: LoginRequest) => {
-    try {
-      const res = await login(data)
-      console.log(res)
-      localStorage.setItem('token', res.token)
+  const { addAlert } = useAlerts()
+  const mutation = useMutation({
+    mutationFn: (data: LoginRequest) => login(data),
+    onSuccess: () => {
       refreshUser()
-    } catch (e) {
-      setError((e as Error).message)
-    }
-  }
+    },
+    onError: (e: Error) => {
+      addAlert(new Alert(e.message, 'error'))
+    },
+  })
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form onSubmit={handleSubmit((data) => mutation.mutateAsync(data))}>
       <Card>
         <CardContent>
           <Grid container spacing={2}>
-            {!!error && (
-              <Grid item xs={12}>
-                <Alert severity="error">{error}</Alert>
-              </Grid>
-            )}
-
             <Grid item xs={12}>
               <TextField
                 fullWidth
