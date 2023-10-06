@@ -1,35 +1,37 @@
 import { Router } from 'express'
 import { asyncWrapper } from '../utils/asyncWrapper'
 import { login, register } from '../services/auth.service'
-import type { User } from '../types/user.types'
 import { validate } from '../middlewares/validation.middleware'
-import { UserValidator } from '../validators/user.validator'
+import {
+  LoginRequestValidator,
+  RegisterRequestValidator,
+} from '../validators/user.validator'
+import {
+  LoginResponse,
+  type LoginRequest,
+  type RegisterRequest,
+  RegisterResponse,
+} from '../types/auth.types'
 
 export const authRouter = Router()
 
 // This is just a temporary endpoint to test the login and register functionality
 authRouter.post(
   '/register',
-  validate(UserValidator),
-  asyncWrapper(async (req, res) => {
-    const { username, password } = req.body
-
-    res.send(
-      await register({
-        username,
-        password,
-      })
-    )
+  validate(RegisterRequestValidator),
+  asyncWrapper<RegisterRequest>(async (req, res) => {
+    res.send(new RegisterResponse(await register(req.body)))
   })
 )
 
 authRouter.post(
   '/login',
-  asyncWrapper<User>(async (req, res) => {
+  validate(LoginRequestValidator),
+  asyncWrapper<LoginRequest>(async (req, res) => {
     const { username, password } = req.body
 
     const token = await login(username, password)
 
-    res.send({ token })
+    res.send(new LoginResponse(token))
   })
 )

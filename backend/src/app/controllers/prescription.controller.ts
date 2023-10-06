@@ -5,6 +5,7 @@ import { validate } from '../middlewares/validation.middleware'
 import {
   type CreatePrescriptionRequest,
   CreatePrescriptionRequestValidator,
+  CreatePrescriptionResponse,
 } from '../types/prescription.types'
 
 export const prescriptionsRouter = Router()

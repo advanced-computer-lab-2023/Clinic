@@ -1,18 +1,19 @@
-import type { User } from './user.types'
-
 export enum DoctorStatus {
   Pending = 'pending',
   Approved = 'approved',
   Rejected = 'rejected',
 }
 
-export interface Doctor {
-  user: User
-  name: string
-  email: string
-  dateOfBirth: Date
-  hourlyRate: number
-  affiliation: string
-  educationalBackground: string
-  requestStatus: DoctorStatus
+export class GetPendingDoctorsResponse {
+  constructor(
+    public doctors: Array<{
+      username: string
+      name: string
+      email: string
+      dateOfBirth: Date
+      hourlyRate: number
+      affiliation: string
+      educationalBackground: string
+    }>
+  ) {}
 }

@@ -18,5 +18,6 @@ const patientSchema = new Schema(
   { timestamps: true }
 )
 
-const PatientModel = mongoose.model('Patient', patientSchema)
-export { PatientModel }
+export type PatientDocument = mongoose.InferSchemaType<typeof patientSchema>
+
+export const PatientModel = mongoose.model('Patient', patientSchema)

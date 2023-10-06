@@ -11,5 +11,11 @@ const prescriptionSchema = new Schema(
   { timestamps: true }
 )
 
-const PrescriptionModel = mongoose.model('Prescription', prescriptionSchema)
-export { PrescriptionModel }
+export type PrescriptionDocument = mongoose.InferSchemaType<
+  typeof prescriptionSchema
+>
+
+export const PrescriptionModel = mongoose.model(
+  'Prescription',
+  prescriptionSchema
+)

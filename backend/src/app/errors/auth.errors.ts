@@ -6,6 +6,12 @@ export class LoginError extends APIError {
   }
 }
 
+export class UsernameAlreadyTakenError extends APIError {
+  constructor() {
+    super('Username already taken', 400)
+  }
+}
+
 export class TokenError extends APIError {
   constructor() {
     super('Token error', 401)

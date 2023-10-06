@@ -1,11 +1,17 @@
 import type { HydratedDocument } from 'mongoose'
-import { DoctorModel } from '../models/doctor.model'
-import type { Doctor } from '../types/doctor.types'
+import { DoctorModel, type DoctorDocument } from '../models/doctor.model'
+import type { UserDocument } from '../models/user.model'
+
+type DoctorDocumentWithUser = Omit<HydratedDocument<DoctorDocument>, 'user'> & {
+  user: UserDocument
+}
 
 export async function getPendingDoctorRequests(): Promise<
-  Array<HydratedDocument<Doctor>>
+  DoctorDocumentWithUser[]
 > {
-  return await DoctorModel.find({
+  const models = await DoctorModel.find({
     requestStatus: 'pending',
-  })
+  }).populate<{ user: UserDocument }>('user')
+
+  return models
 }
