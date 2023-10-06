@@ -12,7 +12,10 @@ export const prescriptionsRouter = Router()
 prescriptionsRouter.get(
   '/',
   asyncWrapper(async (req, res) => {
-    const prescriptions = await PrescriptionModel.find({})
+    const prescriptions = await PrescriptionModel.find({}).populate([
+      'doctor',
+      'patient',
+    ])
 
     res.status(200).json(prescriptions)
   })
@@ -30,6 +33,14 @@ prescriptionsRouter.post(
       date,
     })
 
-    res.status(200).json(prescription)
+    res
+      .status(200)
+      .json(
+        new CreatePrescriptionResponse(
+          prescription.date,
+          prescription.doctor.toString(),
+          prescription.patient
+        )
+      )
   })
 )
