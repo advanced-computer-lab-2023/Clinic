@@ -1,8 +1,12 @@
 import { Router } from 'express'
 
-import { login, register } from './app/controllers/auth'
+import { authRouter } from './app/controllers/auth.controller'
+import { doctorsRouter } from './app/controllers/doctor.controller'
+import { debugRouter } from './app/controllers/debug.controller'
 
 export const router = Router()
 
-router.get('/login', login)
-router.get('/register', register)
+router.use('/auth', authRouter)
+router.use('/doctors', doctorsRouter)
+
+router.use('/debug', debugRouter)
