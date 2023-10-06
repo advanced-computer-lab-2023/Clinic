@@ -1,7 +1,7 @@
 import type { z } from 'zod'
 import type {
   UpdateDoctorRequestValidator,
-  type RegisterDoctorRequestValidator,
+  RegisterDoctorRequestValidator,
 } from '../validators/doctor.validator'
 
 export enum DoctorStatus {

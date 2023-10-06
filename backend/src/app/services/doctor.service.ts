@@ -7,7 +7,7 @@ import {
 } from '../types/doctor.types'
 import type {
   UpdateDoctorRequest,
-  type RegisterDoctorRequest,
+  RegisterDoctorRequest,
 } from '../types/doctor.types'
 import { NotFoundError } from '../errors'
 
