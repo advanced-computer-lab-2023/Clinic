@@ -1,9 +1,8 @@
 import mongoose from 'mongoose'
-import type { User } from '../types/user.types'
 
 const Schema = mongoose.Schema
 
-const userSchema = new Schema<User>(
+const userSchema = new Schema(
   {
     username: { type: String, required: true, unique: true },
     password: { type: String, required: true },
@@ -11,4 +10,6 @@ const userSchema = new Schema<User>(
   { timestamps: true }
 )
 
-export const UserModel = mongoose.model<User>('User', userSchema)
+export type UserDocument = mongoose.InferSchemaType<typeof userSchema>
+
+export const UserModel = mongoose.model('User', userSchema)

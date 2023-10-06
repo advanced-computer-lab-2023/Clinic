@@ -1,11 +1,14 @@
 import * as jwt from 'jsonwebtoken'
 import * as bcrypt from 'bcrypt'
-import { type HydratedDocument } from 'mongoose'
 import { UserModel } from '../models/user.model'
-import { TokenError, LoginError } from '../errors/auth.errors'
-import type { User } from '../types/user.types'
+import {
+  TokenError,
+  LoginError,
+  UsernameAlreadyTakenError,
+} from '../errors/auth.errors'
 import { APIError } from '../errors'
 import { AdminModel } from '../models/admin.model'
+import { type RegisterRequest } from '../types/auth.types'
 
 const jwtSecret = process.env.JWT_TOKEN ?? 'secret'
 const bcryptSalt = process.env.BCRYPT_SALT ?? '$2b$10$13bXTGGukQXsCf5hokNe2u'
@@ -35,17 +38,19 @@ export async function login(
   return await generateJWTToken(payload)
 }
 
-export async function register(user: User): Promise<HydratedDocument<User>> {
-  const hashedPassword = await bcrypt.hash(user.password, bcryptSalt)
+export async function register(request: RegisterRequest): Promise<string> {
+  if (await isUsernameTaken(request.username)) {
+    throw new UsernameAlreadyTakenError()
+  }
 
-  const newUser = new UserModel({
-    username: user.username,
+  const hashedPassword = await bcrypt.hash(request.password, bcryptSalt)
+
+  const newUser = await UserModel.create({
+    username: request.username,
     password: hashedPassword,
   })
 
-  await newUser.save()
-
-  return newUser
+  return await generateJWTToken(new JwtPayload(newUser.username))
 }
 
 export async function isUsernameTaken(username: string): Promise<boolean> {

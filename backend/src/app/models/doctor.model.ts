@@ -1,9 +1,9 @@
 import mongoose from 'mongoose'
-import { type Doctor, DoctorStatus } from '../types/doctor.types'
+import { DoctorStatus } from '../types/doctor.types'
 
 const Schema = mongoose.Schema
 
-const doctorSchema = new Schema<Doctor>(
+const doctorSchema = new Schema(
   {
     user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     name: { type: String, required: true },
@@ -22,4 +22,6 @@ const doctorSchema = new Schema<Doctor>(
   { timestamps: true }
 )
 
-export const DoctorModel = mongoose.model<Doctor>('Doctor', doctorSchema)
+export type DoctorDocument = mongoose.InferSchemaType<typeof doctorSchema>
+
+export const DoctorModel = mongoose.model('Doctor', doctorSchema)
