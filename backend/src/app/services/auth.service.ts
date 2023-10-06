@@ -38,7 +38,7 @@ export async function login(
 
   return await generateJWTToken(payload)
 }
-
+//
 export async function register(request: RegisterRequest): Promise<string> {
   const {
     username,
