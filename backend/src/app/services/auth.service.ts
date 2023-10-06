@@ -10,6 +10,7 @@ import { APIError, NotFoundError } from '../errors'
 import { type RegisterRequest } from '../types/auth.types'
 import { UserType } from '../types/user.types'
 import { type HydratedDocument } from 'mongoose'
+import { PatientModel } from '../models/patient.model'
 
 const jwtSecret = process.env.JWT_TOKEN ?? 'secret'
 const bcryptSalt = process.env.BCRYPT_SALT ?? '$2b$10$13bXTGGukQXsCf5hokNe2u'
@@ -39,18 +40,46 @@ export async function login(
   return await generateJWTToken(payload)
 }
 
-export async function register(request: RegisterRequest): Promise<string> {
+export async function registerPatient(
+  request: RegisterRequest
+): Promise<string> {
+  const {
+    username,
+    name,
+    email,
+    password,
+    dateOfBirth,
+    gender,
+    mobileNumber,
+    emergencyContact: {
+      name: emergencyContactName,
+      mobileNumber: emergencyMobileNumber,
+    },
+  } = request
   if (await isUsernameTaken(request.username)) {
     throw new UsernameAlreadyTakenError()
   }
-
   const hashedPassword = await bcrypt.hash(request.password, bcryptSalt)
 
   const newUser = await UserModel.create({
     username: request.username,
     password: hashedPassword,
   })
-
+  await newUser.save()
+  const newPatient = await PatientModel.create({
+    username,
+    name,
+    email,
+    password,
+    dateOfBirth,
+    gender,
+    mobileNumber,
+    emergencyContact: {
+      name: emergencyContactName,
+      mobileNumber: emergencyMobileNumber,
+    },
+  })
+  await newPatient.save()
   return await generateJWTToken(new JwtPayload(newUser.username))
 }
 
