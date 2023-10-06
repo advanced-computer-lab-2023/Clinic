@@ -9,12 +9,23 @@ services:
     depends_on:
       - backend
     entrypoint: sh -c "npm install && npm run dev"
-    
+
   backend:
     image: node:18-alpine
     ports:
       - "3000:3000"
     volumes:
       - ./backend:/app
+    environment:
+      - MONGO_URI=mongodb://root:example@database:27017
     working_dir: /app
     entrypoint: sh -c "npm install && npm start"
+
+  database:
+    image: mongo:7
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=example
