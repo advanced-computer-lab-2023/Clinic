@@ -25,6 +25,16 @@ authRouter.post(
   })
 )
 
+// authRouter.get('/getAllPatients',
+//     asyncWrapper<RegisterRequest>(async (req, res) => {
+//         const patients = await PatientModel.find();
+//         res.status(200)
+//             .json(
+//                 patients
+//             )
+//
+//     }
+//
 authRouter.post(
   '/login',
   validate(LoginRequestValidator),
