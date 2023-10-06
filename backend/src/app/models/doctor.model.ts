@@ -5,6 +5,9 @@ const Schema = mongoose.Schema
 
 const doctorSchema = new Schema(
   {
+    // exist error if username is not exist in user collection
+    // but it is not required
+    username: { type: String, required: false, unique: false },
     user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
