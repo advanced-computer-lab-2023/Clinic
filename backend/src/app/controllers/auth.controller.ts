@@ -1,6 +1,11 @@
 import { Router } from 'express'
 import { asyncWrapper } from '../utils/asyncWrapper'
-import { getUserByUsername, isAdmin, login, register } from '../services/auth.service'
+import {
+  getUserByUsername,
+  isAdmin,
+  login,
+  register,
+} from '../services/auth.service'
 import { validate } from '../middlewares/validation.middleware'
 import {
   LoginRequestValidator,
@@ -14,7 +19,11 @@ import {
 } from '../types/auth.types'
 import { allowAuthenticated } from '../middlewares/auth.middleware'
 import { NotAuthorizedError } from '../errors/auth.errors'
-import { GetUserByUsernameResponse, type UserType } from '../types/user.types'
+import {
+  GetCurrentUserResponse,
+  GetUserByUsernameResponse,
+  type UserType,
+} from '../types/user.types'
 
 export const authRouter = Router()
 
@@ -36,6 +45,22 @@ authRouter.post(
     const token = await login(username, password)
 
     res.send(new LoginResponse(token))
+  })
+)
+
+/**
+ * Get the currently logged in user
+ */
+authRouter.get(
+  '/me',
+  allowAuthenticated,
+  asyncWrapper(async (req, res) => {
+    console.log(req.username)
+    const user = await getUserByUsername(req.username as string)
+
+    res.send(
+      new GetCurrentUserResponse(user.id, user.username, user.type as UserType)
+    )
   })
 )
 
