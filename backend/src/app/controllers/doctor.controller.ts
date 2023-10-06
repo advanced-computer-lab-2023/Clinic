@@ -1,6 +1,7 @@
 import { Router } from 'express'
 
 import {
+  getAllDoctors,
   getPendingDoctorRequests,
   isUsernameLinkedToDoctorWithId,
   updateDoctor,
@@ -8,6 +9,7 @@ import {
 import { asyncWrapper } from '../utils/asyncWrapper'
 import { allowAdmins } from '../middlewares/auth.middleware'
 import {
+  GetApprovedDoctorsResponse,
   GetPendingDoctorsResponse,
   UpdateDoctorResponse,
 } from '../types/doctor.types'
@@ -76,6 +78,29 @@ doctorsRouter.patch(
         updatedDoctor.hourlyRate,
         updatedDoctor.affiliation,
         updatedDoctor.educationalBackground
+      )
+    )
+  })
+)
+
+// Get all (approved) doctors
+doctorsRouter.get(
+  '/all',
+  asyncWrapper(async (req, res) => {
+    const doctors = await getAllDoctors()
+
+    res.send(
+      new GetApprovedDoctorsResponse(
+        doctors.map((doctor) => ({
+          id: doctor.id,
+          username: doctor.user.username,
+          name: doctor.name,
+          email: doctor.email,
+          dateOfBirth: doctor.dateOfBirth,
+          hourlyRate: doctor.hourlyRate,
+          affiliation: doctor.affiliation,
+          educationalBackground: doctor.educationalBackground,
+        }))
       )
     )
   })
