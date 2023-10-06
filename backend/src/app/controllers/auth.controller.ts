@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { asyncWrapper } from '../utils/asyncWrapper'
-import { login, register } from '../services/auth.service'
+import { login, registerPatient } from '../services/auth.service'
 import { validate } from '../middlewares/validation.middleware'
 import {
   LoginRequestValidator,
@@ -19,7 +19,7 @@ authRouter.post(
   '/register-patient',
   validate(RegisterRequestValidator),
   asyncWrapper<RegisterRequest>(async (req, res) => {
-    const token = await register(req.body)
+    const token = await registerPatient(req.body)
     res.send(new RegisterResponse(token))
   })
 )
