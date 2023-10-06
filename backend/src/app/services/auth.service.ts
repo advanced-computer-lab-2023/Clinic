@@ -1,14 +1,15 @@
 import * as jwt from 'jsonwebtoken'
 import * as bcrypt from 'bcrypt'
-import { UserModel } from '../models/user.model'
+import { type UserDocument, UserModel } from '../models/user.model'
 import {
   TokenError,
   LoginError,
   UsernameAlreadyTakenError,
 } from '../errors/auth.errors'
-import { APIError } from '../errors'
-import { AdminModel } from '../models/admin.model'
+import { APIError, NotFoundError } from '../errors'
 import { type RegisterRequest } from '../types/auth.types'
+import { UserType } from '../types/user.types'
+import { type HydratedDocument } from 'mongoose'
 
 const jwtSecret = process.env.JWT_TOKEN ?? 'secret'
 const bcryptSalt = process.env.BCRYPT_SALT ?? '$2b$10$13bXTGGukQXsCf5hokNe2u'
@@ -88,7 +89,17 @@ export async function isAdmin(username: string): Promise<boolean> {
     return false
   }
 
-  const admin = await AdminModel.findOne({ user: user.id })
+  return user.type === UserType.Admin
+}
 
-  return admin != null
+export async function getUserByUsername(
+  username: string
+): Promise<HydratedDocument<UserDocument>> {
+  const user = await UserModel.findOne({ username })
+
+  if (user == null) {
+    throw new NotFoundError()
+  }
+
+  return user
 }

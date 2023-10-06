@@ -1,12 +1,14 @@
-import type { HydratedDocument } from 'mongoose'
 import { DoctorModel, type DoctorDocument } from '../models/doctor.model'
 import type { UserDocument } from '../models/user.model'
 import type { UpdateDoctorRequest } from '../types/doctor.types'
 import { NotFoundError } from '../errors'
+import { type WithUser } from '../utils/typeUtils'
 
-type DoctorDocumentWithUser = Omit<HydratedDocument<DoctorDocument>, 'user'> & {
-  user: UserDocument
-}
+/**
+ * TODO: Replace DoctorDocumentWithUser with WithUser<DoctorDocument>,
+ * leaving it for now not to break other PRs
+ */
+type DoctorDocumentWithUser = WithUser<DoctorDocument>
 
 export async function getPendingDoctorRequests(): Promise<
   DoctorDocumentWithUser[]
