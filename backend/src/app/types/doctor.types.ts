@@ -20,7 +20,8 @@ export class DoctorResponseBase {
   ) {}
 }
 
-export class GetPendingDoctorsResponse {
+// Used for getting pending doctors and for getting approved doctors
+export class GetDoctorsResponse {
   constructor(public doctors: DoctorResponseBase[]) {}
 }
 

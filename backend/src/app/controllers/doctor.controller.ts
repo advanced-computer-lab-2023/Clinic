@@ -1,16 +1,14 @@
 import { Router } from 'express'
 
 import {
+  getAllDoctors,
   getPendingDoctorRequests,
   isUsernameLinkedToDoctorWithId,
   updateDoctor,
 } from '../services/doctor.service'
 import { asyncWrapper } from '../utils/asyncWrapper'
 import { allowAdmins } from '../middlewares/auth.middleware'
-import {
-  GetPendingDoctorsResponse,
-  UpdateDoctorResponse,
-} from '../types/doctor.types'
+import { GetDoctorsResponse, UpdateDoctorResponse } from '../types/doctor.types'
 import type { UpdateDoctorRequest } from '../types/doctor.types'
 import { isAdmin } from '../services/auth.service'
 import { NotAuthenticatedError } from '../errors/auth.errors'
@@ -27,7 +25,7 @@ doctorsRouter.get(
     const pendingDoctorRequests = await getPendingDoctorRequests()
 
     res.send(
-      new GetPendingDoctorsResponse(
+      new GetDoctorsResponse(
         pendingDoctorRequests.map((doctor) => ({
           id: doctor.id,
           username: doctor.user.username,
@@ -76,6 +74,29 @@ doctorsRouter.patch(
         updatedDoctor.hourlyRate,
         updatedDoctor.affiliation,
         updatedDoctor.educationalBackground
+      )
+    )
+  })
+)
+
+// Get all (approved) doctors
+doctorsRouter.get(
+  '/all-doctors',
+  asyncWrapper(async (req, res) => {
+    const doctors = await getAllDoctors()
+
+    res.send(
+      new GetDoctorsResponse(
+        doctors.map((doctor) => ({
+          id: doctor.id,
+          username: doctor.user.username,
+          name: doctor.name,
+          email: doctor.email,
+          dateOfBirth: doctor.dateOfBirth,
+          hourlyRate: doctor.hourlyRate,
+          affiliation: doctor.affiliation,
+          educationalBackground: doctor.educationalBackground,
+        }))
       )
     )
   })
