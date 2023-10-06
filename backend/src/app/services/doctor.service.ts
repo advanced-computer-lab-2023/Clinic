@@ -3,12 +3,11 @@ import { DoctorModel, type DoctorDocument } from '../models/doctor.model'
 import type { UserDocument } from '../models/user.model'
 import {
   DoctorStatus,
-  RegisterDoctorRequestResponse,
-} from '../types/doctor.types'
-import type {
-  UpdateDoctorRequest,
   type RegisterDoctorRequest,
+  RegisterDoctorRequestResponse,
+  type UpdateDoctorRequest,
 } from '../types/doctor.types'
+
 import { NotFoundError } from '../errors'
 
 import { UserModel } from '../models/user.model'
