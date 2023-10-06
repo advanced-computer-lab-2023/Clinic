@@ -7,6 +7,7 @@ import { allowAuthenticated } from '../middlewares/auth.middleware'
 import { APIError } from '../errors'
 import { AdminModel } from '../models/admin.model'
 import { hash } from 'bcrypt'
+import { UserType } from '../types/user.types'
 
 const bcryptSalt = process.env.BCRYPT_SALT ?? '$2b$10$13bXTGGukQXsCf5hokNe2u'
 
@@ -69,6 +70,9 @@ debugRouter.get(
   })
 )
 
+/**
+ * This endpoint makes the current user an admin.
+ */
 debugRouter.get(
   '/make-me-admin',
   allowAuthenticated,
@@ -83,6 +87,11 @@ debugRouter.get(
       throw new APIError('User is already an admin', 400)
     }
 
-    res.send(await AdminModel.create({ user: user.id }))
+    const admin = await AdminModel.create({ user: user.id })
+
+    user.type = UserType.Admin
+    await user.save()
+
+    res.send(admin)
   })
 )
