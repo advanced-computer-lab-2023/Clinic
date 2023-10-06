@@ -49,7 +49,7 @@ export async function register(request: RegisterRequest): Promise<string> {
     gender,
     mobileNumber,
     emergencyContact: {
-      emergencyContactName,
+      name: emergencyContactName,
       mobileNumber: emergencyMobileNumber,
     },
   } = request
@@ -72,7 +72,7 @@ export async function register(request: RegisterRequest): Promise<string> {
     gender,
     mobileNumber,
     emergencyContact: {
-      emergencyContactName,
+      name: emergencyContactName,
       mobileNumber: emergencyMobileNumber,
     },
   })
