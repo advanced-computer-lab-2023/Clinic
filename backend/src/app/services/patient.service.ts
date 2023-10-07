@@ -1,9 +1,8 @@
 import { type PatientDocument, PatientModel } from '../models/patient.model'
 import { type UserDocument } from '../models/user.model'
+import { type WithUser } from '../utils/typeUtils'
 
-type PatientDocumentWithUser = Omit<PatientDocument, 'user'> & {
-  user: UserDocument
-}
+type PatientDocumentWithUser = WithUser<PatientDocument>
 
 export async function getPatientByName(
   name: string

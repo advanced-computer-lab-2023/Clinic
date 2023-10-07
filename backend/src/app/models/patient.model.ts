@@ -14,6 +14,7 @@ const patientSchema = new Schema(
       name: { type: String, required: true },
       mobileNumber: { type: String, required: true },
     },
+    familyMembers: [{ type: Schema.Types.ObjectId, ref: 'FamilyMember' }],
   },
   { timestamps: true }
 )
