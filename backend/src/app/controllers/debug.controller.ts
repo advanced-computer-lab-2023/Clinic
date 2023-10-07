@@ -154,7 +154,7 @@ debugRouter.post(
     const user = await UserModel.create({
       username: randomUsername('patient'),
       password: await hash('patient', bcryptSalt),
-      type: UserType.Admin,
+      type: UserType.Patient,
     })
 
     const patient = await PatientModel.create({
