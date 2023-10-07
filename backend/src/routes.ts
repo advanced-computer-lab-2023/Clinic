@@ -25,4 +25,4 @@ router.use('/prescriptions', prescriptionsRouter)
 router.use('/familyMembers', familyMemberRouter)
 router.use('/patients', patientRouter)
 
-router.use('/administrators', asyncWrapper(allowAdmins), adminRouter)
+router.use('/admins', asyncWrapper(allowAdmins), adminRouter)

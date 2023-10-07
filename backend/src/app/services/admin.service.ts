@@ -1,16 +1,26 @@
-import { UsernameAlreadyTakenError } from '../errors/auth.errors'
+import {
+  UsernameAlreadyTakenError,
+  UsernameNotExistError,
+} from '../errors/auth.errors'
 import * as bcrypt from 'bcrypt'
 import { UserModel } from '../models/user.model'
 import { isUsernameTaken } from './auth.service'
-import { type AddAnotherAdminRequest } from '../types/admin.types'
+
+import {
+  type AddAdminRequest,
+  type RemoveUserRequest,
+} from '../types/admin.types'
 import { UserType } from '../types/user.types'
-import { AddAnotherAdminResponse } from '../validators/admin.validation'
+import { AddAdminResponse } from '../validators/admin.validation'
+import { AdminModel } from '../models/admin.model'
+import { DoctorModel } from '../models/doctor.model'
+import { PatientModel } from '../models/patient.model'
 
 const bcryptSalt = process.env.BCRYPT_SALT ?? '$2b$10$13bXTGGukQXsCf5hokNe2u'
 
-export async function AddAnotherAdmin(
-  request: AddAnotherAdminRequest
-): Promise<AddAnotherAdminResponse> {
+export async function addAdmin(
+  request: AddAdminRequest
+): Promise<AddAdminResponse> {
   const { username, password } = request
   if (await isUsernameTaken(request.username)) {
     throw new UsernameAlreadyTakenError()
@@ -23,5 +33,21 @@ export async function AddAnotherAdmin(
     type: UserType.Admin,
   })
   await newUser.save()
-  return new AddAnotherAdminResponse(username, password)
+
+  const newAdmin = await AdminModel.create({
+    user: newUser.id,
+  })
+  await newAdmin.save()
+  return new AddAdminResponse(username, password)
+}
+
+export async function removeUser(request: RemoveUserRequest): Promise<void> {
+  const { username } = request
+  const user = await UserModel.findOneAndDelete({ username })
+  if (user == null) {
+    throw new UsernameNotExistError()
+  }
+  await DoctorModel.findOneAndDelete({ user: user.id })
+  await PatientModel.deleteOne({ user: user.id })
+  await AdminModel.deleteOne({ user: user.id })
 }
