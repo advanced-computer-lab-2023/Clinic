@@ -179,3 +179,18 @@ export async function isDoctor(username: string): Promise<boolean> {
 
   return doctor != null
 }
+export async function isDoctorAndApproved(username: string): Promise<boolean> {
+  const user = await UserModel.findOne({ username })
+
+  if (user == null) {
+    return false
+  }
+
+  const doctor = await DoctorModel.findOne({ user: user.id })
+  if (doctor != null) {
+    if (doctor.requestStatus !== 'approved') {
+      return false
+    }
+  }
+  return true
+}

@@ -22,8 +22,9 @@ debugRouter.post(
   '/create-doctor',
   asyncWrapper(async (req, res) => {
     const user = await UserModel.create({
-      username: 'doctor' + Math.random(),
-      password: await hash('doctor', bcryptSalt),
+      username: 'Yadoctor' + Math.random(),
+      password: await hash('Yadoctor', bcryptSalt),
+      type: UserType.Doctor,
     })
 
     const doctor = await DoctorModel.create({
@@ -40,24 +41,26 @@ debugRouter.post(
     res.send(doctor)
   })
 )
+
 debugRouter.post(
-  '/create-patient1',
+  '/create-patient',
   asyncWrapper(async (req, res) => {
     const user = await UserModel.create({
-      username: 'patient1' + Math.random(),
-      password: await hash('patient1', bcryptSalt),
+      username: 'patient' + Math.random(),
+      password: await hash('patient', bcryptSalt),
+      type: UserType.Patient,
     })
 
     const patient = await PatientModel.create({
       user: user.id,
-      name: 'Patient1',
+      name: 'Patient',
       email: user.username + '@gmail.com',
-      mobileNumber: '0100',
+      mobileNumber: '01001111111',
       dateOfBirth: new Date(),
       gender: 'female',
       emergencyContact: {
         name: 'Emergency1',
-        mobileNumber: '0100',
+        mobileNumber: '0100111111',
       },
     })
 
@@ -65,36 +68,30 @@ debugRouter.post(
   })
 )
 debugRouter.post(
-  '/create-patient2',
+  '/create-patient-onlyonce',
   asyncWrapper(async (req, res) => {
     const user = await UserModel.create({
-      username: 'patient2' + Math.random(),
-      password: await hash('patient2', bcryptSalt),
+      username: 'patientP',
+      password: await hash('patient', bcryptSalt),
+      type: UserType.Patient,
     })
 
     const patient = await PatientModel.create({
       user: user.id,
-      name: 'Patient2',
+      name: 'Patient',
       email: user.username + '@gmail.com',
-      mobileNumber: '0100',
+      mobileNumber: '01001111111',
       dateOfBirth: new Date(),
       gender: 'female',
       emergencyContact: {
-        name: 'Emergency2',
-        mobileNumber: '0100',
+        name: 'Emergency1',
+        mobileNumber: '0100111111',
       },
     })
 
     res.send(patient)
   })
 )
-debugRouter.get(
-  '/patients',
-  asyncWrapper(async (req, res) => {
-    res.send(await PatientModel.find({ name: 'Patient1' }).populate('user'))
-  })
-)
-
 debugRouter.post(
   '/create-pending-doctor',
   asyncWrapper(async (req, res) => {
