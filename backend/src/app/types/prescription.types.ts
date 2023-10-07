@@ -1,13 +1,9 @@
-import * as zod from 'zod'
 import type { z } from 'zod'
+import type { CreatePrescriptionRequestValidator } from '../validators/prescription.validator'
 
-export const CreatePrescriptionRequestValidator = zod.object({
-  date: zod.date(),
-  doctor: zod.string().min(1),
-  patient: zod.string().min(1),
-})
-
-export type CreatePrescriptionRequest = z.infer<typeof CreatePrescriptionRequestValidator>
+export type CreatePrescriptionRequest = z.infer<
+  typeof CreatePrescriptionRequestValidator
+>
 
 export class CreatePrescriptionResponse {
   date: Date

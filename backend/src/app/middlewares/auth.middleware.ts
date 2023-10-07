@@ -4,7 +4,7 @@ import {
   NotAuthorizedError,
   TokenError,
 } from '../errors/auth.errors'
-import { isAdmin, verifyJWTToken } from '../services/auth.service'
+import { isDoctor, isAdmin, verifyJWTToken } from '../services/auth.service'
 
 export async function authenticate(
   req: Request,
@@ -58,6 +58,23 @@ export async function allowAdmins(
   }
 
   if (await isAdmin(req.username)) {
+    next()
+    return
+  }
+
+  throw new NotAuthorizedError()
+}
+
+export async function allowDoctors(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  if (req.username == null) {
+    throw new NotAuthenticatedError()
+  }
+
+  if (await isDoctor(req.username)) {
     next()
     return
   }

@@ -8,6 +8,7 @@ import {
 } from '../errors/auth.errors'
 import { APIError } from '../errors'
 import { AdminModel } from '../models/admin.model'
+import { DoctorModel } from '../models/doctor.model'
 import { type RegisterRequest } from '../types/auth.types'
 
 const jwtSecret = process.env.JWT_TOKEN ?? 'secret'
@@ -91,4 +92,16 @@ export async function isAdmin(username: string): Promise<boolean> {
   const admin = await AdminModel.findOne({ user: user.id })
 
   return admin != null
+}
+
+export async function isDoctor(username: string): Promise<boolean> {
+  const user = await UserModel.findOne({ username })
+
+  if (user == null) {
+    return false
+  }
+
+  const doctor = await DoctorModel.findOne({ user: user.id })
+
+  return doctor != null
 }

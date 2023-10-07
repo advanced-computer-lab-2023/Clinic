@@ -4,7 +4,10 @@ import type { UserDocument } from '../models/user.model'
 import type { UpdateDoctorRequest } from '../types/doctor.types'
 import { NotFoundError } from '../errors'
 
-type DoctorDocumentWithUser = Omit<HydratedDocument<DoctorDocument>, 'user'> & {
+export type DoctorDocumentWithUser = Omit<
+  HydratedDocument<DoctorDocument>,
+  'user'
+> & {
   user: UserDocument
 }
 
