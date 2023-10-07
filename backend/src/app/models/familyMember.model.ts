@@ -19,3 +19,7 @@ export const FamilyMemberModel = mongoose.model<FamilyMember>(
   'FamilyMember',
   familyMemberSchema
 )
+
+export type FamilyMemberDocument = mongoose.InferSchemaType<
+  typeof familyMemberSchema
+>
