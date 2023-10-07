@@ -74,7 +74,7 @@ export async function registerPatient(
   })
   await newUser.save()
   const newPatient = await PatientModel.create({
-    user: newUser._id,
+    user: newUser.id,
     name,
     email,
     dateOfBirth,
@@ -169,6 +169,7 @@ export async function submitDoctorRequest(
   })
   await newDoctor.save()
   return new RegisterDoctorRequestResponse(
+    newDoctor.id,
     doctor.username,
     doctor.name,
     doctor.email,

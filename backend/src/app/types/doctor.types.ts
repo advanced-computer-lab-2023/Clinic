@@ -39,14 +39,4 @@ export type RegisterDoctorRequest = z.infer<
 
 export class UpdateDoctorResponse extends DoctorResponseBase {}
 
-export class RegisterDoctorRequestResponse {
-  constructor(
-    public username: string,
-    public name: string,
-    public email: string,
-    public dateOfBirth: Date,
-    public hourlyRate: number,
-    public affiliation: string,
-    public educationalBackground: string
-  ) {}
-}
+export class RegisterDoctorRequestResponse extends DoctorResponseBase {}
