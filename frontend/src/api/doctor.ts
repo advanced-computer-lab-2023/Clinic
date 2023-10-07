@@ -1,5 +1,6 @@
 import {
   GetDoctorResponse,
+  GetPendingDoctorsResponse,
   UpdateDoctorRequest,
   UpdateDoctorResponse,
 } from '@/types/doctor.types'
@@ -17,5 +18,11 @@ export async function updateDoctor(
 export async function getDoctor(username: string): Promise<GetDoctorResponse> {
   return await api
     .get<GetDoctorResponse>(`/doctors/${username}`)
+    .then((res) => res.data)
+}
+
+export async function getPendingDoctors(): Promise<GetPendingDoctorsResponse> {
+  return await api
+    .get<GetPendingDoctorsResponse>(`/doctors/pending`)
     .then((res) => res.data)
 }
