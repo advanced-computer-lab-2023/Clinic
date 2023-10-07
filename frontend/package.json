@@ -18,6 +18,7 @@
     "@hookform/resolvers": "^3.3.1",
     "@mui/icons-material": "^5.14.12",
     "@mui/material": "^5.14.12",
+    "@tanstack/react-query": "^4.35.7",
     "axios": "^1.5.1",
     "localforage": "^1.10.0",
     "match-sorter": "^6.3.1",

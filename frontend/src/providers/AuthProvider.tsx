@@ -1,6 +1,6 @@
 import { getCurrentUser } from '@/api/auth'
 import { UserType } from '@/types/user.types'
-import { createContext, useEffect, useState } from 'react'
+import { createContext, useCallback, useEffect, useState } from 'react'
 
 interface AuthContextUser {
   type: UserType
@@ -19,15 +19,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<AuthContextUser | undefined>()
   const [loading, setLoading] = useState<boolean>(true)
 
-  useEffect(() => {
-    refreshUser()
+  const refreshUser = useCallback(async () => {
+    setLoading(true)
+    try {
+      const user = await getCurrentUser()
+      setUser(user)
+    } catch (e) {
+      logout()
+    } finally {
+      setLoading(false)
+    }
   }, [])
 
-  const refreshUser = async () => {
-    setLoading(true)
-    setUser(await getCurrentUser())
-    setLoading(false)
-  }
+  useEffect(() => {
+    refreshUser()
+  }, [refreshUser])
 
   const logout = async () => {
     setUser(undefined)

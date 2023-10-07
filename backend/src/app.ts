@@ -31,5 +31,3 @@ mongoose
   .catch((err) => {
     console.log(err)
   })
-
-// const connection = mongoose.connection;

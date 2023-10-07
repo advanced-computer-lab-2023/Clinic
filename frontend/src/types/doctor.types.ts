@@ -32,3 +32,5 @@ export class GetApprovedDoctorsResponse {
 export type UpdateDoctorRequest = z.infer<typeof UpdateDoctorRequestValidator>
 
 export class UpdateDoctorResponse extends DoctorResponseBase {}
+
+export class GetDoctorResponse extends DoctorResponseBase {}
