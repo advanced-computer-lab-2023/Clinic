@@ -1,15 +1,14 @@
-import type { HydratedDocument } from 'mongoose'
 import { DoctorModel, type DoctorDocument } from '../models/doctor.model'
 import type { UserDocument } from '../models/user.model'
 import {
   DoctorStatus,
+  type RegisterDoctorRequest,
   RegisterDoctorRequestResponse,
+  type UpdateDoctorRequest,
 } from '../types/doctor.types'
-import type {
-  UpdateDoctorRequest,
-  RegisterDoctorRequest,
-} from '../types/doctor.types'
+
 import { NotFoundError } from '../errors'
+import { type WithUser } from '../utils/typeUtils'
 
 import { UserModel } from '../models/user.model'
 import { hash } from 'bcrypt'
@@ -18,11 +17,14 @@ import {
   UsernameAlreadyTakenError,
 } from '../errors/auth.errors'
 import { isUsernameTaken } from './auth.service'
+import { UserType } from '../types/user.types'
 
-type DoctorDocumentWithUser = Omit<HydratedDocument<DoctorDocument>, 'user'> & {
-  user: UserDocument
-}
 const bcryptSalt = process.env.BCRYPT_SALT ?? '$2b$10$13bXTGGukQXsCf5hokNe2u'
+/**
+ * TODO: Replace DoctorDocumentWithUser with WithUser<DoctorDocument>,
+ * leaving it for now not to break other PRs
+ */
+type DoctorDocumentWithUser = WithUser<DoctorDocument>
 
 export async function getPendingDoctorRequests(): Promise<
   DoctorDocumentWithUser[]
@@ -89,6 +91,7 @@ export async function submitDoctorRequest(
   const user = await UserModel.create({
     username: doctor.username,
     password: await hash('doctor', bcryptSalt),
+    type: UserType.Doctor,
   })
   await user.save()
   const newDoctor = await DoctorModel.create({
