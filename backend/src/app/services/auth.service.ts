@@ -179,7 +179,3 @@ export async function isDoctor(username: string): Promise<boolean> {
 
   return doctor != null
 }
-
-
-
-

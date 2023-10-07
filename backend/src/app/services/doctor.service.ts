@@ -10,8 +10,6 @@ import { type WithUser } from '../utils/typeUtils'
  */
 export type DoctorDocumentWithUser = WithUser<DoctorDocument>
 
-
-
 export async function getPendingDoctorRequests(): Promise<
   DoctorDocumentWithUser[]
 > {
