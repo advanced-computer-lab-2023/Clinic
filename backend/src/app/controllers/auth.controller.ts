@@ -55,9 +55,7 @@ authRouter.get(
   '/me',
   allowAuthenticated,
   asyncWrapper(async (req, res) => {
-    console.log(req.username)
     const user = await getUserByUsername(req.username as string)
-
     res.send(
       new GetCurrentUserResponse(user.id, user.username, user.type as UserType)
     )
