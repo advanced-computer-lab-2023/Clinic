@@ -1,3 +1,5 @@
+import { type Schema } from 'mongoose'
+
 export interface FamilyMember {
   name: string
   nationalId: string
@@ -15,7 +17,7 @@ export class FamilyMemberResponseBase {
     public age: number,
     public gender: string,
     public relation: string,
-    public relatedTo: string
+    public relatedTo: Schema.Types.ObjectId
   ) {}
 }
 

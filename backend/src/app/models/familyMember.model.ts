@@ -10,7 +10,7 @@ const familyMemberSchema = new Schema(
     age: { type: Number, required: true },
     gender: { type: String, required: true },
     relation: { type: String, required: true },
-    relatedTo: { type: String, required: true },
+    relatedTo: { type: Schema.Types.ObjectId, ref: 'Patient', required: true },
   },
   { timestamps: true }
 )
