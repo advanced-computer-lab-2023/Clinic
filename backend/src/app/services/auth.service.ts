@@ -1,11 +1,16 @@
 import * as jwt from 'jsonwebtoken'
 import * as bcrypt from 'bcrypt'
+import { type UserDocument, UserModel } from '../models/user.model'
+import {
+  TokenError,
+  LoginError,
+  UsernameAlreadyTakenError,
+} from '../errors/auth.errors'
+import { APIError, NotFoundError } from '../errors'
+import { type RegisterRequest } from '../types/auth.types'
+import { UserType } from '../types/user.types'
 import { type HydratedDocument } from 'mongoose'
-import { UserModel } from '../models/user.model'
-import { TokenError, LoginError } from '../errors/auth.errors'
-import type { User } from '../types/user.types'
-import { APIError } from '../errors'
-import { AdminModel } from '../models/admin.model'
+import { PatientModel } from '../models/patient.model'
 
 const jwtSecret = process.env.JWT_TOKEN ?? 'secret'
 const bcryptSalt = process.env.BCRYPT_SALT ?? '$2b$10$13bXTGGukQXsCf5hokNe2u'
@@ -35,17 +40,47 @@ export async function login(
   return await generateJWTToken(payload)
 }
 
-export async function register(user: User): Promise<HydratedDocument<User>> {
-  const hashedPassword = await bcrypt.hash(user.password, bcryptSalt)
+export async function registerPatient(
+  request: RegisterRequest
+): Promise<string> {
+  const {
+    username,
+    name,
+    email,
+    password,
+    dateOfBirth,
+    gender,
+    mobileNumber,
+    emergencyContact: {
+      name: emergencyContactName,
+      mobileNumber: emergencyMobileNumber,
+    },
+  } = request
+  if (await isUsernameTaken(request.username)) {
+    throw new UsernameAlreadyTakenError()
+  }
+  const hashedPassword = await bcrypt.hash(request.password, bcryptSalt)
 
-  const newUser = new UserModel({
-    username: user.username,
+  const newUser = await UserModel.create({
+    username: request.username,
     password: hashedPassword,
   })
-
   await newUser.save()
-
-  return newUser
+  const newPatient = await PatientModel.create({
+    username,
+    name,
+    email,
+    password,
+    dateOfBirth,
+    gender,
+    mobileNumber,
+    emergencyContact: {
+      name: emergencyContactName,
+      mobileNumber: emergencyMobileNumber,
+    },
+  })
+  await newPatient.save()
+  return await generateJWTToken(new JwtPayload(newUser.username))
 }
 
 export async function isUsernameTaken(username: string): Promise<boolean> {
@@ -83,7 +118,17 @@ export async function isAdmin(username: string): Promise<boolean> {
     return false
   }
 
-  const admin = await AdminModel.findOne({ user: user.id })
+  return user.type === UserType.Admin
+}
 
-  return admin != null
+export async function getUserByUsername(
+  username: string
+): Promise<HydratedDocument<UserDocument>> {
+  const user = await UserModel.findOne({ username })
+
+  if (user == null) {
+    throw new NotFoundError()
+  }
+
+  return user
 }

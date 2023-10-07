@@ -1,4 +1,17 @@
-import type { z } from 'zod'
-import type { UserValidator } from '../validators/user.validator'
+export enum UserType {
+  Doctor = 'Doctor',
+  Patient = 'Patient',
+  Admin = 'Admin',
+}
 
-export type User = z.infer<typeof UserValidator>
+export class GetUserResponse {
+  constructor(
+    public id: string,
+    public username: string,
+    public type: UserType
+  ) {}
+}
+
+export class GetUserByUsernameResponse extends GetUserResponse {}
+
+export class GetCurrentUserResponse extends GetUserResponse {}

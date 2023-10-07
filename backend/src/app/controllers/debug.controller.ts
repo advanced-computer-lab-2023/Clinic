@@ -6,6 +6,10 @@ import { DoctorStatus } from '../types/doctor.types'
 import { allowAuthenticated } from '../middlewares/auth.middleware'
 import { APIError } from '../errors'
 import { AdminModel } from '../models/admin.model'
+import { hash } from 'bcrypt'
+import { UserType } from '../types/user.types'
+
+const bcryptSalt = process.env.BCRYPT_SALT ?? '$2b$10$13bXTGGukQXsCf5hokNe2u'
 
 /**
  * This is a controller that has some helper endpoints for debugging purposes.
@@ -17,14 +21,14 @@ debugRouter.post(
   '/create-doctor',
   asyncWrapper(async (req, res) => {
     const user = await UserModel.create({
-      username: 'doctor2',
-      password: 'doctor',
+      username: 'doctor' + Math.random(),
+      password: await hash('doctor', bcryptSalt),
     })
 
     const doctor = await DoctorModel.create({
       user: user.id,
       name: 'Doctor',
-      email: 'doctor@gmail.com',
+      email: user.username + '@gmail.com',
       dateOfBirth: new Date(),
       hourlyRate: 100,
       affiliation: 'Hospital',
@@ -41,7 +45,7 @@ debugRouter.post(
   asyncWrapper(async (req, res) => {
     const user = await UserModel.create({
       username: 'pending-doctor2',
-      password: 'doctor',
+      password: await hash('doctor', bcryptSalt),
     })
 
     const doctor = await DoctorModel.create({
@@ -66,6 +70,9 @@ debugRouter.get(
   })
 )
 
+/**
+ * This endpoint makes the current user an admin.
+ */
 debugRouter.get(
   '/make-me-admin',
   allowAuthenticated,
@@ -80,6 +87,11 @@ debugRouter.get(
       throw new APIError('User is already an admin', 400)
     }
 
-    res.send(await AdminModel.create({ user: user.id }))
+    const admin = await AdminModel.create({ user: user.id })
+
+    user.type = UserType.Admin
+    await user.save()
+
+    res.send(admin)
   })
 )
