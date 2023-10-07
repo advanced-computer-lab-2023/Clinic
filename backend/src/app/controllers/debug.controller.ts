@@ -8,6 +8,7 @@ import { APIError } from '../errors'
 import { AdminModel } from '../models/admin.model'
 import { hash } from 'bcrypt'
 import { UserType } from '../types/user.types'
+import { PatientModel } from '../models/patient.model'
 
 const bcryptSalt = process.env.BCRYPT_SALT ?? '$2b$10$13bXTGGukQXsCf5hokNe2u'
 
@@ -37,6 +38,60 @@ debugRouter.post(
     })
 
     res.send(doctor)
+  })
+)
+debugRouter.post(
+  '/create-patient1',
+  asyncWrapper(async (req, res) => {
+    const user = await UserModel.create({
+      username: 'patient1' + Math.random(),
+      password: await hash('patient1', bcryptSalt),
+    })
+
+    const patient = await PatientModel.create({
+      user: user.id,
+      name: 'Patient1',
+      email: user.username + '@gmail.com',
+      mobileNumber: '0100',
+      dateOfBirth: new Date(),
+      gender: 'female',
+      emergencyContact: {
+        name: 'Emergency1',
+        mobileNumber: '0100',
+      },
+    })
+
+    res.send(patient)
+  })
+)
+debugRouter.post(
+  '/create-patient2',
+  asyncWrapper(async (req, res) => {
+    const user = await UserModel.create({
+      username: 'patient2' + Math.random(),
+      password: await hash('patient2', bcryptSalt),
+    })
+
+    const patient = await PatientModel.create({
+      user: user.id,
+      name: 'Patient2',
+      email: user.username + '@gmail.com',
+      mobileNumber: '0100',
+      dateOfBirth: new Date(),
+      gender: 'female',
+      emergencyContact: {
+        name: 'Emergency2',
+        mobileNumber: '0100',
+      },
+    })
+
+    res.send(patient)
+  })
+)
+debugRouter.get(
+  '/patients',
+  asyncWrapper(async (req, res) => {
+    res.send(await PatientModel.find({ name: 'Patient1' }).populate('user'))
   })
 )
 
