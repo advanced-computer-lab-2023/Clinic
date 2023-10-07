@@ -5,12 +5,17 @@ import {
   TokenError,
   LoginError,
   UsernameAlreadyTakenError,
+  EmailAlreadyTakenError,
 } from '../errors/auth.errors'
 import { APIError, NotFoundError } from '../errors'
 import { type RegisterRequest } from '../types/auth.types'
 import { UserType } from '../types/user.types'
 import { type HydratedDocument } from 'mongoose'
 import { PatientModel } from '../models/patient.model'
+import { DoctorStatus, type RegisterDoctorRequest } from '../types/doctor.types'
+import { type DoctorDocument, DoctorModel } from '../models/doctor.model'
+import { hash } from 'bcrypt'
+import { type WithUser } from '../utils/typeUtils'
 
 const jwtSecret = process.env.JWT_TOKEN ?? 'secret'
 const bcryptSalt = process.env.BCRYPT_SALT ?? '$2b$10$13bXTGGukQXsCf5hokNe2u'
@@ -44,10 +49,8 @@ export async function registerPatient(
   request: RegisterRequest
 ): Promise<string> {
   const {
-    username,
     name,
     email,
-    password,
     dateOfBirth,
     gender,
     mobileNumber,
@@ -64,13 +67,13 @@ export async function registerPatient(
   const newUser = await UserModel.create({
     username: request.username,
     password: hashedPassword,
+    type: UserType.Patient,
   })
   await newUser.save()
   const newPatient = await PatientModel.create({
-    username,
+    user: newUser.id,
     name,
     email,
-    password,
     dateOfBirth,
     gender,
     mobileNumber,
@@ -113,11 +116,9 @@ export async function generateJWTToken(payload: JwtPayload): Promise<string> {
 
 export async function isAdmin(username: string): Promise<boolean> {
   const user = await UserModel.findOne({ username })
-
   if (user == null) {
     return false
   }
-
   return user.type === UserType.Admin
 }
 
@@ -131,4 +132,38 @@ export async function getUserByUsername(
   }
 
   return user
+}
+
+export async function submitDoctorRequest(
+  doctor: RegisterDoctorRequest
+): Promise<WithUser<DoctorDocument>> {
+  if (await isUsernameTaken(doctor.username)) {
+    throw new UsernameAlreadyTakenError()
+  }
+  const existingDoctor = await DoctorModel.findOne({ email: doctor.email })
+
+  if (existingDoctor !== null && existingDoctor !== undefined) {
+    throw new EmailAlreadyTakenError()
+  }
+  const user = await UserModel.create({
+    username: doctor.username,
+    password: await hash('doctor', bcryptSalt),
+    type: UserType.Doctor,
+  })
+  await user.save()
+  const newDoctor = await DoctorModel.create({
+    username: doctor.username,
+    user: user.id,
+    name: doctor.name,
+    email: doctor.email,
+    dateOfBirth: doctor.dateOfBirth,
+    hourlyRate: doctor.hourlyRate,
+    affiliation: doctor.affiliation,
+    educationalBackground: doctor.educationalBackground,
+    requestStatus: DoctorStatus.Pending,
+  })
+  await newDoctor.save()
+  return (await newDoctor.populate<{ user: UserDocument }>(
+    'user'
+  )) as WithUser<DoctorDocument>
 }

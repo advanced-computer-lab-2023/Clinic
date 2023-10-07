@@ -1,5 +1,8 @@
 import type { z } from 'zod'
-import type { UpdateDoctorRequestValidator } from '../validators/doctor.validator'
+import type {
+  UpdateDoctorRequestValidator,
+  RegisterDoctorRequestValidator,
+} from '../validators/doctor.validator'
 
 export enum DoctorStatus {
   Pending = 'pending',
@@ -13,7 +16,13 @@ export class DoctorResponseBase {
     public username: string,
     public name: string,
     public email: string,
-    public dateOfBirth: Date,
+    // public dateOfBirth: Date,
+    /** 
+     * Changed this to string instead of Date, because JSON doesn't support Dates,
+     * and this object is sent to the frontend as JSON, so in the frontend it is actually
+     * received as a string not a Date, even if you send a Date.
+     **/ 
+    public dateOfBirth: string,
     public hourlyRate: number,
     public affiliation: string,
     public educationalBackground: string
@@ -30,5 +39,11 @@ export class GetApprovedDoctorsResponse {
 }
 
 export type UpdateDoctorRequest = z.infer<typeof UpdateDoctorRequestValidator>
+export type RegisterDoctorRequest = z.infer<
+  typeof RegisterDoctorRequestValidator
+>
 
 export class UpdateDoctorResponse extends DoctorResponseBase {}
+
+export class RegisterDoctorRequestResponse extends DoctorResponseBase {}
+export class GetDoctorResponse extends DoctorResponseBase {}

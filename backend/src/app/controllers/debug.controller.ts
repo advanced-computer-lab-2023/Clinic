@@ -23,6 +23,7 @@ debugRouter.post(
     const user = await UserModel.create({
       username: 'doctor' + Math.random(),
       password: await hash('doctor', bcryptSalt),
+      type: UserType.Doctor,
     })
 
     const doctor = await DoctorModel.create({
@@ -43,15 +44,18 @@ debugRouter.post(
 debugRouter.post(
   '/create-pending-doctor',
   asyncWrapper(async (req, res) => {
+    const username = 'pending-doctor' + Math.random()
+
     const user = await UserModel.create({
-      username: 'pending-doctor2',
+      username,
       password: await hash('doctor', bcryptSalt),
+      type: UserType.Doctor,
     })
 
     const doctor = await DoctorModel.create({
       user: user.id,
-      name: 'Doctor',
-      email: 'pending-doctor@gmail.com',
+      name: 'Doctor Name ' + username,
+      email: username + '@gmail.com',
       dateOfBirth: new Date(),
       hourlyRate: 100,
       affiliation: 'Hospital',
@@ -59,7 +63,7 @@ debugRouter.post(
       requestStatus: DoctorStatus.Pending,
     })
 
-    res.send(doctor)
+    res.send(await doctor.populate('user'))
   })
 )
 
@@ -93,5 +97,28 @@ debugRouter.get(
     await user.save()
 
     res.send(admin)
+  })
+)
+
+/**
+ * This endpoint creates an admin with random username and password 'admin',
+ * and returns the created admin, for testing purposes.
+ */
+debugRouter.post(
+  '/create-admin',
+  asyncWrapper(async (req, res) => {
+    const username = 'admin' + Math.random().toString()
+
+    const user = await UserModel.create({
+      username,
+      password: await hash('admin', bcryptSalt),
+      type: UserType.Admin,
+    })
+
+    const admin = await AdminModel.create({
+      user: user.id,
+    })
+
+    res.send(await admin.populate('user'))
   })
 )
