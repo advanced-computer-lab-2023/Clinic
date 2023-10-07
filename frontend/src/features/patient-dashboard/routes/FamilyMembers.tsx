@@ -1,13 +1,18 @@
 import { CardPlaceholder } from '@/components/CardPlaceholder'
-import { Box, Button } from '@mui/material'
+import { Box, Button, Container, Divider, Modal } from '@mui/material'
 import { useQuery } from '@tanstack/react-query'
 import { GridColDef, DataGrid } from '@mui/x-data-grid'
 import { GetFamilyMembersResponse } from '@/types/familyMember.types'
 import { getFamilyMembers } from '@/api/familyMembers'
+import { useState } from 'react'
+import { AddFamilyMember } from './AddFamilyMember'
 
 export function FamilyMembers() {
+  const [addFamilyMemberModalOpen, setAddFamilyMemberModalOpen] =
+    useState(false)
+
   const query = useQuery({
-    queryKey: ['pending-doctors'],
+    queryKey: ['familyMembers'],
     queryFn: getFamilyMembers,
   })
 
@@ -68,7 +73,30 @@ export function FamilyMembers() {
 
   return (
     <Box sx={{ height: 400, width: '100%' }}>
-      <DataGrid rows={query.data?.familyMembers || []} columns={columns} />
+      <Modal
+        open={addFamilyMemberModalOpen}
+        onClose={() => setAddFamilyMemberModalOpen(false)}
+      >
+        <Container maxWidth="sm" sx={{ mt: 4 }}>
+          <AddFamilyMember
+            onSuccess={() => setAddFamilyMemberModalOpen(false)}
+          />
+        </Container>
+      </Modal>
+
+      <Button
+        variant="contained"
+        size="large"
+        onClick={() => setAddFamilyMemberModalOpen(true)}
+      >
+        Add Family Member
+      </Button>
+      <Divider sx={{ my: 2 }} />
+      <DataGrid
+        rows={query.data?.familyMembers || []}
+        columns={columns}
+        autoHeight
+      />
     </Box>
   )
 }
