@@ -44,7 +44,6 @@ export function allowAuthenticated(
   if (req.username == null) {
     throw new NotAuthenticatedError()
   }
-
   next()
 }
 

@@ -1,9 +1,9 @@
 import { DoctorModel, type DoctorDocument } from '../models/doctor.model'
 import type { UserDocument } from '../models/user.model'
-import type { UpdateDoctorRequest } from '../types/doctor.types'
+import { type UpdateDoctorRequest } from '../types/doctor.types'
+
 import { NotFoundError } from '../errors'
 import { type WithUser } from '../utils/typeUtils'
-
 /**
  * TODO: Replace DoctorDocumentWithUser with WithUser<DoctorDocument>,
  * leaving it for now not to break other PRs
