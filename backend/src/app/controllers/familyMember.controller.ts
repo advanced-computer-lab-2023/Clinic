@@ -63,13 +63,13 @@ familyMemberRouter.get(
   })
 )
 
-// Create a family member for the currently logged in patient
+// Create a family member for the patient with the given username
 familyMemberRouter.post(
-  '/mine',
+  '/:patientUsername',
   validate(AddFamilyMemberRequestValidator),
   asyncWrapper<AddFamilyMemberRequest>(async (req, res) => {
     const newFamilyMember = await createFamilyMember(
-      req.params.username,
+      req.params.patientUsername,
       req.body
     )
 
