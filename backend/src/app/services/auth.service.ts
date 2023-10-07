@@ -7,6 +7,7 @@ import {
   UsernameAlreadyTakenError,
 } from '../errors/auth.errors'
 import { APIError, NotFoundError } from '../errors'
+import { DoctorModel } from '../models/doctor.model'
 import { type RegisterRequest } from '../types/auth.types'
 import { UserType } from '../types/user.types'
 import { type HydratedDocument } from 'mongoose'
@@ -131,4 +132,16 @@ export async function getUserByUsername(
   }
 
   return user
+}
+
+export async function isDoctor(username: string): Promise<boolean> {
+  const user = await UserModel.findOne({ username })
+
+  if (user == null) {
+    return false
+  }
+
+  const doctor = await DoctorModel.findOne({ user: user.id })
+
+  return doctor != null
 }
