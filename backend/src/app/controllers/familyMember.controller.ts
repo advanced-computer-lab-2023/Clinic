@@ -1,8 +1,17 @@
 import { Router } from 'express'
 import { asyncWrapper } from '../utils/asyncWrapper'
-import { getFamilyMembers } from '../services/familyMember.service'
-import { GetFamilyMembersResponse } from '../types/familyMember.types'
+import {
+  createFamilyMember,
+  getFamilyMembers,
+} from '../services/familyMember.service'
+import {
+  type AddFamilyMemberRequest,
+  AddFamilyMemberResponse,
+  GetFamilyMembersResponse,
+} from '../types/familyMember.types'
 import { allowAuthenticated } from '../middlewares/auth.middleware'
+import { AddFamilyMemberRequestValidator } from '../validators/familyMembers.validator'
+import { validate } from '../middlewares/validation.middleware'
 
 export const familyMemberRouter = Router()
 
@@ -49,6 +58,29 @@ familyMemberRouter.get(
           gender: familyMember.gender,
           relation: familyMember.relation,
         }))
+      )
+    )
+  })
+)
+
+// Create a family member for the currently logged in patient
+familyMemberRouter.post(
+  '/mine',
+  validate(AddFamilyMemberRequestValidator),
+  asyncWrapper<AddFamilyMemberRequest>(async (req, res) => {
+    const newFamilyMember = await createFamilyMember(
+      req.params.username,
+      req.body
+    )
+
+    res.send(
+      new AddFamilyMemberResponse(
+        newFamilyMember.id,
+        newFamilyMember.name,
+        newFamilyMember.nationalId,
+        newFamilyMember.age,
+        newFamilyMember.gender,
+        newFamilyMember.relation
       )
     )
   })
