@@ -1,6 +1,7 @@
 import { RouteObject } from 'react-router-dom'
 import { PatientDashboardLayout } from '../components/PatientDashboardLayout'
 import { PatientDashboardHome } from './PatientDashboardHome'
+import { FamilyMembers } from './FamilyMembers'
 
 export const patientDashboardRoutes: RouteObject[] = [
   {
@@ -9,6 +10,10 @@ export const patientDashboardRoutes: RouteObject[] = [
       {
         path: '',
         element: <PatientDashboardHome />,
+      },
+      {
+        path: 'family-members',
+        element: <FamilyMembers />,
       },
     ],
   },
