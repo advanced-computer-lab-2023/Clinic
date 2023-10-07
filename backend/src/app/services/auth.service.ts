@@ -84,7 +84,11 @@ export async function registerPatient(
 }
 
 export async function isUsernameTaken(username: string): Promise<boolean> {
-  return (await UserModel.count({ username })) > 0
+  const usernameRegex = new RegExp(`^${username}$`, 'i')
+
+  const count = await UserModel.countDocuments({ username: usernameRegex })
+
+  return count > 0
 }
 
 export async function verifyJWTToken(token: string): Promise<JwtPayload> {
