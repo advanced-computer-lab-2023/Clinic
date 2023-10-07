@@ -31,7 +31,6 @@ doctorsRouter.get(
   asyncWrapper(allowAdmins),
   asyncWrapper(async (req, res) => {
     const pendingDoctorRequests = await getPendingDoctorRequests()
-
     res.send(
       new GetPendingDoctorsResponse(
         pendingDoctorRequests.map((doctor) => ({

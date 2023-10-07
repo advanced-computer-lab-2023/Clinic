@@ -113,11 +113,9 @@ export async function generateJWTToken(payload: JwtPayload): Promise<string> {
 
 export async function isAdmin(username: string): Promise<boolean> {
   const user = await UserModel.findOne({ username })
-
   if (user == null) {
     return false
   }
-
   return user.type === UserType.Admin
 }
 
