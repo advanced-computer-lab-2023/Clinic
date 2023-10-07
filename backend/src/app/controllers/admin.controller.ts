@@ -4,12 +4,10 @@ import { validate } from '../middlewares/validation.middleware'
 import {
   AddAdminValidator,
   RemoveUserResponse,
-  RemoveUserValidator,
 } from '../validators/admin.validation'
 import { asyncWrapper } from '../utils/asyncWrapper'
 import {
   type AddAdminRequest,
-  type RemoveUserRequest,
 } from '../types/admin.types'
 import { addAdmin, removeUser } from '../services/admin.service'
 
@@ -22,11 +20,10 @@ adminRouter.post(
     res.send(addAdminResponse)
   })
 )
-adminRouter.post(
-  '/remove-user',
-  validate(RemoveUserValidator),
-  asyncWrapper<RemoveUserRequest>(async (req, res) => {
-    await removeUser(req.body)
-    res.send(new RemoveUserResponse(req.body.username))
+adminRouter.delete(
+    '/:username',
+  asyncWrapper(async (req, res) => {
+    await removeUser(req.params.username)
+    res.send(new RemoveUserResponse(req.params.username))
   })
 )

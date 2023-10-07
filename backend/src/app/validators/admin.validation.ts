@@ -11,9 +11,7 @@ export class AddAdminResponse {
     public password: string
   ) {}
 }
-export const RemoveUserValidator = zod.object({
-  username: zod.string().min(3).max(255),
-})
+
 export class RemoveUserResponse {
   constructor(public username: string) {}
 }

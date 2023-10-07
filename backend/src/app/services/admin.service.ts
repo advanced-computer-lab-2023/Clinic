@@ -1,6 +1,5 @@
 import {
   UsernameAlreadyTakenError,
-  UsernameNotExistError,
 } from '../errors/auth.errors'
 import * as bcrypt from 'bcrypt'
 import { UserModel } from '../models/user.model'
@@ -8,13 +7,13 @@ import { isUsernameTaken } from './auth.service'
 
 import {
   type AddAdminRequest,
-  type RemoveUserRequest,
 } from '../types/admin.types'
 import { UserType } from '../types/user.types'
 import { AddAdminResponse } from '../validators/admin.validation'
 import { AdminModel } from '../models/admin.model'
 import { DoctorModel } from '../models/doctor.model'
 import { PatientModel } from '../models/patient.model'
+import {NotFoundError} from "../errors";
 
 const bcryptSalt = process.env.BCRYPT_SALT ?? '$2b$10$13bXTGGukQXsCf5hokNe2u'
 
@@ -41,11 +40,10 @@ export async function addAdmin(
   return new AddAdminResponse(username, password)
 }
 
-export async function removeUser(request: RemoveUserRequest): Promise<void> {
-  const { username } = request
+export async function removeUser(username: string): Promise<void> {
   const user = await UserModel.findOneAndDelete({ username })
   if (user == null) {
-    throw new UsernameNotExistError()
+    throw new NotFoundError()
   }
   await DoctorModel.findOneAndDelete({ user: user.id })
   await PatientModel.deleteOne({ user: user.id })
