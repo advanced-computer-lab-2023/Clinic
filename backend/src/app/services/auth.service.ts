@@ -167,3 +167,14 @@ export async function submitDoctorRequest(
     'user'
   )) as WithUser<DoctorDocument>
 }
+export async function isDoctor(username: string): Promise<boolean> {
+  const user = await UserModel.findOne({ username })
+
+  if (user == null) {
+    return false
+  }
+
+  const doctor = await DoctorModel.findOne({ user: user.id })
+
+  return doctor != null
+}

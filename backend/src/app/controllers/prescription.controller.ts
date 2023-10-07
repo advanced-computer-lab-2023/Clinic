@@ -4,9 +4,9 @@ import { asyncWrapper } from '../utils/asyncWrapper'
 import { validate } from '../middlewares/validation.middleware'
 import {
   type CreatePrescriptionRequest,
-  CreatePrescriptionRequestValidator,
   CreatePrescriptionResponse,
 } from '../types/prescription.types'
+import { CreatePrescriptionRequestValidator } from '../validators/prescription.validator'
 
 export const prescriptionsRouter = Router()
 
@@ -26,10 +26,9 @@ prescriptionsRouter.post(
   '/',
   validate(CreatePrescriptionRequestValidator),
   asyncWrapper<CreatePrescriptionRequest>(async (req, res) => {
-    const { doctor, patient, date } = req.body
+    const { patient, date } = req.body
 
     const prescription = await PrescriptionModel.create({
-      doctor,
       patient,
       date,
     })
@@ -40,7 +39,7 @@ prescriptionsRouter.post(
         new CreatePrescriptionResponse(
           prescription.date,
           prescription.doctor.toString(),
-          prescription.patient
+          prescription.patient.toString()
         )
       )
   })
