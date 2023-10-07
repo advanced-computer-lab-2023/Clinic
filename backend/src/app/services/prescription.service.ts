@@ -6,20 +6,23 @@ import {
 
 import { type DoctorDocument } from '../models/doctor.model'
 import { NotFoundError } from '../errors'
+import { type PatientDocument } from '../models/patient.model'
 
 type PrescriptionDocumentWithDoctor = Omit<
-  HydratedDocument<PrescriptionDocument>,
-  'doctor'
+  Omit<HydratedDocument<PrescriptionDocument>, 'doctor'>,
+  'patient'
 > & {
   doctor: DoctorDocument
+  patient: PatientDocument
 }
 
-export async function getPrescriptions(
-  id: string
-): Promise<PrescriptionDocumentWithDoctor[]> {
-  const prescription = await PrescriptionModel.find({ patient: id }).populate<{
+export async function getPrescriptions(): Promise<
+  PrescriptionDocumentWithDoctor[]
+> {
+  const prescription = await PrescriptionModel.find().populate<{
     doctor: DoctorDocument
-  }>('doctor')
+    patient: PatientDocument
+  }>('doctor', 'patient')
   if (prescription == null) {
     throw new NotFoundError()
   }
