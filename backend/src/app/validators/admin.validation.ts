@@ -11,3 +11,4 @@ export class AddAdminResponse {
     public password: string
   ) {}
 }
+
