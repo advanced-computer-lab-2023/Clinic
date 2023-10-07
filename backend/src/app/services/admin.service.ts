@@ -4,14 +4,14 @@ import { UserModel } from '../models/user.model'
 import { isUsernameTaken } from './auth.service'
 import { type AddAdminRequest } from '../types/admin.types'
 import { UserType } from '../types/user.types'
-import { AddAnotherAdminResponse } from '../validators/admin.validation'
+import { AddAdminResponse } from '../validators/admin.validation'
 import { AdminModel } from '../models/admin.model'
 
 const bcryptSalt = process.env.BCRYPT_SALT ?? '$2b$10$13bXTGGukQXsCf5hokNe2u'
 
 export async function addAdmin(
   request: AddAdminRequest
-): Promise<AddAnotherAdminResponse> {
+): Promise<AddAdminResponse> {
   const { username, password } = request
   if (await isUsernameTaken(request.username)) {
     throw new UsernameAlreadyTakenError()
@@ -28,5 +28,5 @@ export async function addAdmin(
     user: newUser.id,
   })
   await newAdmin.save()
-  return new AddAnotherAdminResponse(username, password)
+  return new AddAdminResponse(username, password)
 }

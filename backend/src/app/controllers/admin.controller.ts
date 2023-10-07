@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { validate } from '../middlewares/validation.middleware'
-import { AddAnotherAdminValidator } from '../validators/admin.validation'
+import { AddAdminValidator } from '../validators/admin.validation'
 import { asyncWrapper } from '../utils/asyncWrapper'
 import { type AddAdminRequest } from '../types/admin.types'
 import { addAdmin } from '../services/admin.service'
@@ -8,9 +8,9 @@ import { addAdmin } from '../services/admin.service'
 export const adminRouter = Router()
 adminRouter.post(
   '/',
-  validate(AddAnotherAdminValidator),
+  validate(AddAdminValidator),
   asyncWrapper<AddAdminRequest>(async (req, res) => {
-    const addAnotherAdminResponse = await addAdmin(req.body)
-    res.send(addAnotherAdminResponse)
+    const addAdminResponse = await addAdmin(req.body)
+    res.send(addAdminResponse)
   })
 )
