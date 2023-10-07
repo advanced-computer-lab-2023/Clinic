@@ -28,6 +28,24 @@ export class GetPendingDoctorsResponse {
 export class GetApprovedDoctorsResponse {
   constructor(public doctors: DoctorResponseBase[]) {}
 }
+class GetDoctorWithRateResponseBase {
+  constructor(
+    public id: string,
+    public username: string,
+    public name: string,
+    public email: string,
+    public dateOfBirth: Date,
+    public hourlyRate: number,
+    public affiliation: string,
+    public educationalBackground: string,
+    public sessionRate: number,
+    public speciality: string
+  ) {}
+}
+
+export class GetDoctorWithRateResponse {
+  constructor(public doctors: GetDoctorWithRateResponseBase[]) {}
+}
 
 export type UpdateDoctorRequest = z.infer<typeof UpdateDoctorRequestValidator>
 
