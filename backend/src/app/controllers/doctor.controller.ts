@@ -4,7 +4,6 @@ import {
   getAllDoctors,
   getPendingDoctorRequests,
   isUsernameLinkedToDoctorWithId,
-  submitDoctorRequest,
   updateDoctor,
 } from '../services/doctor.service'
 import { asyncWrapper } from '../utils/asyncWrapper'
@@ -19,10 +18,7 @@ import { isAdmin } from '../services/auth.service'
 import { NotAuthenticatedError } from '../errors/auth.errors'
 import { APIError } from '../errors'
 import { validate } from '../middlewares/validation.middleware'
-import {
-  RegisterDoctorRequestValidator,
-  UpdateDoctorRequestValidator,
-} from '../validators/doctor.validator'
+import { UpdateDoctorRequestValidator } from '../validators/doctor.validator'
 
 export const doctorsRouter = Router()
 
@@ -106,15 +102,5 @@ doctorsRouter.get(
         }))
       )
     )
-  })
-)
-
-// Submit a Request to Register as a Doctor
-doctorsRouter.post(
-  '/request',
-  validate(RegisterDoctorRequestValidator),
-  asyncWrapper(async (req, res) => {
-    const registerDoctorRequestResponse = await submitDoctorRequest(req.body)
-    res.send(registerDoctorRequestResponse)
   })
 )
