@@ -5,6 +5,7 @@ import { validate } from '../middlewares/validation.middleware'
 import {
   type CreatePrescriptionRequest,
   CreatePrescriptionResponse,
+  GetPrescriptionResponse,
 } from '../types/prescription.types'
 import { CreatePrescriptionRequestValidator } from '../validators/prescription.validator'
 import { getPrescriptions } from '../services/prescription.service'
@@ -14,8 +15,18 @@ export const prescriptionsRouter = Router()
 prescriptionsRouter.get(
   '/',
   asyncWrapper(async (req, res) => {
-    const prescriptionRequests = await getPrescriptions()
-    res.send(prescriptionRequests)
+    const id = req.query.id as string
+    const prescriptionRequests = await getPrescriptions(id)
+    res.send(
+      new GetPrescriptionResponse(
+        prescriptionRequests.map((prescription) => ({
+          doctor: prescription.doctor.name,
+          patient: prescription.patient.name,
+          date: prescription.date,
+          status: prescription.status === true ? 'Filled' : 'UnFilled',
+        }))
+      )
+    )
   })
 )
 
