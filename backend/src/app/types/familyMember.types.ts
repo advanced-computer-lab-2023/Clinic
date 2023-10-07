@@ -19,7 +19,6 @@ export class FamilyMemberResponseBase {
   ) {}
 }
 
-// Used for getting pending doctors and for getting approved doctors
 export class GetFamilyMembersResponse {
   constructor(public doctors: FamilyMemberResponseBase[]) {}
 }
