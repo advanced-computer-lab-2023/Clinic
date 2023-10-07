@@ -5,6 +5,7 @@ import {
   isAdmin,
   login,
   registerPatient,
+  submitDoctorRequest,
 } from '../services/auth.service'
 import { validate } from '../middlewares/validation.middleware'
 import {
@@ -24,6 +25,7 @@ import {
   GetUserByUsernameResponse,
   type UserType,
 } from '../types/user.types'
+import { RegisterDoctorRequestValidator } from '../validators/doctor.validator'
 
 export const authRouter = Router()
 
@@ -83,5 +85,15 @@ authRouter.get(
         user.type as UserType
       )
     )
+  })
+)
+
+// Submit a Request to Register as a Doctor
+authRouter.post(
+  '/request-doctor',
+  validate(RegisterDoctorRequestValidator),
+  asyncWrapper(async (req, res) => {
+    const registerDoctorRequestResponse = await submitDoctorRequest(req.body)
+    res.send(registerDoctorRequestResponse)
   })
 )

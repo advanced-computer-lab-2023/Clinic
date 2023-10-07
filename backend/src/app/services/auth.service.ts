@@ -5,12 +5,20 @@ import {
   TokenError,
   LoginError,
   UsernameAlreadyTakenError,
+  EmailAlreadyTakenError,
 } from '../errors/auth.errors'
 import { APIError, NotFoundError } from '../errors'
 import { type RegisterRequest } from '../types/auth.types'
 import { UserType } from '../types/user.types'
 import { type HydratedDocument } from 'mongoose'
 import { PatientModel } from '../models/patient.model'
+import {
+  DoctorStatus,
+  type RegisterDoctorRequest,
+  RegisterDoctorRequestResponse,
+} from '../types/doctor.types'
+import { DoctorModel } from '../models/doctor.model'
+import { hash } from 'bcrypt'
 
 const jwtSecret = process.env.JWT_TOKEN ?? 'secret'
 const bcryptSalt = process.env.BCRYPT_SALT ?? '$2b$10$13bXTGGukQXsCf5hokNe2u'
@@ -44,10 +52,8 @@ export async function registerPatient(
   request: RegisterRequest
 ): Promise<string> {
   const {
-    username,
     name,
     email,
-    password,
     dateOfBirth,
     gender,
     mobileNumber,
@@ -64,13 +70,13 @@ export async function registerPatient(
   const newUser = await UserModel.create({
     username: request.username,
     password: hashedPassword,
+    type: UserType.Patient,
   })
   await newUser.save()
   const newPatient = await PatientModel.create({
-    username,
+    user: newUser._id,
     name,
     email,
-    password,
     dateOfBirth,
     gender,
     mobileNumber,
@@ -131,4 +137,44 @@ export async function getUserByUsername(
   }
 
   return user
+}
+
+export async function submitDoctorRequest(
+  doctor: RegisterDoctorRequest
+): Promise<RegisterDoctorRequestResponse> {
+  if (await isUsernameTaken(doctor.username)) {
+    throw new UsernameAlreadyTakenError()
+  }
+  const existingDoctor = await DoctorModel.findOne({ email: doctor.email })
+
+  if (existingDoctor !== null && existingDoctor !== undefined) {
+    throw new EmailAlreadyTakenError()
+  }
+  const user = await UserModel.create({
+    username: doctor.username,
+    password: await hash('doctor', bcryptSalt),
+    type: UserType.Doctor,
+  })
+  await user.save()
+  const newDoctor = await DoctorModel.create({
+    username: doctor.username,
+    user: user.id,
+    name: doctor.name,
+    email: doctor.email,
+    dateOfBirth: doctor.dateOfBirth,
+    hourlyRate: doctor.hourlyRate,
+    affiliation: doctor.affiliation,
+    educationalBackground: doctor.educationalBackground,
+    requestStatus: DoctorStatus.Pending,
+  })
+  await newDoctor.save()
+  return new RegisterDoctorRequestResponse(
+    doctor.username,
+    doctor.name,
+    doctor.email,
+    doctor.dateOfBirth,
+    doctor.hourlyRate,
+    doctor.affiliation,
+    doctor.educationalBackground
+  )
 }
