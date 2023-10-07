@@ -7,18 +7,15 @@ import {
   CreatePrescriptionResponse,
 } from '../types/prescription.types'
 import { CreatePrescriptionRequestValidator } from '../validators/prescription.validator'
+import { getPrescriptions } from '../services/prescription.service'
 
 export const prescriptionsRouter = Router()
 
 prescriptionsRouter.get(
   '/',
   asyncWrapper(async (req, res) => {
-    const prescriptions = await PrescriptionModel.find({}).populate([
-      'doctor',
-      'patient',
-    ])
-
-    res.status(200).json(prescriptions)
+    const prescriptionRequests = await getPrescriptions()
+    res.send(prescriptionRequests)
   })
 )
 
