@@ -12,13 +12,10 @@ import { type RegisterRequest } from '../types/auth.types'
 import { UserType } from '../types/user.types'
 import { type HydratedDocument } from 'mongoose'
 import { PatientModel } from '../models/patient.model'
-import {
-  DoctorStatus,
-  type RegisterDoctorRequest,
-  RegisterDoctorRequestResponse,
-} from '../types/doctor.types'
-import { DoctorModel } from '../models/doctor.model'
+import { DoctorStatus, type RegisterDoctorRequest } from '../types/doctor.types'
+import { type DoctorDocument, DoctorModel } from '../models/doctor.model'
 import { hash } from 'bcrypt'
+import { type WithUser } from '../utils/typeUtils'
 
 const jwtSecret = process.env.JWT_TOKEN ?? 'secret'
 const bcryptSalt = process.env.BCRYPT_SALT ?? '$2b$10$13bXTGGukQXsCf5hokNe2u'
@@ -141,7 +138,7 @@ export async function getUserByUsername(
 
 export async function submitDoctorRequest(
   doctor: RegisterDoctorRequest
-): Promise<RegisterDoctorRequestResponse> {
+): Promise<WithUser<DoctorDocument>> {
   if (await isUsernameTaken(doctor.username)) {
     throw new UsernameAlreadyTakenError()
   }
@@ -168,14 +165,7 @@ export async function submitDoctorRequest(
     requestStatus: DoctorStatus.Pending,
   })
   await newDoctor.save()
-  return new RegisterDoctorRequestResponse(
-    newDoctor.id,
-    doctor.username,
-    doctor.name,
-    doctor.email,
-    doctor.dateOfBirth,
-    doctor.hourlyRate,
-    doctor.affiliation,
-    doctor.educationalBackground
-  )
+  return (await newDoctor.populate<{ user: UserDocument }>(
+    'user'
+  )) as WithUser<DoctorDocument>
 }
