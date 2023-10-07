@@ -1,28 +1,28 @@
-import { Router } from 'express'
-import { validate } from '../middlewares/validation.middleware'
+import {Router} from 'express'
+import {validate} from '../middlewares/validation.middleware'
 
 import {
-  AddAdminValidator,
+    AddAdminValidator,
 } from '../validators/admin.validation'
-import { asyncWrapper } from '../utils/asyncWrapper'
+import {asyncWrapper} from '../utils/asyncWrapper'
 import {
-  type AddAdminRequest,
+    type AddAdminRequest,
 } from '../types/admin.types'
-import { addAdmin, removeUser } from '../services/admin.service'
+import {addAdmin, removeUser} from '../services/admin.service'
 
 export const adminRouter = Router()
 adminRouter.post(
-  '/',
-  validate(AddAdminValidator),
-  asyncWrapper<AddAdminRequest>(async (req, res) => {
-    const addAdminResponse = await addAdmin(req.body)
-    res.send(addAdminResponse)
-  })
+    '/',
+    validate(AddAdminValidator),
+    asyncWrapper<AddAdminRequest>(async (req, res) => {
+        const addAdminResponse = await addAdmin(req.body)
+        res.send(addAdminResponse)
+    })
 )
 adminRouter.delete(
-    '/:username',
-  asyncWrapper(async (req, res) => {
-    await removeUser(req.params.username)
-      res.sendStatus(204)
-  })
+    '/username/:username',
+    asyncWrapper(async (req, res) => {
+        await removeUser(req.params.username)
+        res.sendStatus(204)
+    })
 )
