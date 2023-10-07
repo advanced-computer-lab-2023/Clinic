@@ -20,6 +20,8 @@ services:
       - MONGO_URI=mongodb://root:example@database:27017
     working_dir: /app
     entrypoint: sh -c "npm install && npm start"
+    depends_on:
+      - database
 
   database:
     image: mongo:7
