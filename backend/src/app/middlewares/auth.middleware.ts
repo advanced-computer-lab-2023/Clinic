@@ -12,27 +12,20 @@ export async function authenticate(
   next: NextFunction
 ): Promise<void> {
   const authHeader = req.headers.authorization
-
   if (authHeader == null) {
     next()
     return
   }
-
   const parts = authHeader.split(' ')
-
   if (parts.length !== 2) {
     throw new TokenError()
   }
-
   const [scheme, token] = parts
   if (!/^Bearer$/i.test(scheme)) {
     throw new TokenError()
   }
-
   const payload = await verifyJWTToken(token)
-
   req.username = payload.username
-
   next()
 }
 
@@ -55,7 +48,6 @@ export async function allowAdmins(
   if (req.username == null) {
     throw new NotAuthenticatedError()
   }
-
   if (await isAdmin(req.username)) {
     next()
     return
