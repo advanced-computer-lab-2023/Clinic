@@ -60,3 +60,10 @@ export async function getAllDoctors(): Promise<DoctorDocumentWithUser[]> {
 
   return models
 }
+
+export async function getDoctorWithRate(): Promise<DoctorDocumentWithUser[]> {
+  const models = await DoctorModel.find({
+    requestStatus: 'approved',
+  }).populate<{ user: UserDocument }>('user')
+  return models
+}

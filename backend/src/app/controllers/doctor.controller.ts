@@ -2,6 +2,7 @@ import { Router } from 'express'
 
 import {
   getAllDoctors,
+  getDoctorWithRate,
   getPendingDoctorRequests,
   isUsernameLinkedToDoctorWithId,
   updateDoctor,
@@ -100,6 +101,29 @@ doctorsRouter.get(
           hourlyRate: doctor.hourlyRate,
           affiliation: doctor.affiliation,
           educationalBackground: doctor.educationalBackground,
+        }))
+      )
+    )
+  })
+)
+
+doctorsRouter.get(
+  /doctors-with-rate/,
+  asyncWrapper(async (req, res) => {
+    const doctors = await getDoctorWithRate()
+    res.send(
+      new GetApprovedDoctorsResponse(
+        doctors.map((doctor) => ({
+          id: doctor.id,
+          username: doctor.user.username,
+          name: doctor.name,
+          email: doctor.email,
+          dateOfBirth: doctor.dateOfBirth,
+          hourlyRate: doctor.hourlyRate,
+          affiliation: doctor.affiliation,
+          educationalBackground: doctor.educationalBackground,
+          sessionRate: doctor.hourlyRate * 1.1 - 5, // dummy discount percentage until packages done
+          speciality: 'Dentist', // dummy data untill i know whether speciality is the same as edu-background
         }))
       )
     )
