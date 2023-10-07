@@ -3,7 +3,6 @@ import { validate } from '../middlewares/validation.middleware'
 
 import {
   AddAdminValidator,
-  RemoveUserResponse,
 } from '../validators/admin.validation'
 import { asyncWrapper } from '../utils/asyncWrapper'
 import {
@@ -24,6 +23,6 @@ adminRouter.delete(
     '/:username',
   asyncWrapper(async (req, res) => {
     await removeUser(req.params.username)
-    res.send(new RemoveUserResponse(req.params.username))
+      res.sendStatus(204)
   })
 )

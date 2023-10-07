@@ -12,6 +12,3 @@ export class AddAdminResponse {
   ) {}
 }
 
-export class RemoveUserResponse {
-  constructor(public username: string) {}
-}
