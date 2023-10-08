@@ -12,6 +12,12 @@ export class UsernameAlreadyTakenError extends APIError {
   }
 }
 
+export class EmailAlreadyTakenError extends APIError {
+  constructor() {
+    super('Email is used before', 400)
+  }
+}
+
 export class TokenError extends APIError {
   constructor() {
     super('Token error', 401)

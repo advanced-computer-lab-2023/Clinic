@@ -2,14 +2,15 @@ import { Router } from 'express'
 
 import {
   getAllDoctors,
+  getDoctorByUsername,
   getPendingDoctorRequests,
-  isUsernameLinkedToDoctorWithId,
-  updateDoctor,
+  updateDoctorByUsername,
 } from '../services/doctor.service'
 import { asyncWrapper } from '../utils/asyncWrapper'
-import { allowAdmins } from '../middlewares/auth.middleware'
+import { allowAdmins, allowAuthenticated } from '../middlewares/auth.middleware'
 import {
   GetApprovedDoctorsResponse,
+  GetDoctorResponse,
   GetPendingDoctorsResponse,
   UpdateDoctorResponse,
 } from '../types/doctor.types'
@@ -27,7 +28,6 @@ doctorsRouter.get(
   asyncWrapper(allowAdmins),
   asyncWrapper(async (req, res) => {
     const pendingDoctorRequests = await getPendingDoctorRequests()
-
     res.send(
       new GetPendingDoctorsResponse(
         pendingDoctorRequests.map((doctor) => ({
@@ -35,7 +35,7 @@ doctorsRouter.get(
           username: doctor.user.username,
           name: doctor.name,
           email: doctor.email,
-          dateOfBirth: doctor.dateOfBirth,
+          dateOfBirth: doctor.dateOfBirth.toDateString(),
           hourlyRate: doctor.hourlyRate,
           affiliation: doctor.affiliation,
           educationalBackground: doctor.educationalBackground,
@@ -47,7 +47,7 @@ doctorsRouter.get(
 )
 
 doctorsRouter.patch(
-  '/:id',
+  '/:username',
   validate(UpdateDoctorRequestValidator),
   asyncWrapper<UpdateDoctorRequest>(async (req, res) => {
     if (req.username == null) {
@@ -55,10 +55,7 @@ doctorsRouter.patch(
     }
 
     const admin = await isAdmin(req.username)
-    const sameUser = await isUsernameLinkedToDoctorWithId(
-      req.username,
-      req.params.id
-    )
+    const sameUser = req.username === req.params.username
 
     if (!admin && !sameUser) {
       throw new APIError(
@@ -67,7 +64,10 @@ doctorsRouter.patch(
       )
     }
 
-    const updatedDoctor = await updateDoctor(req.params.id, req.body)
+    const updatedDoctor = await updateDoctorByUsername(
+      req.params.username,
+      req.body
+    )
 
     res.send(
       new UpdateDoctorResponse(
@@ -75,7 +75,7 @@ doctorsRouter.patch(
         updatedDoctor.user.username,
         updatedDoctor.name,
         updatedDoctor.email,
-        updatedDoctor.dateOfBirth,
+        updatedDoctor.dateOfBirth.toDateString(),
         updatedDoctor.hourlyRate,
         updatedDoctor.affiliation,
         updatedDoctor.educationalBackground,
@@ -104,6 +104,50 @@ doctorsRouter.get(
           educationalBackground: doctor.educationalBackground,
           speciality: doctor.speciality,
         }))
+      )
+    )
+  })
+)
+
+// Get all (approved) doctors
+doctorsRouter.get(
+  '/all',
+  asyncWrapper(async (req, res) => {
+    const doctors = await getAllDoctors()
+
+    res.send(
+      new GetApprovedDoctorsResponse(
+        doctors.map((doctor) => ({
+          id: doctor.id,
+          username: doctor.user.username,
+          name: doctor.name,
+          email: doctor.email,
+          dateOfBirth: doctor.dateOfBirth.toDateString(),
+          hourlyRate: doctor.hourlyRate,
+          affiliation: doctor.affiliation,
+          educationalBackground: doctor.educationalBackground,
+        }))
+      )
+    )
+  })
+)
+
+doctorsRouter.get(
+  '/:username',
+  allowAuthenticated,
+  asyncWrapper(async (req, res) => {
+    const doctor = await getDoctorByUsername(req.params.username)
+
+    res.send(
+      new GetDoctorResponse(
+        doctor.id,
+        doctor.user.username,
+        doctor.name,
+        doctor.email,
+        doctor.dateOfBirth.toDateString(),
+        doctor.hourlyRate,
+        doctor.affiliation,
+        doctor.educationalBackground
       )
     )
   })
