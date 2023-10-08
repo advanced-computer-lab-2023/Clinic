@@ -4,7 +4,7 @@ import {
   type PrescriptionDocument,
 } from '../models/prescription.model'
 
-import { type DoctorDocument } from '../models/doctor.model'
+import { DoctorModel, type DoctorDocument } from '../models/doctor.model'
 import { NotFoundError } from '../errors'
 import { PatientModel, type PatientDocument } from '../models/patient.model'
 import { type UserDocument } from '../models/user.model'
@@ -20,10 +20,22 @@ type PrescriptionDocumentWithDoctor = Omit<
 }
 
 export async function getPrescriptions(
-  id: string
+  userName: string
 ): Promise<PrescriptionDocumentWithDoctor[]> {
+  const User = await UserModel.findOne({
+    username: userName,
+  })
+  if (User == null) {
+    throw new NotFoundError()
+  }
+  const Patient = await PatientModel.findOne({
+    user: User.id,
+  }).populate<{ user: UserDocument }>('user')
+  if (Patient == null) {
+    throw new NotFoundError()
+  }
   const prescription = await PrescriptionModel.find({
-    patient: id.split('=', 2)[1],
+    patient: Patient.id,
   })
     .populate<{
       doctor: DoctorDocument
@@ -37,23 +49,36 @@ export async function getPrescriptions(
 }
 export async function createPrescription(
   request: CreatePrescriptionRequest,
-  doctorId: string
+  doctorUsername: string
 ): Promise<void> {
-  const User = await UserModel.findOne({
+  const DoctorUser = await UserModel.findOne({
+    username: doctorUsername,
+  })
+  if (DoctorUser == null) {
+    throw new NotFoundError()
+  }
+  const Doctor = await DoctorModel.findOne({
+    user: DoctorUser.id,
+  }).populate<{ user: UserDocument }>('user')
+  if (Doctor == null) {
+    throw new NotFoundError()
+  }
+  const PatientUser = await UserModel.findOne({
     username: request.patient,
   })
-  if (User == null) {
+  if (PatientUser == null) {
     throw new NotFoundError()
   }
   const Patient = await PatientModel.findOne({
-    user: User.id,
+    user: PatientUser.id,
   }).populate<{ user: UserDocument }>('user')
   if (Patient == null) {
     throw new NotFoundError()
   }
   await PrescriptionModel.create({
     date: request.date,
-    doctor: doctorId.split('=', 2)[1],
+    doctor: Doctor.id,
     patient: Patient.id,
+    medicine: request.medicine,
   })
 }

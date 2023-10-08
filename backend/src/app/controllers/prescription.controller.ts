@@ -12,15 +12,17 @@ import {
 } from '../services/prescription.service'
 import { NotAuthenticatedError } from '../errors/auth.errors'
 import { isDoctorAndApproved } from '../services/auth.service'
-import { isUsernameLinkedToDoctorWithId } from '../services/doctor.service'
+
 import { APIError } from '../errors'
 export const prescriptionsRouter = Router()
 
 prescriptionsRouter.get(
-  '/:id',
+  '/',
   asyncWrapper(async (req, res) => {
-    const id = req.params.id
-    const prescriptionRequests = await getPrescriptions(id)
+    if (req.username == null) {
+      throw new NotAuthenticatedError()
+    }
+    const prescriptionRequests = await getPrescriptions(req.username)
     res.send(
       new GetPrescriptionResponse(
         prescriptionRequests.map((prescription) => ({
@@ -35,25 +37,20 @@ prescriptionsRouter.get(
 )
 
 prescriptionsRouter.post(
-  '/:id',
+  '/',
   validate(CreatePrescriptionRequestValidator),
   asyncWrapper<CreatePrescriptionRequest>(async (req, res) => {
-    const id = req.params.id
     if (req.username == null) {
       throw new NotAuthenticatedError()
     }
 
     const doctor = await isDoctorAndApproved(req.username)
-    const sameUser = await isUsernameLinkedToDoctorWithId(
-      req.username,
-      req.params.id
-    )
 
-    if (!doctor && !sameUser) {
+    if (!doctor) {
       throw new APIError('Only Doctors can add a prescription', 403)
     }
 
-    await createPrescription(req.body, id)
+    await createPrescription(req.body, req.username)
     res.status(200).json('Prescription added Successfully')
   })
 )
