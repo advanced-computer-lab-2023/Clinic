@@ -1,4 +1,5 @@
 import { getDoctor, updateDoctor } from '@/api/doctor'
+import { AlertsBox } from '@/components/AlertsBox'
 import { CardPlaceholder } from '@/components/CardPlaceholder'
 import { useAlerts } from '@/hooks/alerts'
 import { useAuth } from '@/hooks/auth'
@@ -6,9 +7,10 @@ import { Alert } from '@/providers/AlertsProvider'
 import { UpdateDoctorRequest } from '@/types/doctor.types'
 import { UpdateDoctorRequestValidator } from '@/validators/doctor.validator'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Button, Card, CardContent, Stack, TextField } from '@mui/material'
+import { Card, CardContent, Stack, TextField } from '@mui/material'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
+import { LoadingButton } from '@mui/lab'
 
 export function UpdateProfile() {
   const {
@@ -32,7 +34,9 @@ export function UpdateProfile() {
       queryClient.invalidateQueries({
         queryKey: ['doctors', user!.username],
       })
-      addAlert(new Alert('Profile updated successfully!', 'success'))
+      addAlert(
+        new Alert('Profile updated successfully!', 'success', 'profile-form')
+      )
     },
     onError: (e) => {
       console.log(e)
@@ -47,6 +51,7 @@ export function UpdateProfile() {
   return (
     <form onSubmit={handleSubmit((data) => mutation.mutateAsync(data))}>
       <Card>
+        <AlertsBox scope="profile-form" />
         <CardContent>
           <Stack spacing={2}>
             <TextField
@@ -75,9 +80,10 @@ export function UpdateProfile() {
               helperText={errors.affiliation?.message as string}
               defaultValue={query.data?.affiliation}
             />
-            <Button type="submit" variant="contained">
+
+            <LoadingButton loading={mutation.isLoading} type="submit">
               Update
-            </Button>
+            </LoadingButton>
           </Stack>
         </CardContent>
       </Card>

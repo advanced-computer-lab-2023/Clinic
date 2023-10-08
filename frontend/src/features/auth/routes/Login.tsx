@@ -6,9 +6,10 @@ import { LoginRequest } from '@/types/auth.types'
 import { LoginRequestValidator } from '@/validators/user.validator'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ArrowForward } from '@mui/icons-material'
-import { Button, Card, CardContent, Grid, TextField } from '@mui/material'
+import { Card, CardContent, Grid, TextField } from '@mui/material'
 import { useMutation } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
+import { LoadingButton } from '@mui/lab'
 
 export const Login = () => {
   const {
@@ -54,7 +55,8 @@ export const Login = () => {
               />
             </Grid>
             <Grid item xs={12}>
-              <Button
+              <LoadingButton
+                loading={mutation.isLoading}
                 type="submit"
                 fullWidth
                 variant="contained"
@@ -62,7 +64,7 @@ export const Login = () => {
                 size="large"
               >
                 Login
-              </Button>
+              </LoadingButton>
             </Grid>
           </Grid>
         </CardContent>
