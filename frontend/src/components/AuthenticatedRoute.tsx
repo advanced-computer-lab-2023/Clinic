@@ -19,7 +19,6 @@ export function AuthenticatedRoute({
   }
 
   if (requiredUserType && user.type !== requiredUserType) {
-    console.log('user.type', user.type)
     return (
       <div>
         <h1>Unauthorized</h1>
