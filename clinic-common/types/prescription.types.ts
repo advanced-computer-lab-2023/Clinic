@@ -21,7 +21,8 @@ export class PrescriptionResponseBase {
     public doctor: string,
     public patient: string,
     public date: Date,
-    public status: string
+    public isFilled: boolean, // FE will show it as Filled or UnFilled,
+    public medicine: string
   ) {}
 }
 // export class GetPrescriptionResponse {
