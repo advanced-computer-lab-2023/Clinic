@@ -99,7 +99,7 @@ authRouter.post(
         doctor.user.username,
         doctor.name,
         doctor.email,
-        doctor.dateOfBirth.toDateString(),
+        doctor.dateOfBirth,
         doctor.hourlyRate,
         doctor.affiliation,
         doctor.educationalBackground,

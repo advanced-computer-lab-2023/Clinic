@@ -23,7 +23,7 @@ export class DoctorResponseBase {
      * received as a string not a Date, even if you send a Date.
      *
      **/
-    public dateOfBirth: string,
+    public dateOfBirth: Date,
     public hourlyRate: number,
     public affiliation: string,
     public educationalBackground: string,
@@ -36,8 +36,34 @@ export class GetPendingDoctorsResponse {
   constructor(public doctors: DoctorResponseBase[]) {}
 }
 
+export class ApprovedDoctorsResponse extends DoctorResponseBase {
+  constructor(
+    id: string,
+    username: string,
+    name: string,
+    email: string,
+    dateOfBirth: Date,
+    hourlyRate: number,
+    affiliation: string,
+    educationalBackground: string,
+    speciality: string,
+    public sessionRate: number // Additional property
+  ) {
+    super(
+      id,
+      username,
+      name,
+      email,
+      dateOfBirth,
+      hourlyRate,
+      affiliation,
+      educationalBackground,
+      speciality
+    )
+  }
+}
 export class GetApprovedDoctorsResponse {
-  constructor(public doctors: DoctorResponseBase[]) {}
+  constructor(public doctors: ApprovedDoctorsResponse[]) {}
 }
 
 export type UpdateDoctorRequest = z.infer<typeof UpdateDoctorRequestValidator>

@@ -1,18 +1,45 @@
 import { Router } from 'express'
 
 import { asyncWrapper } from '../utils/asyncWrapper'
-import { getPatientByName } from '../services/patient.service'
-import { GetPatientResponse } from 'clinic-common/types/patient.types'
-import { NotAuthenticatedError } from '../errors/auth.errors'
+import { getPatientByID, getPatientByName } from '../services/patient.service'
+import {
+  GetPatientResponse,
+  PatientResponseBase,
+} from 'clinic-common/types/patient.types'
+
+import { allowApprovedDoctors } from '../middlewares/auth.middleware'
 
 export const patientRouter = Router()
 
 patientRouter.get(
-  '/search',
+  '/:id',
+  asyncWrapper(allowApprovedDoctors),
   asyncWrapper(async (req, res) => {
-    if (req.username == null) {
-      throw new NotAuthenticatedError()
-    }
+    const id = req.params.id
+
+    const patient = await getPatientByID(id)
+    res.send(
+      new PatientResponseBase(
+        patient.id,
+        patient.user.username,
+        patient.name,
+        patient.email,
+        patient.mobileNumber,
+        patient.dateOfBirth,
+        patient.gender,
+        {
+          name: patient.emergencyContact?.name ?? '',
+          mobileNumber: patient.emergencyContact?.mobileNumber ?? '',
+        }
+      )
+    )
+  })
+)
+
+patientRouter.get(
+  '/search',
+  asyncWrapper(allowApprovedDoctors),
+  asyncWrapper(async (req, res) => {
     const name = req.query.name as string
 
     const patients = await getPatientByName(name)

@@ -35,7 +35,7 @@ doctorsRouter.get(
           username: doctor.user.username,
           name: doctor.name,
           email: doctor.email,
-          dateOfBirth: doctor.dateOfBirth.toDateString(),
+          dateOfBirth: doctor.dateOfBirth,
           hourlyRate: doctor.hourlyRate,
           affiliation: doctor.affiliation,
           educationalBackground: doctor.educationalBackground,
@@ -75,7 +75,7 @@ doctorsRouter.patch(
         updatedDoctor.user.username,
         updatedDoctor.name,
         updatedDoctor.email,
-        updatedDoctor.dateOfBirth.toDateString(),
+        updatedDoctor.dateOfBirth,
         updatedDoctor.hourlyRate,
         updatedDoctor.affiliation,
         updatedDoctor.educationalBackground,
@@ -87,7 +87,7 @@ doctorsRouter.patch(
 
 // Get all (approved) doctors
 doctorsRouter.get(
-  '/all',
+  '/approved',
   asyncWrapper(async (req, res) => {
     const doctors = await getAllDoctors()
 
@@ -98,35 +98,12 @@ doctorsRouter.get(
           username: doctor.user.username,
           name: doctor.name,
           email: doctor.email,
-          dateOfBirth: doctor.dateOfBirth.toDateString(),
-          hourlyRate: doctor.hourlyRate,
-          affiliation: doctor.affiliation,
-          educationalBackground: doctor.educationalBackground,
-          speciality: doctor.speciality,
-        }))
-      )
-    )
-  })
-)
-
-// Get all (approved) doctors
-doctorsRouter.get(
-  '/all',
-  asyncWrapper(async (req, res) => {
-    const doctors = await getAllDoctors()
-
-    res.send(
-      new GetApprovedDoctorsResponse(
-        doctors.map((doctor) => ({
-          id: doctor.id,
-          username: doctor.user.username,
-          name: doctor.name,
-          email: doctor.email,
-          dateOfBirth: doctor.dateOfBirth.toDateString(),
+          dateOfBirth: doctor.dateOfBirth,
           hourlyRate: doctor.hourlyRate,
           affiliation: doctor.affiliation,
           speciality: doctor.speciality,
           educationalBackground: doctor.educationalBackground,
+          sessionRate: doctor.hourlyRate * 1.1 - Math.random() * 10, // this is a random discount till the pachage part is done
         }))
       )
     )
@@ -145,7 +122,7 @@ doctorsRouter.get(
         doctor.user.username,
         doctor.name,
         doctor.email,
-        doctor.dateOfBirth.toDateString(),
+        doctor.dateOfBirth,
         doctor.hourlyRate,
         doctor.affiliation,
         doctor.speciality,

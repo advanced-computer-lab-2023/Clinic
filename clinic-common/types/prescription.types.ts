@@ -10,8 +10,9 @@ export class PrescriptionResponseBase {
   constructor(
     public doctor: string,
     public patient: string,
-    public date: string,
-    public status: string
+    public date: Date,
+    public isFilled: boolean, // FE will show it as Filled or UnFilled,
+    public medicine: string
   ) {}
 }
 
