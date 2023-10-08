@@ -19,8 +19,8 @@ patientRouter.get(
     res.send(
       new GetPatientResponse(
         patients.map((patient) => ({
-          username: patient.username,
-          password: patient.password,
+          id: patient.id,
+          username: patient.user.username,
           name: patient.name,
           email: patient.email,
           mobileNumber: patient.mobileNumber,

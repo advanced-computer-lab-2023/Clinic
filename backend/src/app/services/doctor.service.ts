@@ -1,9 +1,8 @@
 import { DoctorModel, type DoctorDocument } from '../models/doctor.model'
-import type { UserDocument } from '../models/user.model'
+import { UserModel, type UserDocument } from '../models/user.model'
 import type { UpdateDoctorRequest } from '../types/doctor.types'
 import { NotFoundError } from '../errors'
 import { type WithUser } from '../utils/typeUtils'
-
 /**
  * TODO: Replace DoctorDocumentWithUser with WithUser<DoctorDocument>,
  * leaving it for now not to break other PRs
@@ -20,13 +19,21 @@ export async function getPendingDoctorRequests(): Promise<
   return models
 }
 
-export async function updateDoctor(
-  id: string,
+export async function updateDoctorByUsername(
+  username: string,
   request: UpdateDoctorRequest
 ): Promise<DoctorDocumentWithUser> {
-  const updatedDoctor = await DoctorModel.findByIdAndUpdate(id, request, {
-    new: true,
-  }).populate<{
+  const user = await UserModel.findOne({ username })
+
+  if (user == null) throw new NotFoundError()
+
+  const updatedDoctor = await DoctorModel.findOneAndUpdate(
+    { user: user.id },
+    request,
+    {
+      new: true,
+    }
+  ).populate<{
     user: UserDocument
   }>('user')
 
@@ -37,21 +44,6 @@ export async function updateDoctor(
   return updatedDoctor
 }
 
-export async function isUsernameLinkedToDoctorWithId(
-  username: string,
-  id: string
-): Promise<boolean> {
-  const doctor = await DoctorModel.findById(id).populate<{
-    user: UserDocument
-  }>('user')
-
-  if (doctor == null) {
-    throw new NotFoundError()
-  }
-
-  return doctor.user.username === username
-}
-
 // fetches approved doctors only
 export async function getAllDoctors(): Promise<DoctorDocumentWithUser[]> {
   const models = await DoctorModel.find({
@@ -59,4 +51,20 @@ export async function getAllDoctors(): Promise<DoctorDocumentWithUser[]> {
   }).populate<{ user: UserDocument }>('user')
 
   return models
+}
+
+export async function getDoctorByUsername(
+  username: string
+): Promise<DoctorDocumentWithUser> {
+  const user = await UserModel.findOne({ username })
+
+  if (user == null) throw new NotFoundError()
+
+  const doctor = await DoctorModel.findOne({ user: user.id }).populate<{
+    user: UserDocument
+  }>('user')
+
+  if (doctor == null) throw new NotFoundError()
+
+  return doctor
 }
