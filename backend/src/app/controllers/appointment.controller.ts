@@ -7,20 +7,15 @@ export const appointmentsRouter = Router()
 appointmentsRouter.get(
   '/filter',
   asyncWrapper(async (req, res) => {
-    try {
-      const { date, status } = req.body
-      const query: any = {}
-      if (date !== null) {
-        query.date = date
-      }
-      if (status !== null) {
-        query.status = status
-      }
-      const filterAppointments = await getfilteredAppointments(query)
-      res.send(filterAppointments)
-    } catch (error) {
-      console.error(error)
-      res.status(500).json({ message: 'Server Error' })
+    const { date, status } = req.body
+    const query: any = {}
+    if (date !== null) {
+      query.date = date
     }
+    if (status !== null) {
+      query.status = status
+    }
+    const filterAppointments = await getfilteredAppointments(query)
+    res.send(filterAppointments)
   })
 )
