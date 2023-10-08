@@ -58,6 +58,7 @@ debugRouter.post(
       hourlyRate: faker.number.float().toPrecision(2),
       affiliation: faker.company.name(),
       educationalBackground: faker.company.name(),
+      speciality: 'oncology', // TODO (fareedah): randomize speciality from list of specialities
       requestStatus: DoctorStatus.Approved,
     })
 
@@ -82,6 +83,7 @@ debugRouter.post(
       hourlyRate: faker.number.float().toPrecision(2),
       affiliation: faker.company.name(),
       educationalBackground: faker.company.name(),
+      speciality: 'dermatology',
       requestStatus: DoctorStatus.Pending,
     })
 

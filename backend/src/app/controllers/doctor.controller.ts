@@ -39,6 +39,7 @@ doctorsRouter.get(
           hourlyRate: doctor.hourlyRate,
           affiliation: doctor.affiliation,
           educationalBackground: doctor.educationalBackground,
+          speciality: doctor.speciality,
         }))
       )
     )
@@ -77,7 +78,32 @@ doctorsRouter.patch(
         updatedDoctor.dateOfBirth.toDateString(),
         updatedDoctor.hourlyRate,
         updatedDoctor.affiliation,
-        updatedDoctor.educationalBackground
+        updatedDoctor.educationalBackground,
+        updatedDoctor.speciality
+      )
+    )
+  })
+)
+
+// Get all (approved) doctors
+doctorsRouter.get(
+  '/all',
+  asyncWrapper(async (req, res) => {
+    const doctors = await getAllDoctors()
+
+    res.send(
+      new GetApprovedDoctorsResponse(
+        doctors.map((doctor) => ({
+          id: doctor.id,
+          username: doctor.user.username,
+          name: doctor.name,
+          email: doctor.email,
+          dateOfBirth: doctor.dateOfBirth,
+          hourlyRate: doctor.hourlyRate,
+          affiliation: doctor.affiliation,
+          educationalBackground: doctor.educationalBackground,
+          speciality: doctor.speciality,
+        }))
       )
     )
   })

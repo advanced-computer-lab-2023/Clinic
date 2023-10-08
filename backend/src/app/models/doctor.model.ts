@@ -13,6 +13,7 @@ const doctorSchema = new Schema(
     hourlyRate: { type: Number, required: true },
     affiliation: { type: String, required: true },
     educationalBackground: { type: String, required: true },
+    speciality: { type: String, required: true },
     requestStatus: {
       type: String,
       required: true,
