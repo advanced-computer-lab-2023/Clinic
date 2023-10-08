@@ -14,7 +14,8 @@ export async function getfilteredAppointments(
     query.status !== null &&
     query.status !== ''
   ) {
-    return await AppointmentModel.find({ date: query.date }).find({
+    return await AppointmentModel.find({
+      date: query.date,
       status: query.status,
     })
   } else if (
