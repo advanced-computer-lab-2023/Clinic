@@ -47,6 +47,7 @@ export async function getPrescriptions(
   }
   return prescription
 }
+
 export async function createPrescription(
   request: CreatePrescriptionRequest,
   doctorUsername: string

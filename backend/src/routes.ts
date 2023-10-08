@@ -14,6 +14,7 @@ import {
 
 import { adminRouter } from './app/controllers/admin.controller'
 import { asyncWrapper } from './app/utils/asyncWrapper'
+import { healthPackagesRouter } from './app/controllers/healthPackage.controller'
 
 export const router = Router()
 
@@ -24,6 +25,7 @@ router.use('/debug', debugRouter)
 
 router.use('/prescriptions', prescriptionsRouter)
 router.use('/family-members', familyMemberRouter)
+router.use('/health-packages', healthPackagesRouter)
 router.use('/patients', patientRouter)
 router.use('/appointment', appointmentsRouter)
 router.use('/admins', asyncWrapper(allowAdmins), adminRouter)
