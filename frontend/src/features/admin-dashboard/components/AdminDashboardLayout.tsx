@@ -1,6 +1,6 @@
 import { AuthenticatedRoute } from '@/components/AuthenticatedRoute'
 import { useSidebar } from '@/hooks/sidebar'
-import { UserType } from '@/types/user.types'
+import { UserType } from 'clinic-common/types/user.types'
 import { PersonAdd } from '@mui/icons-material'
 import { Container } from '@mui/material'
 import { useEffect } from 'react'

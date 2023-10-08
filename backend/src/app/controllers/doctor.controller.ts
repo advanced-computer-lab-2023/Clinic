@@ -13,13 +13,13 @@ import {
   GetDoctorResponse,
   GetPendingDoctorsResponse,
   UpdateDoctorResponse,
-} from '../types/doctor.types'
-import type { UpdateDoctorRequest } from '../types/doctor.types'
+} from 'clinic-common/types/doctor.types'
+import type { UpdateDoctorRequest } from 'clinic-common/types/doctor.types'
 import { isAdmin } from '../services/auth.service'
 import { NotAuthenticatedError } from '../errors/auth.errors'
 import { APIError } from '../errors'
 import { validate } from '../middlewares/validation.middleware'
-import { UpdateDoctorRequestValidator } from '../validators/doctor.validator'
+import { UpdateDoctorRequestValidator } from 'clinic-common/validators/doctor.validator'
 
 export const doctorsRouter = Router()
 

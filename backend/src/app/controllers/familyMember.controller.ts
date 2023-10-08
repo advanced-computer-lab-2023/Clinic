@@ -8,9 +8,9 @@ import {
   type AddFamilyMemberRequest,
   AddFamilyMemberResponse,
   GetFamilyMembersResponse,
-} from '../types/familyMember.types'
+} from 'clinic-common/types/familyMember.types'
 import { allowAuthenticated } from '../middlewares/auth.middleware'
-import { AddFamilyMemberRequestValidator } from '../validators/familyMembers.validator'
+import { AddFamilyMemberRequestValidator } from 'clinic-common/validators/familyMembers.validator'
 import { validate } from '../middlewares/validation.middleware'
 
 export const familyMemberRouter = Router()

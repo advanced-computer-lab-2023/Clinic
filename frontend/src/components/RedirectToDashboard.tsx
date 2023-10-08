@@ -1,5 +1,5 @@
 import { useAuth } from '@/hooks/auth'
-import { UserType } from '@/types/user.types'
+import { UserType } from 'clinic-common/types/user.types'
 import { Navigate } from 'react-router-dom'
 
 export function RedirectToDashboard() {

@@ -2,7 +2,7 @@ import { Router } from 'express'
 
 import { asyncWrapper } from '../utils/asyncWrapper'
 import { getPatientByName } from '../services/patient.service'
-import { GetPatientResponse } from '../types/patient.types'
+import { GetPatientResponse } from 'clinic-common/types/patient.types'
 import { NotAuthenticatedError } from '../errors/auth.errors'
 
 export const patientRouter = Router()

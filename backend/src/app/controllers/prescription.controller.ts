@@ -6,7 +6,7 @@ import {
   type CreatePrescriptionRequest,
   CreatePrescriptionRequestValidator,
   CreatePrescriptionResponse,
-} from '../types/prescription.types'
+} from 'clinic-common/types/prescription.types'
 
 export const prescriptionsRouter = Router()
 

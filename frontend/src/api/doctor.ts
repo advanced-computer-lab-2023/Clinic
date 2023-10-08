@@ -3,7 +3,7 @@ import {
   GetPendingDoctorsResponse,
   UpdateDoctorRequest,
   UpdateDoctorResponse,
-} from '@/types/doctor.types'
+} from 'clinic-common/types/doctor.types'
 import { api } from '.'
 
 export async function updateDoctor(
