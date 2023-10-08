@@ -1,11 +1,27 @@
 import type { HydratedDocument } from 'mongoose'
-import {
-  FamilyMemberModel,
-  type FamilyMemberDocument,
-} from '../models/familyMember.model'
+import { type FamilyMemberDocument } from '../models/familyMember.model'
+import { UserModel } from '../models/user.model'
+import { NotFoundError } from '../errors'
+import { PatientModel } from '../models/patient.model'
 
-export async function getRegisteredFamilyMembers(
-  username: string | undefined
+export async function getFamilyMembers(
+  username: string
 ): Promise<Array<HydratedDocument<FamilyMemberDocument>>> {
-  return await FamilyMemberModel.find({ relatedTo: username })
+  const user = await UserModel.findOne({ username })
+
+  if (user == null) {
+    throw new NotFoundError()
+  }
+
+  const patient = await PatientModel.findOne({ user: user.id }).populate<{
+    familyMembers: Array<HydratedDocument<FamilyMemberDocument>>
+  }>({
+    path: 'familyMembers',
+  })
+
+  if (patient == null) {
+    throw new NotFoundError()
+  }
+
+  return patient.familyMembers
 }
