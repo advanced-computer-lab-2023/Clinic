@@ -6,6 +6,7 @@ import { debugRouter } from './app/controllers/debug.controller'
 import { prescriptionsRouter } from './app/controllers/prescription.controller'
 import { familyMemberRouter } from './app/controllers/familyMember.controller'
 import { patientRouter } from './app/controllers/patient.controller'
+import { appointmentsRouter } from './app/controllers/appointment.controller'
 import {
   allowAdmins,
   allowAuthenticated,
@@ -24,7 +25,5 @@ router.use('/debug', debugRouter)
 router.use('/prescriptions', prescriptionsRouter)
 router.use('/family-members', familyMemberRouter)
 router.use('/patients', patientRouter)
-
-router.use('/admins',
-    asyncWrapper(allowAdmins),
-    adminRouter)
+router.use('/appointment', appointmentsRouter)
+router.use('/admins', asyncWrapper(allowAdmins), adminRouter)

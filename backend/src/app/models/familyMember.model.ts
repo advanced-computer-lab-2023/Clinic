@@ -9,7 +9,6 @@ const familyMemberSchema = new Schema(
     age: { type: Number, required: true },
     gender: { type: String, required: true },
     relation: { type: String, required: true },
-
     /**
      * Removed this in favor of PatientModel.familyMembers, it makes the query
      * easier and more efficient. And we usually start from the patient and get
