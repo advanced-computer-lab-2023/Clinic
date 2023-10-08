@@ -8,7 +8,6 @@ import { APIError } from '../errors'
 import { AdminModel } from '../models/admin.model'
 import { hash } from 'bcrypt'
 import { UserType } from '../types/user.types'
-import { PatientModel } from '../models/patient.model'
 
 import { faker } from '@faker-js/faker'
 import { PatientModel } from '../models/patient.model'
