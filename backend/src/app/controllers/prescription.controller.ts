@@ -32,6 +32,7 @@ prescriptionsRouter.get(
           patient: prescription.patient.name,
           date: prescription.date.toDateString(),
           status: prescription.status ? 'Filled' : 'UnFilled',
+          medicine: prescription.medicine,
         }))
       )
     )

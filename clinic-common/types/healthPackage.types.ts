@@ -11,12 +11,16 @@ export type UpdateHealthPackageRequest = z.infer<
   typeof UpdateHealthPackageRequestValidator
 >
 export class HealthPackageResponseBase {
-    constructor(
-      public name: string,
-      public pricePerYear: mongoose.Types.Decimal128,
-      public sessionDiscount: mongoose.Types.Decimal128,
-      public medicineDiscount: mongoose.Types.Decimal128,
-      public familyMemberSubscribtionDiscount: mongoose.Types.Decimal128,
-    ) {}
-  }
-  export class UpdateHealthPackageResponse extends HealthPackageResponseBase {}
+  constructor(
+    public name: string,
+    public pricePerYear: number,
+    public sessionDiscount: number,
+    public medicineDiscount: number,
+    public familyMemberSubscribtionDiscount: number
+  ) {}
+}
+export class UpdateHealthPackageResponse extends HealthPackageResponseBase {}
+
+export class GetAllHealthPackagesResponse {
+  constructor(public healthPackages: HealthPackageResponseBase[]) {}
+}

@@ -4,18 +4,20 @@ import {
   UpdateHealthPackageResponse,
   type UpdateHealthPackageRequest,
   type createHealthPackageRequest,
+  GetAllHealthPackagesResponse,
 } from 'clinic-common/types/healthPackage.types'
 import { asyncWrapper } from '../utils/asyncWrapper'
 import { allowAdmins } from '../middlewares/auth.middleware'
 import {
   addHealthPackages,
+  getAllHealthPackages,
+  removeHealthPackage,
   updateHealthPackage,
 } from '../services/healthPackage.service'
 import {
   CreateHealthPackageRequestValidator,
   UpdateHealthPackageRequestValidator,
 } from 'clinic-common/validators/healthPackage.validator'
-import type mongoose from 'mongoose'
 
 export const healthPackagesRouter = Router()
 
@@ -40,10 +42,37 @@ healthPackagesRouter.patch(
     res.send(
       new UpdateHealthPackageResponse(
         updatedHealthPackage.name,
-        updatedHealthPackage.pricePerYear as mongoose.Types.Decimal128,
-        updatedHealthPackage.sessionDiscount as mongoose.Types.Decimal128,
-        updatedHealthPackage.medicineDiscount as mongoose.Types.Decimal128,
-        updatedHealthPackage.familyMemberSubscribtionDiscount as mongoose.Types.Decimal128
+        updatedHealthPackage.pricePerYear,
+        updatedHealthPackage.sessionDiscount,
+        updatedHealthPackage.medicineDiscount,
+        updatedHealthPackage.familyMemberSubscribtionDiscount
+      )
+    )
+  })
+)
+healthPackagesRouter.delete(
+  '/:name',
+  asyncWrapper(allowAdmins),
+  asyncWrapper(async (req, res) => {
+    await removeHealthPackage(req.params.name)
+    res.send('deletedSuccefuly')
+  })
+)
+
+healthPackagesRouter.get(
+  '/',
+  asyncWrapper(async (req, res) => {
+    const healthPackages = await getAllHealthPackages()
+    res.send(
+      new GetAllHealthPackagesResponse(
+        healthPackages.map((health) => ({
+          name: health.name,
+          pricePerYear: health.pricePerYear,
+          sessionDiscount: health.sessionDiscount,
+          medicineDiscount: health.medicineDiscount,
+          familyMemberSubscribtionDiscount:
+            health.familyMemberSubscribtionDiscount,
+        }))
       )
     )
   })

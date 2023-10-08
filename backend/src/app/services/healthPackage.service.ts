@@ -25,7 +25,6 @@ export async function updateHealthPackage(
   request: UpdateHealthPackageRequest
 ): Promise<HealthPackageDocument> {
   if (packageName == null) throw new NotFoundError()
-  console.log(packageName)
   const updatedHealthPackage = await HealthPackageModel.findOneAndUpdate(
     { name: packageName },
     request,
@@ -33,10 +32,24 @@ export async function updateHealthPackage(
       new: true,
     }
   )
-
   if (updatedHealthPackage == null) {
     throw new NotFoundError()
   }
 
   return updatedHealthPackage
+}
+export async function removeHealthPackage(packageName: string): Promise<void> {
+  const healthPackage = await HealthPackageModel.findOneAndDelete({
+    name: packageName,
+  })
+  if (healthPackage == null) {
+    throw new NotFoundError()
+  }
+}
+export async function getAllHealthPackages(): Promise<HealthPackageDocument[]> {
+  const healthPackages = await HealthPackageModel.find({})
+  if (healthPackages == null) {
+    throw new NotFoundError()
+  }
+  return healthPackages
 }
