@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import { asyncWrapper } from '../utils/asyncWrapper'
-import { DoctorModel } from '../models/doctor.model'
-import { UserModel } from '../models/user.model'
+import { type DoctorDocument, DoctorModel } from '../models/doctor.model'
+import { type UserDocument, UserModel } from '../models/user.model'
 import { DoctorStatus } from 'clinic-common/types/doctor.types'
 import { allowAuthenticated } from '../middlewares/auth.middleware'
 import { APIError } from '../errors'
@@ -12,6 +12,8 @@ import { UserType } from 'clinic-common/types/user.types'
 import { faker } from '@faker-js/faker'
 import { PatientModel } from '../models/patient.model'
 import { FamilyMemberModel } from '../models/familyMember.model'
+import { type WithUser } from '../utils/typeUtils'
+import { PrescriptionModel } from '../models/prescription.model'
 
 const bcryptSalt = process.env.BCRYPT_SALT ?? '$2b$10$13bXTGGukQXsCf5hokNe2u'
 
@@ -35,6 +37,31 @@ function randomEmail(): string {
   return faker.internet.userName() + '_' + randomShortId() + '@gmail.com'
 }
 
+// Creates a random doctor with random data and password 'doctor',
+async function createDummyDoctor(): Promise<WithUser<DoctorDocument>> {
+  const user = await UserModel.create({
+    username: randomUsername('doctor'),
+    password: await hash('doctor', bcryptSalt),
+    type: UserType.Doctor,
+  })
+
+  const doctor = await DoctorModel.create({
+    user: user.id,
+    name: faker.person.fullName(),
+    email: randomEmail(),
+    dateOfBirth: faker.date.past(),
+    hourlyRate: faker.number.float().toPrecision(2),
+    affiliation: faker.company.name(),
+    educationalBackground: faker.company.name(),
+    speciality: faker.helpers.arrayElement(specialities),
+    requestStatus: DoctorStatus.Approved,
+  })
+
+  return await doctor.populate<{
+    user: UserDocument
+  }>('user')
+}
+
 /**
  * This is a controller that has some helper endpoints for debugging purposes.
  */
@@ -46,25 +73,7 @@ const specialities = ['oncology', 'dermatology', 'cardiology', 'neurology']
 debugRouter.post(
   '/create-doctor',
   asyncWrapper(async (req, res) => {
-    const user = await UserModel.create({
-      username: randomUsername('doctor'),
-      password: await hash('doctor', bcryptSalt),
-      type: UserType.Doctor,
-    })
-
-    const doctor = await DoctorModel.create({
-      user: user.id,
-      name: faker.person.fullName(),
-      email: randomEmail(),
-      dateOfBirth: faker.date.past(),
-      hourlyRate: faker.number.float().toPrecision(2),
-      affiliation: faker.company.name(),
-      educationalBackground: faker.company.name(),
-      speciality: faker.helpers.arrayElement(specialities),
-      requestStatus: DoctorStatus.Approved,
-    })
-
-    res.send(await doctor.populate('user'))
+    res.send(await createDummyDoctor())
   })
 )
 
@@ -202,6 +211,7 @@ debugRouter.post(
  * This endpoint creates a patient with random data and password 'patient',
  * and returns the created patient, for testing purposes.
  * It also creates some family members for the patient.
+ * It also creates some prescriptions for the patient.
  */
 debugRouter.post(
   '/create-patient',
@@ -242,6 +252,18 @@ debugRouter.post(
       })
 
       patient.familyMembers.push(familyMember.id)
+    }
+
+    for (let i = 0; i < 3; i++) {
+      const doctor = await createDummyDoctor()
+
+      await PrescriptionModel.create({
+        patient: patient.id,
+        doctor: doctor.id,
+        date: faker.date.past(),
+        medicine: faker.lorem.sentence(),
+        isFilled: faker.datatype.boolean(),
+      })
     }
 
     await patient.save()
