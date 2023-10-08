@@ -30,7 +30,7 @@ prescriptionsRouter.get(
         prescriptionRequests.map((prescription) => ({
           doctor: prescription.doctor.name,
           patient: prescription.patient.name,
-          date: prescription.date,
+          date: prescription.date.toDateString(),
           status: prescription.status ? 'Filled' : 'UnFilled',
         }))
       )
