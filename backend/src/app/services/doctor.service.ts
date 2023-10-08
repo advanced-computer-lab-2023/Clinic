@@ -7,7 +7,7 @@ import { type WithUser } from '../utils/typeUtils'
  * TODO: Replace DoctorDocumentWithUser with WithUser<DoctorDocument>,
  * leaving it for now not to break other PRs
  */
-type DoctorDocumentWithUser = WithUser<DoctorDocument>
+export type DoctorDocumentWithUser = WithUser<DoctorDocument>
 
 export async function getPendingDoctorRequests(): Promise<
   DoctorDocumentWithUser[]

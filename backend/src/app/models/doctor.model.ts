@@ -5,7 +5,6 @@ const Schema = mongoose.Schema
 
 const doctorSchema = new Schema(
   {
-    username: { type: String, required: false, unique: true },
     user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
