@@ -6,23 +6,15 @@ import {
   GetPatientResponse,
   PatientResponseBase,
 } from 'clinic-common/types/patient.types'
-import {
-  NotAuthenticatedError,
-  NotAuthorizedError,
-} from '../errors/auth.errors'
-import { isDoctorAndApproved } from '../services/auth.service'
+
+import { allowApprovedDoctors } from '../middlewares/auth.middleware'
 
 export const patientRouter = Router()
 
 patientRouter.get(
-  '/view/:id',
+  '/:id',
+  asyncWrapper(allowApprovedDoctors),
   asyncWrapper(async (req, res) => {
-    if (req.username == null) {
-      throw new NotAuthenticatedError()
-    }
-    if (!(await isDoctorAndApproved(req.username))) {
-      throw new NotAuthorizedError()
-    }
     const id = req.params.id
 
     const patient = await getPatientByID(id)
@@ -46,13 +38,8 @@ patientRouter.get(
 
 patientRouter.get(
   '/search',
+  asyncWrapper(allowApprovedDoctors),
   asyncWrapper(async (req, res) => {
-    if (req.username == null) {
-      throw new NotAuthenticatedError()
-    }
-    if (!(await isDoctorAndApproved(req.username))) {
-      throw new NotAuthorizedError()
-    }
     const name = req.query.name as string
 
     const patients = await getPatientByName(name)
