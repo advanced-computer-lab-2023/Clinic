@@ -41,6 +41,8 @@ function randomEmail(): string {
 
 export const debugRouter = Router()
 
+const specialities = ['oncology', 'dermatology', 'cardiology', 'neurology']
+
 debugRouter.post(
   '/create-doctor',
   asyncWrapper(async (req, res) => {
@@ -58,7 +60,7 @@ debugRouter.post(
       hourlyRate: faker.number.float().toPrecision(2),
       affiliation: faker.company.name(),
       educationalBackground: faker.company.name(),
-      speciality: 'oncology', // TODO (fareedah): randomize speciality from list of specialities
+      speciality: faker.helpers.arrayElement(specialities),
       requestStatus: DoctorStatus.Approved,
     })
 
@@ -83,7 +85,7 @@ debugRouter.post(
       hourlyRate: faker.number.float().toPrecision(2),
       affiliation: faker.company.name(),
       educationalBackground: faker.company.name(),
-      speciality: 'dermatology',
+      speciality: faker.helpers.arrayElement(specialities),
       requestStatus: DoctorStatus.Pending,
     })
 

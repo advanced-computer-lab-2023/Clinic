@@ -125,6 +125,7 @@ doctorsRouter.get(
           dateOfBirth: doctor.dateOfBirth.toDateString(),
           hourlyRate: doctor.hourlyRate,
           affiliation: doctor.affiliation,
+          speciality: doctor.speciality,
           educationalBackground: doctor.educationalBackground,
         }))
       )
@@ -147,6 +148,7 @@ doctorsRouter.get(
         doctor.dateOfBirth.toDateString(),
         doctor.hourlyRate,
         doctor.affiliation,
+        doctor.speciality,
         doctor.educationalBackground
       )
     )

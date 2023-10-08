@@ -102,7 +102,8 @@ authRouter.post(
         doctor.dateOfBirth.toDateString(),
         doctor.hourlyRate,
         doctor.affiliation,
-        doctor.educationalBackground
+        doctor.educationalBackground,
+        doctor.speciality
       )
     )
   })

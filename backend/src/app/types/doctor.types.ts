@@ -17,12 +17,13 @@ export class DoctorResponseBase {
     public name: string,
     public email: string,
     // public dateOfBirth: Date,
-    /** 
-     * Changed this to string instead of Date, because JSON doesn't support Dates,
+    /**
+     * Changed this to also accept strings not just Dates, because JSON doesn't support Dates,
      * and this object is sent to the frontend as JSON, so in the frontend it is actually
      * received as a string not a Date, even if you send a Date.
-     **/ 
-    public dateOfBirth: string,
+     *
+     **/
+    public dateOfBirth: Date | string,
     public hourlyRate: number,
     public affiliation: string,
     public educationalBackground: string,
