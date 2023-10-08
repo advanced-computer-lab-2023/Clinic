@@ -68,31 +68,32 @@ debugRouter.post(
   })
 )
 
-debugRouter.post(
-  '/create-patient',
-  asyncWrapper(async (req, res) => {
-    const user = await UserModel.create({
-      username: 'patient' + Math.random(),
-      password: await hash('patient', bcryptSalt),
-      type: UserType.Patient,
-    })
+// debugRouter.post(
+//   '/create-patient',
+//   asyncWrapper(async (req, res) => {
+//     const user = await UserModel.create({
+//       username: 'patient' + Math.random(),
+//       password: await hash('patient', bcryptSalt),
+//       type: UserType.Patient,
+//     })
 
-    const patient = await PatientModel.create({
-      user: user.id,
-      name: 'Patient',
-      email: user.username + '@gmail.com',
-      mobileNumber: '01001111111',
-      dateOfBirth: new Date(),
-      gender: 'female',
-      emergencyContact: {
-        name: 'Emergency1',
-        mobileNumber: '0100111111',
-      },
-    })
+//     const patient = await PatientModel.create({
+//       user: user.id,
+//       name: 'Patient',
+//       email: user.username + '@gmail.com',
+//       mobileNumber: '01001111111',
+//       dateOfBirth: new Date(),
+//       gender: 'female',
+//       emergencyContact: {
+//         name: 'Emergency1',
+//         mobileNumber: '0100111111',
+//       },
+//     })
 
-    res.send(patient)
-  })
-)
+//     res.send(patient)
+//   })
+// )
+
 debugRouter.post(
   '/create-patient-onlyonce',
   asyncWrapper(async (req, res) => {
