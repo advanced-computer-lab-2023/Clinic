@@ -8,7 +8,7 @@ import { DoctorModel, type DoctorDocument } from '../models/doctor.model'
 import { NotFoundError } from '../errors'
 import { PatientModel, type PatientDocument } from '../models/patient.model'
 import { type UserDocument } from '../models/user.model'
-import { type CreatePrescriptionRequest } from '../types/prescription.types'
+import { type CreatePrescriptionRequest } from 'clinic-common/types/prescription.types'
 import { UserModel } from '../models/user.model'
 
 type PrescriptionDocumentWithDoctor = Omit<

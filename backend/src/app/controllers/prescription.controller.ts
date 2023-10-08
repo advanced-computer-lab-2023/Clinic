@@ -1,19 +1,21 @@
 import { Router } from 'express'
 import { asyncWrapper } from '../utils/asyncWrapper'
 import { validate } from '../middlewares/validation.middleware'
-import {
-  type CreatePrescriptionRequest,
-  GetPrescriptionResponse,
-} from '../types/prescription.types'
-import { CreatePrescriptionRequestValidator } from '../validators/prescription.validator'
+
 import {
   createPrescription,
   getPrescriptions,
 } from '../services/prescription.service'
 import { NotAuthenticatedError } from '../errors/auth.errors'
 import { isDoctorAndApproved } from '../services/auth.service'
+import {
+  type CreatePrescriptionRequest,
+  GetPrescriptionResponse,
+} from 'clinic-common/types/prescription.types'
 
 import { APIError } from '../errors'
+import { CreatePrescriptionRequestValidator } from 'clinic-common/validators/prescription.validator'
+
 export const prescriptionsRouter = Router()
 
 prescriptionsRouter.get(

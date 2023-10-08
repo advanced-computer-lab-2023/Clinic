@@ -4,8 +4,8 @@ import { CardPlaceholder } from '@/components/CardPlaceholder'
 import { useAlerts } from '@/hooks/alerts'
 import { useAuth } from '@/hooks/auth'
 import { Alert } from '@/providers/AlertsProvider'
-import { UpdateDoctorRequest } from '@/types/doctor.types'
-import { UpdateDoctorRequestValidator } from '@/validators/doctor.validator'
+import { UpdateDoctorRequest } from 'clinic-common/types/doctor.types'
+import { UpdateDoctorRequestValidator } from 'clinic-common/validators/doctor.validator'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Card, CardContent, Stack, TextField } from '@mui/material'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
@@ -51,9 +51,9 @@ export function UpdateProfile() {
   return (
     <form onSubmit={handleSubmit((data) => mutation.mutateAsync(data))}>
       <Card>
-        <AlertsBox scope="profile-form" />
         <CardContent>
           <Stack spacing={2}>
+            <AlertsBox scope="profile-form" />
             <TextField
               fullWidth
               label="Email"

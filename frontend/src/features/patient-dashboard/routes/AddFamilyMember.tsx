@@ -7,8 +7,8 @@ import { Card, CardContent, Stack, TextField } from '@mui/material'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
 import { LoadingButton } from '@mui/lab'
-import { AddFamilyMemberRequest } from '@/types/familyMember.types'
-import { AddFamilyMemberRequestValidator } from '@/validators/familyMembers.validator'
+import { AddFamilyMemberRequest } from 'clinic-common/types/familyMember.types'
+import { AddFamilyMemberRequestValidator } from 'clinic-common/validators/familyMembers.validator'
 import { addFamilyMember } from '@/api/familyMembers'
 
 export function AddFamilyMember({ onSuccess }: { onSuccess: () => void }) {

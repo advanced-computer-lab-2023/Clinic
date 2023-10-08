@@ -11,22 +11,22 @@ import { validate } from '../middlewares/validation.middleware'
 import {
   LoginRequestValidator,
   RegisterRequestValidator,
-} from '../validators/user.validator'
+} from 'clinic-common/validators/user.validator'
 import {
   LoginResponse,
   type LoginRequest,
   type RegisterRequest,
   RegisterResponse,
-} from '../types/auth.types'
+} from 'clinic-common/types/auth.types'
 import { allowAuthenticated } from '../middlewares/auth.middleware'
 import { NotAuthorizedError } from '../errors/auth.errors'
 import {
   GetCurrentUserResponse,
   GetUserByUsernameResponse,
   type UserType,
-} from '../types/user.types'
-import { RegisterDoctorRequestValidator } from '../validators/doctor.validator'
-import { RegisterDoctorRequestResponse } from '../types/doctor.types'
+} from 'clinic-common/types/user.types'
+import { RegisterDoctorRequestValidator } from 'clinic-common/validators/doctor.validator'
+import { RegisterDoctorRequestResponse } from 'clinic-common/types/doctor.types'
 
 export const authRouter = Router()
 

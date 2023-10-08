@@ -1,7 +1,7 @@
-import { GetFamilyMembersResponse } from '@/types/familyMember.types'
+import { GetFamilyMembersResponse } from 'clinic-common/types/familyMember.types'
 import { api } from '.'
-import { AddFamilyMemberRequest } from '@/types/familyMember.types'
-import { AddFamilyMemberResponse } from '@/types/familyMember.types'
+import { AddFamilyMemberRequest } from 'clinic-common/types/familyMember.types'
+import { AddFamilyMemberResponse } from 'clinic-common/types/familyMember.types'
 
 export async function getFamilyMembers(): Promise<GetFamilyMembersResponse> {
   return await api

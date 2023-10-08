@@ -23,7 +23,7 @@ export class DoctorResponseBase {
      * received as a string not a Date, even if you send a Date.
      *
      **/
-    public dateOfBirth: Date | string,
+    public dateOfBirth: string,
     public hourlyRate: number,
     public affiliation: string,
     public educationalBackground: string,

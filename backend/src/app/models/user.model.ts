@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-import { UserType } from '../types/user.types'
+import { UserType } from 'clinic-common/types/user.types'
 
 const Schema = mongoose.Schema
 
