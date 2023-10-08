@@ -16,6 +16,39 @@ export interface Field<Request extends { [key: string]: unknown }> {
   valueAsNumber?: boolean
 }
 
+/**
+ * Used to create a form that submits to an API endpoint.
+ *
+ * @param fields The fields to display in the form.
+ *               The `property` field is the property of the request object.
+ *               The `label` field is the label of the text field.
+ *              The `valueAsNumber` field is whether the value should be parsed as a number. (False by default)
+ * @param validator The validator to use for the form.
+ * @param initialDataFetcher The function to fetch the initial data for the form,
+ *                           if not provided, the form will be empty at first.
+ * @param queryKey An array of strings that uniquely identifies the query that is used to fetch the initial data
+ *                 for the form. If not provided, the form will be empty at first.
+ * @param successMessage The message to display when the form is successfully submitted.
+ * @param action The function to call when the form is submitted.
+ * @param onSuccess The function to call when the form is successfully submitted.
+ * @param buttonText The text to display on the submit button.
+ * 
+ * @example
+ * ```tsx
+ * <ApiForm<UpdateDoctorRequest>
+      fields={[
+        { label: 'Email', property: 'email' },
+        { label: 'Hourly Rate', property: 'hourlyRate', valueAsNumber: true },
+        { label: 'Affiliation', property: 'affiliation' },
+      ]}
+      validator={UpdateDoctorRequestValidator}
+      initialDataFetcher={() => getDoctor(user!.username)}
+      queryKey={['doctors', user!.username]}
+      successMessage="Updated doctor successfully."
+      action={(data) => updateDoctor(user!.username, data)}
+    />
+    ```
+ */
 export function ApiForm<Request extends { [key: string]: unknown }>({
   fields,
   validator,

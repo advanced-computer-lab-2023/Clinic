@@ -16,7 +16,7 @@ export function UpdateProfile() {
       ]}
       validator={UpdateDoctorRequestValidator}
       initialDataFetcher={() => getDoctor(user!.username)}
-      queryKey={[]}
+      queryKey={['doctors', user!.username]}
       successMessage="Updated doctor successfully."
       action={(data) => updateDoctor(user!.username, data)}
     />
