@@ -16,7 +16,8 @@ export class DoctorResponseBase {
     public dateOfBirth: Date,
     public hourlyRate: number,
     public affiliation: string,
-    public educationalBackground: string
+    public educationalBackground: string,
+    public speciality: string
   ) {}
 }
 

@@ -32,6 +32,7 @@ debugRouter.post(
       hourlyRate: 100,
       affiliation: 'Hospital',
       educationalBackground: 'University',
+      speciality: 'oncology',
       requestStatus: DoctorStatus.Approved,
     })
 
@@ -55,6 +56,7 @@ debugRouter.post(
       hourlyRate: 100,
       affiliation: 'Hospital',
       educationalBackground: 'University',
+      speciality: 'dermatology',
       requestStatus: DoctorStatus.Pending,
     })
 

@@ -39,6 +39,7 @@ doctorsRouter.get(
           hourlyRate: doctor.hourlyRate,
           affiliation: doctor.affiliation,
           educationalBackground: doctor.educationalBackground,
+          speciality: doctor.speciality,
         }))
       )
     )
@@ -77,7 +78,8 @@ doctorsRouter.patch(
         updatedDoctor.dateOfBirth,
         updatedDoctor.hourlyRate,
         updatedDoctor.affiliation,
-        updatedDoctor.educationalBackground
+        updatedDoctor.educationalBackground,
+        updatedDoctor.speciality
       )
     )
   })
@@ -100,6 +102,7 @@ doctorsRouter.get(
           hourlyRate: doctor.hourlyRate,
           affiliation: doctor.affiliation,
           educationalBackground: doctor.educationalBackground,
+          speciality: doctor.speciality,
         }))
       )
     )
