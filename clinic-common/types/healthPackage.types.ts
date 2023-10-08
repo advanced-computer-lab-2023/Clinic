@@ -13,6 +13,7 @@ export type UpdateHealthPackageRequest = z.infer<
 export class HealthPackageResponseBase {
   constructor(
     public name: string,
+    public id:string,
     public pricePerYear: number,
     public sessionDiscount: number,
     public medicineDiscount: number,

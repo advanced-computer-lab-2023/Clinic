@@ -31,17 +31,18 @@ healthPackagesRouter.post(
   })
 )
 healthPackagesRouter.patch(
-  '/:name',
+  '/:id',
   asyncWrapper(allowAdmins),
   validate(UpdateHealthPackageRequestValidator),
   asyncWrapper<UpdateHealthPackageRequest>(async (req, res) => {
     const updatedHealthPackage = await updateHealthPackage(
-      req.params.name,
+      req.params.id,
       req.body
     )
     res.send(
       new UpdateHealthPackageResponse(
         updatedHealthPackage.name,
+        updatedHealthPackage.id,
         updatedHealthPackage.pricePerYear,
         updatedHealthPackage.sessionDiscount,
         updatedHealthPackage.medicineDiscount,
@@ -51,10 +52,10 @@ healthPackagesRouter.patch(
   })
 )
 healthPackagesRouter.delete(
-  '/:name',
+  '/:id',
   asyncWrapper(allowAdmins),
   asyncWrapper(async (req, res) => {
-    await removeHealthPackage(req.params.name)
+    await removeHealthPackage(req.params.id)
     res.send('deletedSuccefuly')
   })
 )
@@ -65,13 +66,14 @@ healthPackagesRouter.get(
     const healthPackages = await getAllHealthPackages()
     res.send(
       new GetAllHealthPackagesResponse(
-        healthPackages.map((health) => ({
-          name: health.name,
-          pricePerYear: health.pricePerYear,
-          sessionDiscount: health.sessionDiscount,
-          medicineDiscount: health.medicineDiscount,
+        healthPackages.map((healthPackage) => ({
+          name: healthPackage.name,
+          id: healthPackage.id,
+          pricePerYear: healthPackage.pricePerYear,
+          sessionDiscount: healthPackage.sessionDiscount,
+          medicineDiscount: healthPackage.medicineDiscount,
           familyMemberSubscribtionDiscount:
-            health.familyMemberSubscribtionDiscount,
+            healthPackage.familyMemberSubscribtionDiscount,
         }))
       )
     )

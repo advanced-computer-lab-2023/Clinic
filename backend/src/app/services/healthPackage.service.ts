@@ -1,3 +1,4 @@
+import { type HydratedDocument } from 'mongoose'
 import { NotFoundError } from '../errors'
 import {
   type HealthPackageDocument,
@@ -21,12 +22,12 @@ export async function addHealthPackages(
 }
 
 export async function updateHealthPackage(
-  packageName: string,
+  packageId: string,
   request: UpdateHealthPackageRequest
-): Promise<HealthPackageDocument> {
-  if (packageName == null) throw new NotFoundError()
-  const updatedHealthPackage = await HealthPackageModel.findOneAndUpdate(
-    { name: packageName },
+): Promise<HydratedDocument<HealthPackageDocument>> {
+  if (packageId == null) throw new NotFoundError()
+  const updatedHealthPackage = await HealthPackageModel.findByIdAndUpdate(
+    { _id: packageId },
     request,
     {
       new: true,
@@ -38,15 +39,17 @@ export async function updateHealthPackage(
 
   return updatedHealthPackage
 }
-export async function removeHealthPackage(packageName: string): Promise<void> {
-  const healthPackage = await HealthPackageModel.findOneAndDelete({
-    name: packageName,
+export async function removeHealthPackage(packageId: string): Promise<void> {
+  const healthPackage = await HealthPackageModel.findByIdAndDelete({
+    _id: packageId,
   })
   if (healthPackage == null) {
     throw new NotFoundError()
   }
 }
-export async function getAllHealthPackages(): Promise<HealthPackageDocument[]> {
+export async function getAllHealthPackages(): Promise<
+  Array<HydratedDocument<HealthPackageDocument>>
+> {
   const healthPackages = await HealthPackageModel.find({})
   if (healthPackages == null) {
     throw new NotFoundError()
