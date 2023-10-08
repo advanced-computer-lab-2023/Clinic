@@ -1,74 +1,23 @@
 import { login } from '@/api/auth'
-import { useAlerts } from '@/hooks/alerts'
 import { useAuth } from '@/hooks/auth'
-import { Alert } from '@/providers/AlertsProvider'
 import { LoginRequest } from 'clinic-common/types/auth.types'
 import { LoginRequestValidator } from 'clinic-common/validators/user.validator'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { ArrowForward } from '@mui/icons-material'
-import { Card, CardContent, Grid, TextField } from '@mui/material'
-import { useMutation } from '@tanstack/react-query'
-import { useForm } from 'react-hook-form'
-import { LoadingButton } from '@mui/lab'
+import { ApiForm } from '@/components/ApiForm'
 
 export const Login = () => {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<LoginRequest>({
-    resolver: zodResolver(LoginRequestValidator),
-  })
   const { refreshUser } = useAuth()
-  const { addAlert } = useAlerts()
-  const mutation = useMutation({
-    mutationFn: (data: LoginRequest) => login(data),
-    onSuccess: () => {
-      refreshUser()
-    },
-    onError: (e: Error) => {
-      addAlert(new Alert(e.message, 'error'))
-    },
-  })
 
   return (
-    <form onSubmit={handleSubmit((data) => mutation.mutateAsync(data))}>
-      <Card>
-        <CardContent>
-          <Grid container spacing={2}>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Username"
-                {...register('username')}
-                error={!!errors.username}
-                helperText={errors.username?.message as string}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Password"
-                {...register('password')}
-                error={!!errors.password}
-                helperText={errors.password?.message as string}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <LoadingButton
-                loading={mutation.isLoading}
-                type="submit"
-                fullWidth
-                variant="contained"
-                endIcon={<ArrowForward />}
-                size="large"
-              >
-                Login
-              </LoadingButton>
-            </Grid>
-          </Grid>
-        </CardContent>
-      </Card>
-    </form>
+    <ApiForm<LoginRequest>
+      fields={[
+        { label: 'Username', property: 'username' },
+        { label: 'Password', property: 'password' },
+      ]}
+      validator={LoginRequestValidator}
+      successMessage="Logged in successfully."
+      action={login}
+      onSuccess={() => refreshUser()}
+      buttonText="Login"
+    />
   )
 }
