@@ -4,7 +4,13 @@ import {
   NotAuthorizedError,
   TokenError,
 } from '../errors/auth.errors'
-import { isDoctor, isAdmin, verifyJWTToken } from '../services/auth.service'
+import {
+  isDoctor,
+  isAdmin,
+  verifyJWTToken,
+  isPatient,
+  isDoctorAndApproved,
+} from '../services/auth.service'
 
 export async function authenticate(
   req: Request,
@@ -66,6 +72,40 @@ export async function allowDoctors(
   }
 
   if (await isDoctor(req.username)) {
+    next()
+    return
+  }
+
+  throw new NotAuthorizedError()
+}
+
+export async function allowApprovedDoctors(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  if (req.username == null) {
+    throw new NotAuthenticatedError()
+  }
+
+  if (await isDoctorAndApproved(req.username)) {
+    next()
+    return
+  }
+
+  throw new NotAuthorizedError()
+}
+
+export async function allowPatients(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  if (req.username == null) {
+    throw new NotAuthenticatedError()
+  }
+
+  if (await isPatient(req.username)) {
     next()
     return
   }
