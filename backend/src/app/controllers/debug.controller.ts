@@ -9,7 +9,31 @@ import { AdminModel } from '../models/admin.model'
 import { hash } from 'bcrypt'
 import { UserType } from '../types/user.types'
 
+import { faker } from '@faker-js/faker'
+import { PatientModel } from '../models/patient.model'
+import { FamilyMemberModel } from '../models/familyMember.model'
+
 const bcryptSalt = process.env.BCRYPT_SALT ?? '$2b$10$13bXTGGukQXsCf5hokNe2u'
+
+// Generate a random long number to be used in usernames to avoid duplicated usernames
+function randomLongId(): string {
+  return Math.floor(Math.random() * 100000000000000).toString()
+}
+
+// Generate a random short number to be used in emails to avoid duplicated emails
+function randomShortId(): string {
+  return Math.floor(Math.random() * 10000).toString()
+}
+
+// Generate a random username with a prefix, for example prefix = 'doctor' gives 'doctor_123456789'
+function randomUsername(prefix: string): string {
+  return prefix + '_' + randomLongId()
+}
+
+// Generate a random email, 'mathewhany_1234243@gmail.com'
+function randomEmail(): string {
+  return faker.internet.userName() + '_' + randomShortId() + '@gmail.com'
+}
 
 /**
  * This is a controller that has some helper endpoints for debugging purposes.
@@ -21,45 +45,43 @@ debugRouter.post(
   '/create-doctor',
   asyncWrapper(async (req, res) => {
     const user = await UserModel.create({
-      username: 'doctor' + Math.random(),
+      username: randomUsername('doctor'),
       password: await hash('doctor', bcryptSalt),
       type: UserType.Doctor,
     })
 
     const doctor = await DoctorModel.create({
       user: user.id,
-      name: 'Doctor',
-      email: user.username + '@gmail.com',
-      dateOfBirth: new Date(),
-      hourlyRate: 100,
-      affiliation: 'Hospital',
-      educationalBackground: 'University',
+      name: faker.person.fullName(),
+      email: randomEmail(),
+      dateOfBirth: faker.date.past(),
+      hourlyRate: faker.number.float().toPrecision(2),
+      affiliation: faker.company.name(),
+      educationalBackground: faker.company.name(),
       requestStatus: DoctorStatus.Approved,
     })
 
-    res.send(doctor)
+    res.send(await doctor.populate('user'))
   })
 )
 
 debugRouter.post(
   '/create-pending-doctor',
   asyncWrapper(async (req, res) => {
-    const username = 'pending-doctor' + Math.random()
-
     const user = await UserModel.create({
-      username,
+      username: randomUsername('doctor'),
       password: await hash('doctor', bcryptSalt),
       type: UserType.Doctor,
     })
 
     const doctor = await DoctorModel.create({
       user: user.id,
-      name: 'Doctor Name ' + username,
-      email: username + '@gmail.com',
-      dateOfBirth: new Date(),
-      hourlyRate: 100,
-      affiliation: 'Hospital',
-      educationalBackground: 'University',
+      name: faker.person.fullName(),
+      email: randomEmail(),
+      dateOfBirth: faker.date.past(),
+      hourlyRate: faker.number.float().toPrecision(2),
+      affiliation: faker.company.name(),
+      educationalBackground: faker.company.name(),
       requestStatus: DoctorStatus.Pending,
     })
 
@@ -107,10 +129,8 @@ debugRouter.get(
 debugRouter.post(
   '/create-admin',
   asyncWrapper(async (req, res) => {
-    const username = 'admin' + Math.random().toString()
-
     const user = await UserModel.create({
-      username,
+      username: randomUsername('admin'),
       password: await hash('admin', bcryptSalt),
       type: UserType.Admin,
     })
@@ -120,5 +140,57 @@ debugRouter.post(
     })
 
     res.send(await admin.populate('user'))
+  })
+)
+
+/**
+ * This endpoint creates a patient with random data and password 'patient',
+ * and returns the created patient, for testing purposes.
+ * It also creates some family members for the patient.
+ */
+debugRouter.post(
+  '/create-patient',
+  asyncWrapper(async (req, res) => {
+    const user = await UserModel.create({
+      username: randomUsername('patient'),
+      password: await hash('patient', bcryptSalt),
+      type: UserType.Patient,
+    })
+
+    const patient = await PatientModel.create({
+      user: user.id,
+      name: faker.person.fullName(),
+      email: randomEmail(),
+      dateOfBirth: faker.date.past(),
+      mobileNumber: faker.phone.number(),
+      gender: faker.person.gender(),
+      emergencyContact: {
+        name: faker.person.fullName(),
+        mobileNumber: faker.phone.number(),
+      },
+    })
+
+    for (let i = 0; i < 3; i++) {
+      const familyMember = await FamilyMemberModel.create({
+        name: faker.person.fullName(),
+        nationalId: faker.string.numeric(14),
+        age: faker.number.int({
+          min: 20,
+        }),
+        gender: faker.person.gender(),
+        relation: faker.helpers.arrayElement([
+          'father',
+          'mother',
+          'brother',
+          'sister',
+        ]),
+      })
+
+      patient.familyMembers.push(familyMember.id)
+    }
+
+    await patient.save()
+
+    res.send(await patient.populate(['familyMembers', 'user']))
   })
 )

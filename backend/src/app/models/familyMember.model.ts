@@ -1,5 +1,4 @@
 import mongoose from 'mongoose'
-import { type FamilyMember } from '../types/familyMember.types'
 
 const Schema = mongoose.Schema
 
@@ -10,12 +9,17 @@ const familyMemberSchema = new Schema(
     age: { type: Number, required: true },
     gender: { type: String, required: true },
     relation: { type: String, required: true },
-    relatedTo: { type: Schema.Types.ObjectId, ref: 'Patient', required: true },
+    /**
+     * Removed this in favor of PatientModel.familyMembers, it makes the query
+     * easier and more efficient. And we usually start from the patient and get
+     * their family members, not the other way around.
+     */
+    // relatedTo: { type: Schema.Types.ObjectId, ref: 'Patient', required: true },
   },
   { timestamps: true }
 )
 
-export const FamilyMemberModel = mongoose.model<FamilyMember>(
+export const FamilyMemberModel = mongoose.model(
   'FamilyMember',
   familyMemberSchema
 )

@@ -23,7 +23,7 @@ router.use('/doctors', allowAuthenticated, doctorsRouter)
 router.use('/debug', debugRouter)
 
 router.use('/prescriptions', prescriptionsRouter)
-router.use('/familyMembers', familyMemberRouter)
+router.use('/family-members', familyMemberRouter)
 router.use('/patients', patientRouter)
 router.use('/appointment', appointmentsRouter)
 router.use('/admins', asyncWrapper(allowAdmins), adminRouter)
