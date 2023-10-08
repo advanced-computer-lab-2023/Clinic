@@ -6,7 +6,7 @@ const prescriptionSchema = new Schema(
     doctor: { type: Schema.Types.ObjectId, ref: 'Doctor', required: true },
     patient: { type: Schema.Types.ObjectId, ref: 'Patient', required: true },
     date: { type: Date, required: true },
-    status: { type: Boolean },
+    status: { type: Boolean, required: true, default: false },
   },
   { timestamps: true }
 )

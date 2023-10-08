@@ -27,7 +27,7 @@ prescriptionsRouter.get(
           doctor: prescription.doctor.name,
           patient: prescription.patient.name,
           date: prescription.date,
-          status: prescription.status === true ? 'Filled' : 'UnFilled',
+          status: prescription.status ? 'Filled' : 'UnFilled',
         }))
       )
     )
