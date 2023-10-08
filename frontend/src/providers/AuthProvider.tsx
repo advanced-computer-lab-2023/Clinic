@@ -1,5 +1,5 @@
 import { getCurrentUser } from '@/api/auth'
-import { UserType } from '@/types/user.types'
+import { UserType } from 'clinic-common/types/user.types'
 import { createContext, useCallback, useEffect, useState } from 'react'
 
 interface AuthContextUser {

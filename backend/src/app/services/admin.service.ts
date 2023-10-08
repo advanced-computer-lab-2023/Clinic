@@ -7,9 +7,9 @@ import { isUsernameTaken } from './auth.service'
 
 import {
   type AddAdminRequest,
-} from '../types/admin.types'
-import { UserType } from '../types/user.types'
-import { AddAdminResponse } from '../validators/admin.validation'
+} from 'clinic-common/types/admin.types'
+import { UserType } from 'clinic-common/types/user.types'
+import { AddAdminResponse } from 'clinic-common/validators/admin.validation'
 import { AdminModel } from '../models/admin.model'
 import { DoctorModel } from '../models/doctor.model'
 import { PatientModel } from '../models/patient.model'

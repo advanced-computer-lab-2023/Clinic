@@ -6,7 +6,7 @@ import {
 import { UserModel } from '../models/user.model'
 import { NotFoundError } from '../errors'
 import { PatientModel } from '../models/patient.model'
-import { type AddFamilyMemberRequest } from '../types/familyMember.types'
+import { type AddFamilyMemberRequest } from 'clinic-common/types/familyMember.types'
 
 export async function getFamilyMembers(
   username: string

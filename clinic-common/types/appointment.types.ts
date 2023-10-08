@@ -1,8 +1,6 @@
-import { type Schema } from 'mongoose'
-
 export interface Appointment {
-  patientID: Schema.Types.ObjectId
-  doctorID: Schema.Types.ObjectId
+  patientID: string
+  doctorID: string
   date: Date
   status: AppointmentStatus
 }
@@ -16,8 +14,8 @@ export enum AppointmentStatus {
 export class AppointmentResponseBase {
   constructor(
     public id: string,
-    public patientID: Schema.Types.ObjectId,
-    public doctorID: Schema.Types.ObjectId,
+    public patientID: string,
+    public doctorID: string,
     public date: Date,
     public status: AppointmentStatus
   ) {}

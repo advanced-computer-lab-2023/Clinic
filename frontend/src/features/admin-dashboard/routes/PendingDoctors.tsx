@@ -3,7 +3,7 @@ import { CardPlaceholder } from '@/components/CardPlaceholder'
 import { Box, Button } from '@mui/material'
 import { useQuery } from '@tanstack/react-query'
 import { GridColDef, DataGrid } from '@mui/x-data-grid'
-import { GetPendingDoctorsResponse } from '@/types/doctor.types'
+import { GetPendingDoctorsResponse } from 'clinic-common/types/doctor.types'
 
 export function PendingDoctors() {
   const query = useQuery({

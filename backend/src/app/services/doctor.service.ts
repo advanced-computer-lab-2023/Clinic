@@ -1,6 +1,6 @@
 import { DoctorModel, type DoctorDocument } from '../models/doctor.model'
 import { UserModel, type UserDocument } from '../models/user.model'
-import type { UpdateDoctorRequest } from '../types/doctor.types'
+import { DoctorStatus, type UpdateDoctorRequest } from 'clinic-common/types/doctor.types'
 import { NotFoundError } from '../errors'
 import { type WithUser } from '../utils/typeUtils'
 /**
@@ -13,7 +13,7 @@ export async function getPendingDoctorRequests(): Promise<
   DoctorDocumentWithUser[]
 > {
   const models = await DoctorModel.find({
-    requestStatus: 'pending',
+    requestStatus: DoctorStatus.Pending,
   }).populate<{ user: UserDocument }>('user')
 
   return models

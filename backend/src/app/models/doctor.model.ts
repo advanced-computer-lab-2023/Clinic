@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-import { DoctorStatus } from '../types/doctor.types'
+import { DoctorStatus } from 'clinic-common/types/doctor.types'
 
 const Schema = mongoose.Schema
 

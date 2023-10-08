@@ -8,13 +8,15 @@ import {
   EmailAlreadyTakenError,
 } from '../errors/auth.errors'
 import { APIError, NotFoundError } from '../errors'
-import { DoctorModel } from '../models/doctor.model'
-import { type RegisterRequest } from '../types/auth.types'
-import { UserType } from '../types/user.types'
+import { type RegisterRequest } from 'clinic-common/types/auth.types'
+import { UserType } from 'clinic-common/types/user.types'
 import { type HydratedDocument } from 'mongoose'
 import { PatientModel } from '../models/patient.model'
-import { DoctorStatus, type RegisterDoctorRequest } from '../types/doctor.types'
-import { type DoctorDocument } from '../models/doctor.model'
+import {
+  DoctorStatus,
+  type RegisterDoctorRequest,
+} from 'clinic-common/types/doctor.types'
+import { type DoctorDocument, DoctorModel } from '../models/doctor.model'
 import { hash } from 'bcrypt'
 import { type WithUser } from '../utils/typeUtils'
 
