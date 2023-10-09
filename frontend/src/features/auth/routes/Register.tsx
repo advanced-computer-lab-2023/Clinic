@@ -25,9 +25,9 @@ export const Register = () => {
           property: 'gender',
           type: 'select',
           selectedValues: [
-            { key: 'Male', value: 'male' },
-            { key: 'Female', value: 'female' },
-            { key: 'Other', value: 'other' },
+            { label: 'Male', value: 'male' },
+            { label: 'Female', value: 'female' },
+            { label: 'Other', value: 'other' },
           ],
         },
         {
