@@ -20,6 +20,7 @@ const patientSchema = new Schema(
       mobileNumber: { type: String, required: true },
     },
     familyMembers: [{ type: Schema.Types.ObjectId, ref: 'FamilyMember' }],
+    documents: [{ type: String }],
   },
   { timestamps: true }
 )

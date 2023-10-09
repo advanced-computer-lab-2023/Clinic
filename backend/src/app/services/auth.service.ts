@@ -19,6 +19,7 @@ import {
 import { type DoctorDocument, DoctorModel } from '../models/doctor.model'
 import { hash } from 'bcrypt'
 import { type WithUser } from '../utils/typeUtils'
+import { AppointmentModel } from '../models/appointment.model'
 
 const jwtSecret = process.env.JWT_TOKEN ?? 'secret'
 const bcryptSalt = process.env.BCRYPT_SALT ?? '$2b$10$13bXTGGukQXsCf5hokNe2u'
@@ -166,7 +167,7 @@ export async function submitDoctorRequest(
     hourlyRate: doctor.hourlyRate,
     affiliation: doctor.affiliation,
     educationalBackground: doctor.educationalBackground,
-    speciality:doctor.speciality,
+    speciality: doctor.speciality,
     requestStatus: DoctorStatus.Pending,
   })
   await newDoctor.save()
@@ -209,4 +210,36 @@ export async function isDoctorAndApproved(username: string): Promise<boolean> {
   const doctor = await DoctorModel.findOne({ user: user.id })
 
   return doctor != null && doctor.requestStatus === 'approved'
+}
+
+export async function isDoctorPatientAuthorized(
+  username: string,
+  id: string
+): Promise<boolean> {
+  const user = await UserModel.findOne({ username })
+
+  if (user == null) {
+    return false
+  }
+
+  const doctor = await DoctorModel.findOne({ user: user.id })
+
+  if (doctor == null) {
+    return false
+  }
+
+  if (doctor.requestStatus !== 'approved') {
+    return false
+  }
+
+  const appointment = await AppointmentModel.findOne({
+    doctorID: doctor.id,
+    patientID: id,
+  })
+
+  if (appointment == null) {
+    return false
+  }
+
+  return true
 }

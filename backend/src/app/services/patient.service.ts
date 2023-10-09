@@ -1,5 +1,13 @@
 import { NotFoundError } from '../errors'
+import {
+  type AppointmentDocument,
+  AppointmentModel,
+} from '../models/appointment.model'
 import { type PatientDocument, PatientModel } from '../models/patient.model'
+import {
+  type PrescriptionDocument,
+  PrescriptionModel,
+} from '../models/prescription.model'
 import { type UserDocument } from '../models/user.model'
 import { type WithUser } from '../utils/typeUtils'
 
@@ -23,10 +31,30 @@ export async function getPatientByName(
 
 export async function getPatientByID(
   id: string
-): Promise<PatientDocumentWithUser> {
+): Promise<{
+  patient: PatientDocumentWithUser
+  appointments: AppointmentDocument[]
+  prescriptions: PrescriptionDocument[]
+}> {
   const patient = await PatientModel.findOne({ _id: id })
     .populate<{ user: UserDocument }>('user')
     .exec()
   if (patient == null) throw new NotFoundError()
-  return patient
+
+  const appointments = await AppointmentModel.find({
+    patientID: id,
+  }).exec()
+
+  const prescriptions = await PrescriptionModel.find({
+    patient: id,
+  }).exec()
+
+  return { patient, appointments, prescriptions }
 }
+
+//   return {
+//     ...patient.toJSON(),
+//     appointments,
+//     prescriptions,
+//   };
+// }

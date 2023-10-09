@@ -33,7 +33,8 @@ export class MyPatientsResponseBase {
       name: string
       mobileNumber: string
     },
-    public familyMembers: Types.ObjectId[]
+    public familyMembers: Types.ObjectId[],
+    public documents: string[],
   ) {}
 }
 
