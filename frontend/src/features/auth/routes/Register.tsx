@@ -1,5 +1,5 @@
 import { ApiForm } from '@/components/ApiForm'
-import { register } from '@/api/auth'
+import { registerPatient } from '@/api/auth'
 import { useAuth } from '@/hooks/auth'
 
 import { RegisterRequest } from 'clinic-common/types/auth.types'
@@ -58,7 +58,7 @@ export const Register = () => {
       ]}
       validator={RegisterRequestValidator}
       successMessage="Register successfully."
-      action={register}
+      action={registerPatient}
       onSuccess={() => refreshUser()}
       buttonText="Register"
     />
