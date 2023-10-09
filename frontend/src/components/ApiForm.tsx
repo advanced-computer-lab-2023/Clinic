@@ -3,23 +3,39 @@ import { CardPlaceholder } from '@/components/CardPlaceholder'
 import { useAlerts } from '@/hooks/alerts'
 import { Alert } from '@/providers/AlertsProvider'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Card, CardContent, FormControl, Stack, TextField } from '@mui/material'
+import {
+  Card,
+  CardContent,
+  FormControl,
+  FormHelperText,
+  InputLabel,
+  MenuItem,
+  Select,
+  Stack,
+  TextField,
+} from '@mui/material'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { Path, useForm, Controller } from 'react-hook-form'
+import {
+  Path,
+  useForm,
+  Controller,
+  ControllerRenderProps,
+  ControllerFieldState,
+} from 'react-hook-form'
 import { LoadingButton } from '@mui/lab'
 import { v4 as uuidv4 } from 'uuid'
 import { useMemo } from 'react'
-import { DateField } from '@mui/x-date-pickers'
-import InputLabel from '@mui/material/InputLabel'
-import MenuItem from '@mui/material/MenuItem'
-import Select from '@mui/material/Select'
+import { DatePicker } from '@mui/x-date-pickers'
+import dayjs, { Dayjs } from 'dayjs'
 
-export interface Field<Request extends { [key: string]: unknown }> {
+type ObjectWithStringKeys = { [key: string]: unknown }
+
+export interface Field<Request extends ObjectWithStringKeys> {
   label: string
   property: Path<Request>
   valueAsNumber?: boolean
   type?: string
-  selectedValues?: { key: string; value: string }[]
+  selectedValues?: { label: string; value: string }[]
   customError?: string
   customComponent?: unknown
 }
@@ -57,7 +73,7 @@ export interface Field<Request extends { [key: string]: unknown }> {
  />
  ```
  */
-export function ApiForm<Request extends { [key: string]: unknown }>({
+export function ApiForm<Request extends ObjectWithStringKeys>({
   fields,
   validator,
   initialDataFetcher,
@@ -99,9 +115,8 @@ export function ApiForm<Request extends { [key: string]: unknown }>({
       addAlert(new Alert(successMessage, 'success', alertScope))
       onSuccess?.()
     },
-    onError: (e) => {
-      console.log(e)
-      addAlert(new Alert('Failed! Try again.', 'error', alertScope))
+    onError: (e: Error) => {
+      addAlert(new Alert(e.message ?? 'Failed! Try again', 'error', alertScope))
     },
   })
 
@@ -115,32 +130,42 @@ export function ApiForm<Request extends { [key: string]: unknown }>({
         <CardContent>
           <Stack spacing={2}>
             <AlertsBox scope={alertScope} />
-            {fields.map((field) => {
+            {fields.map((field, i) => {
               return (
                 <Controller
+                  key={i}
                   name={field.property}
                   control={control}
                   render={({ field: fieldItem, fieldState }) => (
                     <>
-                      {field.type === 'select' ? (
+                      {field.selectedValues ? (
                         <SelectInputField
                           field={field}
                           fieldState={fieldState}
                           fieldItem={fieldItem}
+                          defaultValue={
+                            query.data && query.data[field.property]
+                          }
                         />
                       ) : field.type === 'date' ? (
                         <DateInputField
                           field={field}
                           fieldState={fieldState}
                           fieldItem={fieldItem}
+                          defaultValue={
+                            query.data && query.data[field.property]
+                          }
                         />
                       ) : field.customComponent ? (
-                        <field.customComponent />
+                        field.customComponent
                       ) : !field.type ? (
                         <TextInputField
                           field={field}
                           fieldState={fieldState}
                           fieldItem={fieldItem}
+                          defaultValue={
+                            query.data && query.data[field.property]
+                          }
                         />
                       ) : null}
                     </>
@@ -159,43 +184,84 @@ export function ApiForm<Request extends { [key: string]: unknown }>({
   )
 }
 
-const TextInputField = ({ field, fieldState, fieldItem }) => {
+type FieldComponentProps<T extends ObjectWithStringKeys> = {
+  field: Field<T>
+  fieldItem: ControllerRenderProps<T, Path<T>>
+  fieldState: ControllerFieldState
+  defaultValue?: unknown
+}
+
+const TextInputField = <T extends ObjectWithStringKeys>({
+  field,
+  fieldState,
+  fieldItem,
+  defaultValue,
+}: FieldComponentProps<T>) => {
   return (
     <TextField
       fullWidth
       label={field.label}
       {...fieldItem}
+      onChange={(e) => {
+        if (field.valueAsNumber) {
+          if (e.target.value == '' || isNaN(Number(e.target.value))) {
+            fieldItem.onChange(e.target.value)
+          } else {
+            fieldItem.onChange(Number(e.target.value))
+          }
+        } else {
+          fieldItem.onChange(e.target.value)
+        }
+      }}
+      defaultValue={defaultValue}
       error={!!fieldState.error}
       helperText={fieldState.error?.message as string}
     />
   )
 }
-const SelectInputField = ({ field, fieldState, fieldItem }) => {
+
+const SelectInputField = <T extends ObjectWithStringKeys>({
+  field,
+  fieldState,
+  fieldItem,
+  defaultValue,
+}: FieldComponentProps<T>) => {
   return (
     <FormControl fullWidth error={!!fieldState.error}>
       <InputLabel id="demo-simple-select-label">{field.label}</InputLabel>
       <Select
-        labelId="demo-simple-select-label"
-        id="demo-simple-select"
         label={field.label}
         {...fieldItem}
         error={!!fieldState.error}
-        helperText={fieldState.error?.message as string}
+        defaultValue={defaultValue}
       >
-        {field.selectedValues?.map((value) => {
-          return <MenuItem value={value.value}>{value.key}</MenuItem>
-        })}
+        {field.selectedValues?.map((value) => (
+          <MenuItem value={value.value}>{value.label}</MenuItem>
+        ))}
       </Select>
+      <FormHelperText>{fieldState.error?.message}</FormHelperText>
     </FormControl>
   )
 }
-const DateInputField = ({ field, fieldState, fieldItem }) => {
+const DateInputField = <T extends ObjectWithStringKeys>({
+  field,
+  fieldState,
+  fieldItem,
+  defaultValue,
+}: FieldComponentProps<T>) => {
   return (
-    <DateField
-      label={field.label}
-      {...fieldItem}
-      error={!!fieldState.error}
-      helperText={fieldState.error?.message as string}
-    />
+    <FormControl error={!!fieldState.error}>
+      <DatePicker
+        label={field.label}
+        {...fieldItem}
+        value={dayjs(fieldItem.value as Date)}
+        onChange={(date: Dayjs | null) => {
+          fieldItem.onChange(date?.toDate())
+        }}
+        disableFuture={!!fieldState.error}
+        defaultValue={dayjs(defaultValue as Date)}
+      />
+      <FormHelperText>{fieldState.error?.message}</FormHelperText>
+    </FormControl>
   )
 }
