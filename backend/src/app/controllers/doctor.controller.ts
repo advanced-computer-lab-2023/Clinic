@@ -3,6 +3,7 @@ import { Router } from 'express'
 import {
   getAllDoctors,
   getDoctorByUsername,
+  getMyPatients,
   getPendingDoctorRequests,
   updateDoctorByUsername,
 } from '../services/doctor.service'
@@ -20,6 +21,7 @@ import { NotAuthenticatedError } from '../errors/auth.errors'
 import { APIError } from '../errors'
 import { validate } from '../middlewares/validation.middleware'
 import { UpdateDoctorRequestValidator } from 'clinic-common/validators/doctor.validator'
+import { GetMyPatientsResponse } from 'clinic-common/types/patient.types'
 
 export const doctorsRouter = Router()
 
@@ -127,6 +129,35 @@ doctorsRouter.get(
         doctor.affiliation,
         doctor.speciality,
         doctor.educationalBackground
+      )
+    )
+  })
+)
+
+doctorsRouter.get(
+  '/myPatients',
+  allowAuthenticated,
+  asyncWrapper(async (req, res) => {
+    const username: string | undefined = req.username
+    const usernameString: string = username ?? ''
+    const doctor = await getDoctorByUsername(usernameString)
+    console.log(doctor)
+    const patients = await getMyPatients(doctor.id)
+    res.send(
+      new GetMyPatientsResponse(
+        patients.map((patient) => ({
+          id: patient.user.toString(),
+          name: patient.name,
+          email: patient.email,
+          mobileNumber: patient.mobileNumber,
+          dateOfBirth: patient.dateOfBirth.toDateString(),
+          gender: patient.gender,
+          emergencyContact: {
+            name: patient.emergencyContact?.name ?? '',
+            mobileNumber: patient.emergencyContact?.mobileNumber ?? '',
+          },
+          familyMembers: patient.familyMembers,
+        }))
       )
     )
   })

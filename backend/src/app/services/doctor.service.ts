@@ -1,8 +1,14 @@
 import { DoctorModel, type DoctorDocument } from '../models/doctor.model'
 import { UserModel, type UserDocument } from '../models/user.model'
-import { DoctorStatus, type UpdateDoctorRequest } from 'clinic-common/types/doctor.types'
+import {
+  DoctorStatus,
+  type UpdateDoctorRequest,
+} from 'clinic-common/types/doctor.types'
 import { NotFoundError } from '../errors'
 import { type WithUser } from '../utils/typeUtils'
+import { type PatientDocument, PatientModel } from '../models/patient.model'
+import { AppointmentModel } from '../models/appointment.model'
+import { type ObjectId } from 'mongoose'
 /**
  * TODO: Replace DoctorDocumentWithUser with WithUser<DoctorDocument>,
  * leaving it for now not to break other PRs
@@ -67,4 +73,25 @@ export async function getDoctorByUsername(
   if (doctor == null) throw new NotFoundError()
 
   return doctor
+}
+
+// Define the function to get all patients of a doctor
+export async function getMyPatients(
+  doctorId: ObjectId
+): Promise<PatientDocument[]> {
+  // Find all appointments with the given doctorId
+  const appointments = await AppointmentModel.find({ doctorID: doctorId })
+  // Get all patients who had appointments with the doctor
+  const patients = await Promise.all(
+    appointments.map(async (appointment) => {
+      const patient = await PatientModel.findById(appointment.patientID)
+      return patient
+    })
+  )
+  // Filter out null values
+  const filteredPatients = patients.filter(
+    (patient) => patient !== null
+  ) as PatientDocument[]
+  // Return the list of patients
+  return filteredPatients
 }
