@@ -4,7 +4,7 @@ import {
   DoctorStatus,
   type UpdateDoctorRequest,
 } from 'clinic-common/types/doctor.types'
-import { NotFoundError } from '../errors'
+import { APIError, NotFoundError } from '../errors'
 import { type WithUser } from '../utils/typeUtils'
 import { type PatientDocument, PatientModel } from '../models/patient.model'
 import { AppointmentModel } from '../models/appointment.model'
@@ -32,6 +32,10 @@ export async function updateDoctorByUsername(
   const user = await UserModel.findOne({ username })
 
   if (user == null) throw new NotFoundError()
+
+  if ((await DoctorModel.count({ email: request.email })) > 0) {
+    throw new APIError('Email already exists', 400)
+  }
 
   const updatedDoctor = await DoctorModel.findOneAndUpdate(
     { user: user.id },
