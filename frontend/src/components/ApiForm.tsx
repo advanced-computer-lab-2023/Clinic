@@ -9,11 +9,13 @@ import { Path, useForm } from 'react-hook-form'
 import { LoadingButton } from '@mui/lab'
 import { v4 as uuidv4 } from 'uuid'
 import { useMemo } from 'react'
+import { DatePicker } from '@mui/x-date-pickers'
 
 export interface Field<Request extends { [key: string]: unknown }> {
   label: string
   property: Path<Request>
   valueAsNumber?: boolean
+  valueAsDate?: boolean
 }
 
 /**
@@ -32,22 +34,22 @@ export interface Field<Request extends { [key: string]: unknown }> {
  * @param action The function to call when the form is submitted.
  * @param onSuccess The function to call when the form is successfully submitted.
  * @param buttonText The text to display on the submit button.
- * 
+ *
  * @example
  * ```tsx
  * <ApiForm<UpdateDoctorRequest>
-      fields={[
+ fields={[
         { label: 'Email', property: 'email' },
         { label: 'Hourly Rate', property: 'hourlyRate', valueAsNumber: true },
         { label: 'Affiliation', property: 'affiliation' },
       ]}
-      validator={UpdateDoctorRequestValidator}
-      initialDataFetcher={() => getDoctor(user!.username)}
-      queryKey={['doctors', user!.username]}
-      successMessage="Updated doctor successfully."
-      action={(data) => updateDoctor(user!.username, data)}
-    />
-    ```
+ validator={UpdateDoctorRequestValidator}
+ initialDataFetcher={() => getDoctor(user!.username)}
+ queryKey={['doctors', user!.username]}
+ successMessage="Updated doctor successfully."
+ action={(data) => updateDoctor(user!.username, data)}
+ />
+ ```
  */
 export function ApiForm<Request extends { [key: string]: unknown }>({
   fields,
@@ -111,18 +113,35 @@ export function ApiForm<Request extends { [key: string]: unknown }>({
         <CardContent>
           <Stack spacing={2}>
             <AlertsBox scope={alertScope} />
-            {fields.map((field) => (
-              <TextField
-                fullWidth
-                label={field.label}
-                {...register(field.property, {
-                  valueAsNumber: field.valueAsNumber,
-                })}
-                error={!!errors[field.property]}
-                helperText={errors[field.property]?.message as string}
-                defaultValue={query.data && query.data[field.property]}
-              />
-            ))}
+            {fields.map((field) => {
+              if (field.valueAsDate) {
+                return (
+                  <DatePicker
+                    label="Date of birth"
+                    {...register(field.property, {
+                      valueAsDate: field.valueAsDate,
+                    })}
+                    error={!!errors[field.property]}
+                    helperText={errors[field.property]?.message as string}
+                    defaultValue={query.data && query.data[field.property]}
+                  />
+                )
+              } else {
+                return (
+                  <TextField
+                    fullWidth
+                    label={field.label}
+                    {...register(field.property, {
+                      valueAsNumber: field.valueAsNumber,
+                    })}
+                    type={field.valueAsNumber ? 'number' : 'text'}
+                    error={!!errors[field.property]}
+                    helperText={errors[field.property]?.message as string}
+                    defaultValue={query.data && query.data[field.property]}
+                  />
+                )
+              }
+            })}
 
             <LoadingButton loading={mutation.isLoading} type="submit">
               {buttonText ?? 'Submit'}
