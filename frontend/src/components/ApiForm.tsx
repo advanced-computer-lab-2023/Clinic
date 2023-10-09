@@ -3,19 +3,25 @@ import { CardPlaceholder } from '@/components/CardPlaceholder'
 import { useAlerts } from '@/hooks/alerts'
 import { Alert } from '@/providers/AlertsProvider'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Card, CardContent, Stack, TextField } from '@mui/material'
+import { Card, CardContent, FormControl, Stack, TextField } from '@mui/material'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { Path, useForm } from 'react-hook-form'
+import { Path, useForm, Controller } from 'react-hook-form'
 import { LoadingButton } from '@mui/lab'
 import { v4 as uuidv4 } from 'uuid'
 import { useMemo } from 'react'
-import { DatePicker } from '@mui/x-date-pickers'
+import { DateField } from '@mui/x-date-pickers'
+import InputLabel from '@mui/material/InputLabel'
+import MenuItem from '@mui/material/MenuItem'
+import Select from '@mui/material/Select'
 
 export interface Field<Request extends { [key: string]: unknown }> {
   label: string
   property: Path<Request>
   valueAsNumber?: boolean
-  valueAsDate?: boolean
+  type?: string
+  selectedValues?: { key: string; value: string }[]
+  customError?: string
+  customComponent?: unknown
 }
 
 /**
@@ -70,11 +76,7 @@ export function ApiForm<Request extends { [key: string]: unknown }>({
   onSuccess?: () => void
   buttonText?: string
 }) {
-  const {
-    handleSubmit,
-    register,
-    formState: { errors },
-  } = useForm<Request>({
+  const { handleSubmit, control } = useForm<Request>({
     resolver: zodResolver(validator),
   })
   const { addAlert } = useAlerts()
@@ -114,33 +116,37 @@ export function ApiForm<Request extends { [key: string]: unknown }>({
           <Stack spacing={2}>
             <AlertsBox scope={alertScope} />
             {fields.map((field) => {
-              if (field.valueAsDate) {
-                return (
-                  <DatePicker
-                    label="Date of birth"
-                    {...register(field.property, {
-                      valueAsDate: field.valueAsDate,
-                    })}
-                    error={!!errors[field.property]}
-                    helperText={errors[field.property]?.message as string}
-                    defaultValue={query.data && query.data[field.property]}
-                  />
-                )
-              } else {
-                return (
-                  <TextField
-                    fullWidth
-                    label={field.label}
-                    {...register(field.property, {
-                      valueAsNumber: field.valueAsNumber,
-                    })}
-                    type={field.valueAsNumber ? 'number' : 'text'}
-                    error={!!errors[field.property]}
-                    helperText={errors[field.property]?.message as string}
-                    defaultValue={query.data && query.data[field.property]}
-                  />
-                )
-              }
+              return (
+                <Controller
+                  name={field.property}
+                  control={control}
+                  render={({ field: fieldItem, fieldState }) => (
+                    <>
+                      {field.type === 'select' ? (
+                        <SelectInputField
+                          field={field}
+                          fieldState={fieldState}
+                          fieldItem={fieldItem}
+                        />
+                      ) : field.type === 'date' ? (
+                        <DateInputField
+                          field={field}
+                          fieldState={fieldState}
+                          fieldItem={fieldItem}
+                        />
+                      ) : field.customComponent ? (
+                        <field.customComponent />
+                      ) : !field.type ? (
+                        <TextInputField
+                          field={field}
+                          fieldState={fieldState}
+                          fieldItem={fieldItem}
+                        />
+                      ) : null}
+                    </>
+                  )}
+                />
+              )
             })}
 
             <LoadingButton loading={mutation.isLoading} type="submit">
@@ -150,5 +156,46 @@ export function ApiForm<Request extends { [key: string]: unknown }>({
         </CardContent>
       </Card>
     </form>
+  )
+}
+
+const TextInputField = ({ field, fieldState, fieldItem }) => {
+  return (
+    <TextField
+      fullWidth
+      label={field.label}
+      {...fieldItem}
+      error={!!fieldState.error}
+      helperText={fieldState.error?.message as string}
+    />
+  )
+}
+const SelectInputField = ({ field, fieldState, fieldItem }) => {
+  return (
+    <FormControl fullWidth error={!!fieldState.error}>
+      <InputLabel id="demo-simple-select-label">{field.label}</InputLabel>
+      <Select
+        labelId="demo-simple-select-label"
+        id="demo-simple-select"
+        label={field.label}
+        {...fieldItem}
+        error={!!fieldState.error}
+        helperText={fieldState.error?.message as string}
+      >
+        {field.selectedValues?.map((value) => {
+          return <MenuItem value={value.value}>{value.key}</MenuItem>
+        })}
+      </Select>
+    </FormControl>
+  )
+}
+const DateInputField = ({ field, fieldState, fieldItem }) => {
+  return (
+    <DateField
+      label={field.label}
+      {...fieldItem}
+      error={!!fieldState.error}
+      helperText={fieldState.error?.message as string}
+    />
   )
 }
