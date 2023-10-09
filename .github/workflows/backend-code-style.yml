@@ -8,15 +8,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      
+
       - name: Install packages
         run: npm ci
         working-directory: ./backend
 
       - name: Prettier
-        run: npm run format
+        run: npm run format:check
         working-directory: ./backend
 
       - name: Lint
         run: npm run lint
+        working-directory: ./backend
+
+      - name: Test Compile
+        run: npm run compile:check
         working-directory: ./backend

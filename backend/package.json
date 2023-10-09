@@ -35,12 +35,15 @@
     "dev": "nodemon --exec ts-node src/app.ts",
     "prepare": "cd .. && husky install backend/.husky",
     "lint": "eslint --ext .js,.ts,.jsx,.tsx src",
-    "format": "prettier . --write -u"
+    "format": "prettier . --write -u",
+    "format:check": "prettier . --check",
+    "compile:check": "tsc --noEmit"
   },
   "lint-staged": {
     "{src,test}/**/*.{js,ts,jsx,tsx}": [
       "eslint --fix",
-      "prettier --write -u"
+      "prettier --write -u",
+      "tsc --noEmit"
     ],
     "!**/*.{js,ts,jsx,tsx}": "prettier --write -u"
   }

@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      
+
       - name: Install packages
         run: npm ci
         working-directory: ./frontend
@@ -18,4 +18,8 @@ jobs:
 
       - name: Lint
         run: npm run lint
+        working-directory: ./frontend
+
+      - name: Test Compile
+        run: npm run compile:check
         working-directory: ./frontend
