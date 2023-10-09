@@ -159,7 +159,6 @@ export async function submitDoctorRequest(
   })
   await user.save()
   const newDoctor = await DoctorModel.create({
-    username: doctor.username,
     user: user.id,
     name: doctor.name,
     email: doctor.email,
@@ -167,6 +166,7 @@ export async function submitDoctorRequest(
     hourlyRate: doctor.hourlyRate,
     affiliation: doctor.affiliation,
     educationalBackground: doctor.educationalBackground,
+    speciality:doctor.speciality,
     requestStatus: DoctorStatus.Pending,
   })
   await newDoctor.save()

@@ -27,6 +27,13 @@ mongoose
   .connect(MongoURL)
   .then(() => {
     console.log('Database connected')
+      mongoose.connection.db.dropDatabase()
+          .then(() => {
+              console.log('Database dropped');
+          })
+          .catch((error) => {
+              console.error('Error dropping database:', error);
+          })
   })
   .catch((err) => {
     console.log(err)

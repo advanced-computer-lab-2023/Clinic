@@ -1,21 +1,9 @@
 import { ApiForm } from '@/components/ApiForm'
-import { registerPatient } from '@/api/auth'
+import { requestDoctor } from '@/api/auth'
 import { useAuth } from '@/hooks/auth'
 
 import { RegisterDoctorRequestValidator } from 'clinic-common/validators/doctor.validator'
 import { RegisterDoctorRequest } from 'clinic-common/types/doctor.types'
-// export const RegisterDoctorRequestValidator = zod.object({
-//     username: zod.string().min(3).max(255),
-//     password: zod.string().min(6).max(255),
-//     name: zod.string().min(3).max(255),
-//     email: zod.string().email(),
-//     mobileNumber: zod.string().min(10).max(10),
-//     dateOfBirth: zod.coerce.date(),
-//     hourlyRate: zod.number(),
-//     affiliation: zod.string().min(1),
-//     educationalBackground: zod.string().min(1),
-// })
-
 export const RequestDoctor = () => {
   const { refreshUser } = useAuth()
   return (
@@ -31,16 +19,14 @@ export const RequestDoctor = () => {
           customError: 'Mobile number must be 10 digits.',
         },
         { label: 'Date of Birth', property: 'dateOfBirth', type: 'date' },
-        {
-          label: 'Hourly Rate',
-          property: 'hourlyRate',
-          type: 'number',
-          valueAsNumber: true,
-        },
+        { label: 'Hourly Rate', property: 'hourlyRate', valueAsNumber: true },
+        { label: 'Affiliation', property: 'affiliation' },
+        { label: 'Educational background', property: 'educationalBackground' },
+        { label: 'Speciality', property: 'speciality' },
       ]}
       validator={RegisterDoctorRequestValidator}
       successMessage="Register successfully."
-      action={registerPatient}
+      action={requestDoctor}
       onSuccess={() => refreshUser()}
       buttonText="Register"
     />
