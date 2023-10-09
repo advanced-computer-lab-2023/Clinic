@@ -236,7 +236,7 @@ const SelectInputField = <T extends ObjectWithStringKeys>({
         defaultValue={defaultValue}
       >
         {field.selectedValues?.map((value) => (
-          <MenuItem value={value.value}>{value.label}</MenuItem>
+          <MenuItem value={value.value}>{value.value}</MenuItem>
         ))}
       </Select>
       <FormHelperText>{fieldState.error?.message}</FormHelperText>
