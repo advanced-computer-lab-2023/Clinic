@@ -12,7 +12,6 @@ const appointmentSchema = new Schema(
       type: String,
       required: true,
       enum: AppointmentStatus,
-      default: AppointmentStatus.Pending,
     },
   },
   { timestamps: true }
