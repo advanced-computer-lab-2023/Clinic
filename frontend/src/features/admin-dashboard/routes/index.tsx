@@ -2,6 +2,7 @@ import { RouteObject } from 'react-router-dom'
 import { AdminDashboardLayout } from '../components/AdminDashboardLayout'
 import { AdminDashboardHome } from './AdminDashboardHome'
 import { PendingDoctors } from './PendingDoctors'
+import { HealthPackages } from './HealthPackages'
 
 export const adminDashboardRoutes: RouteObject[] = [
   {
@@ -15,6 +16,11 @@ export const adminDashboardRoutes: RouteObject[] = [
       {
         path: 'pending-doctors',
         element: <PendingDoctors />,
+      },
+
+      {
+        path: 'health-packages',
+        element: <HealthPackages />,
       },
     ],
   },
