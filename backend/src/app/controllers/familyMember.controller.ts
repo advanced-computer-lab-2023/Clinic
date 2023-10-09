@@ -13,6 +13,7 @@ import {
 import { allowAuthenticated } from '../middlewares/auth.middleware'
 import { AddFamilyMemberRequestValidator } from 'clinic-common/validators/familyMembers.validator'
 import { validate } from '../middlewares/validation.middleware'
+import { type Gender } from 'clinic-common/types/gender.types'
 
 export const familyMemberRouter = Router()
 
@@ -35,7 +36,7 @@ familyMemberRouter.get(
           name: familyMember.name,
           nationalId: familyMember.nationalId,
           age: familyMember.age,
-          gender: familyMember.gender,
+          gender: familyMember.gender as Gender,
           relation: familyMember.relation as Relation,
         }))
       )
@@ -56,7 +57,7 @@ familyMemberRouter.get(
           name: familyMember.name,
           nationalId: familyMember.nationalId,
           age: familyMember.age,
-          gender: familyMember.gender,
+          gender: familyMember.gender as Gender,
           relation: familyMember.relation as Relation,
         }))
       )
@@ -80,7 +81,7 @@ familyMemberRouter.post(
         newFamilyMember.name,
         newFamilyMember.nationalId,
         newFamilyMember.age,
-        newFamilyMember.gender,
+        newFamilyMember.gender as Gender,
         newFamilyMember.relation as Relation
       )
     )

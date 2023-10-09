@@ -1,4 +1,5 @@
 import { type Types } from 'mongoose'
+import { Gender } from './gender.types'
 
 export class PatientResponseBase {
   constructor(
@@ -8,7 +9,7 @@ export class PatientResponseBase {
     public email: string,
     public mobileNumber: string,
     public dateOfBirth: Date,
-    public gender: string,
+    public gender: Gender,
     public emergencyContact: {
       name: string
       mobileNumber: string
@@ -27,7 +28,7 @@ export class MyPatientsResponseBase {
     public email: string,
     public mobileNumber: string,
     public dateOfBirth: string,
-    public gender: string,
+    public gender: Gender,
     public emergencyContact: {
       name: string
       mobileNumber: string

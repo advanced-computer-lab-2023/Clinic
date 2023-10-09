@@ -1,5 +1,6 @@
 import { type z } from 'zod'
 import { type AddFamilyMemberRequestValidator } from '../validators/familyMembers.validator'
+import { Gender } from './gender.types'
 
 export enum Relation {
   Wife = 'wife',
@@ -14,7 +15,7 @@ export class FamilyMemberResponseBase {
     public name: string,
     public nationalId: string,
     public age: number,
-    public gender: string,
+    public gender: Gender,
     public relation: Relation, 
   ) {}
 }
