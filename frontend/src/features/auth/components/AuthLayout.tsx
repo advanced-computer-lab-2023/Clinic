@@ -21,6 +21,11 @@ export function AuthLayout() {
         text: 'Register',
         icon: <AppRegistrationRounded />,
       },
+      {
+        to: '/auth/requestDoctor',
+        text: 'Request as a doctor',
+        icon: <AppRegistrationRounded />,
+      },
     ])
   }, [setSidebarLinks])
 

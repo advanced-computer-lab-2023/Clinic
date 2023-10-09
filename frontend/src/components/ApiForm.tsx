@@ -3,17 +3,41 @@ import { CardPlaceholder } from '@/components/CardPlaceholder'
 import { useAlerts } from '@/hooks/alerts'
 import { Alert } from '@/providers/AlertsProvider'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Card, CardContent, Stack, TextField } from '@mui/material'
+import {
+  Card,
+  CardContent,
+  FormControl,
+  FormHelperText,
+  InputLabel,
+  MenuItem,
+  Select,
+  Stack,
+  TextField,
+} from '@mui/material'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { Path, useForm } from 'react-hook-form'
+import {
+  Path,
+  useForm,
+  Controller,
+  ControllerRenderProps,
+  ControllerFieldState,
+} from 'react-hook-form'
 import { LoadingButton } from '@mui/lab'
 import { v4 as uuidv4 } from 'uuid'
 import { useMemo } from 'react'
+import { DatePicker } from '@mui/x-date-pickers'
+import dayjs, { Dayjs } from 'dayjs'
 
-export interface Field<Request extends { [key: string]: unknown }> {
+type ObjectWithStringKeys = { [key: string]: unknown }
+
+export interface Field<Request extends ObjectWithStringKeys> {
   label: string
   property: Path<Request>
   valueAsNumber?: boolean
+  type?: string
+  selectedValues?: { label: string; value: string }[]
+  customError?: string
+  customComponent?: unknown
 }
 
 /**
@@ -32,24 +56,24 @@ export interface Field<Request extends { [key: string]: unknown }> {
  * @param action The function to call when the form is submitted.
  * @param onSuccess The function to call when the form is successfully submitted.
  * @param buttonText The text to display on the submit button.
- * 
+ *
  * @example
  * ```tsx
  * <ApiForm<UpdateDoctorRequest>
-      fields={[
+ fields={[
         { label: 'Email', property: 'email' },
         { label: 'Hourly Rate', property: 'hourlyRate', valueAsNumber: true },
         { label: 'Affiliation', property: 'affiliation' },
       ]}
-      validator={UpdateDoctorRequestValidator}
-      initialDataFetcher={() => getDoctor(user!.username)}
-      queryKey={['doctors', user!.username]}
-      successMessage="Updated doctor successfully."
-      action={(data) => updateDoctor(user!.username, data)}
-    />
-    ```
+ validator={UpdateDoctorRequestValidator}
+ initialDataFetcher={() => getDoctor(user!.username)}
+ queryKey={['doctors', user!.username]}
+ successMessage="Updated doctor successfully."
+ action={(data) => updateDoctor(user!.username, data)}
+ />
+ ```
  */
-export function ApiForm<Request extends { [key: string]: unknown }>({
+export function ApiForm<Request extends ObjectWithStringKeys>({
   fields,
   validator,
   initialDataFetcher,
@@ -68,11 +92,7 @@ export function ApiForm<Request extends { [key: string]: unknown }>({
   onSuccess?: () => void
   buttonText?: string
 }) {
-  const {
-    handleSubmit,
-    register,
-    formState: { errors },
-  } = useForm<Request>({
+  const { handleSubmit, control } = useForm<Request>({
     resolver: zodResolver(validator),
   })
   const { addAlert } = useAlerts()
@@ -95,9 +115,8 @@ export function ApiForm<Request extends { [key: string]: unknown }>({
       addAlert(new Alert(successMessage, 'success', alertScope))
       onSuccess?.()
     },
-    onError: (e) => {
-      console.log(e)
-      addAlert(new Alert('Failed! Try again.', 'error', alertScope))
+    onError: (e: Error) => {
+      addAlert(new Alert(e.message ?? 'Failed! Try again', 'error', alertScope))
     },
   })
 
@@ -111,18 +130,49 @@ export function ApiForm<Request extends { [key: string]: unknown }>({
         <CardContent>
           <Stack spacing={2}>
             <AlertsBox scope={alertScope} />
-            {fields.map((field) => (
-              <TextField
-                fullWidth
-                label={field.label}
-                {...register(field.property, {
-                  valueAsNumber: field.valueAsNumber,
-                })}
-                error={!!errors[field.property]}
-                helperText={errors[field.property]?.message as string}
-                defaultValue={query.data && query.data[field.property]}
-              />
-            ))}
+            {fields.map((field, i) => {
+              return (
+                <Controller
+                  key={i}
+                  name={field.property}
+                  control={control}
+                  render={({ field: fieldItem, fieldState }) => (
+                    <>
+                      {field.selectedValues ? (
+                        <SelectInputField
+                          field={field}
+                          fieldState={fieldState}
+                          fieldItem={fieldItem}
+                          defaultValue={
+                            query.data && query.data[field.property]
+                          }
+                        />
+                      ) : field.type === 'date' ? (
+                        <DateInputField
+                          field={field}
+                          fieldState={fieldState}
+                          fieldItem={fieldItem}
+                          defaultValue={
+                            query.data && query.data[field.property]
+                          }
+                        />
+                      ) : field.customComponent ? (
+                        field.customComponent
+                      ) : !field.type ? (
+                        <TextInputField
+                          field={field}
+                          fieldState={fieldState}
+                          fieldItem={fieldItem}
+                          defaultValue={
+                            query.data && query.data[field.property]
+                          }
+                        />
+                      ) : null}
+                    </>
+                  )}
+                />
+              )
+            })}
 
             <LoadingButton loading={mutation.isLoading} type="submit">
               {buttonText ?? 'Submit'}
@@ -131,5 +181,87 @@ export function ApiForm<Request extends { [key: string]: unknown }>({
         </CardContent>
       </Card>
     </form>
+  )
+}
+
+type FieldComponentProps<T extends ObjectWithStringKeys> = {
+  field: Field<T>
+  fieldItem: ControllerRenderProps<T, Path<T>>
+  fieldState: ControllerFieldState
+  defaultValue?: unknown
+}
+
+const TextInputField = <T extends ObjectWithStringKeys>({
+  field,
+  fieldState,
+  fieldItem,
+  defaultValue,
+}: FieldComponentProps<T>) => {
+  return (
+    <TextField
+      fullWidth
+      label={field.label}
+      {...fieldItem}
+      onChange={(e) => {
+        if (field.valueAsNumber) {
+          if (e.target.value == '' || isNaN(Number(e.target.value))) {
+            fieldItem.onChange(e.target.value)
+          } else {
+            fieldItem.onChange(Number(e.target.value))
+          }
+        } else {
+          fieldItem.onChange(e.target.value)
+        }
+      }}
+      defaultValue={defaultValue}
+      error={!!fieldState.error}
+      helperText={fieldState.error?.message as string}
+    />
+  )
+}
+
+const SelectInputField = <T extends ObjectWithStringKeys>({
+  field,
+  fieldState,
+  fieldItem,
+  defaultValue,
+}: FieldComponentProps<T>) => {
+  return (
+    <FormControl fullWidth error={!!fieldState.error}>
+      <InputLabel id="demo-simple-select-label">{field.label}</InputLabel>
+      <Select
+        label={field.label}
+        {...fieldItem}
+        error={!!fieldState.error}
+        defaultValue={defaultValue}
+      >
+        {field.selectedValues?.map((value) => (
+          <MenuItem value={value.value}>{value.label}</MenuItem>
+        ))}
+      </Select>
+      <FormHelperText>{fieldState.error?.message}</FormHelperText>
+    </FormControl>
+  )
+}
+const DateInputField = <T extends ObjectWithStringKeys>({
+  field,
+  fieldState,
+  fieldItem,
+  defaultValue,
+}: FieldComponentProps<T>) => {
+  return (
+    <FormControl error={!!fieldState.error}>
+      <DatePicker
+        label={field.label}
+        {...fieldItem}
+        value={dayjs(fieldItem.value as Date)}
+        onChange={(date: Dayjs | null) => {
+          fieldItem.onChange(date?.toDate())
+        }}
+        disableFuture={!!fieldState.error}
+        defaultValue={dayjs(defaultValue as Date)}
+      />
+      <FormHelperText>{fieldState.error?.message}</FormHelperText>
+    </FormControl>
   )
 }

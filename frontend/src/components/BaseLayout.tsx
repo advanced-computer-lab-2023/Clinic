@@ -16,6 +16,8 @@ import React from 'react'
 import { Link, Outlet } from 'react-router-dom'
 import { OnlyAuthenticated } from './OnlyAuthenticated'
 import { AlertsBox } from './AlertsBox'
+import { LocalizationProvider } from '@mui/x-date-pickers'
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 
 interface ListItemLinkProps {
   icon?: React.ReactElement
@@ -104,11 +106,13 @@ export function BaseLayout() {
       >
         <Toolbar />
         <AlertsBox />
-        <Outlet
-          context={
-            { setSidebarLinks, sidebarLinks } satisfies OutletContextType
-          }
-        />
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <Outlet
+            context={
+              { setSidebarLinks, sidebarLinks } satisfies OutletContextType
+            }
+          />
+        </LocalizationProvider>
       </Box>
     </Box>
   )
