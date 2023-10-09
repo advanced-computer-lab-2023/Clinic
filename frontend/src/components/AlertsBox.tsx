@@ -7,7 +7,7 @@ export function AlertsBox({ scope }: { scope?: string }) {
   scope = scope || 'global'
 
   return (
-    <Stack>
+    <Stack spacing={1}>
       {alerts
         .filter((a) => a.scope == scope)
         .map((alert) => (

@@ -1,10 +1,9 @@
 import type { ErrorRequestHandler } from 'express'
 import { APIError } from '../errors'
-import { ZodError } from 'zod'
-
+import { ZodError } from 'clinic-common/validators'
 
 export const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
-  console.log(err)
+  console.log(err instanceof ZodError, err)
   if (err instanceof APIError) {
     res.status(err.status).json({ message: err.message })
   } else if (err instanceof ZodError) {

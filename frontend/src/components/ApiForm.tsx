@@ -116,7 +116,15 @@ export function ApiForm<Request extends ObjectWithStringKeys>({
       onSuccess?.()
     },
     onError: (e: Error) => {
-      addAlert(new Alert(e.message ?? 'Failed! Try again', 'error', alertScope))
+      if (Array.isArray(e)) {
+        for (const error of e) {
+          addAlert(new Alert(error.message, 'error', alertScope))
+        }
+      } else {
+        addAlert(
+          new Alert(e.message ?? 'Failed! Try again', 'error', alertScope)
+        )
+      }
     },
   })
 
@@ -226,10 +234,13 @@ const SelectInputField = <T extends ObjectWithStringKeys>({
   fieldItem,
   defaultValue,
 }: FieldComponentProps<T>) => {
+  const id = useMemo(() => uuidv4(), [])
+
   return (
     <FormControl fullWidth error={!!fieldState.error}>
-      <InputLabel id="demo-simple-select-label">{field.label}</InputLabel>
+      <InputLabel id={id}>{field.label}</InputLabel>
       <Select
+        labelId={id}
         label={field.label}
         {...fieldItem}
         error={!!fieldState.error}
@@ -243,6 +254,7 @@ const SelectInputField = <T extends ObjectWithStringKeys>({
     </FormControl>
   )
 }
+
 const DateInputField = <T extends ObjectWithStringKeys>({
   field,
   fieldState,
@@ -254,11 +266,10 @@ const DateInputField = <T extends ObjectWithStringKeys>({
       <DatePicker
         label={field.label}
         {...fieldItem}
-        value={dayjs(fieldItem.value as Date)}
+        value={dayjs((fieldItem.value as Date) || (defaultValue as Date))}
         onChange={(date: Dayjs | null) => {
           fieldItem.onChange(date?.toDate())
         }}
-        disableFuture={!!fieldState.error}
         defaultValue={dayjs(defaultValue as Date)}
       />
       <FormHelperText>{fieldState.error?.message}</FormHelperText>
