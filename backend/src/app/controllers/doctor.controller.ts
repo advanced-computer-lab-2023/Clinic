@@ -22,6 +22,7 @@ import { APIError } from '../errors'
 import { validate } from '../middlewares/validation.middleware'
 import { UpdateDoctorRequestValidator } from 'clinic-common/validators/doctor.validator'
 import { GetMyPatientsResponse } from 'clinic-common/types/patient.types'
+import { type Gender } from 'clinic-common/types/gender.types'
 
 export const doctorsRouter = Router()
 
@@ -151,7 +152,7 @@ doctorsRouter.get(
           email: patient.email,
           mobileNumber: patient.mobileNumber,
           dateOfBirth: patient.dateOfBirth.toDateString(),
-          gender: patient.gender,
+          gender: patient.gender as Gender,
           emergencyContact: {
             name: patient.emergencyContact?.name ?? '',
             mobileNumber: patient.emergencyContact?.mobileNumber ?? '',
