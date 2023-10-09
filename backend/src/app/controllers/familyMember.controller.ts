@@ -8,6 +8,7 @@ import {
   type AddFamilyMemberRequest,
   AddFamilyMemberResponse,
   GetFamilyMembersResponse,
+  type Relation,
 } from 'clinic-common/types/familyMember.types'
 import { allowAuthenticated } from '../middlewares/auth.middleware'
 import { AddFamilyMemberRequestValidator } from 'clinic-common/validators/familyMembers.validator'
@@ -35,7 +36,7 @@ familyMemberRouter.get(
           nationalId: familyMember.nationalId,
           age: familyMember.age,
           gender: familyMember.gender,
-          relation: familyMember.relation,
+          relation: familyMember.relation as Relation,
         }))
       )
     )
@@ -56,7 +57,7 @@ familyMemberRouter.get(
           nationalId: familyMember.nationalId,
           age: familyMember.age,
           gender: familyMember.gender,
-          relation: familyMember.relation,
+          relation: familyMember.relation as Relation,
         }))
       )
     )
@@ -80,7 +81,7 @@ familyMemberRouter.post(
         newFamilyMember.nationalId,
         newFamilyMember.age,
         newFamilyMember.gender,
-        newFamilyMember.relation
+        newFamilyMember.relation as Relation
       )
     )
   })
