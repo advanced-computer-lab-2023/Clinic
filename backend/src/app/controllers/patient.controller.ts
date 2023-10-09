@@ -8,6 +8,7 @@ import {
 } from 'clinic-common/types/patient.types'
 
 import { allowApprovedDoctors } from '../middlewares/auth.middleware'
+import { type Gender } from 'clinic-common/types/gender.types'
 
 export const patientRouter = Router()
 
@@ -26,7 +27,7 @@ patientRouter.get(
         patient.email,
         patient.mobileNumber,
         patient.dateOfBirth,
-        patient.gender,
+        patient.gender as Gender,
         {
           name: patient.emergencyContact?.name ?? '',
           mobileNumber: patient.emergencyContact?.mobileNumber ?? '',
@@ -52,7 +53,7 @@ patientRouter.get(
           email: patient.email,
           mobileNumber: patient.mobileNumber,
           dateOfBirth: patient.dateOfBirth,
-          gender: patient.gender,
+          gender: patient.gender as Gender,
           emergencyContact: {
             name: patient.emergencyContact?.name ?? '',
             mobileNumber: patient.emergencyContact?.mobileNumber ?? '',

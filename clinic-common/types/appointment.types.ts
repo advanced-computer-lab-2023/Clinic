@@ -6,9 +6,8 @@ export interface Appointment {
 }
 
 export enum AppointmentStatus {
-  Pending = 'pending',
-  Confirmed = 'confirmed',
-  Canceled = 'canceled',
+  Upcoming = 'upcoming',
+  Completed = 'completed',
 }
 
 export class AppointmentResponseBase {
