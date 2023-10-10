@@ -108,8 +108,8 @@ doctorsRouter.get(
           educationalBackground: doctor.educationalBackground,
           sessionRate: doctor.hourlyRate * 1.1 - Math.random() * 10, // this is a random discount till the pachage part is done
           // TODO: retrieve available times from the Appointments. Since we aren't required to make appointments for this sprint, I will
-          // assume available times is a field in the doctors schema for this sprint.
-          availableTimes: doctor.availableTimes?? '' as string,
+          // assume available times is a field in the doctors schema for now.
+          availableTimes: ((doctor.availableTimes) as  [string]),
         }))
       )
     )
