@@ -172,7 +172,7 @@ debugRouter.get(
 )
 
 /**
- * This endpoint makes the current user an admin.
+ * This endpoint makes the current user an admin.ts.
  */
 debugRouter.get(
   '/make-me-admin',
@@ -185,7 +185,7 @@ debugRouter.get(
     }
 
     if ((await AdminModel.count({ user: user.id })) > 0) {
-      throw new APIError('User is already an admin', 400)
+      throw new APIError('User is already an admin.ts', 400)
     }
 
     const admin = await AdminModel.create({ user: user.id })
@@ -198,15 +198,15 @@ debugRouter.get(
 )
 
 /**
- * This endpoint creates an admin with random username and password 'admin',
- * and returns the created admin, for testing purposes.
+ * This endpoint creates an admin.ts with random username and password 'admin.ts',
+ * and returns the created admin.ts, for testing purposes.
  */
 debugRouter.post(
   '/create-admin',
   asyncWrapper(async (req, res) => {
     const user = await UserModel.create({
-      username: randomUsername('admin'),
-      password: await hash('admin', bcryptSalt),
+      username: randomUsername('admin.ts'),
+      password: await hash('admin.ts', bcryptSalt),
       type: UserType.Admin,
     })
 
