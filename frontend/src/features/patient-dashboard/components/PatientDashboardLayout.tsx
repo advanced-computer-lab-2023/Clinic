@@ -1,7 +1,7 @@
 import { AuthenticatedRoute } from '@/components/AuthenticatedRoute'
 import { useSidebar } from '@/hooks/sidebar'
-import { UserType } from 'clinic-common/types/user.types'
 import { Group, MedicalInformation } from '@mui/icons-material'
+import { UserType } from 'clinic-common/types/user.types'
 import { Container } from '@mui/material'
 import { useEffect } from 'react'
 import { Outlet } from 'react-router-dom'
@@ -20,6 +20,11 @@ export function PatientDashboardLayout() {
         to: '/patient-dashboard/prescriptions',
         text: 'Prescriptions',
         icon: <MedicalInformation />,
+      },
+      {
+        to: '/patient-dashboard/approved-doctors',
+        text: 'Doctors',
+        icon: <Group />,
       },
     ])
   }, [setSidebarLinks])
