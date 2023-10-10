@@ -2,8 +2,10 @@ import { addHealthPackage } from '@/api/healthPackages'
 import { ApiForm } from '@/components/ApiForm'
 import { createHealthPackageRequest } from 'clinic-common/types/healthPackage.types'
 import { CreateHealthPackageRequestValidator } from 'clinic-common/validators/healthPackage.validator'
+import { useNavigate } from 'react-router-dom'
 
-export function AddHealthPackage({ onSuccess }: { onSuccess: () => void }) {
+export function AddHealthPackage() {
+  const navigate = useNavigate()
   return (
     <ApiForm<createHealthPackageRequest>
       fields={[
@@ -32,7 +34,9 @@ export function AddHealthPackage({ onSuccess }: { onSuccess: () => void }) {
       validator={CreateHealthPackageRequestValidator}
       successMessage="Added health package successfully"
       action={(data) => addHealthPackage(data)}
-      onSuccess={onSuccess}
+      onSuccess={() => {
+        navigate('/admin-dashboard/health-packages')
+      }}
     />
   )
 }

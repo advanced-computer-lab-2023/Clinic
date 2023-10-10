@@ -4,6 +4,7 @@ import { AdminDashboardHome } from './AdminDashboardHome'
 import { PendingDoctors } from './PendingDoctors'
 import { HealthPackages } from './HealthPackages'
 import { AddAdmin } from '@/features/admin-dashboard/routes/AddAdmin'
+import { AddHealthPackage } from './AddHealthPackage'
 
 export const adminDashboardRoutes: RouteObject[] = [
   {
@@ -23,8 +24,13 @@ export const adminDashboardRoutes: RouteObject[] = [
         element: <HealthPackages />,
       },
       {
+<<<<<<< HEAD
         path: 'add-admin',
         element: <AddAdmin />,
+=======
+        path: 'add-health-package',
+        element: <AddHealthPackage />,
+>>>>>>> 80afb50 (add-health-package)
       },
     ],
   },
