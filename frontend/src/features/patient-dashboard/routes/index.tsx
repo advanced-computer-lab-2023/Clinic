@@ -3,6 +3,7 @@ import { PatientDashboardLayout } from '../components/PatientDashboardLayout'
 import { PatientDashboardHome } from './PatientDashboardHome'
 import { FamilyMembers } from './FamilyMembers'
 import { FilteredPrescriptions } from './FilteredPrescriptions'
+import { ApprovedDoctors } from './ApprovedDoctors'
 
 export const patientDashboardRoutes: RouteObject[] = [
   {
@@ -19,6 +20,10 @@ export const patientDashboardRoutes: RouteObject[] = [
       {
         path: 'prescriptions',
         element: <FilteredPrescriptions />,
+      },
+      {
+        path: 'approved-doctors',
+        element: <ApprovedDoctors />,
       },
     ],
   },
