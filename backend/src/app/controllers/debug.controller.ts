@@ -254,14 +254,14 @@ debugRouter.post(
       patient.familyMembers.push(familyMember.id)
     }
 
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < 6; i++) {
       const doctor = await createDummyDoctor()
 
       await PrescriptionModel.create({
         patient: patient.id,
         doctor: doctor.id,
         date: faker.date.past(),
-        medicine: faker.lorem.sentence(),
+        medicine: faker.word.noun() + ' ' + faker.word.noun(),
         isFilled: faker.datatype.boolean(),
       })
     }
