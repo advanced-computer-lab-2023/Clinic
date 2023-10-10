@@ -1,4 +1,4 @@
-import { getHealthPackages } from '@/api/healthPackages'
+import { deleteHealthPackage, getHealthPackages } from '@/api/healthPackages'
 import { CardPlaceholder } from '@/components/CardPlaceholder'
 import {
   Button,
@@ -9,16 +9,35 @@ import {
   Stack,
   Typography,
 } from '@mui/material'
+import Dialog from '@mui/material/Dialog'
+import DialogActions from '@mui/material/DialogActions'
+import DialogContent from '@mui/material/DialogContent'
+import DialogContentText from '@mui/material/DialogContentText'
+import DialogTitle from '@mui/material/DialogTitle'
+
 import UpgradeIcon from '@mui/icons-material/Upgrade'
 import DeleteIcon from '@mui/icons-material/Delete'
 import AddIcon from '@mui/icons-material/Add'
 import { useQuery } from '@tanstack/react-query'
-
+import { useNavigate } from 'react-router-dom'
+// import { useAlerts } from '@/hooks/alerts'
+// import { Alert } from '@/providers/AlertsProvider'
+import {
+  //  useMemo,
+  useState,
+} from 'react'
+import { LoadingButton } from '@mui/lab'
 export function HealthPackages() {
+  const navigate = useNavigate()
   const query = useQuery({
     queryKey: ['health-packages'],
     queryFn: () => getHealthPackages(),
   })
+  // const { addAlert } = useAlerts()
+  // const alertScope = useMemo(() => uuidv4(), [])
+  const [open, setOpen] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [packageId, setPackageId] = useState('')
   if (query.isLoading) {
     return <CardPlaceholder />
   }
@@ -26,8 +45,54 @@ export function HealthPackages() {
     return <h1>error</h1>
   }
 
+  function handleUpdate(id: string) {
+    navigate(`/admin-dashboard/update-health-package/${id}`)
+  }
+  const handleClickOpen = () => {
+    setOpen(true)
+  }
+
+  const handleClose = () => {
+    setOpen(false)
+    setLoading(false)
+  }
+
+  function handleDelelte() {
+    // addAlert(new Alert("successMessage", 'success',alertScope))
+    setLoading(true)
+    deleteHealthPackage(packageId).then(() => {
+      handleClose()
+      query.refetch()
+    })
+  }
+
   return (
     <div>
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="responsive-dialog-title"
+      >
+        <DialogTitle id="responsive-dialog-title">{'Alert'}</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure,you want to delete this package?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button autoFocus onClick={handleClose}>
+            Cancel
+          </Button>
+          <LoadingButton
+            size="small"
+            color="primary"
+            onClick={handleDelelte}
+            loading={loading}
+          >
+            <span>Delete</span>
+          </LoadingButton>
+        </DialogActions>
+      </Dialog>
       <Grid container spacing={1}>
         {query.data.healthPackages.map((healthPackage) => {
           return (
@@ -89,10 +154,24 @@ export function HealthPackages() {
                   </Stack>
                 </CardContent>
                 <CardActions>
-                  <Button size="small" startIcon={<UpgradeIcon />}>
+                  <Button
+                    size="small"
+                    startIcon={<UpgradeIcon />}
+                    onClick={() => {
+                      handleUpdate(healthPackage.id)
+                    }}
+                  >
                     Update
                   </Button>
-                  <Button size="small" startIcon={<DeleteIcon />}>
+                  <Button
+                    size="small"
+                    startIcon={<DeleteIcon />}
+                    onClick={() => {
+                      // handleDelte(healthPackage.id)
+                      setPackageId(healthPackage.id)
+                      handleClickOpen()
+                    }}
+                  >
                     Delete
                   </Button>
                 </CardActions>
