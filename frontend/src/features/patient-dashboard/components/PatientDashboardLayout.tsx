@@ -1,6 +1,6 @@
 import { AuthenticatedRoute } from '@/components/AuthenticatedRoute'
 import { useSidebar } from '@/hooks/sidebar'
-import { Group, MedicalInformation } from '@mui/icons-material'
+import { Group, Healing, MedicalInformation } from '@mui/icons-material'
 import { UserType } from 'clinic-common/types/user.types'
 import { Container } from '@mui/material'
 import { useEffect } from 'react'
@@ -24,7 +24,7 @@ export function PatientDashboardLayout() {
       {
         to: '/patient-dashboard/approved-doctors',
         text: 'Doctors',
-        icon: <Group />,
+        icon: <Healing />,
       },
     ])
   }, [setSidebarLinks])

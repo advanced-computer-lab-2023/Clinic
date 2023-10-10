@@ -21,6 +21,13 @@ export function ApprovedDoctors() {
             actual.toLowerCase().includes(required.toLowerCase()),
           type: 'text',
         },
+        {
+          label: 'Available Times',
+          property: (v) => v.availableTimes,
+          filter: (actual: string, required: string) =>
+            actual.toLowerCase().includes(required.toLowerCase()),
+          type: 'text',
+        },
       ]}
       queryKey={['approved-doctors']}
       component={(doctor) => (
@@ -39,6 +46,14 @@ export function ApprovedDoctors() {
                     Doctor Speciality
                   </Typography>
                   <Typography variant="body1">{doctor.speciality}</Typography>
+                </Stack>
+                <Stack spacing={-1}>
+                  <Typography variant="overline" color="text.secondary">
+                    Available Times
+                  </Typography>
+                  <Typography variant="body1">
+                    {doctor.availableTimes}
+                  </Typography>
                 </Stack>
               </Stack>
             </CardContent>

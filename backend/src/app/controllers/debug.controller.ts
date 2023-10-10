@@ -15,7 +15,6 @@ import { FamilyMemberModel } from '../models/familyMember.model'
 import { type WithUser } from '../utils/typeUtils'
 import { PrescriptionModel } from '../models/prescription.model'
 
-
 const bcryptSalt = process.env.BCRYPT_SALT ?? '$2b$10$13bXTGGukQXsCf5hokNe2u'
 
 // Generate a random long number to be used in usernames to avoid duplicated usernames
@@ -56,6 +55,7 @@ async function createDummyDoctor(): Promise<WithUser<DoctorDocument>> {
     educationalBackground: faker.company.name(),
     speciality: faker.helpers.arrayElement(specialities),
     requestStatus: DoctorStatus.Approved,
+    availableTimes: faker.date.future(),
   })
 
   return await doctor.populate<{
