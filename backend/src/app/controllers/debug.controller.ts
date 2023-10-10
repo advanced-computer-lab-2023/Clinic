@@ -15,6 +15,7 @@ import { FamilyMemberModel } from '../models/familyMember.model'
 import { type WithUser } from '../utils/typeUtils'
 import { PrescriptionModel } from '../models/prescription.model'
 
+
 const bcryptSalt = process.env.BCRYPT_SALT ?? '$2b$10$13bXTGGukQXsCf5hokNe2u'
 
 // Generate a random long number to be used in usernames to avoid duplicated usernames
@@ -228,7 +229,7 @@ debugRouter.post(
       email: randomEmail(),
       dateOfBirth: faker.date.past(),
       mobileNumber: faker.phone.number(),
-      gender: faker.person.gender(),
+      gender: 'female',
       emergencyContact: {
         name: faker.person.fullName(),
         mobileNumber: faker.phone.number(),
@@ -242,12 +243,12 @@ debugRouter.post(
         age: faker.number.int({
           min: 20,
         }),
-        gender: faker.person.gender(),
+        gender: 'female',
         relation: faker.helpers.arrayElement([
-          'father',
-          'mother',
-          'brother',
-          'sister',
+          'son',
+          'husband',
+          'daughter',
+          'wife',
         ]),
       })
 

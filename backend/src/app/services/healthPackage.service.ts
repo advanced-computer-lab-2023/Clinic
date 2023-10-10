@@ -11,14 +11,15 @@ import {
 
 export async function addHealthPackages(
   request: createHealthPackageRequest
-): Promise<void> {
-  await HealthPackageModel.create({
+): Promise<HydratedDocument<HealthPackageDocument>> {
+  const healthPackage=await HealthPackageModel.create({
     name: request.name,
     pricePerYear: request.pricePerYear,
     sessionDiscount: request.sessionDiscount,
     medicineDiscount: request.medicineDiscount,
     familyMemberSubscribtionDiscount: request.familyMemberSubscribtionDiscount,
   })
+  return healthPackage
 }
 
 export async function updateHealthPackage(
