@@ -21,6 +21,11 @@ export function AdminDashboardLayout() {
         text: 'Health Packages',
         icon: <Discount />,
       },
+      {
+        to: '/admin-dashboard/add-admin',
+        text: 'Add Admin',
+        icon: <PersonAdd />,
+      },
     ])
   }, [setSidebarLinks])
 
