@@ -4,7 +4,7 @@ import { getfilteredAppointments } from '../services/appointment.service'
 import { type AppointmentStatus, GetFilteredAppointmentsResponse } from 'clinic-common/types/appointment.types'
 import { PatientModel } from '../models/patient.model'
 import { DoctorModel } from '../models/doctor.model'
-import { HydratedDocument, type Document } from 'mongoose'
+import { type HydratedDocument } from 'mongoose'
 import { type UserDocument, UserModel } from '../models/user.model'
 
 export const appointmentsRouter = Router()
