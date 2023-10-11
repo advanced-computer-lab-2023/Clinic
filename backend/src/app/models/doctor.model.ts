@@ -19,7 +19,7 @@ const doctorSchema = new Schema(
       enum: DoctorStatus,
       default: DoctorStatus.Pending,
     },
-    availableTimes: { type: String, required: false},
+    availableTimes: { type:[String] , required: false, default: []},
   },
   { timestamps: true }
 )

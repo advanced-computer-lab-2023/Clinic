@@ -7,24 +7,27 @@ import {
   getPatientByName,
 } from '../services/patient.service'
 import {
+  APatientResponseBase,
   GetPatientResponse,
-  PatientResponseBase,
 } from 'clinic-common/types/patient.types'
 
-import { allowApprovedDoctors } from '../middlewares/auth.middleware'
+import {
+  allowApprovedDoctorOfPatient,
+  allowApprovedDoctors,
+} from '../middlewares/auth.middleware'
 import { type Gender } from 'clinic-common/types/gender.types'
 
 export const patientRouter = Router()
 
 patientRouter.get(
   '/:id',
-  asyncWrapper(allowApprovedDoctors),
+  asyncWrapper(allowApprovedDoctorOfPatient),
   asyncWrapper(async (req, res) => {
     const id = req.params.id
 
-    const patient = await getPatientByID(id)
+    const { patient, appointments, prescriptions } = await getPatientByID(id)
     res.send(
-      new PatientResponseBase(
+      new APatientResponseBase(
         patient.id,
         patient.user.username,
         patient.name,
@@ -35,7 +38,10 @@ patientRouter.get(
         {
           name: patient.emergencyContact?.name ?? '',
           mobileNumber: patient.emergencyContact?.mobileNumber ?? '',
-        }
+        },
+        patient.documents,
+        appointments,
+        prescriptions
       )
     )
   })
