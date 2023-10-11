@@ -11,7 +11,6 @@ import {
 } from '../models/prescription.model'
 import { type UserDocument } from '../models/user.model'
 import { type WithUser } from '../utils/typeUtils'
-import { AppointmentModel } from '../models/appointment.model'
 
 type PatientDocumentWithUser = WithUser<PatientDocument>
 
