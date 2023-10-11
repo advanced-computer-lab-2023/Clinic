@@ -28,7 +28,7 @@ export const adminDashboardRoutes: RouteObject[] = [
         element: <AddHealthPackage />,
       },
       {
-        path: 'update-health-package',
+        path: 'update-health-package/:id',
         element: <UpdateHealthPackage />,
       },
     ],
