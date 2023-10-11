@@ -8,3 +8,4 @@ export const AddAdminValidator = zod.object({
 export class AddAdminResponse {
   constructor(public username: string, public password: string) {}
 }
+

@@ -15,13 +15,10 @@ import { type ObjectId } from 'mongoose'
  */
 export type DoctorDocumentWithUser = WithUser<DoctorDocument>
 
-export async function getPendingDoctorRequests(): Promise<
-  DoctorDocumentWithUser[]
-> {
+export async function getPendingDoctorRequests(): Promise<DoctorDocumentWithUser[]> {
   const models = await DoctorModel.find({
     requestStatus: DoctorStatus.Pending,
   }).populate<{ user: UserDocument }>('user')
-
   return models
 }
 
