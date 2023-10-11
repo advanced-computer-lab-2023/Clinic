@@ -4,7 +4,7 @@ import { PatientDashboardHome } from './PatientDashboardHome'
 import { FamilyMembers } from './FamilyMembers'
 import { FilteredPrescriptions } from './FilteredPrescriptions'
 import { ApprovedDoctors } from './ApprovedDoctors'
-import { PatientAppointments } from './PatientAppointments'
+import { Appointments } from './Appointments'
 
 export const patientDashboardRoutes: RouteObject[] = [
   {
@@ -28,7 +28,7 @@ export const patientDashboardRoutes: RouteObject[] = [
       },
       {
         path: 'appointments',
-        element: <PatientAppointments />,
+        element: <Appointments />,
       },
     ],
   },

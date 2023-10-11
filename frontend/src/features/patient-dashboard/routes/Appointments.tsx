@@ -2,7 +2,7 @@ import { Card, CardContent, Grid, Stack, Typography } from '@mui/material'
 import { FilteredList } from '@/components/FilteredList'
 import { getAppointments } from '@/api/appointments'
 
-export function PatientAppointments() {
+export function Appointments() {
   return (
     <FilteredList
       dataFetcher={getAppointments}
