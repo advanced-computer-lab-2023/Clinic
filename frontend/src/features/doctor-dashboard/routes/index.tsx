@@ -4,6 +4,7 @@ import { DoctorDashboardHome } from './DoctorDashboardHome'
 import { UpdateProfile } from './UpdateProfile'
 import { Appointments } from '@/features/patient-dashboard/routes/Appointments'
 
+import { ViewPatients } from './ViewPatients'
 export const doctorDashboardRoutes: RouteObject[] = [
   {
     element: <DoctorDashboardLayout />,
@@ -20,7 +21,10 @@ export const doctorDashboardRoutes: RouteObject[] = [
       {
         path: 'appointments',
         element: <Appointments />,
-      },
+      },{
+        path: 'view-patients',
+        element: <ViewPatients />,
+      }
     ],
   },
 ]

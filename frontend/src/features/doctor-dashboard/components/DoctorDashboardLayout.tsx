@@ -21,7 +21,11 @@ export function DoctorDashboardLayout() {
         to: '/doctor-dashboard/appointments',
         text: 'Appoitments',
         icon: <AccessTimeIcon />,
-      },
+      },{
+        to: '/doctor-dashboard/view-patients',
+        text: 'View Patients',
+        icon: <Person />,
+      }
     ])
   }, [setSidebarLinks])
 

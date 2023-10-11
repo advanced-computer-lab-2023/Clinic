@@ -9,8 +9,9 @@ import {
   type PrescriptionDocument,
   PrescriptionModel,
 } from '../models/prescription.model'
-import { type UserDocument } from '../models/user.model'
+import { UserModel, type UserDocument } from '../models/user.model'
 import { type WithUser } from '../utils/typeUtils'
+import { DoctorModel } from '../models/doctor.model'
 
 type PatientDocumentWithUser = WithUser<PatientDocument>
 
@@ -30,9 +31,7 @@ export async function getPatientByName(
   return patients
 }
 
-export async function getPatientByID(
-  id: string
-): Promise<{
+export async function getPatientByID(id: string): Promise<{
   patient: PatientDocumentWithUser
   appointments: AppointmentDocument[]
   prescriptions: PrescriptionDocument[]
@@ -76,3 +75,23 @@ export async function filterPatientByAppointment(
   return patientsDocs
 }
 
+export async function getMyPatients(
+  doctorUsername: string
+): Promise<PatientDocumentWithUser[]> {
+  const user = await UserModel.findOne({ username: doctorUsername }).exec()
+  const doctor = await DoctorModel.findOne({ user: user?._id }).exec()
+  const appointments = await AppointmentModel.find({
+    doctorID: doctor?._id,
+    status: AppointmentStatus.Upcoming,
+  }).exec()
+  const patients = []
+  for (const appointment of appointments) {
+    patients.push(appointment.patientID)
+  }
+  const patientsDocs = await PatientModel.find({
+    _id: { $in: patients },
+  })
+    .populate<{ user: UserDocument }>('user')
+    .exec()
+  return patientsDocs
+}

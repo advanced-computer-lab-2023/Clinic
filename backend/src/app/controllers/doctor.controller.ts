@@ -111,7 +111,7 @@ doctorsRouter.get(
           sessionRate: doctor.hourlyRate * 1.1 - Math.random() * 10, // this is a random discount till the pachage part is done
           // TODO: retrieve available times from the Appointments. Since we aren't required to make appointments for this sprint, I will
           // assume available times is a field in the doctors schema for now.
-          availableTimes: ((doctor.availableTimes) as  [string]),
+          availableTimes: doctor.availableTimes as [string],
         }))
       )
     )
@@ -142,7 +142,6 @@ doctorsRouter.get(
 
 doctorsRouter.get(
   '/myPatients',
-  allowAuthenticated,
   asyncWrapper(async (req, res) => {
     const username: string | undefined = req.username
     const usernameString: string = username ?? ''
@@ -170,7 +169,7 @@ doctorsRouter.get(
 )
 
 // get id of an APPROVED doctor with a given id
- doctorsRouter.get(
+doctorsRouter.get(
   '/approved/:id',
   asyncWrapper(async (req, res) => {
     const doctor = await getApprovedDoctorById(req.params.id)
@@ -190,4 +189,5 @@ doctorsRouter.get(
         doctor.hourlyRate * 1.1 - Math.random() * 10 // this is a random discount till the pachage part is done
       )
     )
-  }) ) 
+  })
+)
