@@ -5,7 +5,6 @@ import {AddAdminValidator} from 'clinic-common/validators/admin.validation'
 import {asyncWrapper} from '../utils/asyncWrapper'
 import {type AddAdminRequest, GetUsersResponse, UsersResponse} from 'clinic-common/types/admin.types'
 import {addAdmin, getUsersRequest, removeUser} from '../services/admin.service'
-import {allowAdmins} from "../middlewares/auth.middleware";
 import {UserDocument} from "../models/user.model";
 
 export const adminRouter = Router()

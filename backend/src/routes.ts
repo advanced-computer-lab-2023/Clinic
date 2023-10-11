@@ -27,6 +27,4 @@ router.use('/family-members', familyMemberRouter)
 router.use('/health-packages', healthPackagesRouter)
 router.use('/patients', patientRouter)
 router.use('/appointment', appointmentsRouter)
-router.use('/admins',
-    // asyncWrapper(allowAdmins),
-    adminRouter)
+router.use('/admins', asyncWrapper(allowAdmins), adminRouter)
