@@ -28,6 +28,8 @@ export async function getPendingDoctors(): Promise<GetPendingDoctorsResponse> {
     .then((res) => res.data)
 }
 
+// export async function getUsers
+
 export async function getApprovedDoctors(): Promise<
   GetApprovedDoctorsResponse['doctors']
 > {
