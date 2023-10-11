@@ -1,7 +1,7 @@
 export interface Appointment {
   patientID: string
   doctorID: string
-  date: Date
+  date: string
   status: AppointmentStatus
 }
 
@@ -15,7 +15,7 @@ export class AppointmentResponseBase {
     public id: string,
     public patientID: string,
     public doctorID: string,
-    public date: Date,
+    public date: string,
     public status: AppointmentStatus
   ) {}
 }
