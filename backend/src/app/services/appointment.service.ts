@@ -1,3 +1,4 @@
+import { type HydratedDocument } from 'mongoose'
 import {
   AppointmentModel,
   type AppointmentDocument,
@@ -5,7 +6,7 @@ import {
 
 export async function getfilteredAppointments(
   query: any
-): Promise<AppointmentDocument[]> {
+): Promise<Array<HydratedDocument<AppointmentDocument>>> {
   if (
     query.date !== undefined &&
     query.date !== null &&
