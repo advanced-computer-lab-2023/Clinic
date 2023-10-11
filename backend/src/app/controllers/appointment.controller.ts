@@ -16,6 +16,7 @@ appointmentsRouter.get(
       query.status = status
     }
     const filterAppointments = await getfilteredAppointments(query)
+    console.log(filterAppointments)
     res.send(filterAppointments)
   })
 )

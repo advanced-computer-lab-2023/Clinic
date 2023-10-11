@@ -24,7 +24,13 @@ export async function getfilteredAppointments(
     query.date !== ''
   ) {
     return await AppointmentModel.find({ date: query.date })
-  } else {
+  } else if (
+    query.status !== undefined &&
+    query.status !== null &&
+    query.status !== ''
+  ){
     return await AppointmentModel.find({ status: query.status })
+  } else {
+    return await AppointmentModel.find()
   }
 }
