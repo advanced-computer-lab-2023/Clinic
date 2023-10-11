@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import { asyncWrapper } from '../utils/asyncWrapper'
 import { getfilteredAppointments } from '../services/appointment.service'
-import { AppointmentStatus, GetFilteredAppointmentsResponse } from 'clinic-common/types/appointment.types'
+import { type AppointmentStatus, GetFilteredAppointmentsResponse } from 'clinic-common/types/appointment.types'
 
 export const appointmentsRouter = Router()
 
