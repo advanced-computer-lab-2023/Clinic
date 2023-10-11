@@ -2,6 +2,7 @@ import { Router } from 'express'
 
 import {
   getAllDoctors,
+  getApprovedDoctorById,
   getDoctorByUsername,
   getMyPatients,
   getPendingDoctorRequests,
@@ -11,6 +12,7 @@ import { asyncWrapper } from '../utils/asyncWrapper'
 import { allowAdmins, allowAuthenticated } from '../middlewares/auth.middleware'
 import {
   GetApprovedDoctorsResponse,
+  GetApprovedDoctorResponse,
   GetDoctorResponse,
   GetPendingDoctorsResponse,
   UpdateDoctorResponse,
@@ -166,3 +168,26 @@ doctorsRouter.get(
     )
   })
 )
+
+// get id of an APPROVED doctor with a given id
+ doctorsRouter.get(
+  '/approved/:id',
+  asyncWrapper(async (req, res) => {
+    const doctor = await getApprovedDoctorById(req.params.id)
+
+    res.send(
+      new GetApprovedDoctorResponse(
+        doctor.id,
+        doctor.user.username,
+        doctor.name,
+        doctor.email,
+        doctor.dateOfBirth,
+        doctor.hourlyRate,
+        doctor.affiliation,
+        doctor.educationalBackground,
+        doctor.speciality,
+        doctor.availableTimes as [string],
+        doctor.hourlyRate * 1.1 - Math.random() * 10 // this is a random discount till the pachage part is done
+      )
+    )
+  }) ) 

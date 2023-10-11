@@ -1,8 +1,23 @@
 import { getApprovedDoctors } from '@/api/doctor'
-import { Card, CardContent, Grid, Stack, Typography } from '@mui/material'
+import {
+  Button,
+  Card,
+  CardActions,
+  CardContent,
+  Grid,
+  Stack,
+  Typography,
+} from '@mui/material'
 import { FilteredList } from '@/components/FilteredList'
+import { useNavigate } from 'react-router-dom'
 
 export function ApprovedDoctors() {
+  const navigate = useNavigate()
+
+  function handleView(id: string) {
+    navigate(`/patient-dashboard/view-doctor/${id}`)
+  }
+
   return (
     <FilteredList
       dataFetcher={getApprovedDoctors}
@@ -58,6 +73,16 @@ export function ApprovedDoctors() {
                   </Typography>
                 </Stack>
               </Stack>
+              <CardActions>
+                <Button
+                  size="small"
+                  onClick={() => {
+                    handleView(doctor.id)
+                  }}
+                >
+                  View
+                </Button>
+              </CardActions>
             </CardContent>
           </Card>
         </Grid>
