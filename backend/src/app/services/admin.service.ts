@@ -1,6 +1,6 @@
 import {UsernameAlreadyTakenError,} from '../errors/auth.errors'
 import * as bcrypt from 'bcrypt'
-import {UserDocument, UserModel} from '../models/user.model'
+import {type UserDocument, UserModel} from '../models/user.model'
 import {isUsernameTaken} from './auth.service'
 import {type AddAdminRequest} from 'clinic-common/types/admin.types'
 import {UserType} from 'clinic-common/types/user.types'
@@ -46,5 +46,5 @@ export async function removeUser(username: string): Promise<void> {
 }
 
 export async function getUsersRequest(): Promise<UserDocument[]> {
-  return UserModel.find({}).exec()
+  return await UserModel.find({}).exec()
 }
