@@ -36,13 +36,13 @@ export async function addAdmin(
 }
 
 export async function removeUser(username: string): Promise<void> {
-  const user = await UserModel.findOneAndDelete({ username })
+  const user = await UserModel.findOneAndDelete({ username: username })
   if (user == null) {
     throw new NotFoundError()
   }
   await DoctorModel.findOneAndDelete({ user: user.id })
-  await PatientModel.deleteOne({ user: user.id })
-  await AdminModel.deleteOne({ user: user.id })
+  await PatientModel.findOneAndDelete({ user: user.id })
+  await AdminModel.findOneAndDelete({ user: user.id })
 }
 
 export async function getUsersRequest(): Promise<UserDocument[]> {

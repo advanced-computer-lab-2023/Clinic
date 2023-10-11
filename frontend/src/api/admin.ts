@@ -6,3 +6,13 @@ export async function AddAdminApi(request: AddAdminRequest): Promise<void> {
     console.log('admin added successfully', res.data)
   })
 }
+
+export async function GetUsersApi(): Promise<void> {
+  return await api.get('/admins/get-users').then((res) => res.data)
+}
+
+export async function DeleteUserApi(id: string): Promise<void> {
+  return await api
+    .delete(`/admins/username/${id}`)
+    .then((res) => console.log('user removed successfully', res.data))
+}

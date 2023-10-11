@@ -5,7 +5,7 @@ import { PersonAdd, Discount } from '@mui/icons-material'
 import { Container } from '@mui/material'
 import { useEffect } from 'react'
 import { Outlet } from 'react-router-dom'
-
+import PersonIcon from '@mui/icons-material/Person'
 export function AdminDashboardLayout() {
   const { setSidebarLinks } = useSidebar()
 
@@ -25,6 +25,11 @@ export function AdminDashboardLayout() {
         to: '/admin-dashboard/add-admin',
         text: 'Add Admin',
         icon: <PersonAdd />,
+      },
+      {
+        to: '/admin-dashboard/users',
+        text: 'Users',
+        icon: <PersonIcon />,
       },
     ])
   }, [setSidebarLinks])
