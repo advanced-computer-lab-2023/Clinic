@@ -37,6 +37,15 @@ function randomEmail(): string {
   return faker.internet.userName() + '_' + randomShortId() + '@gmail.com'
 }
 
+function randomFutureDates(): string[] {
+  const futureDates = []
+  for (let i = 0; i < 5; i++) {
+    futureDates.push(faker.date.future().toString());
+
+  }
+  return futureDates
+}
+
 // Creates a random doctor with random data and password 'doctor',
 async function createDummyDoctor(): Promise<WithUser<DoctorDocument>> {
   const user = await UserModel.create({
@@ -44,6 +53,7 @@ async function createDummyDoctor(): Promise<WithUser<DoctorDocument>> {
     password: await hash('doctor', bcryptSalt),
     type: UserType.Doctor,
   })
+
 
   const doctor = await DoctorModel.create({
     user: user.id,
@@ -55,7 +65,7 @@ async function createDummyDoctor(): Promise<WithUser<DoctorDocument>> {
     educationalBackground: faker.company.name(),
     speciality: faker.helpers.arrayElement(specialities),
     requestStatus: DoctorStatus.Approved,
-    availableTimes: faker.date.future(),
+    availableTimes: randomFutureDates(),
   })
 
   return await doctor.populate<{

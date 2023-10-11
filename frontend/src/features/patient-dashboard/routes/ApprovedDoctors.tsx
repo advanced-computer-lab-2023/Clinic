@@ -24,8 +24,10 @@ export function ApprovedDoctors() {
         {
           label: 'Available Times',
           property: (v) => v.availableTimes,
-          filter: (actual: string, required: string) =>
-            actual.toLowerCase().includes(required.toLowerCase()),
+          filter: (actual: [string], required: string) =>
+            actual.some((time) =>
+              time.toLowerCase().includes(required.toLowerCase())
+            ),
           type: 'text',
         },
       ]}
@@ -52,7 +54,7 @@ export function ApprovedDoctors() {
                     Available Times
                   </Typography>
                   <Typography variant="body1">
-                    {doctor.availableTimes}
+                    {doctor.availableTimes.map((data) => `${data}`).join(', ')}
                   </Typography>
                 </Stack>
               </Stack>
