@@ -1,3 +1,4 @@
+import { AppointmentStatus } from 'clinic-common/types/appointment.types'
 import { NotFoundError } from '../errors'
 import {
   type AppointmentDocument,
@@ -10,6 +11,7 @@ import {
 } from '../models/prescription.model'
 import { type UserDocument } from '../models/user.model'
 import { type WithUser } from '../utils/typeUtils'
+import { AppointmentModel } from '../models/appointment.model'
 
 type PatientDocumentWithUser = WithUser<PatientDocument>
 
@@ -52,9 +54,26 @@ export async function getPatientByID(
   return { patient, appointments, prescriptions }
 }
 
-//   return {
-//     ...patient.toJSON(),
-//     appointments,
-//     prescriptions,
-//   };
-// }
+export async function filterPatientByAppointment(
+  patients: string[],
+  doctorId: string
+): Promise<PatientDocumentWithUser[]> {
+  const filteredPatients = []
+  for (const patient of patients) {
+    const appointments = await AppointmentModel.find({
+      patientID: patient,
+      doctorID: doctorId,
+      status: AppointmentStatus.Upcoming,
+    })
+    if (appointments.length > 0) {
+      filteredPatients.push(patient)
+    }
+  }
+  const patientsDocs = await PatientModel.find({
+    _id: { $in: filteredPatients },
+  })
+    .populate<{ user: UserDocument }>('user')
+    .exec()
+  return patientsDocs
+}
+

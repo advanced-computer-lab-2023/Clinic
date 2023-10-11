@@ -5,6 +5,7 @@ import {
   type UpdateHealthPackageRequest,
   type createHealthPackageRequest,
   GetAllHealthPackagesResponse,
+  AddHealthPackageResponse,
 } from 'clinic-common/types/healthPackage.types'
 import { asyncWrapper } from '../utils/asyncWrapper'
 import { allowAdmins } from '../middlewares/auth.middleware'
@@ -26,8 +27,17 @@ healthPackagesRouter.post(
   asyncWrapper(allowAdmins),
   validate(CreateHealthPackageRequestValidator),
   asyncWrapper<createHealthPackageRequest>(async (req, res) => {
-    await addHealthPackages(req.body)
-    res.send('HealthPackage is added Successfully')
+    const HealthPackage= await addHealthPackages(req.body)
+    res.send(
+      new AddHealthPackageResponse(
+        HealthPackage.name,
+        HealthPackage.id,
+        HealthPackage.pricePerYear,
+        HealthPackage.sessionDiscount,
+        HealthPackage.medicineDiscount,
+        HealthPackage.familyMemberSubscribtionDiscount
+      )
+    )
   })
 )
 healthPackagesRouter.patch(

@@ -37,6 +37,15 @@ function randomEmail(): string {
   return faker.internet.userName() + '_' + randomShortId() + '@gmail.com'
 }
 
+function randomFutureDates(): string[] {
+  const futureDates = []
+  for (let i = 0; i < 5; i++) {
+    futureDates.push(faker.date.future().toString());
+
+  }
+  return futureDates
+}
+
 // Creates a random doctor with random data and password 'doctor',
 async function createDummyDoctor(): Promise<WithUser<DoctorDocument>> {
   const user = await UserModel.create({
@@ -44,6 +53,7 @@ async function createDummyDoctor(): Promise<WithUser<DoctorDocument>> {
     password: await hash('doctor', bcryptSalt),
     type: UserType.Doctor,
   })
+
 
   const doctor = await DoctorModel.create({
     user: user.id,
@@ -55,6 +65,7 @@ async function createDummyDoctor(): Promise<WithUser<DoctorDocument>> {
     educationalBackground: faker.company.name(),
     speciality: faker.helpers.arrayElement(specialities),
     requestStatus: DoctorStatus.Approved,
+    availableTimes: randomFutureDates(),
   })
 
   return await doctor.populate<{
@@ -228,7 +239,7 @@ debugRouter.post(
       email: randomEmail(),
       dateOfBirth: faker.date.past(),
       mobileNumber: faker.phone.number(),
-      gender: faker.person.gender(),
+      gender: 'female',
       emergencyContact: {
         name: faker.person.fullName(),
         mobileNumber: faker.phone.number(),
@@ -242,26 +253,26 @@ debugRouter.post(
         age: faker.number.int({
           min: 20,
         }),
-        gender: faker.person.gender(),
+        gender: 'female',
         relation: faker.helpers.arrayElement([
-          'father',
-          'mother',
-          'brother',
-          'sister',
+          'son',
+          'husband',
+          'daughter',
+          'wife',
         ]),
       })
 
       patient.familyMembers.push(familyMember.id)
     }
 
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < 6; i++) {
       const doctor = await createDummyDoctor()
 
       await PrescriptionModel.create({
         patient: patient.id,
         doctor: doctor.id,
         date: faker.date.past(),
-        medicine: faker.lorem.sentence(),
+        medicine: faker.word.noun() + ' ' + faker.word.noun(),
         isFilled: faker.datatype.boolean(),
       })
     }

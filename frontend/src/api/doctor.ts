@@ -1,4 +1,5 @@
 import {
+  GetApprovedDoctorsResponse,
   GetDoctorResponse,
   GetPendingDoctorsResponse,
   UpdateDoctorRequest,
@@ -25,4 +26,12 @@ export async function getPendingDoctors(): Promise<GetPendingDoctorsResponse> {
   return await api
     .get<GetPendingDoctorsResponse>(`/doctors/pending`)
     .then((res) => res.data)
+}
+
+export async function getApprovedDoctors(): Promise<
+  GetApprovedDoctorsResponse['doctors']
+> {
+  return await api
+    .get<GetApprovedDoctorsResponse>(`/doctors/approved`)
+    .then((res) => res.data.doctors)
 }

@@ -3,7 +3,6 @@ import {
   type UpdateHealthPackageRequestValidator,
   type CreateHealthPackageRequestValidator,
 } from '../validators/healthPackage.validator'
-import mongoose from 'mongoose'
 export type createHealthPackageRequest = z.infer<
   typeof CreateHealthPackageRequestValidator
 >
@@ -21,7 +20,7 @@ export class HealthPackageResponseBase {
   ) {}
 }
 export class UpdateHealthPackageResponse extends HealthPackageResponseBase {}
-
+export class AddHealthPackageResponse extends HealthPackageResponseBase {}
 export class GetAllHealthPackagesResponse {
   constructor(public healthPackages: HealthPackageResponseBase[]) {}
 }

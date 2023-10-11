@@ -21,5 +21,5 @@ export class AppointmentResponseBase {
 }
 
 export class GetFilteredAppointmentsResponse {
-  constructor(public doctors: AppointmentResponseBase[]) {}
+  constructor(public appointments: AppointmentResponseBase[]) {}
 }

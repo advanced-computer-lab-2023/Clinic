@@ -1,7 +1,7 @@
 import { AuthenticatedRoute } from '@/components/AuthenticatedRoute'
 import { useSidebar } from '@/hooks/sidebar'
 import { UserType } from 'clinic-common/types/user.types'
-import { PersonAdd } from '@mui/icons-material'
+import { PersonAdd, Discount } from '@mui/icons-material'
 import { Container } from '@mui/material'
 import { useEffect } from 'react'
 import { Outlet } from 'react-router-dom'
@@ -14,6 +14,16 @@ export function AdminDashboardLayout() {
       {
         to: '/admin-dashboard/pending-doctors',
         text: 'Pending Doctor Requests',
+        icon: <PersonAdd />,
+      },
+      {
+        to: '/admin-dashboard/health-packages',
+        text: 'Health Packages',
+        icon: <Discount />,
+      },
+      {
+        to: '/admin-dashboard/add-admin',
+        text: 'Add Admin',
         icon: <PersonAdd />,
       },
     ])

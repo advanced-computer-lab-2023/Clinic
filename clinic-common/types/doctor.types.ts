@@ -47,6 +47,7 @@ export class ApprovedDoctorsResponse extends DoctorResponseBase {
     affiliation: string,
     educationalBackground: string,
     speciality: string,
+    public availableTimes: [String],
     public sessionRate: number // Additional property
   ) {
     super(
