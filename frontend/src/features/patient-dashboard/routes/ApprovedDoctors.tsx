@@ -54,7 +54,7 @@ export function ApprovedDoctors() {
                     Available Times
                   </Typography>
                   <Typography variant="body1">
-                    {doctor.availableTimes}
+                    {doctor.availableTimes.map((data) => `${data}`).join(', ')}
                   </Typography>
                 </Stack>
               </Stack>
