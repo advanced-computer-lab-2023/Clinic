@@ -10,6 +10,7 @@ import {
   verifyJWTToken,
   isPatient,
   isDoctorAndApproved,
+  isDoctorPatientAuthorized,
 } from '../services/auth.service'
 
 export async function authenticate(
@@ -89,6 +90,23 @@ export async function allowApprovedDoctors(
   }
 
   if (await isDoctorAndApproved(req.username)) {
+    next()
+    return
+  }
+
+  throw new NotAuthorizedError()
+}
+
+export async function allowApprovedDoctorOfPatient(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  if (req.username == null) {
+    throw new NotAuthenticatedError()
+  }
+
+  if (await isDoctorPatientAuthorized(req.username, req.params.id)) {
     next()
     return
   }
