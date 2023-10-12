@@ -83,14 +83,16 @@ export async function getMyPatients(
 ): Promise<PatientDocument[]> {
   // Find all appointments with the given doctorId
   const appointments = await AppointmentModel.find({ doctorID: doctorId })
-  // Get all patients who had appointments with the doctor
-  console.log(appointments)
-  const patients = await Promise.all(
-    appointments.map(async (appointment) => {
-      const patient = await PatientModel.findById(appointment.patientID)
-      return patient
-    })
-  )
+  // Get all unique patient IDs who had appointments with the doctor
+  const uniquePatientIds = new Set(appointments.map(appointment => appointment.patientID))
+ // Retrieve the corresponding patients from the database
+ const patients = await Promise.all(
+  Array.from(uniquePatientIds).map(async (patientId) => {
+    const patient = await PatientModel.findById(patientId)
+    return patient
+  })
+)
+console.log(patients)
   // Filter out null values
   const filteredPatients = patients.filter(
     (patient) => patient !== null
