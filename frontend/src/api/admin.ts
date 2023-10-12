@@ -1,4 +1,4 @@
-import { AddAdminRequest } from 'clinic-common/types/admin.types'
+import { AddAdminRequest, GetUsersResponse } from 'clinic-common/types/admin.types'
 import { api } from '@/api/index'
 
 export async function AddAdminApi(request: AddAdminRequest): Promise<void> {
@@ -7,7 +7,7 @@ export async function AddAdminApi(request: AddAdminRequest): Promise<void> {
   })
 }
 
-export async function GetUsersApi(): Promise<void> {
+export async function GetUsersApi(): Promise<GetUsersResponse> {
   return await api.get('/admins/get-users').then((res) => res.data)
 }
 

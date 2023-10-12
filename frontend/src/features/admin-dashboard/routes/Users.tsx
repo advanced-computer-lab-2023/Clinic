@@ -22,7 +22,7 @@ export function Users() {
 
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [deletedUser, setDeletedUser] = useState(null)
+  const [deletedUser, setDeletedUser] = useState<string>()
   const handleClickOpen = () => {
     setOpen(true)
   }
@@ -32,7 +32,7 @@ export function Users() {
   }
   const deleteUser = () => {
     setLoading(true)
-    DeleteUserApi(deletedUser)
+    DeleteUserApi(deletedUser!)
       .then(() => {
         query
           .refetch()
@@ -108,6 +108,7 @@ export function Users() {
         </DialogActions>
       </Dialog>
       <DataGrid
+        autoHeight
         rows={
           query.data?.user
             .filter((user) => {
@@ -122,7 +123,6 @@ export function Users() {
             }) || []
         }
         columns={columns}
-        pageSize={5}
         style={{ display: 'flex', width: '100%' }}
       />
     </Box>
