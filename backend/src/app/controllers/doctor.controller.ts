@@ -142,6 +142,7 @@ doctorsRouter.get(
 
 doctorsRouter.get(
   '/myPatients',
+  allowAuthenticated,
   asyncWrapper(async (req, res) => {
     const username: string | undefined = req.username
     const usernameString: string = username ?? ''
