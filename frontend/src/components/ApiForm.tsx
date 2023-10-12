@@ -24,7 +24,7 @@ import {
 } from 'react-hook-form'
 import { LoadingButton } from '@mui/lab'
 import { v4 as uuidv4 } from 'uuid'
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { DatePicker } from '@mui/x-date-pickers'
 import dayjs, { Dayjs } from 'dayjs'
 
@@ -197,22 +197,40 @@ const TextInputField = <T extends ObjectWithStringKeys>({
   fieldItem,
   defaultValue,
 }: FieldComponentProps<T>) => {
-  return (
-    <TextField
-      fullWidth
-      label={field.label}
-      {...fieldItem}
-      onChange={(e) => {
-        if (field.valueAsNumber) {
+  /**
+   * Used only when valueAsNum is true. Because there was a problem when entering numbers,
+   * when you enter 1234 it is shown correctly, but when you try to write 1234.4, you cant
+   * go past the decimal sign, so this helps by storing the original string value, and transforming
+   * it to number only when it is actually a number. And when displaing it displaying the original value */
+  const [originalValue, setOriginalValue] = useState('')
+
+  if (field.valueAsNumber) {
+    return (
+      <TextField
+        fullWidth
+        label={field.label}
+        {...fieldItem}
+        onChange={(e) => {
           if (e.target.value == '' || isNaN(Number(e.target.value))) {
             fieldItem.onChange(e.target.value)
           } else {
             fieldItem.onChange(Number(e.target.value))
           }
-        } else {
-          fieldItem.onChange(e.target.value)
-        }
-      }}
+          setOriginalValue(e.target.value)
+        }}
+        value={fieldState.isDirty ? originalValue : defaultValue}
+        defaultValue={defaultValue}
+        error={!!fieldState.error}
+        helperText={fieldState.error?.message as string}
+      />
+    )
+  }
+
+  return (
+    <TextField
+      fullWidth
+      label={field.label}
+      {...fieldItem}
       defaultValue={defaultValue}
       error={!!fieldState.error}
       helperText={fieldState.error?.message as string}
