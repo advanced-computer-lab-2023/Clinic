@@ -11,7 +11,8 @@ import {
 } from '../models/prescription.model'
 import { UserModel, type UserDocument } from '../models/user.model'
 import { type WithUser } from '../utils/typeUtils'
-import { DoctorModel } from '../models/doctor.model'
+import { type ObjectId } from 'mongoose'
+
 
 type PatientDocumentWithUser = WithUser<PatientDocument>
 
@@ -75,23 +76,28 @@ export async function filterPatientByAppointment(
   return patientsDocs
 }
 
+// Define the function to get all patients of a doctor
 export async function getMyPatients(
-  doctorUsername: string
-): Promise<PatientDocumentWithUser[]> {
-  const user = await UserModel.findOne({ username: doctorUsername }).exec()
-  const doctor = await DoctorModel.findOne({ user: user?._id }).exec()
-  const appointments = await AppointmentModel.find({
-    doctorID: doctor?._id,
-    status: AppointmentStatus.Upcoming,
-  }).exec()
-  const patients = []
-  for (const appointment of appointments) {
-    patients.push(appointment.patientID)
-  }
-  const patientsDocs = await PatientModel.find({
-    _id: { $in: patients },
+  doctorId: ObjectId
+): Promise<PatientDocument[]> {
+  // Find all appointments with the given doctorId
+  const appointments = await AppointmentModel.find({ doctorID: doctorId })
+  // Get all unique patient IDs who had appointments with the doctor
+  const uniquePatientIds = new Set(appointments.map(appointment => appointment.patientID))
+ // Retrieve the corresponding patients from the database
+ const patients = await Promise.all(
+  Array.from(uniquePatientIds).map(async (patientId) => {
+    const patient = await PatientModel.findById(patientId)
+    return patient
   })
-    .populate<{ user: UserDocument }>('user')
-    .exec()
-  return patientsDocs
+)
+console.log(patients)
+  // Filter out null values
+  const filteredPatients = patients.filter(
+    (patient) => patient !== null
+  ) as PatientDocument[]
+  // Return the list of patients
+  return filteredPatients
 }
+
+
