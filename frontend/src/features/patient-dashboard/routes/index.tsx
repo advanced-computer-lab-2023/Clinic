@@ -5,6 +5,7 @@ import { FamilyMembers } from './FamilyMembers'
 import { FilteredPrescriptions } from './FilteredPrescriptions'
 import { ApprovedDoctors } from './ApprovedDoctors'
 import { Appointments } from './Appointments'
+import { DoctorView } from './DoctorView'
 
 export const patientDashboardRoutes: RouteObject[] = [
   {
@@ -29,6 +30,10 @@ export const patientDashboardRoutes: RouteObject[] = [
       {
         path: 'appointments',
         element: <Appointments />,
+      },
+      {
+        path: 'view-doctor/:id',
+        element: <DoctorView />,
       },
     ],
   },

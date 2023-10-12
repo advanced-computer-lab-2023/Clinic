@@ -99,3 +99,16 @@ export async function getMyPatients(
   // Return the list of patients
   return filteredPatients
 }
+
+export async function getApprovedDoctorById(
+  doctorId: string
+): Promise<DoctorDocumentWithUser> {
+  const doctor = await DoctorModel.findById({ _id: doctorId,  requestStatus: 'approved', }).populate<{
+    user: UserDocument
+  }>('user')
+
+  if (doctor == null) throw new NotFoundError()
+
+  return doctor
+}
+
