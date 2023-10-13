@@ -6,6 +6,7 @@ import Container from '@mui/material/Container'
 import { useEffect } from 'react'
 import { Outlet } from 'react-router-dom'
 import AccessTimeIcon from '@mui/icons-material/AccessTime'
+import GroupIcon from '@mui/icons-material/Group'
 
 export function DoctorDashboardLayout() {
   const { setSidebarLinks } = useSidebar()
@@ -21,6 +22,16 @@ export function DoctorDashboardLayout() {
         to: '/doctor-dashboard/appointments',
         text: 'Appoitments',
         icon: <AccessTimeIcon />,
+      },{
+        to: '/doctor-dashboard/view-patients',
+        text: 'View Patients',
+        icon: <Person />,
+      }
+      },
+      {
+        to: '/doctor-dashboard/patients',
+        text: 'Patients',
+        icon: <GroupIcon />,
       },
     ])
   }, [setSidebarLinks])

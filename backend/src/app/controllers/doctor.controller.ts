@@ -4,7 +4,6 @@ import {
   getAllDoctors,
   getApprovedDoctorById,
   getDoctorByUsername,
-  getMyPatients,
   getPendingDoctorRequests,
   updateDoctorByUsername,
 } from '../services/doctor.service'
@@ -23,9 +22,6 @@ import { NotAuthenticatedError } from '../errors/auth.errors'
 import { APIError } from '../errors'
 import { validate } from '../middlewares/validation.middleware'
 import { UpdateDoctorRequestValidator } from 'clinic-common/validators/doctor.validator'
-import { GetMyPatientsResponse } from 'clinic-common/types/patient.types'
-import { type Gender } from 'clinic-common/types/gender.types'
-
 export const doctorsRouter = Router()
 
 doctorsRouter.get(
@@ -111,7 +107,7 @@ doctorsRouter.get(
           sessionRate: doctor.hourlyRate * 1.1 - Math.random() * 10, // this is a random discount till the pachage part is done
           // TODO: retrieve available times from the Appointments. Since we aren't required to make appointments for this sprint, I will
           // assume available times is a field in the doctors schema for now.
-          availableTimes: ((doctor.availableTimes) as  [string]),
+          availableTimes: doctor.availableTimes as [string],
         }))
       )
     )
@@ -140,37 +136,8 @@ doctorsRouter.get(
   })
 )
 
-doctorsRouter.get(
-  '/myPatients',
-  allowAuthenticated,
-  asyncWrapper(async (req, res) => {
-    const username: string | undefined = req.username
-    const usernameString: string = username ?? ''
-    const doctor = await getDoctorByUsername(usernameString)
-    console.log(doctor)
-    const patients = await getMyPatients(doctor.id)
-    res.send(
-      new GetMyPatientsResponse(
-        patients.map((patient) => ({
-          id: patient.user.toString(),
-          name: patient.name,
-          email: patient.email,
-          mobileNumber: patient.mobileNumber,
-          dateOfBirth: patient.dateOfBirth.toDateString(),
-          gender: patient.gender as Gender,
-          emergencyContact: {
-            name: patient.emergencyContact?.name ?? '',
-            mobileNumber: patient.emergencyContact?.mobileNumber ?? '',
-          },
-          familyMembers: patient.familyMembers,
-        }))
-      )
-    )
-  })
-)
-
 // get id of an APPROVED doctor with a given id
- doctorsRouter.get(
+doctorsRouter.get(
   '/approved/:id',
   asyncWrapper(async (req, res) => {
     const doctor = await getApprovedDoctorById(req.params.id)
@@ -190,4 +157,5 @@ doctorsRouter.get(
         doctor.hourlyRate * 1.1 - Math.random() * 10 // this is a random discount till the pachage part is done
       )
     )
-  }) ) 
+  })
+)
