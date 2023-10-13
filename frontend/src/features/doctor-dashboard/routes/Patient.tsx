@@ -87,6 +87,15 @@ export function Patient() {
               </Typography>
             ))}
           </Stack>
+          <Stack spacing={5}>
+            <img
+              src={
+                'https://images.sampleforms.com/wp-content/uploads/2016/07/pediatric-medical-history-form.jpg'
+              }
+              className="Screenshot"
+              alt="showing screen capture"
+            />
+          </Stack>
         </Stack>
       </CardContent>
     </Card>
