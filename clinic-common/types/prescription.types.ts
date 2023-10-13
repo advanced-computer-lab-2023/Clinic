@@ -8,6 +8,7 @@ export type CreatePrescriptionRequest = z.infer<
 
 export class PrescriptionResponseBase {
   constructor(
+    public id:string,
     public doctor: string,
     public patient: string,
     public date: Date,
@@ -19,3 +20,4 @@ export class PrescriptionResponseBase {
 export class GetPrescriptionResponse {
   constructor(public prescriptions: PrescriptionResponseBase[]) {}
 }
+

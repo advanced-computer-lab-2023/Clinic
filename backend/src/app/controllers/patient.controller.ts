@@ -19,6 +19,12 @@ import { type HydratedDocument } from 'mongoose'
 import { type UserDocument, UserModel } from '../models/user.model'
 import { NotAuthenticatedError } from '../errors/auth.errors'
 import { DoctorModel } from '../models/doctor.model'
+import { getFamilyMembers } from '../services/familyMember.service'
+import {
+  GetFamilyMembersResponse,
+  type Relation,
+} from 'clinic-common/types/familyMember.types'
+
 
 export const patientRouter = Router()
 
@@ -109,6 +115,27 @@ patientRouter.post(
     )
   })
 )
+    
+// Get all family members of a patient with the given username
+patientRouter.get(
+  '/:username/family-members',
+  asyncWrapper(async (req, res) => {
+    const familyMembers = await getFamilyMembers(req.params.username)
+
+    res.send(
+      new GetFamilyMembersResponse(
+        familyMembers.map((familyMember) => ({
+          id: familyMember.id,
+          name: familyMember.name,
+          nationalId: familyMember.nationalId,
+          age: familyMember.age,
+          gender: familyMember.gender as Gender,
+          relation: familyMember.relation as Relation,
+        }))
+      )
+    )
+  })
+)
 
 patientRouter.get(
   '/:id',
@@ -133,7 +160,7 @@ patientRouter.get(
         patient.documents,
         appointments,
         prescriptions
-      )
+        )
     )
   })
 )

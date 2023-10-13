@@ -1,10 +1,26 @@
 import { getLoggedInUserPrescriptions } from '@/api/prescriptions'
 import { useAuth } from '@/hooks/auth'
-import { Card, CardContent, Chip, Grid, Stack, Typography } from '@mui/material'
+import {
+  Button,
+  Card,
+  CardActions,
+  CardContent,
+  Chip,
+  Grid,
+  Stack,
+  Typography,
+} from '@mui/material'
 import { FilteredList } from '../../../components/FilteredList'
+import VisibilityIcon from '@mui/icons-material/Visibility'
+import { useNavigate } from 'react-router-dom'
 
 export const FilteredPrescriptions = () => {
   const { user } = useAuth()
+  const navigate = useNavigate()
+
+  function handleView(id: string) {
+    navigate(`/patient-dashboard/prescriptions/${id}`)
+  }
 
   return (
     <FilteredList
@@ -101,6 +117,17 @@ export const FilteredPrescriptions = () => {
                 </Stack>
               </Stack>
             </CardContent>
+            <CardActions>
+              <Button
+                size="small"
+                startIcon={<VisibilityIcon />}
+                onClick={() => {
+                  handleView(prescription.id)
+                }}
+              >
+                view
+              </Button>
+            </CardActions>
           </Card>
         </Grid>
       )}
