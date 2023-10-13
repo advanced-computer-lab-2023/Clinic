@@ -8,7 +8,7 @@ import {
   getMyPatients,
 } from '../services/patient.service'
 import {
-  APatientResponseBase,
+  GetAPatientResponse,
   GetMyPatientsResponse,
   GetPatientResponse,
 } from 'clinic-common/types/patient.types'
@@ -145,7 +145,7 @@ patientRouter.get(
 
     const { patient, appointments, prescriptions } = await getPatientByID(id)
     res.send(
-      new APatientResponseBase(
+      new GetAPatientResponse(
         patient.id,
         patient.user.username,
         patient.name,
