@@ -6,12 +6,12 @@ import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'react-router-dom'
 
 export function Patient() {
-  const {id} = useParams()
+  const { id } = useParams()
   const query = useQuery({
-      queryKey: ['get-patient'],
-      queryFn: () => getPatient(id!),
+    queryKey: ['get-patient'],
+    queryFn: () => getPatient(id!),
   })
- if (query.isLoading) {
+  if (query.isLoading) {
     return <CardPlaceholder />
   }
   const patient = query.data
@@ -19,7 +19,7 @@ export function Patient() {
     return <AlertsBox />
   }
   return (
-      <Card variant="outlined">
+    <Card variant="outlined">
       <CardContent>
         <Stack spacing={2}>
           <Stack
@@ -57,6 +57,35 @@ export function Patient() {
               Gender
             </Typography>
             <Typography variant="body1">{patient.gender}</Typography>
+          </Stack>
+          <Stack spacing={-1}>
+            <Typography variant="overline" color="text.secondary">
+              Emergency Contact
+            </Typography>
+            <Typography variant="body1">
+              {patient.emergencyContact.name} -{' '}
+              {patient.emergencyContact.mobileNumber}
+            </Typography>
+          </Stack>
+          <Stack spacing={-1}>
+            <Typography variant="overline" color="text.secondary">
+              Appointments
+            </Typography>
+            {patient.appointments.map((appointment) => (
+              <Typography variant="body1" key={appointment.date}>
+                {`${appointment.date} - ${appointment.status}`}
+              </Typography>
+            ))}
+          </Stack>
+          <Stack spacing={-1}>
+            <Typography variant="overline" color="text.secondary">
+              Prescriptions
+            </Typography>
+            {patient.prescriptions.map((prescription) => (
+              <Typography variant="body1">
+                {`${prescription.medicine} - ${prescription.date.toString()}`}
+              </Typography>
+            ))}
           </Stack>
         </Stack>
       </CardContent>
