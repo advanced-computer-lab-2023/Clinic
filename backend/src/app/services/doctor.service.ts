@@ -12,7 +12,9 @@ import { type WithUser } from '../utils/typeUtils'
  */
 export type DoctorDocumentWithUser = WithUser<DoctorDocument>
 
-export async function getPendingDoctorRequests(): Promise<DoctorDocumentWithUser[]> {
+export async function getPendingDoctorRequests(): Promise<
+  DoctorDocumentWithUser[]
+> {
   const models = await DoctorModel.find({
     requestStatus: DoctorStatus.Pending,
   }).populate<{ user: UserDocument }>('user')
@@ -27,7 +29,14 @@ export async function updateDoctorByUsername(
 
   if (user == null) throw new NotFoundError()
 
-  if ((await DoctorModel.count({ email: request.email })) > 0) {
+  const doctor = await DoctorModel.findOne({ user: user.id })
+
+  // If the doctor tried to change their email with the same email they already have,
+  // no errors should be thrown, otherwise, check if the email already exists
+  if (
+    doctor?.email !== request.email &&
+    (await DoctorModel.count({ email: request.email })) > 0
+  ) {
     throw new APIError('Email already exists', 400)
   }
 
@@ -60,7 +69,6 @@ export async function getAllDoctors(): Promise<DoctorDocumentWithUser[]> {
 export async function getDoctorByUsername(
   username: string
 ): Promise<DoctorDocumentWithUser> {
-  console.log("I'm here")
   const user = await UserModel.findOne({ username })
 
   if (user == null) throw new NotFoundError()
@@ -77,7 +85,10 @@ export async function getDoctorByUsername(
 export async function getApprovedDoctorById(
   doctorId: string
 ): Promise<DoctorDocumentWithUser> {
-  const doctor = await DoctorModel.findById({ _id: doctorId,  requestStatus: 'approved', }).populate<{
+  const doctor = await DoctorModel.findById({
+    _id: doctorId,
+    requestStatus: 'approved',
+  }).populate<{
     user: UserDocument
   }>('user')
 
@@ -85,4 +96,3 @@ export async function getApprovedDoctorById(
 
   return doctor
 }
-
