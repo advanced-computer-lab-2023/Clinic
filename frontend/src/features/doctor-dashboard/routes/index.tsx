@@ -3,8 +3,6 @@ import { DoctorDashboardLayout } from '../components/DoctorDashboardLayout'
 import { DoctorDashboardHome } from './DoctorDashboardHome'
 import { UpdateProfile } from './UpdateProfile'
 import { Appointments } from '@/features/patient-dashboard/routes/Appointments'
-import { MyPatients } from './MyPatients'
-
 import { ViewPatients } from './ViewPatients'
 import { Patient } from '@/features/doctor-dashboard/routes/Patient'
 
@@ -27,10 +25,6 @@ export const doctorDashboardRoutes: RouteObject[] = [
       {
         path: 'view-patients',
         element: <ViewPatients />,
-      },
-      {
-        path: 'patients',
-        element: <MyPatients />,
       },
       {
         path: 'patient/:id',

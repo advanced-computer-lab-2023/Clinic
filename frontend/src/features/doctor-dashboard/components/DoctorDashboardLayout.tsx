@@ -26,11 +26,6 @@ export function DoctorDashboardLayout() {
       {
         to: '/doctor-dashboard/view-patients',
         text: 'View Patients',
-        icon: <Person />,
-      },
-      {
-        to: '/doctor-dashboard/patients',
-        text: 'Patients',
         icon: <GroupIcon />,
       },
     ])
