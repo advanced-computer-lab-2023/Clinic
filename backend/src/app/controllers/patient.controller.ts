@@ -16,6 +16,11 @@ import {
   allowApprovedDoctors,
 } from '../middlewares/auth.middleware'
 import { type Gender } from 'clinic-common/types/gender.types'
+import { getFamilyMembers } from '../services/familyMember.service'
+import {
+  GetFamilyMembersResponse,
+  type Relation,
+} from 'clinic-common/types/familyMember.types'
 
 export const patientRouter = Router()
 
@@ -96,6 +101,27 @@ patientRouter.post(
             name: patient.emergencyContact?.name ?? '',
             mobileNumber: patient.emergencyContact?.mobileNumber ?? '',
           },
+        }))
+      )
+    )
+  })
+)
+
+// Get all family members of a patient with the given username
+patientRouter.get(
+  '/:username/family-members',
+  asyncWrapper(async (req, res) => {
+    const familyMembers = await getFamilyMembers(req.params.username)
+
+    res.send(
+      new GetFamilyMembersResponse(
+        familyMembers.map((familyMember) => ({
+          id: familyMember.id,
+          name: familyMember.name,
+          nationalId: familyMember.nationalId,
+          age: familyMember.age,
+          gender: familyMember.gender as Gender,
+          relation: familyMember.relation as Relation,
         }))
       )
     )
