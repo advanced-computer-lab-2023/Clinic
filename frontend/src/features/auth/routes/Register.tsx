@@ -31,27 +31,11 @@ export const Register = () => {
           ],
         },
         {
-          label: 'Emergency',
-          property: 'gender',
-          customComponent: () => {
-            return (
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'center',
-                }}
-              >
-                Emergency Contact
-              </div>
-            )
-          },
-        },
-        {
-          label: 'name',
+          label: 'Emergency Contact Name',
           property: 'emergencyContact.name',
         },
         {
-          label: 'mobileNumber',
+          label: 'Emergency Contact Mobile Number',
           property: 'emergencyContact.mobileNumber',
           customError: 'Mobile number must be 10 digits.',
         },
