@@ -9,7 +9,6 @@ import { patientRouter } from './app/controllers/patient.controller'
 import { appointmentsRouter } from './app/controllers/appointment.controller'
 import {
   allowAdmins,
-  allowAuthenticated,
 } from './app/middlewares/auth.middleware'
 
 import { adminRouter } from './app/controllers/admin.controller'
@@ -19,7 +18,7 @@ import { healthPackagesRouter } from './app/controllers/healthPackage.controller
 export const router = Router()
 
 router.use('/auth', authRouter)
-router.use('/doctors', allowAuthenticated, doctorsRouter)
+router.use('/doctors', doctorsRouter)
 
 router.use('/debug', debugRouter)
 

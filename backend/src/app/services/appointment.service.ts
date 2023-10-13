@@ -1,3 +1,4 @@
+import { type HydratedDocument } from 'mongoose'
 import {
   AppointmentModel,
   type AppointmentDocument,
@@ -5,26 +6,22 @@ import {
 
 export async function getfilteredAppointments(
   query: any
-): Promise<AppointmentDocument[]> {
+): Promise<Array<HydratedDocument<AppointmentDocument>>> {
   if (
-    query.date !== undefined &&
-    query.date !== null &&
-    query.date !== '' &&
-    query.status !== undefined &&
-    query.status !== null &&
-    query.status !== ''
-  ) {
+    query.patientID !== undefined &&
+    query.patientID !== null &&
+    query.patientID !== '') {
     return await AppointmentModel.find({
-      date: query.date,
-      status: query.status,
+      patientID: query.patientID
     })
   } else if (
-    query.date !== undefined &&
-    query.date !== null &&
-    query.date !== ''
-  ) {
-    return await AppointmentModel.find({ date: query.date })
+    query.doctorID !== undefined &&
+    query.doctorID !== null &&
+    query.doctorID !== '') {
+    return await AppointmentModel.find({
+      doctorID: query.doctorID
+    })
   } else {
-    return await AppointmentModel.find({ status: query.status })
+    return await AppointmentModel.find()
   }
 }

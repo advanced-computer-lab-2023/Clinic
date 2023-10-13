@@ -7,7 +7,7 @@ const appointmentSchema = new Schema(
   {
     patientID: { type: Schema.Types.ObjectId, ref: 'Patient', required: true },
     doctorID: { type: Schema.Types.ObjectId, ref: 'Doctor', required: true },
-    date: { type: Date, required: true },
+    date: { type: String, required: true },
     status: {
       type: String,
       required: true,

@@ -5,6 +5,7 @@ import { UserType } from 'clinic-common/types/user.types'
 import { Container } from '@mui/material'
 import { useEffect } from 'react'
 import { Outlet } from 'react-router-dom'
+import AccessTimeIcon from '@mui/icons-material/AccessTime'
 
 export function PatientDashboardLayout() {
   const { setSidebarLinks } = useSidebar()
@@ -25,6 +26,11 @@ export function PatientDashboardLayout() {
         to: '/patient-dashboard/approved-doctors',
         text: 'Doctors',
         icon: <Healing />,
+      },
+      {
+        to: '/patient-dashboard/appointments',
+        text: 'Appoitments',
+        icon: <AccessTimeIcon />,
       },
     ])
   }, [setSidebarLinks])
