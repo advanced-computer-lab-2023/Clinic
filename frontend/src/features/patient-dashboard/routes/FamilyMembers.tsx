@@ -1,22 +1,13 @@
 import { CardPlaceholder } from '@/components/CardPlaceholder'
-import {
-  Box,
-  Button,
-  ButtonGroup,
-  Container,
-  Divider,
-  Modal,
-} from '@mui/material'
+import { Box, Button, Container, Divider, Modal } from '@mui/material'
 import { useQuery } from '@tanstack/react-query'
 import { GridColDef, DataGrid } from '@mui/x-data-grid'
 import { GetFamilyMembersResponse } from 'clinic-common/types/familyMember.types'
 import { getFamilyMembers } from '@/api/familyMembers'
 import { useState } from 'react'
 import { AddFamilyMember } from './AddFamilyMember'
-import { useNavigate } from 'react-router-dom'
 
 export function FamilyMembers() {
-  const navigate = useNavigate()
   const [addFamilyMemberModalOpen, setAddFamilyMemberModalOpen] =
     useState(false)
 
@@ -64,20 +55,7 @@ export function FamilyMembers() {
       headerName: 'Actions',
       width: 150,
       renderCell: (column) => (
-        <ButtonGroup
-          variant="contained"
-          aria-label="outlined primary button group"
-        >
-          <Button
-            variant="contained"
-            size="small"
-            color="primary"
-            onClick={() => {
-              navigate(column.row.id)
-            }}
-          >
-            View
-          </Button>
+        <>
           <Button
             variant="contained"
             size="small"
@@ -88,7 +66,7 @@ export function FamilyMembers() {
           >
             Remove
           </Button>
-        </ButtonGroup>
+        </>
       ),
     },
   ]

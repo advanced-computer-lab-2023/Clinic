@@ -1,7 +1,6 @@
 import { type z } from 'zod'
 import { type AddFamilyMemberRequestValidator } from '../validators/familyMembers.validator'
 import { Gender } from './gender.types'
-import { PatientResponseBase } from './patient.types'
 
 export enum Relation {
   Wife = 'wife',
@@ -17,7 +16,7 @@ export class FamilyMemberResponseBase {
     public nationalId: string,
     public age: number,
     public gender: Gender,
-    public relation: Relation
+    public relation: Relation, 
   ) {}
 }
 
@@ -30,10 +29,3 @@ export class AddFamilyMemberResponse extends FamilyMemberResponseBase {}
 export type AddFamilyMemberRequest = z.infer<
   typeof AddFamilyMemberRequestValidator
 >
-
-export class GetFamilyMemberResponse {
-  constructor(
-    public familyMember: FamilyMemberResponseBase,
-    public patient: PatientResponseBase
-  ) {}
-}

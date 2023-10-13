@@ -3,11 +3,10 @@ import {
   FamilyMemberModel,
   type FamilyMemberDocument,
 } from '../models/familyMember.model'
-import { type UserDocument, UserModel } from '../models/user.model'
+import { UserModel } from '../models/user.model'
 import { NotFoundError } from '../errors'
-import { type PatientDocument, PatientModel } from '../models/patient.model'
+import { PatientModel } from '../models/patient.model'
 import { type AddFamilyMemberRequest } from 'clinic-common/types/familyMember.types'
-import { type WithUser } from '../utils/typeUtils'
 
 export async function getFamilyMembers(
   username: string
@@ -54,34 +53,4 @@ export async function createFamilyMember(
   await patient.save()
 
   return familyMember
-}
-
-export async function getFamilyMemberById(
-  id: string
-): Promise<HydratedDocument<FamilyMemberDocument>> {
-  const familyMember = await FamilyMemberModel.findById(id)
-
-  if (familyMember == null) {
-    throw new NotFoundError()
-  }
-  
-  return familyMember
-}
-
-export async function getPatientForFamilyMember(
-  familyMemberId: string
-): Promise<WithUser<PatientDocument>> {
-  const patient = await PatientModel.findOne({
-    familyMembers: {
-      $in: [familyMemberId],
-    },
-  }).populate<{
-    user: UserDocument
-  }>('user')
-
-  if (patient == null) {
-    throw new NotFoundError()
-  }
-
-  return patient
 }

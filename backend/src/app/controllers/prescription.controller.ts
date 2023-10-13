@@ -5,14 +5,12 @@ import { validate } from '../middlewares/validation.middleware'
 import {
   createPrescription,
   getPrescriptions,
-  getSinglePrescription,
 } from '../services/prescription.service'
 import { NotAuthorizedError } from '../errors/auth.errors'
 import { isDoctorAndApproved, isPatient } from '../services/auth.service'
 import {
   type CreatePrescriptionRequest,
   GetPrescriptionResponse,
-  PrescriptionResponseBase,
 } from 'clinic-common/types/prescription.types'
 
 import { CreatePrescriptionRequestValidator } from 'clinic-common/validators/prescription.validator'
@@ -35,13 +33,11 @@ prescriptionsRouter.get(
     res.send(
       new GetPrescriptionResponse(
         prescriptionRequests.map((prescription) => ({
-          id:prescription.id,
           doctor: prescription.doctor.name,
           patient: prescription.patient.name,
           date: prescription.date,
           isFilled: prescription.isFilled,
           medicine: prescription.medicine,
-          
         }))
       )
     )
@@ -81,7 +77,6 @@ prescriptionsRouter.get(
     res.send(
       new GetPrescriptionResponse(
         prescriptions.map((prescription) => ({
-          id:prescription.id,
           doctor: prescription.doctor.name,
           patient: prescription.patient.name,
           date: prescription.date,
@@ -91,26 +86,4 @@ prescriptionsRouter.get(
       )
     )
   })
-)
-
-prescriptionsRouter.get(
-  '/mine/:id',
-  asyncWrapper(allowPatients),
-  asyncWrapper(async (req, res) => {
-    // `!` that is after `req.username` is used to tell TS that we are sure that req.username is not null
-    const prescription = await getSinglePrescription(req.params.id,req.username!)
-    
-    res.send(
-      new PrescriptionResponseBase(
-          prescription.id,
-          prescription.doctor.name,
-          prescription.patient.name,
-          prescription.date,
-          prescription.isFilled,
-          prescription.medicine
-      )
-    )
-  })
-  
-   
 )
