@@ -14,7 +14,6 @@ import {
 } from 'clinic-common/types/patient.types'
 
 import {
-  allowApprovedDoctorOfPatient,
   allowApprovedDoctors,
 } from '../middlewares/auth.middleware'
 import { type Gender } from 'clinic-common/types/gender.types'

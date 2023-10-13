@@ -9,7 +9,7 @@ import {
   type PrescriptionDocument,
   PrescriptionModel,
 } from '../models/prescription.model'
-import { UserModel, type UserDocument } from '../models/user.model'
+import {  type UserDocument } from '../models/user.model'
 import { type WithUser } from '../utils/typeUtils'
 import { type ObjectId } from 'mongoose'
 
