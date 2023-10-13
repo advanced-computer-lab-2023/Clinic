@@ -6,12 +6,14 @@ import {
   type createHealthPackageRequest,
   GetAllHealthPackagesResponse,
   AddHealthPackageResponse,
+  GetHealthPackageResponse,
 } from 'clinic-common/types/healthPackage.types'
 import { asyncWrapper } from '../utils/asyncWrapper'
 import { allowAdmins } from '../middlewares/auth.middleware'
 import {
   addHealthPackages,
   getAllHealthPackages,
+  getHealthPackageById,
   removeHealthPackage,
   updateHealthPackage,
 } from '../services/healthPackage.service'
@@ -27,7 +29,7 @@ healthPackagesRouter.post(
   asyncWrapper(allowAdmins),
   validate(CreateHealthPackageRequestValidator),
   asyncWrapper<createHealthPackageRequest>(async (req, res) => {
-    const HealthPackage= await addHealthPackages(req.body)
+    const HealthPackage = await addHealthPackages(req.body)
     res.send(
       new AddHealthPackageResponse(
         HealthPackage.name,
@@ -85,6 +87,23 @@ healthPackagesRouter.get(
           familyMemberSubscribtionDiscount:
             healthPackage.familyMemberSubscribtionDiscount,
         }))
+      )
+    )
+  })
+)
+
+healthPackagesRouter.get(
+  '/:id',
+  asyncWrapper(async (req, res) => {
+    const healthPackage = await getHealthPackageById(req.params.id)
+    res.send(
+      new GetHealthPackageResponse(
+        healthPackage.name,
+        healthPackage.id,
+        healthPackage.pricePerYear,
+        healthPackage.sessionDiscount,
+        healthPackage.medicineDiscount,
+        healthPackage.familyMemberSubscribtionDiscount
       )
     )
   })

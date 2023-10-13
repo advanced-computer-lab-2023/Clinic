@@ -2,6 +2,7 @@ import { api } from '.'
 import {
   AddHealthPackageResponse,
   GetAllHealthPackagesResponse,
+  GetHealthPackageResponse,
   UpdateHealthPackageRequest,
   UpdateHealthPackageResponse,
   createHealthPackageRequest,
@@ -9,6 +10,13 @@ import {
 export async function getHealthPackages(): Promise<GetAllHealthPackagesResponse> {
   return await api
     .get<GetAllHealthPackagesResponse>(`/health-packages/`)
+    .then((res) => res.data)
+}
+export async function getHealthPackage(
+  id: string
+): Promise<GetHealthPackageResponse> {
+  return await api
+    .get<GetHealthPackageResponse>(`/health-packages/${id}`)
     .then((res) => res.data)
 }
 

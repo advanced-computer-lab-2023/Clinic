@@ -12,7 +12,7 @@ import {
 export async function addHealthPackages(
   request: createHealthPackageRequest
 ): Promise<HydratedDocument<HealthPackageDocument>> {
-  const healthPackage=await HealthPackageModel.create({
+  const healthPackage = await HealthPackageModel.create({
     name: request.name,
     pricePerYear: request.pricePerYear,
     sessionDiscount: request.sessionDiscount,
@@ -56,4 +56,50 @@ export async function getAllHealthPackages(): Promise<
     throw new NotFoundError()
   }
   return healthPackages
+}
+
+/**
+ * Silver package: patient pays 3600 LE per year and gets 40% off any doctor's session price and 20% off any medicin ordered from pharmacy platform and 10% discount on the subscribtion of any of his family members in any package
+ * Gold Package: patient pays 6000 LE per year and gets 60% off any doctor's session price and 30% off any medicin ordered from pharmacy platform and 15% discount on the subscribtion of any of his family members in any package
+ * Platinum Packag: patient pays 9000 LE per year and gets 80% off any doctor's session price and 40% off any medicin ordered from pharmacy platform and 20% discount on the subscribtion of any of his family members in any package
+ */
+export async function createDefaultHealthPackages(): Promise<
+  Array<HydratedDocument<HealthPackageDocument>>
+> {
+  const silver = await HealthPackageModel.create({
+    name: 'Silver',
+    pricePerYear: 3600,
+    sessionDiscount: 40,
+    medicineDiscount: 20,
+    familyMemberSubscribtionDiscount: 10,
+  })
+
+  const gold = await HealthPackageModel.create({
+    name: 'Gold',
+    pricePerYear: 6000,
+    sessionDiscount: 60,
+    medicineDiscount: 30,
+    familyMemberSubscribtionDiscount: 15,
+  })
+
+  const platinum = await HealthPackageModel.create({
+    name: 'Platinum',
+    pricePerYear: 9000,
+    sessionDiscount: 80,
+    medicineDiscount: 40,
+    familyMemberSubscribtionDiscount: 20,
+  })
+
+  return [silver, gold, platinum]
+}
+
+// Get health package by id
+export async function getHealthPackageById(
+  id: string
+): Promise<HydratedDocument<HealthPackageDocument>> {
+  const healthPackage = await HealthPackageModel.findById(id)
+  if (healthPackage == null) {
+    throw new NotFoundError()
+  }
+  return healthPackage
 }

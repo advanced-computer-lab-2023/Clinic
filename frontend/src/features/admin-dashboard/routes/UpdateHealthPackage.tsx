@@ -1,4 +1,4 @@
-import { updateHealthPackage } from '@/api/healthPackages'
+import { getHealthPackage, updateHealthPackage } from '@/api/healthPackages'
 import { AlertsBox } from '@/components/AlertsBox'
 import { ApiForm } from '@/components/ApiForm'
 import { createHealthPackageRequest } from 'clinic-common/types/healthPackage.types'
@@ -8,12 +8,14 @@ import { useNavigate, useParams } from 'react-router-dom'
 export function UpdateHealthPackage() {
   const navigate = useNavigate()
   const { id } = useParams()
-  console.log(id)
+
   if (id == null) {
     return <AlertsBox />
   }
+
   return (
     <ApiForm<createHealthPackageRequest>
+      initialDataFetcher={() => getHealthPackage(id)}
       fields={[
         { label: 'Name', property: 'name' },
         {
@@ -37,6 +39,7 @@ export function UpdateHealthPackage() {
           valueAsNumber: true,
         },
       ]}
+      queryKey={['health-packages', id]}
       validator={UpdateHealthPackageRequestValidator}
       successMessage="Updated health package successfully"
       action={(data) => updateHealthPackage(id, data)}
