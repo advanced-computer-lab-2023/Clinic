@@ -6,6 +6,8 @@ import { FilteredPrescriptions } from './FilteredPrescriptions'
 import { ApprovedDoctors } from './ApprovedDoctors'
 import { Appointments } from './Appointments'
 import { DoctorView } from './DoctorView'
+import { FamilyMemberDetails } from './FamilyMemberDetails'
+import { PrescriptionView } from './PrescriptionView'
 
 export const patientDashboardRoutes: RouteObject[] = [
   {
@@ -18,6 +20,10 @@ export const patientDashboardRoutes: RouteObject[] = [
       {
         path: 'family-members',
         element: <FamilyMembers />,
+      },
+      {
+        path: 'family-members/:id',
+        element: <FamilyMemberDetails />,
       },
       {
         path: 'prescriptions',
@@ -34,6 +40,10 @@ export const patientDashboardRoutes: RouteObject[] = [
       {
         path: 'view-doctor/:id',
         element: <DoctorView />,
+      },
+      {
+        path: 'prescriptions/:id',
+        element: <PrescriptionView />,
       },
     ],
   },

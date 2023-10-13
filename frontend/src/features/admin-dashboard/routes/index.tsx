@@ -7,6 +7,7 @@ import { AddHealthPackage } from './AddHealthPackage'
 import { UpdateHealthPackage } from './UpdateHealthPackage'
 import { AddAdmin } from '@/features/admin-dashboard/routes/AddAdmin'
 import { Users } from './Users'
+import { PendingDoctorDetails } from './PendingDoctorDetails'
 
 export const adminDashboardRoutes: RouteObject[] = [
   {
@@ -20,6 +21,10 @@ export const adminDashboardRoutes: RouteObject[] = [
       {
         path: 'pending-doctors',
         element: <PendingDoctors />,
+      },
+      {
+        path: 'pending-doctors/:username',
+        element: <PendingDoctorDetails />,
       },
       {
         path: 'health-packages',

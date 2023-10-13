@@ -12,7 +12,7 @@ import { type CreatePrescriptionRequest } from 'clinic-common/types/prescription
 import { UserModel } from '../models/user.model'
 
 type PrescriptionDocumentWithDoctor = Omit<
-  Omit<HydratedDocument<PrescriptionDocument>, 'doctor'>,
+  Omit<HydratedDocument<HydratedDocument<PrescriptionDocument>>, 'doctor'>,
   'patient'
 > & {
   doctor: DoctorDocument
@@ -82,4 +82,34 @@ export async function createPrescription(
     patient: Patient.id,
     medicine: request.medicine,
   })
+}
+export async function getSinglePrescription(
+  id: string,
+  userName: string
+): Promise<PrescriptionDocumentWithDoctor> {
+  const User = await UserModel.findOne({
+    username: userName,
+  })
+  if (User == null) {
+    throw new NotFoundError()
+  }
+  const Patient = await PatientModel.findOne({
+    user: User.id,
+  }).populate<{ user: UserDocument }>('user')
+  if (Patient == null) {
+    throw new NotFoundError()
+  }
+  const prescription = await PrescriptionModel.findOne({
+    _id: id,patient:Patient.id
+})
+    .populate<{
+      doctor: DoctorDocument
+    }>('doctor')
+    .populate<{ patient: PatientDocument }>('patient')
+    .exec()
+    if (prescription == null) {
+      throw new NotFoundError()
+    }
+    return prescription
+  
 }
