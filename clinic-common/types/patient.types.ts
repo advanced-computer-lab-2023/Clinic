@@ -35,7 +35,7 @@ export class MyPatientsResponseBase {
       name: string
       mobileNumber: string
     },
-    public familyMembers: Types.ObjectId[],
+    public familyMembers: Types.ObjectId[]
   ) {}
 }
 
@@ -58,10 +58,8 @@ export class APatientResponseBase {
     },
     public documents: string[],
     public appointments: AppointmentDocument[],
-    public prescriptions: PrescriptionDocument[],
+    public prescriptions: PrescriptionDocument[]
   ) {}
 }
 
-export class GetAPatientResponse {
-  constructor(public patient: APatientResponseBase[]) {}
-}
+export class GetAPatientResponse extends APatientResponseBase {}
