@@ -67,7 +67,7 @@ export function HealthPackages() {
   }
 
   return (
-    <div>
+    <>
       <Dialog
         open={open}
         onClose={handleClose}
@@ -94,9 +94,19 @@ export function HealthPackages() {
         </DialogActions>
       </Dialog>
       <Grid container spacing={1}>
+        <Grid item xl={12}>
+          <Button
+            size="small"
+            variant="contained"
+            startIcon={<AddIcon />}
+            href="/admin-dashboard/add-health-Package"
+          >
+            Add Health Package
+          </Button>
+        </Grid>
         {query.data.healthPackages.map((healthPackage) => {
           return (
-            <Grid item xl={12}>
+            <Grid item xl={4}>
               <Card variant="outlined">
                 <CardContent>
                   <Stack spacing={2}>
@@ -180,14 +190,6 @@ export function HealthPackages() {
           )
         })}
       </Grid>
-      <Button
-        size="small"
-        variant="contained"
-        startIcon={<AddIcon />}
-        href="/admin-dashboard/add-health-Package"
-      >
-        AddHealthPackage
-      </Button>
-    </div>
+    </>
   )
 }

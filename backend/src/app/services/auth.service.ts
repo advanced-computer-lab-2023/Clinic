@@ -155,7 +155,7 @@ export async function submitDoctorRequest(
   }
   const user = await UserModel.create({
     username: doctor.username,
-    password: await hash('doctor', bcryptSalt),
+    password: await hash(doctor.password, bcryptSalt),
     type: UserType.Doctor,
   })
   await user.save()

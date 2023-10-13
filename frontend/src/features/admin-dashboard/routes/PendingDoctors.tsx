@@ -21,12 +21,12 @@ export function PendingDoctors() {
     {
       field: 'name',
       headerName: 'Name',
-      width: 150,
+      width: 100,
     },
     {
       field: 'email',
       headerName: 'E-mail',
-      width: 300,
+      width: 200,
     },
     {
       field: 'dateOfBirth',
@@ -41,15 +41,20 @@ export function PendingDoctors() {
     {
       field: 'affiliation',
       headerName: 'Affiliation',
-      width: 250,
+      width: 200,
     },
     {
       field: 'educationalBackground',
       headerName: 'Educational Background',
+      width: 200,
+    },
+    {
+      field: 'speciality',
+      headerName: 'Speciality',
       width: 250,
     },
     {
-      field: '',
+      field: 'actions',
       sortable: false,
       filterable: false,
       hideable: false,

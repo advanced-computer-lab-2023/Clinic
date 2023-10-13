@@ -33,7 +33,7 @@ export function PendingDoctorDetails() {
           value:
             query.data && new Date(query.data.dateOfBirth).toLocaleDateString(),
         },
-        { label: 'Specialization', value: query.data?.email },
+        { label: 'Specialization', value: query.data?.speciality },
         { label: 'Hourly Rate', value: query.data?.hourlyRate },
       ]}
     />

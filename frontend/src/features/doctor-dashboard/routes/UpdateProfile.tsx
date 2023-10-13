@@ -13,7 +13,8 @@ export function UpdateProfile() {
         { label: 'Email', property: 'email' },
         { label: 'Hourly Rate', property: 'hourlyRate', valueAsNumber: true },
         { label: 'Affiliation', property: 'affiliation' },
-        { label: 'Date of Birth', property: 'dateOfBirth', type: 'date' },
+        // Removed, not required and was not working
+        // { label: 'Date of Birth', property: 'dateOfBirth', type: 'date' },
       ]}
       validator={UpdateDoctorRequestValidator}
       initialDataFetcher={() => getDoctor(user!.username)}
