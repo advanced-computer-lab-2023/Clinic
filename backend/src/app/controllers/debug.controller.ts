@@ -92,6 +92,12 @@ async function createDummyDoctor(
     requestStatus: status,
     availableTimes: randomFutureDates(),
   })
+  
+  for (let i = 0; i < 6; i++) {
+    const patient = await createDummyPatient()
+    
+    await createDummyAppointment(patient.id, doctor.id)
+  }
 
   return await doctor.populate<{
     user: UserDocument
