@@ -1,103 +1,145 @@
-import { Card, CardContent, Grid, Stack, Typography } from '@mui/material';
-import { useQuery } from '@tanstack/react-query';
-import { CardPlaceholder } from '@/components/CardPlaceholder';
-import { viewPatients, searchByName, filterPatients } from '@/api/patient'; // Import your functions
-
-import  { useState, useEffect } from 'react'; // Import React and useState
-import {  MyPatientsResponseBase } from 'clinic-common/types/patient.types';
-
+import { Checkbox, FormControlLabel, TextField } from '@mui/material'
+import { useQuery } from '@tanstack/react-query'
+import { CardPlaceholder } from '@/components/CardPlaceholder'
+import { viewPatients, filterPatients } from '@/api/patient'
+import { useState } from 'react'
+import { Box, Button } from '@mui/material'
+import { DataGrid, GridColDef } from '@mui/x-data-grid'
+import { useNavigate } from 'react-router-dom'
 
 export function ViewPatients() {
-  const { data: patients, isLoading } = useQuery(['view-patients'], viewPatients);
-  const [searchQuery, setSearchQuery] = useState(''); // State for search query
-  //const [searchResults, setSearchResults] = useState<MyPatientsResponseBase[]>([]);
+  const query = useQuery(['view-patients'], viewPatients)
+  const queryUpComing = useQuery(['upcoming-appointments'], filterPatients)
+  const [upcomingAppointments, setUpcomingAppointments] = useState(false)
+  const [searchKey, setSearchKey] = useState('')
+  const navigate = useNavigate()
 
-  // State for upcoming appointments filter
-  const [upcomingAppointments, setUpcomingAppointments] = useState(false);
-
-  // State for filtered patients
-  const [filteredPatients, setFilteredPatients] = useState<MyPatientsResponseBase[]>(patients || []);
-
-  const handleSearch = async () => {
-    if (searchQuery) {
-      const results = await searchByName(searchQuery);
-      //setSearchResults(results);
-      setFilteredPatients(results);
-    }
+  if (query.isLoading || query.isRefetching || query.isFetching) {
+    return <CardPlaceholder />
   }
-
-const handleFilter = async () => {
-    // Call the filterPatients function with the list of patient IDs
-    const patientIds = patients?.map((patient) => patient.id);
-    if (patientIds) {
-        const results = await filterPatients(patientIds);
-        setFilteredPatients(results);
-    }
-};
-
-
-useEffect(() => {
-    if (upcomingAppointments) {
-        handleFilter(); // Call the filter function when the checkbox is checked
-    } else {
-        // No filter, use the original patient data
-        setFilteredPatients(patients || []); // Add a null check here
-    }
-}, [upcomingAppointments, handleFilter, patients, setFilteredPatients]);
-
-  if (isLoading) {
-    return <CardPlaceholder />;
-  }
-
+  const columns: GridColDef[] = [
+    {
+      field: 'name',
+      headerName: 'Name',
+      flex: 1,
+    },
+    {
+      field: 'email',
+      headerName: 'Email',
+      flex: 1,
+    },
+    {
+      field: 'mobileNumber',
+      headerName: 'Mobile Number',
+      flex: 1,
+    },
+    {
+      field: 'dateOfBirth',
+      headerName: 'Date of Birth',
+      flex: 1,
+    },
+    {
+      field: 'action',
+      headerName: 'Action',
+      flex: 1,
+      renderCell: (params) => (
+        <strong>
+          <Button
+            variant="contained"
+            color="primary"
+            size="small"
+            style={{ marginLeft: 0 }}
+            onClick={() => {
+              navigate(`/doctor-dashboard/patient/${params.id}`)
+            }}
+          >
+            View Patient
+          </Button>
+        </strong>
+      ),
+    },
+  ]
   return (
-    <div>
-      <input
-        type="text"
-        placeholder="Search by Name"
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
-      />
-      <button onClick={handleSearch}>Search</button>
-
-      <label>
-        <input
-          type="checkbox"
-          checked={upcomingAppointments}
-          onChange={(e) => setUpcomingAppointments(e.target.checked)}
+    <Box
+      sx={{
+        width: '100%',
+        display: 'flex',
+        justifyContent: 'center',
+        flexDirection: 'column',
+        gap: '10px',
+      }}
+      height="auto"
+    >
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-around',
+          width: '100%',
+          alignItems: 'center',
+        }}
+      >
+        <TextField
+          id="outlined-basic"
+          label="Search for patient"
+          variant="outlined"
+          style={{ width: '50%', alignSelf: 'center' }}
+          onChange={(e) => setSearchKey(e.target.value)}
         />
-        Filter by Upcoming Appointments
-      </label>
+        <FormControlLabel
+          control={
+            <Checkbox
+              defaultChecked
+              onChange={(e) => setUpcomingAppointments(e.target.checked)}
+              checked={upcomingAppointments}
+            />
+          }
+          label="Only upcoming appointments"
+        />
+      </div>
 
-      <Grid container spacing={2}>
-        {filteredPatients.map((patient) => (
-          <Grid item xl={3} key={patient.id}>
-            <Card variant="outlined">
-              <CardContent>
-                <Stack spacing={2}>
-                  <Stack spacing={-1}>
-                    <Typography variant="overline" color="text.secondary">
-                      Name
-                    </Typography>
-                    <Typography variant="body1">{patient.name}</Typography>
-                  </Stack>
-                  <Stack spacing={-1}>
-                    <Typography variant="overline" color="text.secondary">
-                      Email
-                    </Typography>
-                    <Typography variant="body1">{patient.email}</Typography>
-                  </Stack>
-                  <Stack spacing={-1}>
-                    <Typography variant="overline" color="text.secondary">
-                      Phone Number
-                    </Typography>
-                    <Typography variant="body1">{patient.mobileNumber}</Typography>
-                  </Stack>
-                </Stack>
-              </CardContent>
-            </Card>
-          </Grid>
-        ))}
-      </Grid>
-    </div>
-  );
+      {upcomingAppointments ? (
+        <DataGrid
+          autoHeight
+          rows={
+            queryUpComing.data?.patients
+              .filter((user) => {
+                return user.name.includes(searchKey)
+              })
+              .map((user) => {
+                return {
+                  id: user.id,
+                  name: user.name,
+                  email: user.email,
+                  mobileNumber: user.mobileNumber,
+                  dateOfBirth: user.dateOfBirth,
+                }
+              }) || []
+          }
+          columns={columns}
+          style={{ display: 'flex', width: '100%' }}
+        />
+      ) : (
+        <DataGrid
+          autoHeight
+          rows={
+            query.data?.patients
+              .filter((user) => {
+                return user.name.includes(searchKey)
+              })
+              .map((user) => {
+                return {
+                  id: user.id,
+                  name: user.name,
+                  email: user.email,
+                  mobileNumber: user.mobileNumber,
+                  dateOfBirth: user.dateOfBirth,
+                }
+              }) || []
+          }
+          columns={columns}
+          style={{ display: 'flex', width: '100%' }}
+        />
+      )}
+    </Box>
+  )
 }

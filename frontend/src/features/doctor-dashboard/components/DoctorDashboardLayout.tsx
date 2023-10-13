@@ -22,11 +22,11 @@ export function DoctorDashboardLayout() {
         to: '/doctor-dashboard/appointments',
         text: 'Appoitments',
         icon: <AccessTimeIcon />,
-      },{
+      },
+      {
         to: '/doctor-dashboard/view-patients',
         text: 'View Patients',
         icon: <Person />,
-      }
       },
       {
         to: '/doctor-dashboard/patients',
@@ -38,7 +38,7 @@ export function DoctorDashboardLayout() {
 
   return (
     <AuthenticatedRoute requiredUserType={UserType.Doctor}>
-      <Container maxWidth="xs">
+      <Container maxWidth="xl">
         <Outlet />
       </Container>
     </AuthenticatedRoute>

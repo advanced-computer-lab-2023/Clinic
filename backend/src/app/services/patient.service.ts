@@ -88,6 +88,7 @@ export async function getMyPatients(
  const patients = await Promise.all(
   Array.from(uniquePatientIds).map(async (patientId) => {
     const patient = await PatientModel.findById(patientId)
+    console.log("patient ",patient)
     return patient
   })
 )

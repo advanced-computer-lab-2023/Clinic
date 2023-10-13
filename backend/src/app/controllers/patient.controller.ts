@@ -111,8 +111,8 @@ patientRouter.post(
 
 
 patientRouter.get(
-  '/:id',   
-  asyncWrapper(allowApprovedDoctorOfPatient),
+  '/:id',
+  // asyncWrapper(allowApprovedDoctorOfPatient),
   asyncWrapper(async (req, res) => {
     const id = req.params.id
 
