@@ -1,7 +1,7 @@
 import { Checkbox, FormControlLabel, TextField } from '@mui/material'
 import { useQuery } from '@tanstack/react-query'
 import { CardPlaceholder } from '@/components/CardPlaceholder'
-import { viewPatients, filterPatients } from '@/api/patient'
+import { filterPatients, viewPatients } from '@/api/patient'
 import { useState } from 'react'
 import { Box, Button } from '@mui/material'
 import { DataGrid, GridColDef } from '@mui/x-data-grid'
@@ -101,10 +101,11 @@ export function ViewPatients() {
         <DataGrid
           autoHeight
           rows={
-            queryUpComing.data?.patients
-              .filter((user) => {
-                return user.name.includes(searchKey)
-              })
+            
+            queryUpComing.data?.filter((user) => {
+
+              return user.name.includes(searchKey)
+            })
               .map((user) => {
                 return {
                   id: user.id,
@@ -122,8 +123,7 @@ export function ViewPatients() {
         <DataGrid
           autoHeight
           rows={
-            query.data?.patients
-              .filter((user) => {
+            query.data?.filter((user: { name: string | string[] }) => {
                 return user.name.includes(searchKey)
               })
               .map((user) => {

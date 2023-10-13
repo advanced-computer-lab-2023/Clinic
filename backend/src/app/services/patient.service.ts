@@ -9,10 +9,9 @@ import {
   type PrescriptionDocument,
   PrescriptionModel,
 } from '../models/prescription.model'
-import {  type UserDocument } from '../models/user.model'
+import { type UserDocument } from '../models/user.model'
 import { type WithUser } from '../utils/typeUtils'
-import { type ObjectId } from 'mongoose'
-
+import { type HydratedDocument, type ObjectId } from 'mongoose'
 
 type PatientDocumentWithUser = WithUser<PatientDocument>
 
@@ -54,18 +53,18 @@ export async function getPatientByID(id: string): Promise<{
 }
 
 export async function filterPatientByAppointment(
-  patients: string[],
   doctorId: string
 ): Promise<PatientDocumentWithUser[]> {
-  const filteredPatients = []
-  for (const patient of patients) {
-    const appointments = await AppointmentModel.find({
-      patientID: patient,
-      doctorID: doctorId,
-      status: AppointmentStatus.Upcoming,
-    })
-    if (appointments.length > 0) {
-      filteredPatients.push(patient)
+  const filteredPatients: string[] = []
+
+  const appointments = await AppointmentModel.find({
+    doctorID: doctorId,
+    status: AppointmentStatus.Upcoming,
+  })
+  for (const appointment of appointments) {
+    const patientId = appointment.patientID.toString()
+    if (!filteredPatients.includes(patientId)) {
+      filteredPatients.push(patientId)
     }
   }
   const patientsDocs = await PatientModel.find({
@@ -79,26 +78,27 @@ export async function filterPatientByAppointment(
 // Define the function to get all patients of a doctor
 export async function getMyPatients(
   doctorId: ObjectId
-): Promise<PatientDocument[]> {
+): Promise<Array<HydratedDocument<PatientDocument>>> {
   // Find all appointments with the given doctorId
   const appointments = await AppointmentModel.find({ doctorID: doctorId })
-  // Get all unique patient IDs who had appointments with the doctor
-  const uniquePatientIds = new Set(appointments.map(appointment => appointment.patientID))
- // Retrieve the corresponding patients from the database
- const patients = await Promise.all(
-  Array.from(uniquePatientIds).map(async (patientId) => {
-    const patient = await PatientModel.findById(patientId)
-    console.log("patient ",patient)
-    return patient
-  })
-)
-console.log(patients)
+  // Create a map of unique patient IDs to their corresponding patient documents
+  const patientMap = new Map<string, PatientDocument>()
+  for (const appointment of appointments) {
+    const patientId = appointment.patientID.toString()
+    if (!patientMap.has(patientId)) {
+      const patient: HydratedDocument<PatientDocument> | null =
+        await PatientModel.findById(patientId)
+      if (patient != null) {
+        patientMap.set(patientId, patient)
+      }
+    }
+  }
+  // Return the list of unique patients
+  const uniquePatients = Array.from(patientMap.values())
   // Filter out null values
-  const filteredPatients = patients.filter(
+  const filteredPatients = uniquePatients.filter(
     (patient) => patient !== null
-  ) as PatientDocument[]
+  ) as Array<HydratedDocument<PatientDocument>>
   // Return the list of patients
   return filteredPatients
 }
-
-

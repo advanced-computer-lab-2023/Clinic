@@ -62,6 +62,4 @@ export class APatientResponseBase {
   ) {}
 }
 
-export class GetAPatientResponse {
-  constructor(public patient: APatientResponseBase[]) {}
-}
+export class GetAPatientResponse extends APatientResponseBase {}

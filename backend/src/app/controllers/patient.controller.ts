@@ -13,9 +13,7 @@ import {
   GetPatientResponse,
 } from 'clinic-common/types/patient.types'
 
-import {
-  allowApprovedDoctors,
-} from '../middlewares/auth.middleware'
+import { allowApprovedDoctors } from '../middlewares/auth.middleware'
 import { type Gender } from 'clinic-common/types/gender.types'
 import { type HydratedDocument } from 'mongoose'
 import { type UserDocument, UserModel } from '../models/user.model'
@@ -25,17 +23,19 @@ import { DoctorModel } from '../models/doctor.model'
 export const patientRouter = Router()
 
 patientRouter.get(
-  '/myPatients',  //  allowAuthenticated,
+  '/myPatients', //  allowAuthenticated,
   asyncWrapper(async (req, res) => {
-    const user: HydratedDocument<UserDocument> | null = await UserModel.findOne({ username: req.username })
+    const user: HydratedDocument<UserDocument> | null = await UserModel.findOne(
+      { username: req.username }
+    )
     if (user == null) throw new NotAuthenticatedError()
     const doctor = await DoctorModel.findOne({ user: user.id })
-    if(doctor == null) throw new NotAuthenticatedError()
+    if (doctor == null) throw new NotAuthenticatedError()
     const patients = await getMyPatients(doctor.id)
     res.send(
       new GetMyPatientsResponse(
         patients.map((patient) => ({
-          id: patient.user.toString(),
+          id: patient.id,
           name: patient.name,
           email: patient.email,
           mobileNumber: patient.mobileNumber,
@@ -51,7 +51,6 @@ patientRouter.get(
     )
   })
 )
-
 
 patientRouter.get(
   '/search',
@@ -84,10 +83,13 @@ patientRouter.post(
   '/filter',
   asyncWrapper(allowApprovedDoctors),
   asyncWrapper(async (req, res) => {
-    const doctorID = req.body.doctorID
-    const patientsIDs = req.body.patients
-
-    const patients = await filterPatientByAppointment(patientsIDs, doctorID)
+    const user: HydratedDocument<UserDocument> | null = await UserModel.findOne(
+      { username: req.username }
+    )
+    if (user == null) throw new NotAuthenticatedError()
+    const doctor = await DoctorModel.findOne({ user: user.id })
+    if (doctor == null) throw new NotAuthenticatedError()
+    const patients = await filterPatientByAppointment(doctor.id)
     res.send(
       new GetPatientResponse(
         patients.map((patient) => ({
@@ -107,7 +109,6 @@ patientRouter.post(
     )
   })
 )
-
 
 patientRouter.get(
   '/:id',
@@ -136,5 +137,3 @@ patientRouter.get(
     )
   })
 )
-
-
