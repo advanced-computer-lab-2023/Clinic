@@ -27,7 +27,8 @@ export class DoctorResponseBase {
     public hourlyRate: number,
     public affiliation: string,
     public educationalBackground: string,
-    public speciality: string
+    public speciality: string,
+    public requestStatus: DoctorStatus
   ) {}
 }
 
@@ -47,6 +48,7 @@ export class GetApprovedDoctorResponse extends DoctorResponseBase {
     affiliation: string,
     educationalBackground: string,
     speciality: string,
+    requestStatus: DoctorStatus,
     public availableTimes: [String],
     public sessionRate: number // Additional property
   ) {
@@ -59,7 +61,8 @@ export class GetApprovedDoctorResponse extends DoctorResponseBase {
       hourlyRate,
       affiliation,
       educationalBackground,
-      speciality
+      speciality,
+      requestStatus
     )
   }
 }

@@ -15,8 +15,9 @@ import {
   GetDoctorResponse,
   GetPendingDoctorsResponse,
   UpdateDoctorResponse,
+  type DoctorStatus,
+  type UpdateDoctorRequest,
 } from 'clinic-common/types/doctor.types'
-import type { UpdateDoctorRequest } from 'clinic-common/types/doctor.types'
 import { isAdmin } from '../services/auth.service'
 import { NotAuthenticatedError } from '../errors/auth.errors'
 import { APIError } from '../errors'
@@ -41,6 +42,7 @@ doctorsRouter.get(
           affiliation: doctor.affiliation,
           educationalBackground: doctor.educationalBackground,
           speciality: doctor.speciality,
+          requestStatus: doctor.requestStatus as DoctorStatus,
         }))
       )
     )
@@ -80,7 +82,8 @@ doctorsRouter.patch(
         updatedDoctor.hourlyRate,
         updatedDoctor.affiliation,
         updatedDoctor.educationalBackground,
-        updatedDoctor.speciality
+        updatedDoctor.speciality,
+        updatedDoctor.requestStatus as DoctorStatus
       )
     )
   })
@@ -104,6 +107,7 @@ doctorsRouter.get(
           affiliation: doctor.affiliation,
           speciality: doctor.speciality,
           educationalBackground: doctor.educationalBackground,
+          requestStatus: doctor.requestStatus as DoctorStatus,
           sessionRate: doctor.hourlyRate * 1.1 - Math.random() * 10, // this is a random discount till the pachage part is done
           // TODO: retrieve available times from the Appointments. Since we aren't required to make appointments for this sprint, I will
           // assume available times is a field in the doctors schema for now.
@@ -130,7 +134,8 @@ doctorsRouter.get(
         doctor.hourlyRate,
         doctor.affiliation,
         doctor.speciality,
-        doctor.educationalBackground
+        doctor.educationalBackground,
+        doctor.requestStatus as DoctorStatus
       )
     )
   })
@@ -153,6 +158,7 @@ doctorsRouter.get(
         doctor.affiliation,
         doctor.educationalBackground,
         doctor.speciality,
+        doctor.requestStatus as DoctorStatus,
         doctor.availableTimes as [string],
         doctor.hourlyRate * 1.1 - Math.random() * 10 // this is a random discount till the pachage part is done
       )
