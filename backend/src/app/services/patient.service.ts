@@ -1,4 +1,3 @@
-import { AppointmentStatus } from 'clinic-common/types/appointment.types'
 import { NotFoundError } from '../errors'
 import {
   type AppointmentDocument,
@@ -41,9 +40,10 @@ export async function getPatientByID(id: string): Promise<{
     .exec()
   if (patient == null) throw new NotFoundError()
 
-  const appointments : Array<HydratedDocument<AppointmentDocument>> = await AppointmentModel.find({
-    patientID: id,
-  }).exec()
+  const appointments: Array<HydratedDocument<AppointmentDocument>> =
+    await AppointmentModel.find({
+      patientID: id,
+    }).exec()
 
   const prescriptions = await PrescriptionModel.find({
     patient: id,
@@ -59,7 +59,7 @@ export async function filterPatientByAppointment(
 
   const appointments = await AppointmentModel.find({
     doctorID: doctorId,
-    status: AppointmentStatus.Upcoming,
+    date: { $gte: new Date() },
   })
   for (const appointment of appointments) {
     const patientId = appointment.patientID.toString()
