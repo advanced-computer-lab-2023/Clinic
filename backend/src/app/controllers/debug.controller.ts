@@ -64,11 +64,10 @@ const specialities = ['oncology', 'dermatology', 'cardiology', 'neurology']
 
 // Creates a random doctor with random data and password 'doctor',
 async function createDummyDoctor(
-  username?: string,
-  status: DoctorStatus = DoctorStatus.Approved
+  username: string = randomUsername('doctor'),
+  status: DoctorStatus = DoctorStatus.Approved,
+  withAppointments: boolean = false
 ): Promise<WithUser<DoctorDocument>> {
-  username = username ?? randomUsername('doctor')
-
   const user = await UserModel.create({
     username,
     password: await hash('doctor', bcryptSalt),
@@ -92,6 +91,14 @@ async function createDummyDoctor(
     requestStatus: status,
     availableTimes: randomFutureDates(),
   })
+
+  if (withAppointments) {
+    for (let i = 0; i < 6; i++) {
+      const patient = await createDummyPatient()
+
+      await createDummyAppointment(patient.id, doctor.id)
+    }
+  }
 
   return await doctor.populate<{
     user: UserDocument
@@ -211,7 +218,13 @@ export const debugRouter = Router()
 debugRouter.post(
   '/create-doctor',
   asyncWrapper(async (req, res) => {
-    res.send(await createDummyDoctor())
+    res.send(
+      await createDummyDoctor(
+        randomUsername('doctor'),
+        DoctorStatus.Approved,
+        true
+      )
+    )
   })
 )
 
@@ -346,7 +359,11 @@ debugRouter.post(
   asyncWrapper(async (req, res) => {
     const admin = await createDummyAdmin('admin')
     const patient = await createDummyPatient('patient')
-    const doctor = await createDummyDoctor('doctor')
+    const doctor = await createDummyDoctor(
+      'doctor',
+      DoctorStatus.Approved,
+      true
+    )
 
     for (let i = 0; i < 3; i++) {
       await createDummyDoctor(
