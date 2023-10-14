@@ -45,6 +45,13 @@ export function ApprovedDoctors() {
             ),
           type: 'text',
         },
+        {
+          label:'Session Rate',
+          property: (v) => v.sessionRate,
+          filter: (actual: number, required: number) =>
+            actual <= required,
+          type: 'text',
+        }
       ]}
       queryKey={['approved-doctors']}
       component={(doctor) => (
@@ -72,6 +79,12 @@ export function ApprovedDoctors() {
                     {doctor.availableTimes.map((data) => `${data}`).join(', ')}
                   </Typography>
                 </Stack>
+                <Stack spacing={-1}>
+                  <Typography variant="overline" color="text.secondary">
+                    Session Rate
+                  </Typography>
+                  <Typography variant="body1">{doctor.sessionRate}</Typography>
+              </Stack>
               </Stack>
               <CardActions>
                 <Button
