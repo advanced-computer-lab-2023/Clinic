@@ -133,8 +133,8 @@ doctorsRouter.get(
         doctor.dateOfBirth,
         doctor.hourlyRate,
         doctor.affiliation,
-        doctor.speciality,
         doctor.educationalBackground,
+        doctor.speciality,
         doctor.requestStatus as DoctorStatus
       )
     )
