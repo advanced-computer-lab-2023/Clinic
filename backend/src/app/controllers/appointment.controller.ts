@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import { asyncWrapper } from '../utils/asyncWrapper'
 import { getfilteredAppointments } from '../services/appointment.service'
-import { type AppointmentStatus, GetFilteredAppointmentsResponse } from 'clinic-common/types/appointment.types'
+import { AppointmentStatus, GetFilteredAppointmentsResponse } from 'clinic-common/types/appointment.types'
 import { PatientModel } from '../models/patient.model'
 import { DoctorModel } from '../models/doctor.model'
 import { type HydratedDocument } from 'mongoose'
@@ -23,6 +23,7 @@ appointmentsRouter.get(
       const doctor = await DoctorModel.findOne({ user: user.id })
       query.doctorID = doctor?.id
     }
+
     const filterAppointments = await getfilteredAppointments(query)
     res.send(
       new GetFilteredAppointmentsResponse(
@@ -31,7 +32,7 @@ appointmentsRouter.get(
           patientID: appointment.patientID.toString(),
           doctorID: appointment.doctorID.toString(),
           date: appointment.date,
-          status: appointment.status as AppointmentStatus
+          status: new Date(appointment.date) > new Date() ? AppointmentStatus.Upcoming : AppointmentStatus.Completed, 
         }))
       )
     )
