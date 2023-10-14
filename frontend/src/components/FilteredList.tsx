@@ -135,7 +135,7 @@ export function FilteredList<T>({
                         ),
                         date: (
                           <DateTimePicker
-                            label="From"
+                            label={filter.label}
                             sx={{ width: '100%' }}
                             value={dayjs(filterValues[filter.id as string])}
                             onChange={(date) =>
