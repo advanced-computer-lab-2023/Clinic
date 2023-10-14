@@ -10,6 +10,7 @@ import {
 } from '@mui/material'
 import { DateRange, FilteredList } from '@/components/FilteredList'
 import { useNavigate } from 'react-router-dom'
+import { useQuery } from '@tanstack/react-query'
 
 export function ApprovedDoctors() {
   const navigate = useNavigate()
@@ -17,6 +18,14 @@ export function ApprovedDoctors() {
   function handleView(id: string) {
     navigate(`/patient-dashboard/view-doctor/${id}`)
   }
+
+  const specialities = useQuery({
+    queryKey: ['specialities'],
+    queryFn: () =>
+      getApprovedDoctors()
+        .then((data) => data.map((v) => v.speciality))
+        .then((data) => [...new Set(data)]),
+  })
 
   return (
     <FilteredList
@@ -30,11 +39,22 @@ export function ApprovedDoctors() {
           type: 'text',
         },
         {
-          label: 'Doctor Speciality',
+          label: 'Search by Doctor Speciality',
           property: (v) => v.speciality,
           filter: (actual: string, required: string) =>
             actual.toLowerCase().includes(required.toLowerCase()),
           type: 'text',
+        },
+        {
+          label: 'Filter by Doctor Speciality',
+          property: (v) => v.speciality,
+          filter: (actual: string, required: string) =>
+            actual.toLowerCase().includes(required.toLowerCase()),
+          selectValues: (specialities.data ?? []).map((v) => ({
+            label: v,
+            value: v,
+          })),
+          type: 'select',
         },
         {
           label: 'ِAvailable',
