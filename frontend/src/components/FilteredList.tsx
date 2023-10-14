@@ -8,8 +8,12 @@ import {
   CardContent,
   Chip,
   Container,
+  FormControl,
   FormControlLabel,
   Grid,
+  InputLabel,
+  MenuItem,
+  Select,
   Stack,
   Switch,
   TextField,
@@ -27,13 +31,21 @@ export interface Filter<T, V = any> {
   property: (obj: T) => V
   label: string
   filter: (actualValue: V, filterValue: V) => boolean
-  type: 'text' | 'date' | 'boolean'
+  type: 'text' | 'date' | 'boolean' | 'dateRange' | 'select'
+  selectValues?: { label: string; value: V }[]
   id?: string
   defaultValue?: V
   customComponent?: (params: {
     value: V
     setValue: (val: V) => void
   }) => JSX.Element | undefined
+}
+
+export class DateRange {
+  constructor(
+    public from: Date | undefined,
+    public to: Date | undefined
+  ) {}
 }
 
 export function FilteredList<T>({
@@ -84,7 +96,6 @@ export function FilteredList<T>({
   }, [query.data, filters, filterValues])
 
   const hasFilters = useMemo(() => {
-    console.log(filterValues)
     return Object.values(filterValues).some(
       (val) => val !== undefined && val !== ''
     )
@@ -167,6 +178,90 @@ export function FilteredList<T>({
                             label="Is Filled?"
                           />
                         ),
+                        dateRange: (
+                          <Stack direction="row" spacing={2}>
+                            <DateTimePicker
+                              label={filter.label + ' From'}
+                              sx={{ width: '100%' }}
+                              value={
+                                filterValues[filter.id as string]?.from
+                                  ? dayjs(
+                                      (
+                                        filterValues[
+                                          filter.id as string
+                                        ] as DateRange
+                                      ).from
+                                    )
+                                  : null
+                              }
+                              onChange={(date) => {
+                                setFilterValues({
+                                  ...filterValues,
+                                  [filter.id as string]: new DateRange(
+                                    date!.toDate(),
+                                    (
+                                      filterValues[
+                                        filter.id as string
+                                      ] as DateRange
+                                    )?.to
+                                  ),
+                                })
+                                console.log(filterValues)
+                              }}
+                            />
+                            <DateTimePicker
+                              label={filter.label + ' To'}
+                              sx={{ width: '100%' }}
+                              value={
+                                filterValues[filter.id as string]?.to
+                                  ? dayjs(
+                                      (
+                                        filterValues[
+                                          filter.id as string
+                                        ] as DateRange
+                                      ).to
+                                    )
+                                  : null
+                              }
+                              onChange={(date) =>
+                                setFilterValues({
+                                  ...filterValues,
+                                  [filter.id as string]: new DateRange(
+                                    (
+                                      filterValues[
+                                        filter.id as string
+                                      ] as DateRange
+                                    )?.from,
+                                    date!.toDate()
+                                  ),
+                                })
+                              }
+                            />
+                          </Stack>
+                        ),
+                        select: (
+                          <FormControl fullWidth>
+                            <InputLabel id="demo-simple-select-label">
+                              {filter.label}
+                            </InputLabel>
+                            <Select
+                              labelId="demo-simple-select-label"
+                              id="demo-simple-select"
+                              label={filter.label}
+                              value={filterValues[filter.id as string] ?? ''}
+                              onChange={(e) =>
+                                setFilterValues({
+                                  ...filterValues,
+                                  [filter.id as string]: e.target.value,
+                                })
+                              }
+                            >
+                              {filter.selectValues?.map(({ label, value }) => (
+                                <MenuItem value={value}>{label}</MenuItem>
+                              ))}
+                            </Select>
+                          </FormControl>
+                        ),
                       }[filter.type]
                     }
                   </Grid>
@@ -193,6 +288,35 @@ export function FilteredList<T>({
                               [filter.id as string]: val,
                             }),
                         })
+                      ) : filter.type == 'dateRange' ? (
+                        <>
+                          <Chip
+                            label={`${filter.label}: ${
+                              filterValues[filter.id as string]?.from
+                                ? 'From ' +
+                                  filterValues[
+                                    filter.id as string
+                                  ]?.from?.toLocaleString()
+                                : ''
+                            }
+                            
+                            ${
+                              filterValues[filter.id as string]?.to
+                                ? 'To ' +
+                                  filterValues[
+                                    filter.id as string
+                                  ]?.to?.toLocaleString()
+                                : ''
+                            }`}
+                            sx={{ mr: 1 }}
+                            onDelete={() =>
+                              setFilterValues({
+                                ...filterValues,
+                                [filter.id as string]: undefined,
+                              })
+                            }
+                          />
+                        </>
                       ) : (
                         <Chip
                           label={`${filter.label}: '${
