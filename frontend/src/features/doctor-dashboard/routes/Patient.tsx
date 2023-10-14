@@ -96,6 +96,17 @@ export function Patient() {
               alt="showing screen capture"
             />
           </Stack>
+          <Stack spacing={-1}>
+            <Typography variant="overline" color="text.secondary">
+              Notes
+            </Typography>
+            {patient.notes.map((note) => (
+              <Typography variant="body1">
+                {note}
+              </Typography>
+            ))}
+          </Stack>
+
         </Stack>
       </CardContent>
     </Card>
