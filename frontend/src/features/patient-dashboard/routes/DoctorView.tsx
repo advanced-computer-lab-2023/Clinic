@@ -65,6 +65,14 @@ export function DoctorView() {
                 {query.data?.educationalBackground}
               </Typography>
             </Stack>
+            <Stack spacing={-1}>
+              <Typography variant="overline" color="text.secondary">
+                Session Rate
+              </Typography>
+              <Typography variant="body1">
+                {query.data?.sessionRate.toFixed(2)}
+              </Typography>
+            </Stack>
           </Stack>
         </CardContent>
       </Card>

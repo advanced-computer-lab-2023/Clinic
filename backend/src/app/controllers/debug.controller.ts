@@ -29,6 +29,7 @@ import {
   type AppointmentDocument,
   AppointmentModel,
 } from '../models/appointment.model'
+import { HealthPackageModel } from '../models/healthPackage.model'
 
 const bcryptSalt = process.env.BCRYPT_SALT ?? '$2b$10$13bXTGGukQXsCf5hokNe2u'
 
@@ -167,6 +168,10 @@ async function createDummyPatient(
       name: faker.person.fullName(),
       mobileNumber: faker.phone.number(),
     },
+    healthPackage: faker.helpers.arrayElement([
+      ...(await HealthPackageModel.find()).map((hp) => hp.id),
+      undefined,
+    ]),
   })
 
   for (let i = 0; i < 3; i++) {
@@ -357,6 +362,8 @@ debugRouter.post(
 debugRouter.post(
   '/seed',
   asyncWrapper(async (req, res) => {
+    await createDefaultHealthPackages()
+
     const admin = await createDummyAdmin('admin')
     const patient = await createDummyPatient('patient')
     const doctor = await createDummyDoctor(
@@ -371,8 +378,6 @@ debugRouter.post(
         DoctorStatus.Pending
       )
     }
-
-    await createDefaultHealthPackages()
 
     res.send({
       admin,
