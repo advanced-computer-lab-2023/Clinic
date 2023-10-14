@@ -98,7 +98,7 @@ export function Patient() {
           </Stack>
           <Stack spacing={-1}>
             <Typography variant="overline" color="text.secondary">
-              Notes
+              Medical Records
             </Typography>
             {patient.notes.map((note) => (
               <Typography variant="body1">
