@@ -1,7 +1,7 @@
 import { type Types } from 'mongoose'
 import { Gender } from './gender.types'
-import { AppointmentDocument } from '../../backend/src/app/models/appointment.model'
 import { PrescriptionDocument } from '../../backend/src/app/models/prescription.model'
+import { GetFilteredAppointmentsResponse } from './appointment.types'
 
 export class PatientResponseBase {
   constructor(
@@ -57,7 +57,7 @@ export class APatientResponseBase {
       mobileNumber: string
     },
     public documents: string[],
-    public appointments: AppointmentDocument[],
+    public appointments: GetFilteredAppointmentsResponse,
     public prescriptions: PrescriptionDocument[]
   ) {}
 }

@@ -71,7 +71,7 @@ export function Patient() {
             <Typography variant="overline" color="text.secondary">
               Appointments
             </Typography>
-            {patient.appointments.map((appointment) => (
+            {patient.appointments.appointments.map((appointment) => (
               <Typography variant="body1" key={appointment.date}>
                 {`${appointment.date} - ${appointment.status}`}
               </Typography>

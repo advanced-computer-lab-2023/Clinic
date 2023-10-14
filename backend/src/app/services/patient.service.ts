@@ -33,7 +33,7 @@ export async function getPatientByName(
 
 export async function getPatientByID(id: string): Promise<{
   patient: PatientDocumentWithUser
-  appointments: AppointmentDocument[]
+  appointments: Array<HydratedDocument<AppointmentDocument>>
   prescriptions: PrescriptionDocument[]
 }> {
   const patient = await PatientModel.findOne({ _id: id })
@@ -41,7 +41,7 @@ export async function getPatientByID(id: string): Promise<{
     .exec()
   if (patient == null) throw new NotFoundError()
 
-  const appointments = await AppointmentModel.find({
+  const appointments : Array<HydratedDocument<AppointmentDocument>> = await AppointmentModel.find({
     patientID: id,
   }).exec()
 

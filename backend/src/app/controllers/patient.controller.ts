@@ -24,6 +24,7 @@ import {
   GetFamilyMembersResponse,
   type Relation,
 } from 'clinic-common/types/familyMember.types'
+import { AppointmentResponseBase, GetFilteredAppointmentsResponse } from 'clinic-common/types/appointment.types'
 
 
 export const patientRouter = Router()
@@ -144,6 +145,12 @@ patientRouter.get(
     const id = req.params.id
 
     const { patient, appointments, prescriptions } = await getPatientByID(id)
+
+    const filteredAppointments = appointments.map(appointment => {
+      return new AppointmentResponseBase(appointment.id, appointment.patientID.toString(), appointment.doctorID.toString(), appointment.date);
+    });
+    
+    const appointmentsRefactored = new GetFilteredAppointmentsResponse(filteredAppointments);
     res.send(
       new GetAPatientResponse(
         patient.id,
@@ -158,7 +165,7 @@ patientRouter.get(
           mobileNumber: patient.emergencyContact?.mobileNumber ?? '',
         },
         patient.documents,
-        appointments,
+        appointmentsRefactored,
         prescriptions
         )
     )
