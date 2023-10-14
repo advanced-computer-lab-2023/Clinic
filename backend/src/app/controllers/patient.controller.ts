@@ -82,6 +82,7 @@ patientRouter.get(
             name: patient.emergencyContact?.name ?? '',
             mobileNumber: patient.emergencyContact?.mobileNumber ?? '',
           },
+          notes: patient.notes,
         }))
       )
     )
@@ -113,6 +114,7 @@ patientRouter.post(
             name: patient.emergencyContact?.name ?? '',
             mobileNumber: patient.emergencyContact?.mobileNumber ?? '',
           },
+          notes: patient.notes,
         }))
       )
     )
@@ -179,7 +181,8 @@ patientRouter.get(
         },
         patient.documents,
         appointmentsRefactored,
-        prescriptions
+        prescriptions,
+        patient.notes
       )
     )
   })

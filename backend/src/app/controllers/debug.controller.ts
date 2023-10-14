@@ -172,6 +172,7 @@ async function createDummyPatient(
       ...(await HealthPackageModel.find()).map((hp) => hp.id),
       undefined,
     ]),
+    notes: [faker.lorem.sentence()],
   })
 
   for (let i = 0; i < 3; i++) {

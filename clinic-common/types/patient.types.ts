@@ -15,7 +15,8 @@ export class PatientResponseBase {
     public emergencyContact: {
       name: string
       mobileNumber: string
-    }
+    },
+    public notes: string[]
   ) {}
 }
 
@@ -58,7 +59,8 @@ export class APatientResponseBase {
     },
     public documents: string[],
     public appointments: GetFilteredAppointmentsResponse,
-    public prescriptions: PrescriptionDocument[]
+    public prescriptions: PrescriptionDocument[],
+    public notes: string[]
   ) {}
 }
 

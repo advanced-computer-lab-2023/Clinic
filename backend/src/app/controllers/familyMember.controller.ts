@@ -100,7 +100,8 @@ familyMemberRouter.get(
           {
             name: patient.emergencyContact?.name ?? '',
             mobileNumber: patient.emergencyContact?.mobileNumber ?? '',
-          }
+          },
+          patient.notes
         )
       )
     )
