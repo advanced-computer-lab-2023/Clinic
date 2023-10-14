@@ -8,7 +8,7 @@ import {
   Stack,
   Typography,
 } from '@mui/material'
-import { FilteredList } from '@/components/FilteredList'
+import { DateRange, FilteredList } from '@/components/FilteredList'
 import { useNavigate } from 'react-router-dom'
 
 export function ApprovedDoctors() {
@@ -37,13 +37,28 @@ export function ApprovedDoctors() {
           type: 'text',
         },
         {
-          label: 'Available Times',
+          label: 'ِAvailable',
           property: (v) => v.availableTimes,
-          filter: (actual: [string], required: string) =>
-            actual.some((time) =>
-              time.toLowerCase().includes(required.toLowerCase())
-            ),
-          type: 'text',
+          filter: (actual: [string], required: DateRange) =>
+            actual.some((time) => {
+              if (required.from && required.to) {
+                return (
+                  new Date(time).getTime() >= required.from.getTime() &&
+                  new Date(time).getTime() <= required.to.getTime()
+                )
+              }
+
+              if (required.from) {
+                return new Date(time).getTime() >= required.from.getTime()
+              }
+
+              if (required.to) {
+                return new Date(time).getTime() <= required.to.getTime()
+              }
+
+              return true
+            }),
+          type: 'dateRange',
         },
       ]}
       queryKey={['approved-doctors']}
@@ -68,9 +83,16 @@ export function ApprovedDoctors() {
                   <Typography variant="overline" color="text.secondary">
                     Available Times
                   </Typography>
-                  <Typography variant="body1">
-                    {doctor.availableTimes.map((data) => `${data}`).join(', ')}
-                  </Typography>
+                  <Stack spacing={-1}>
+                    {doctor.availableTimes
+                      .map((data) => new Date(data as string))
+                      .sort((a, b) => a.getTime() - b.getTime())
+                      .map((data, i) => (
+                        <Typography variant="body1" key={i}>
+                          {new Date(data).toLocaleString()}
+                        </Typography>
+                      ))}
+                  </Stack>
                 </Stack>
               </Stack>
               <CardActions>
