@@ -80,13 +80,14 @@ export function ApprovedDoctors() {
             }),
           type: 'dateRange',
         },
-        {
-          label:'Session Rate',
-          property: (v) => v.sessionRate,
-          filter: (actual: number, required: number) =>
-            actual <= required,
-          type: 'text',
-        }
+        // TODO: Fix this before sprint 2
+        // {
+        //   label:'Session Rate',
+        //   property: (v) => v.sessionRate,
+        //   filter: (actual: number, required: number) =>
+        //     actual <= required,
+        //   type: 'text',
+        // }
       ]}
       queryKey={['approved-doctors']}
       component={(doctor) => (
