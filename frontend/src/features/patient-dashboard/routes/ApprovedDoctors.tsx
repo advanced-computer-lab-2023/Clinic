@@ -83,7 +83,7 @@ export function ApprovedDoctors() {
                   <Typography variant="overline" color="text.secondary">
                     Session Rate
                   </Typography>
-                  <Typography variant="body1">{doctor.sessionRate}</Typography>
+                  <Typography variant="body1">{doctor.sessionRate} E£</Typography>
               </Stack>
               </Stack>
               <CardActions>
