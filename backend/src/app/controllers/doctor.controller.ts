@@ -162,6 +162,18 @@ doctorsRouter.get(
   asyncWrapper(async (req, res) => {
     const doctor = await getApprovedDoctorById(req.params.id)
 
+    const user = await UserModel.findOne({ username: req.username })
+
+    if (user == null) throw new NotAuthenticatedError()
+
+    const patient = await PatientModel.findOne({ user: user.id })
+      .populate<{ healthPackage: HealthPackageDocument }>('healthPackage')
+      .exec()
+
+    if (patient == null) throw new NotAuthenticatedError()
+
+    const discount = patient.healthPackage?.sessionDiscount ?? 0
+
     res.send(
       new GetApprovedDoctorResponse(
         doctor.id,
@@ -175,7 +187,7 @@ doctorsRouter.get(
         doctor.speciality,
         doctor.requestStatus as DoctorStatus,
         doctor.availableTimes as [string],
-        doctor.hourlyRate * 1.1 - Math.random() * 10 // this is a random discount till the pachage part is done
+        doctor.hourlyRate * 1.1 - (discount * doctor.hourlyRate) / 100
       )
     )
   })

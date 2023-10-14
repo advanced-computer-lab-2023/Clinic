@@ -169,9 +169,7 @@ async function createDummyPatient(
       mobileNumber: faker.phone.number(),
     },
     healthPackage: faker.helpers.arrayElement([
-      faker.helpers.arrayElement(
-        (await HealthPackageModel.find()).map((hp) => hp.id)
-      ),
+      ...(await HealthPackageModel.find()).map((hp) => hp.id),
       undefined,
     ]),
   })
@@ -364,6 +362,8 @@ debugRouter.post(
 debugRouter.post(
   '/seed',
   asyncWrapper(async (req, res) => {
+    await createDefaultHealthPackages()
+
     const admin = await createDummyAdmin('admin')
     const patient = await createDummyPatient('patient')
     const doctor = await createDummyDoctor(
@@ -378,8 +378,6 @@ debugRouter.post(
         DoctorStatus.Pending
       )
     }
-
-    await createDefaultHealthPackages()
 
     res.send({
       admin,
