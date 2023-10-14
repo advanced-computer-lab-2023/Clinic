@@ -272,12 +272,19 @@ const DateInputField = <T extends ObjectWithStringKeys>({
       <DatePicker
         label={field.label}
         {...fieldItem}
-        value={dayjs(fieldItem.value as Date)}
+        value={
+          fieldState.isDirty
+            ? fieldItem.value
+              ? dayjs(new Date(fieldItem.value as string))
+              : null
+            : defaultValue
+            ? dayjs(defaultValue as Date)
+            : null
+        }
         onChange={(date: Dayjs | null) => {
           fieldItem.onChange(date?.toDate())
         }}
         disableFuture={!!fieldState.error}
-        defaultValue={dayjs(defaultValue as Date)}
       />
       <FormHelperText>{fieldState.error?.message}</FormHelperText>
     </FormControl>

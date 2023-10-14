@@ -137,7 +137,11 @@ export function FilteredList<T>({
                           <DateTimePicker
                             label={filter.label}
                             sx={{ width: '100%' }}
-                            value={dayjs(filterValues[filter.id as string])}
+                            value={
+                              filterValues[filter.id as string]
+                                ? dayjs(filterValues[filter.id as string])
+                                : null
+                            }
                             onChange={(date) =>
                               setFilterValues({
                                 ...filterValues,

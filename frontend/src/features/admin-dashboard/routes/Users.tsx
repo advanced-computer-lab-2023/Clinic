@@ -51,12 +51,12 @@ export function Users() {
       field: 'username',
       headerName: 'Username',
       flex: 1,
-      editable: true,
+      editable: false,
     },
     {
       field: 'type',
       headerName: 'Type',
-      editable: true,
+      editable: false,
       flex: 1,
     },
     {
