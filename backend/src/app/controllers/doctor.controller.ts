@@ -23,6 +23,11 @@ import { NotAuthenticatedError } from '../errors/auth.errors'
 import { APIError } from '../errors'
 import { validate } from '../middlewares/validation.middleware'
 import { UpdateDoctorRequestValidator } from 'clinic-common/validators/doctor.validator'
+import { type UserDocument, UserModel } from '../models/user.model'
+import { PatientModel } from '../models/patient.model'
+import { type HydratedDocument } from 'mongoose'
+
+import { type HealthPackageDocument } from '../models/healthPackage.model'
 export const doctorsRouter = Router()
 
 doctorsRouter.get(
@@ -93,8 +98,17 @@ doctorsRouter.patch(
 doctorsRouter.get(
   '/approved',
   asyncWrapper(async (req, res) => {
+    const user: HydratedDocument<UserDocument> | null = await UserModel.findOne(
+      { username: req.username }
+    )
+    if (user == null) throw new NotAuthenticatedError()
+    const patient = await PatientModel.findOne({ user: user.id })
+      .populate<{ healthPackage: HealthPackageDocument }>('healthPackage')
+      .exec()
+    if (patient == null) throw new NotAuthenticatedError()
     const doctors = await getAllDoctors()
 
+    const discount = patient.healthPackage?.sessionDiscount ?? 0
     res.send(
       new GetApprovedDoctorsResponse(
         doctors.map((doctor) => ({
@@ -107,11 +121,12 @@ doctorsRouter.get(
           affiliation: doctor.affiliation,
           speciality: doctor.speciality,
           educationalBackground: doctor.educationalBackground,
-          requestStatus: doctor.requestStatus as DoctorStatus,
-          sessionRate: doctor.hourlyRate * 1.1 - Math.random() * 10, // this is a random discount till the pachage part is done
+          sessionRate:
+            doctor.hourlyRate * 1.1 - (discount * doctor.hourlyRate) / 100,
           // TODO: retrieve available times from the Appointments. Since we aren't required to make appointments for this sprint, I will
           // assume available times is a field in the doctors schema for now.
           availableTimes: doctor.availableTimes as [string],
+          requestStatus: doctor.requestStatus as DoctorStatus,
         }))
       )
     )
