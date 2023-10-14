@@ -21,6 +21,7 @@ const patientSchema = new Schema(
     },
     familyMembers: [{ type: Schema.Types.ObjectId, ref: 'FamilyMember' }],
     documents: [{ type: String }],
+    healthPackage: { type: Schema.Types.ObjectId, ref: 'HealthPackage' },
   },
   { timestamps: true }
 )
