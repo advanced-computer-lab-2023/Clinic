@@ -14,6 +14,8 @@ const familyMemberSchema = new Schema(
       required: true,
       enum: Gender,
     },
+    patient:{ type: Schema.Types.ObjectId, ref: 'Patient' }
+    ,
     relation: {
       type: String,
       required: true,
