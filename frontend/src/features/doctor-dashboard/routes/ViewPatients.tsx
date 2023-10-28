@@ -101,11 +101,10 @@ export function ViewPatients() {
         <DataGrid
           autoHeight
           rows={
-            
-            queryUpComing.data?.filter((user) => {
-
-              return user.name.includes(searchKey)
-            })
+            queryUpComing.data
+              ?.filter((user) => {
+                return user.name.includes(searchKey)
+              })
               .map((user) => {
                 return {
                   id: user.id,
@@ -123,7 +122,8 @@ export function ViewPatients() {
         <DataGrid
           autoHeight
           rows={
-            query.data?.filter((user: { name: string | string[] }) => {
+            query.data
+              ?.filter((user: { name: string | string[] }) => {
                 return user.name.includes(searchKey)
               })
               .map((user) => {

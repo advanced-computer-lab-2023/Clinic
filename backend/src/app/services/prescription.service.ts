@@ -100,16 +100,16 @@ export async function getSinglePrescription(
     throw new NotFoundError()
   }
   const prescription = await PrescriptionModel.findOne({
-    _id: id,patient:Patient.id
-})
+    _id: id,
+    patient: Patient.id,
+  })
     .populate<{
       doctor: DoctorDocument
     }>('doctor')
     .populate<{ patient: PatientDocument }>('patient')
     .exec()
-    if (prescription == null) {
-      throw new NotFoundError()
-    }
-    return prescription
-  
+  if (prescription == null) {
+    throw new NotFoundError()
+  }
+  return prescription
 }

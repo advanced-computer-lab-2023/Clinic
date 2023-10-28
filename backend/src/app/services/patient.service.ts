@@ -57,13 +57,14 @@ export async function filterPatientByAppointment(
 ): Promise<PatientDocumentWithUser[]> {
   const filteredPatients: string[] = []
 
-  const appointments = (await AppointmentModel.find({
-    doctorID: doctorId,
-    // Since date is stored as a string (by mistake), as a workaround, we can fetch all then filter using JS
-    // date: { $gte: new Date() }, 
-  })).filter(a => new Date(a.date) > new Date())
-  
-  
+  const appointments = (
+    await AppointmentModel.find({
+      doctorID: doctorId,
+      // Since date is stored as a string (by mistake), as a workaround, we can fetch all then filter using JS
+      // date: { $gte: new Date() },
+    })
+  ).filter((a) => new Date(a.date) > new Date())
+
   for (const appointment of appointments) {
     const patientId = appointment.patientID.toString()
     if (!filteredPatients.includes(patientId)) {

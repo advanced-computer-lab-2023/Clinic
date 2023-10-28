@@ -101,12 +101,9 @@ export function Patient() {
               Medical Records
             </Typography>
             {patient.notes.map((note) => (
-              <Typography variant="body1">
-                {note}
-              </Typography>
+              <Typography variant="body1">{note}</Typography>
             ))}
           </Stack>
-
         </Stack>
       </CardContent>
     </Card>
