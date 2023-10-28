@@ -1,0 +1,23 @@
+{
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "husky": "^8.0.0",
+    "lint-staged": "^15.0.2"
+  },
+  "scripts": {
+    "prepare": "husky install",
+    "start": "concurrently \"npm run dev -w backend\" \"npm run dev -w frontend\""
+  },
+  "workspaces": [
+    "backend",
+    "frontend",
+    "clinic-common"
+  ],
+  "lint-staged": {
+    "**/*.{js,ts,jsx,tsx}": [
+      "eslint --fix",
+      "prettier --write -u"
+    ],
+    "!**/*.{js,ts,jsx,tsx}": "prettier --write -u"
+  }
+}

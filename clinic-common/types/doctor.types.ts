@@ -49,7 +49,7 @@ export class GetApprovedDoctorResponse extends DoctorResponseBase {
     educationalBackground: string,
     speciality: string,
     requestStatus: DoctorStatus,
-    public availableTimes: [String],
+    public availableTimes: [string],
     public sessionRate: number // Additional property
   ) {
     super(

@@ -1,7 +1,8 @@
 {
+  "name": "backend",
   "dependencies": {
     "bcrypt": "^5.1.1",
-    "clinic-common": "file:../clinic-common",
+    "clinic-common": "*",
     "cors": "^2.8.5",
     "express": "^4.18.2",
     "jsonwebtoken": "^9.0.2",
@@ -22,8 +23,6 @@
     "eslint-plugin-import": "^2.28.1",
     "eslint-plugin-n": "^16.1.0",
     "eslint-plugin-promise": "^6.1.1",
-    "husky": "^8.0.3",
-    "lint-staged": "^14.0.1",
     "prettier": "3.0.3",
     "tsx": "^3.14.0",
     "typescript": "~5.2.0"
@@ -32,15 +31,10 @@
     "start": "tsx src/app.ts",
     "build": "tsc",
     "dev": "tsx src/app.ts",
-    "prepare": "cd .. && husky install backend/.husky",
     "lint": "eslint --ext .js,.ts,.jsx,.tsx src",
-    "format": "prettier . --write -u"
-  },
-  "lint-staged": {
-    "{src,test}/**/*.{js,ts,jsx,tsx}": [
-      "eslint --fix",
-      "prettier --write -u"
-    ],
-    "!**/*.{js,ts,jsx,tsx}": "prettier --write -u"
+    "lint:fix": "eslint --ext .js,.ts,.jsx,.tsx src --fix",
+    "format": "prettier . -u --check",
+    "format:fix": "prettier . --write -u",
+    "compile": "tsc --noEmit"
   }
 }

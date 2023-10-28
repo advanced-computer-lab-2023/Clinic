@@ -4,24 +4,24 @@ services:
     ports:
       - "5173:5173"
     volumes:
-      - ./frontend:/app
-      - ./clinic-common:/clinic-common
+      - ./:/app
+      - /app/node_modules
     working_dir: /app
     depends_on:
       - backend
-    entrypoint: sh -c "npm install --install-links && npm run dev"
+    entrypoint: sh -c "npm install && npm run dev -w frontend"
 
   backend:
     image: node:18-alpine
     ports:
       - "3000:3000"
     volumes:
-      - ./backend:/app
-      - ./clinic-common:/clinic-common
+      - ./:/app
+      - /app/node_modules
     environment:
       - MONGO_URI=mongodb://root:example@database:27017
     working_dir: /app
-    entrypoint: sh -c "npm install --install-links && npm start"
+    entrypoint: sh -c "npm install && npm run dev -w backend"
     depends_on:
       - database
 

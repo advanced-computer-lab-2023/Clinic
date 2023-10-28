@@ -1,0 +1,18 @@
+name: Lint & Format
+
+on: [push]
+
+jobs:
+  format-and-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install packages
+        run: npm ci
+
+      - name: Prettier
+        run: npm run format --workspaces --if-present
+
+      - name: Lint
+        run: npm run lint --workspaces --if-present
