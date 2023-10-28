@@ -24,15 +24,14 @@
     "eslint-plugin-promise": "^6.1.1",
     "husky": "^8.0.3",
     "lint-staged": "^14.0.1",
-    "nodemon": "^3.0.1",
     "prettier": "3.0.3",
-    "ts-node": "^10.9.1",
+    "tsx": "^3.14.0",
     "typescript": "~5.2.0"
   },
   "scripts": {
-    "start": "nodemon --exec ts-node src/app.ts",
+    "start": "tsx src/app.ts",
     "build": "tsc",
-    "dev": "nodemon --exec ts-node src/app.ts",
+    "dev": "tsx src/app.ts",
     "prepare": "cd .. && husky install backend/.husky",
     "lint": "eslint --ext .js,.ts,.jsx,.tsx src",
     "format": "prettier . --write -u"
