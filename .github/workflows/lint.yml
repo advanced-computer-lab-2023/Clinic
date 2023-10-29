@@ -12,7 +12,7 @@ jobs:
         run: npm ci
 
       - name: Prettier
-        run: npm run format --workspaces --if-present
+        run: npm run lint
 
       - name: Lint
-        run: npm run lint --workspaces --if-present
+        run: npm run format
