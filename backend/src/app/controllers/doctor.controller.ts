@@ -195,26 +195,7 @@ doctorsRouter.get(
   })
 )
 
-doctorsRouter.patch(
-  '/acceptDoctorRequest/:id',
-  asyncWrapper(async (req, res) => {
-    const doctor = await approveDoctor(req.params.id)
-    res.send(
-      new UpdateDoctorResponse(
-        doctor.id,
-        doctor.user.username,
-        doctor.name,
-        doctor.email,
-        doctor.dateOfBirth,
-        doctor.hourlyRate,
-        doctor.affiliation,
-        doctor.educationalBackground,
-        doctor.speciality,
-        doctor.requestStatus as DoctorStatus
-      )
-    )
-  })
-)
+
 
 doctorsRouter.patch(
   '/rejectDoctorRequest/:id',
