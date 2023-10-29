@@ -55,9 +55,11 @@ function randomEmail(): string {
 
 function randomFutureDates(): string[] {
   const futureDates = []
+
   for (let i = 0; i < 5; i++) {
     futureDates.push(faker.date.future().toString())
   }
+
   return futureDates
 }
 

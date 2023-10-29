@@ -4,6 +4,7 @@ import { Card, CardContent, Grid, Stack, Typography } from '@mui/material'
 import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'react-router-dom'
 import { CardPlaceholder } from '@/components/CardPlaceholder'
+
 export function DoctorView() {
   const { id } = useParams()
 

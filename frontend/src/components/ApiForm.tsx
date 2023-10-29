@@ -216,6 +216,7 @@ const TextInputField = <T extends ObjectWithStringKeys>({
           } else {
             fieldItem.onChange(Number(e.target.value))
           }
+
           setOriginalValue(e.target.value)
         }}
         value={fieldState.isDirty ? originalValue : defaultValue}
@@ -261,6 +262,7 @@ const SelectInputField = <T extends ObjectWithStringKeys>({
     </FormControl>
   )
 }
+
 const DateInputField = <T extends ObjectWithStringKeys>({
   field,
   fieldState,

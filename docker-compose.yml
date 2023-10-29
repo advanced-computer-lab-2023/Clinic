@@ -2,7 +2,7 @@ services:
   frontend:
     image: node:18-alpine
     ports:
-      - "5173:5173"
+      - '5173:5173'
     volumes:
       - ./:/app
       - /app/node_modules
@@ -14,7 +14,7 @@ services:
   backend:
     image: node:18-alpine
     ports:
-      - "3000:3000"
+      - '3000:3000'
     volumes:
       - ./:/app
       - /app/node_modules
@@ -29,7 +29,7 @@ services:
     image: mongo:7
     restart: always
     ports:
-      - "27017:27017"
+      - '27017:27017'
     environment:
       - MONGO_INITDB_ROOT_USERNAME=root
       - MONGO_INITDB_ROOT_PASSWORD=example

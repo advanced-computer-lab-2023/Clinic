@@ -20,6 +20,7 @@ appointmentsRouter.get(
     const user: HydratedDocument<UserDocument> | null = await UserModel.findOne(
       { username: req.username }
     )
+
     if (user != null && user.type === 'Patient') {
       const patient = await PatientModel.findOne({ user: user.id })
       query.patientID = patient?.id

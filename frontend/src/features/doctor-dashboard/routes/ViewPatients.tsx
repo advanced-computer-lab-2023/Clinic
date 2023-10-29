@@ -17,6 +17,7 @@ export function ViewPatients() {
   if (query.isLoading || query.isRefetching || query.isFetching) {
     return <CardPlaceholder />
   }
+
   const columns: GridColDef[] = [
     {
       field: 'name',
@@ -59,6 +60,7 @@ export function ViewPatients() {
       ),
     },
   ]
+
   return (
     <Box
       sx={{

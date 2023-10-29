@@ -25,15 +25,19 @@ export async function getPrescriptions(
   const User = await UserModel.findOne({
     username: userName,
   })
+
   if (User == null) {
     throw new NotFoundError()
   }
+
   const Patient = await PatientModel.findOne({
     user: User.id,
   }).populate<{ user: UserDocument }>('user')
+
   if (Patient == null) {
     throw new NotFoundError()
   }
+
   const prescription = await PrescriptionModel.find({
     patient: Patient.id,
   })
@@ -42,9 +46,11 @@ export async function getPrescriptions(
     }>('doctor')
     .populate<{ patient: PatientDocument }>('patient')
     .exec()
+
   if (prescription == null) {
     throw new NotFoundError()
   }
+
   return prescription
 }
 
@@ -55,27 +61,35 @@ export async function createPrescription(
   const DoctorUser = await UserModel.findOne({
     username: doctorUsername,
   })
+
   if (DoctorUser == null) {
     throw new NotFoundError()
   }
+
   const Doctor = await DoctorModel.findOne({
     user: DoctorUser.id,
   }).populate<{ user: UserDocument }>('user')
+
   if (Doctor == null) {
     throw new NotFoundError()
   }
+
   const PatientUser = await UserModel.findOne({
     username: request.patient,
   })
+
   if (PatientUser == null) {
     throw new NotFoundError()
   }
+
   const Patient = await PatientModel.findOne({
     user: PatientUser.id,
   }).populate<{ user: UserDocument }>('user')
+
   if (Patient == null) {
     throw new NotFoundError()
   }
+
   await PrescriptionModel.create({
     date: request.date,
     doctor: Doctor.id,
@@ -83,6 +97,7 @@ export async function createPrescription(
     medicine: request.medicine,
   })
 }
+
 export async function getSinglePrescription(
   id: string,
   userName: string
@@ -90,15 +105,19 @@ export async function getSinglePrescription(
   const User = await UserModel.findOne({
     username: userName,
   })
+
   if (User == null) {
     throw new NotFoundError()
   }
+
   const Patient = await PatientModel.findOne({
     user: User.id,
   }).populate<{ user: UserDocument }>('user')
+
   if (Patient == null) {
     throw new NotFoundError()
   }
+
   const prescription = await PrescriptionModel.findOne({
     _id: id,
     patient: Patient.id,
@@ -108,8 +127,10 @@ export async function getSinglePrescription(
     }>('doctor')
     .populate<{ patient: PatientDocument }>('patient')
     .exec()
+
   if (prescription == null) {
     throw new NotFoundError()
   }
+
   return prescription
 }

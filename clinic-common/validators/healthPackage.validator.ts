@@ -7,6 +7,7 @@ export const CreateHealthPackageRequestValidator = zod.object({
   medicineDiscount: zod.number(),
   familyMemberSubscribtionDiscount: zod.number(),
 })
+
 export const UpdateHealthPackageRequestValidator = zod.object({
   name: zod.string().min(1).optional(),
   pricePerYear: zod.number().optional(),

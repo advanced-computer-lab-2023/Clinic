@@ -27,6 +27,7 @@ import {
   useState,
 } from 'react'
 import { LoadingButton } from '@mui/lab'
+
 export function HealthPackages() {
   const navigate = useNavigate()
   const query = useQuery({
@@ -38,9 +39,11 @@ export function HealthPackages() {
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const [packageId, setPackageId] = useState('')
+
   if (query.isLoading) {
     return <CardPlaceholder />
   }
+
   if (query.isError) {
     return <h1>error</h1>
   }
@@ -48,6 +51,7 @@ export function HealthPackages() {
   function handleUpdate(id: string) {
     navigate(`/admin-dashboard/update-health-package/${id}`)
   }
+
   const handleClickOpen = () => {
     setOpen(true)
   }

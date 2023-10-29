@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom'
 
 export function AddHealthPackage() {
   const navigate = useNavigate()
+
   return (
     <ApiForm<createHealthPackageRequest>
       fields={[

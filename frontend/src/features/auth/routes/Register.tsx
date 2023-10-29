@@ -7,6 +7,7 @@ import { RegisterRequestValidator } from 'clinic-common/validators/user.validato
 
 export const Register = () => {
   const { refreshUser } = useAuth()
+
   return (
     <ApiForm<RegisterRequest>
       fields={[

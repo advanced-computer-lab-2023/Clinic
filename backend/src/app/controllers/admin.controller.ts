@@ -16,6 +16,7 @@ import {
 import { type UserDocument } from '../models/user.model'
 
 export const adminRouter = Router()
+
 adminRouter.post(
   '/',
   validate(AddAdminValidator),
