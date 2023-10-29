@@ -8,6 +8,7 @@ import { Appointments } from './Appointments'
 import { DoctorView } from './DoctorView'
 import { FamilyMemberDetails } from './FamilyMemberDetails'
 import { PrescriptionView } from './PrescriptionView'
+import { SubscribeToHealthPackages } from './SubscribeToHealthPackages'
 
 export const patientDashboardRoutes: RouteObject[] = [
   {
@@ -44,6 +45,11 @@ export const patientDashboardRoutes: RouteObject[] = [
       {
         path: 'prescriptions/:id',
         element: <PrescriptionView />,
+      },
+
+      {
+        path: 'health-packages',
+        element: <SubscribeToHealthPackages />,
       },
     ],
   },

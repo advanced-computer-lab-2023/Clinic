@@ -15,7 +15,6 @@ import {
 import React from 'react'
 import { Link, Outlet } from 'react-router-dom'
 import { OnlyAuthenticated } from './OnlyAuthenticated'
-import { AlertsBox } from './AlertsBox'
 import { LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 
@@ -105,7 +104,6 @@ export function BaseLayout() {
         sx={{ flexGrow: 1, bgcolor: 'background.default', p: 3 }}
       >
         <Toolbar />
-        <AlertsBox />
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <Outlet
             context={

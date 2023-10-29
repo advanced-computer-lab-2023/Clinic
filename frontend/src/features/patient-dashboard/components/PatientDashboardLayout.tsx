@@ -32,6 +32,11 @@ export function PatientDashboardLayout() {
         text: 'Appoitments',
         icon: <AccessTimeIcon />,
       },
+      {
+        to: '/patient-dashboard/health-packages',
+        text: 'Health Packages',
+        icon: <Healing />,
+      },
     ])
   }, [setSidebarLinks])
 
