@@ -96,3 +96,35 @@ export async function getApprovedDoctorById(
 
   return doctor
 }
+
+export async function approveDoctor(
+  doctorId: string
+): Promise<DoctorDocumentWithUser> {
+  const doctor = await DoctorModel.findByIdAndUpdate(
+    doctorId,
+    { requestStatus: 'approved' },
+    {
+      new: true,
+    }
+  ).populate<{
+    user: UserDocument
+  }>('user')
+  if (doctor == null) throw new NotFoundError()
+  return doctor
+}
+
+export async function rejectDoctor(
+  doctorId: string
+): Promise<DoctorDocumentWithUser> {
+  const doctor = await DoctorModel.findByIdAndUpdate(
+    doctorId,
+    { requestStatus: 'rejected' },
+    {
+      new: true,
+    }
+  ).populate<{
+    user: UserDocument
+  }>('user')
+  if (doctor == null) throw new NotFoundError()
+  return doctor
+}
