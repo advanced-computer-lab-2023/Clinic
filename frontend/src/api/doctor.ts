@@ -46,3 +46,19 @@ export async function getApprovedDoctor(
     .get<GetApprovedDoctorResponse>(`/doctors/approved/${id}`)
     .then((res) => res.data)
 }
+
+export async function acceptDoctorRequest(
+  id: string
+): Promise<UpdateDoctorResponse> {
+  return await api
+    .patch<UpdateDoctorResponse>(`/doctors/acceptDoctorRequest/${id}`)
+    .then((res) => res.data)
+}
+
+export async function rejectDoctorRequest(
+  id: string
+): Promise<UpdateDoctorResponse> {
+  return await api
+    .patch<UpdateDoctorResponse>(`/doctors/rejectDoctorRequest/${id}`)
+    .then((res) => res.data)
+}

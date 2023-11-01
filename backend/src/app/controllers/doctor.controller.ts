@@ -1,10 +1,12 @@
 import { Router } from 'express'
 
 import {
+  approveDoctor,
   getAllDoctors,
   getApprovedDoctorById,
   getDoctorByUsername,
   getPendingDoctorRequests,
+  rejectDoctor,
   updateDoctorByUsername,
 } from '../services/doctor.service'
 import { asyncWrapper } from '../utils/asyncWrapper'
@@ -189,6 +191,49 @@ doctorsRouter.get(
         doctor.requestStatus as DoctorStatus,
         doctor.availableTimes as [string],
         doctor.hourlyRate * 1.1 - (discount * doctor.hourlyRate) / 100
+      )
+    )
+  })
+)
+
+doctorsRouter.patch(
+  '/rejectDoctorRequest/:id',
+  asyncWrapper(allowAdmins),
+  asyncWrapper(async (req, res) => {
+    const doctor = await rejectDoctor(req.params.id)
+    res.send(
+      new UpdateDoctorResponse(
+        doctor.id,
+        doctor.user.username,
+        doctor.name,
+        doctor.email,
+        doctor.dateOfBirth,
+        doctor.hourlyRate,
+        doctor.affiliation,
+        doctor.educationalBackground,
+        doctor.speciality,
+        doctor.requestStatus as DoctorStatus
+      )
+    )
+  })
+)
+doctorsRouter.patch(
+  '/acceptDoctorRequest/:id',
+  asyncWrapper(allowAdmins),
+  asyncWrapper(async (req, res) => {
+    const doctor = await approveDoctor(req.params.id)
+    res.send(
+      new UpdateDoctorResponse(
+        doctor.id,
+        doctor.user.username,
+        doctor.name,
+        doctor.email,
+        doctor.dateOfBirth,
+        doctor.hourlyRate,
+        doctor.affiliation,
+        doctor.educationalBackground,
+        doctor.speciality,
+        doctor.requestStatus as DoctorStatus
       )
     )
   })
