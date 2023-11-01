@@ -19,6 +19,7 @@ export async function addHealthPackages(
     medicineDiscount: request.medicineDiscount,
     familyMemberSubscribtionDiscount: request.familyMemberSubscribtionDiscount,
   })
+
   return healthPackage
 }
 
@@ -34,27 +35,33 @@ export async function updateHealthPackage(
       new: true,
     }
   )
+
   if (updatedHealthPackage == null) {
     throw new NotFoundError()
   }
 
   return updatedHealthPackage
 }
+
 export async function removeHealthPackage(packageId: string): Promise<void> {
   const healthPackage = await HealthPackageModel.findByIdAndDelete({
     _id: packageId,
   })
+
   if (healthPackage == null) {
     throw new NotFoundError()
   }
 }
+
 export async function getAllHealthPackages(): Promise<
   Array<HydratedDocument<HealthPackageDocument>>
 > {
   const healthPackages = await HealthPackageModel.find({})
+
   if (healthPackages == null) {
     throw new NotFoundError()
   }
+
   return healthPackages
 }
 
@@ -98,8 +105,10 @@ export async function getHealthPackageById(
   id: string
 ): Promise<HydratedDocument<HealthPackageDocument>> {
   const healthPackage = await HealthPackageModel.findById(id)
+
   if (healthPackage == null) {
     throw new NotFoundError()
   }
+
   return healthPackage
 }

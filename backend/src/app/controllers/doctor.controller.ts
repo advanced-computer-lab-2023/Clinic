@@ -28,6 +28,7 @@ import { PatientModel } from '../models/patient.model'
 import { type HydratedDocument } from 'mongoose'
 
 import { type HealthPackageDocument } from '../models/healthPackage.model'
+
 export const doctorsRouter = Router()
 
 doctorsRouter.get(

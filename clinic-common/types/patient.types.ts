@@ -1,7 +1,5 @@
-import { type Types } from 'mongoose'
-import { Gender } from './gender.types'
-import { PrescriptionDocument } from '../../backend/src/app/models/prescription.model'
-import { GetFilteredAppointmentsResponse } from './appointment.types'
+import { type Gender } from './gender.types'
+import { type GetFilteredAppointmentsResponse } from './appointment.types'
 
 export class PatientResponseBase {
   constructor(
@@ -36,7 +34,7 @@ export class MyPatientsResponseBase {
       name: string
       mobileNumber: string
     },
-    public familyMembers: Types.ObjectId[]
+    public familyMembers: string[]
   ) {}
 }
 
@@ -59,7 +57,7 @@ export class APatientResponseBase {
     },
     public documents: string[],
     public appointments: GetFilteredAppointmentsResponse,
-    public prescriptions: PrescriptionDocument[],
+    public prescriptions: any[],
     public notes: string[]
   ) {}
 }

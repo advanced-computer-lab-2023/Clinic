@@ -54,7 +54,9 @@ patientRouter.get(
             name: patient.emergencyContact?.name ?? '',
             mobileNumber: patient.emergencyContact?.mobileNumber ?? '',
           },
-          familyMembers: patient.familyMembers,
+          familyMembers: patient.familyMembers.map((familyMember) =>
+            familyMember.toString()
+          ),
         }))
       )
     )

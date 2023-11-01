@@ -23,13 +23,16 @@ export function Users() {
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const [deletedUser, setDeletedUser] = useState<string>()
+
   const handleClickOpen = () => {
     setOpen(true)
   }
+
   const handleClose = () => {
     setOpen(false)
     setLoading(false)
   }
+
   const deleteUser = () => {
     setLoading(true)
     DeleteUserApi(deletedUser!)
@@ -43,9 +46,11 @@ export function Users() {
         console.log(e)
       })
   }
+
   if (query.isLoading) {
     return <CardPlaceholder />
   }
+
   const columns: GridColDef[] = [
     {
       field: 'username',

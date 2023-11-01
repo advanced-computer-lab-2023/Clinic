@@ -35,13 +35,12 @@ prescriptionsRouter.get(
     res.send(
       new GetPrescriptionResponse(
         prescriptionRequests.map((prescription) => ({
-          id:prescription.id,
+          id: prescription.id,
           doctor: prescription.doctor.name,
           patient: prescription.patient.name,
           date: prescription.date,
           isFilled: prescription.isFilled,
           medicine: prescription.medicine,
-          
         }))
       )
     )
@@ -81,7 +80,7 @@ prescriptionsRouter.get(
     res.send(
       new GetPrescriptionResponse(
         prescriptions.map((prescription) => ({
-          id:prescription.id,
+          id: prescription.id,
           doctor: prescription.doctor.name,
           patient: prescription.patient.name,
           date: prescription.date,
@@ -98,19 +97,20 @@ prescriptionsRouter.get(
   asyncWrapper(allowPatients),
   asyncWrapper(async (req, res) => {
     // `!` that is after `req.username` is used to tell TS that we are sure that req.username is not null
-    const prescription = await getSinglePrescription(req.params.id,req.username!)
-    
+    const prescription = await getSinglePrescription(
+      req.params.id,
+      req.username!
+    )
+
     res.send(
       new PrescriptionResponseBase(
-          prescription.id,
-          prescription.doctor.name,
-          prescription.patient.name,
-          prescription.date,
-          prescription.isFilled,
-          prescription.medicine
+        prescription.id,
+        prescription.doctor.name,
+        prescription.patient.name,
+        prescription.date,
+        prescription.isFilled,
+        prescription.medicine
       )
     )
   })
-  
-   
 )

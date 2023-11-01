@@ -19,18 +19,25 @@ export async function authenticate(
   next: NextFunction
 ): Promise<void> {
   const authHeader = req.headers.authorization
+
   if (authHeader == null) {
     next()
+
     return
   }
+
   const parts = authHeader.split(' ')
+
   if (parts.length !== 2) {
     throw new TokenError()
   }
+
   const [scheme, token] = parts
+
   if (!/^Bearer$/i.test(scheme)) {
     throw new TokenError()
   }
+
   const payload = await verifyJWTToken(token)
   req.username = payload.username
   next()
@@ -44,6 +51,7 @@ export function allowAuthenticated(
   if (req.username == null) {
     throw new NotAuthenticatedError()
   }
+
   next()
 }
 
@@ -55,8 +63,10 @@ export async function allowAdmins(
   if (req.username == null) {
     throw new NotAuthenticatedError()
   }
+
   if (await isAdmin(req.username)) {
     next()
+
     return
   }
 
@@ -74,6 +84,7 @@ export async function allowDoctors(
 
   if (await isDoctor(req.username)) {
     next()
+
     return
   }
 
@@ -91,6 +102,7 @@ export async function allowApprovedDoctors(
 
   if (await isDoctorAndApproved(req.username)) {
     next()
+
     return
   }
 
@@ -108,6 +120,7 @@ export async function allowApprovedDoctorOfPatient(
 
   if (await isDoctorPatientAuthorized(req.username, req.params.id)) {
     next()
+
     return
   }
 
@@ -125,6 +138,7 @@ export async function allowPatients(
 
   if (await isPatient(req.username)) {
     next()
+
     return
   }
 

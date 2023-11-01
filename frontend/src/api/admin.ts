@@ -1,4 +1,7 @@
-import { AddAdminRequest, GetUsersResponse } from 'clinic-common/types/admin.types'
+import {
+  AddAdminRequest,
+  GetUsersResponse,
+} from 'clinic-common/types/admin.types'
 import { api } from '@/api/index'
 
 export async function AddAdminApi(request: AddAdminRequest): Promise<void> {

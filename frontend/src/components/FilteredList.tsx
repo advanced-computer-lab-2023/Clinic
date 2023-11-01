@@ -26,7 +26,6 @@ import dayjs from 'dayjs'
 import { v4 as uuidv4 } from 'uuid'
 import React from 'react'
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export interface Filter<T, V = any> {
   property: (obj: T) => V
   label: string
@@ -91,6 +90,7 @@ export function FilteredList<T>({
         )
           return false
       }
+
       return true
     })
   }, [query.data, filters, filterValues])
