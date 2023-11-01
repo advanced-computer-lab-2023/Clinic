@@ -112,6 +112,7 @@ export async function approveDoctor(
     user: UserDocument
   }>('user')
   if (doctor == null) throw new NotFoundError()
+
   return doctor
 }
 
@@ -128,5 +129,6 @@ export async function rejectDoctor(
     user: UserDocument
   }>('user')
   if (doctor == null) throw new NotFoundError()
+
   return doctor
 }
