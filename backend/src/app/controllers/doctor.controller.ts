@@ -196,8 +196,6 @@ doctorsRouter.get(
   })
 )
 
-
-
 doctorsRouter.patch(
   '/rejectDoctorRequest/:id',
   asyncWrapper(allowAdmins),
