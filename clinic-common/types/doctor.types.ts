@@ -49,7 +49,7 @@ export class GetApprovedDoctorResponse extends DoctorResponseBase {
     educationalBackground: string,
     speciality: string,
     requestStatus: DoctorStatus,
-    public availableTimes: [String],
+    public availableTimes: [string],
     public sessionRate: number // Additional property
   ) {
     super(
@@ -66,11 +66,13 @@ export class GetApprovedDoctorResponse extends DoctorResponseBase {
     )
   }
 }
+
 export class GetApprovedDoctorsResponse {
   constructor(public doctors: GetApprovedDoctorResponse[]) {}
 }
 
 export type UpdateDoctorRequest = z.infer<typeof UpdateDoctorRequestValidator>
+
 export type RegisterDoctorRequest = z.infer<
   typeof RegisterDoctorRequestValidator
 >
@@ -78,4 +80,5 @@ export type RegisterDoctorRequest = z.infer<
 export class UpdateDoctorResponse extends DoctorResponseBase {}
 
 export class RegisterDoctorRequestResponse extends DoctorResponseBase {}
+
 export class GetDoctorResponse extends DoctorResponseBase {}

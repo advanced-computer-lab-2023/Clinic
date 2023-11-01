@@ -126,8 +126,10 @@ export function ApprovedDoctors() {
                   <Typography variant="overline" color="text.secondary">
                     Session Rate
                   </Typography>
-                  <Typography variant="body1">{doctor.sessionRate.toFixed(2)} E£</Typography>
-              </Stack>
+                  <Typography variant="body1">
+                    {doctor.sessionRate.toFixed(2)} E£
+                  </Typography>
+                </Stack>
               </Stack>
               <CardActions>
                 <Button

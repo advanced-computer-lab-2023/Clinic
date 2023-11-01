@@ -11,13 +11,17 @@ export function Patient() {
     queryKey: ['get-patient'],
     queryFn: () => getPatient(id!),
   })
+
   if (query.isLoading) {
     return <CardPlaceholder />
   }
+
   const patient = query.data
+
   if (patient == null) {
     return <AlertsBox />
   }
+
   return (
     <Card variant="outlined">
       <CardContent>
@@ -101,12 +105,9 @@ export function Patient() {
               Medical Records
             </Typography>
             {patient.notes.map((note) => (
-              <Typography variant="body1">
-                {note}
-              </Typography>
+              <Typography variant="body1">{note}</Typography>
             ))}
           </Stack>
-
         </Stack>
       </CardContent>
     </Card>

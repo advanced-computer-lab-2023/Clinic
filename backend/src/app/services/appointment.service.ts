@@ -10,16 +10,18 @@ export async function getfilteredAppointments(
   if (
     query.patientID !== undefined &&
     query.patientID !== null &&
-    query.patientID !== '') {
+    query.patientID !== ''
+  ) {
     return await AppointmentModel.find({
-      patientID: query.patientID
+      patientID: query.patientID,
     })
   } else if (
     query.doctorID !== undefined &&
     query.doctorID !== null &&
-    query.doctorID !== '') {
+    query.doctorID !== ''
+  ) {
     return await AppointmentModel.find({
-      doctorID: query.doctorID
+      doctorID: query.doctorID,
     })
   } else {
     return await AppointmentModel.find()

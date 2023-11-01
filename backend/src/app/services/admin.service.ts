@@ -16,9 +16,11 @@ export async function addAdmin(
   request: AddAdminRequest
 ): Promise<AddAdminResponse> {
   const { username, password } = request
+
   if (await isUsernameTaken(request.username)) {
     throw new UsernameAlreadyTakenError()
   }
+
   const hashedPassword = await bcrypt.hash(password, bcryptSalt)
 
   const newUser = await UserModel.create({
@@ -32,14 +34,17 @@ export async function addAdmin(
     user: newUser.id,
   })
   await newAdmin.save()
+
   return new AddAdminResponse(username, password)
 }
 
 export async function removeUser(username: string): Promise<void> {
   const user = await UserModel.findOneAndDelete({ username })
+
   if (user == null) {
     throw new NotFoundError()
   }
+
   await DoctorModel.findOneAndDelete({ user: user.id })
   await PatientModel.findOneAndDelete({ user: user.id })
   await AdminModel.findOneAndDelete({ user: user.id })
