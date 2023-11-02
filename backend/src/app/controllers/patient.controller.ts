@@ -24,8 +24,10 @@ import {
   GetFamilyMembersResponse,
   type Relation,
 } from 'clinic-common/types/familyMember.types'
-import { AppointmentResponseBase, GetFilteredAppointmentsResponse } from 'clinic-common/types/appointment.types'
-
+import {
+  AppointmentResponseBase,
+  GetFilteredAppointmentsResponse,
+} from 'clinic-common/types/appointment.types'
 
 export const patientRouter = Router()
 
@@ -52,7 +54,9 @@ patientRouter.get(
             name: patient.emergencyContact?.name ?? '',
             mobileNumber: patient.emergencyContact?.mobileNumber ?? '',
           },
-          familyMembers: patient.familyMembers,
+          familyMembers: patient.familyMembers.map((familyMember) =>
+            familyMember.toString()
+          ),
         }))
       )
     )
@@ -80,6 +84,7 @@ patientRouter.get(
             name: patient.emergencyContact?.name ?? '',
             mobileNumber: patient.emergencyContact?.mobileNumber ?? '',
           },
+          notes: patient.notes,
         }))
       )
     )
@@ -111,12 +116,13 @@ patientRouter.post(
             name: patient.emergencyContact?.name ?? '',
             mobileNumber: patient.emergencyContact?.mobileNumber ?? '',
           },
+          notes: patient.notes,
         }))
       )
     )
   })
 )
-    
+
 // Get all family members of a patient with the given username
 patientRouter.get(
   '/:username/family-members',
@@ -143,14 +149,25 @@ patientRouter.get(
   // asyncWrapper(allowApprovedDoctorOfPatient),
   asyncWrapper(async (req, res) => {
     const id = req.params.id
+    const user = await UserModel.findOne({ username: req.username })
+    const doctor = await DoctorModel.findOne({ user: user?.id })
 
     const { patient, appointments, prescriptions } = await getPatientByID(id)
 
-    const filteredAppointments = appointments.map(appointment => {
-      return new AppointmentResponseBase(appointment.id, appointment.patientID.toString(), appointment.doctorID.toString(), appointment.date);
-    });
-    
-    const appointmentsRefactored = new GetFilteredAppointmentsResponse(filteredAppointments);
+    const filteredAppointments = appointments
+      .filter((appointment) => appointment.doctorID.toString() === doctor?.id)
+      .map((appointment) => {
+        return new AppointmentResponseBase(
+          appointment.id,
+          appointment.patientID.toString(),
+          appointment.doctorID.toString(),
+          appointment.date
+        )
+      })
+
+    const appointmentsRefactored = new GetFilteredAppointmentsResponse(
+      filteredAppointments
+    )
     res.send(
       new GetAPatientResponse(
         patient.id,
@@ -166,8 +183,9 @@ patientRouter.get(
         },
         patient.documents,
         appointmentsRefactored,
-        prescriptions
-        )
+        prescriptions,
+        patient.notes
+      )
     )
   })
 )

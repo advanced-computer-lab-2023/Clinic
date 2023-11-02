@@ -26,7 +26,10 @@ import {
   type UserType,
 } from 'clinic-common/types/user.types'
 import { RegisterDoctorRequestValidator } from 'clinic-common/validators/doctor.validator'
-import { RegisterDoctorRequestResponse } from 'clinic-common/types/doctor.types'
+import {
+  type DoctorStatus,
+  RegisterDoctorRequestResponse,
+} from 'clinic-common/types/doctor.types'
 
 export const authRouter = Router()
 
@@ -103,7 +106,8 @@ authRouter.post(
         doctor.hourlyRate,
         doctor.affiliation,
         doctor.educationalBackground,
-        doctor.speciality
+        doctor.speciality,
+        doctor.requestStatus as DoctorStatus
       )
     )
   })

@@ -16,10 +16,13 @@ export function PrescriptionView() {
   if (query.isLoading) {
     return <CardPlaceholder />
   }
+
   const prescription = query.data
+
   if (prescription == null) {
     return <AlertsBox />
   }
+
   return (
     <Card variant="outlined">
       <CardContent>

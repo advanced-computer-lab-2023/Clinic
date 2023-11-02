@@ -1,10 +1,12 @@
 import { Router } from 'express'
 
 import {
+  approveDoctor,
   getAllDoctors,
   getApprovedDoctorById,
   getDoctorByUsername,
   getPendingDoctorRequests,
+  rejectDoctor,
   updateDoctorByUsername,
 } from '../services/doctor.service'
 import { asyncWrapper } from '../utils/asyncWrapper'
@@ -15,13 +17,20 @@ import {
   GetDoctorResponse,
   GetPendingDoctorsResponse,
   UpdateDoctorResponse,
+  type DoctorStatus,
+  type UpdateDoctorRequest,
 } from 'clinic-common/types/doctor.types'
-import type { UpdateDoctorRequest } from 'clinic-common/types/doctor.types'
 import { isAdmin } from '../services/auth.service'
 import { NotAuthenticatedError } from '../errors/auth.errors'
 import { APIError } from '../errors'
 import { validate } from '../middlewares/validation.middleware'
 import { UpdateDoctorRequestValidator } from 'clinic-common/validators/doctor.validator'
+import { type UserDocument, UserModel } from '../models/user.model'
+import { PatientModel } from '../models/patient.model'
+import { type HydratedDocument } from 'mongoose'
+
+import { type HealthPackageDocument } from '../models/healthPackage.model'
+
 export const doctorsRouter = Router()
 
 doctorsRouter.get(
@@ -41,6 +50,7 @@ doctorsRouter.get(
           affiliation: doctor.affiliation,
           educationalBackground: doctor.educationalBackground,
           speciality: doctor.speciality,
+          requestStatus: doctor.requestStatus as DoctorStatus,
         }))
       )
     )
@@ -80,7 +90,8 @@ doctorsRouter.patch(
         updatedDoctor.hourlyRate,
         updatedDoctor.affiliation,
         updatedDoctor.educationalBackground,
-        updatedDoctor.speciality
+        updatedDoctor.speciality,
+        updatedDoctor.requestStatus as DoctorStatus
       )
     )
   })
@@ -90,8 +101,17 @@ doctorsRouter.patch(
 doctorsRouter.get(
   '/approved',
   asyncWrapper(async (req, res) => {
+    const user: HydratedDocument<UserDocument> | null = await UserModel.findOne(
+      { username: req.username }
+    )
+    if (user == null) throw new NotAuthenticatedError()
+    const patient = await PatientModel.findOne({ user: user.id })
+      .populate<{ healthPackage: HealthPackageDocument }>('healthPackage')
+      .exec()
+    if (patient == null) throw new NotAuthenticatedError()
     const doctors = await getAllDoctors()
 
+    const discount = patient.healthPackage?.sessionDiscount ?? 0
     res.send(
       new GetApprovedDoctorsResponse(
         doctors.map((doctor) => ({
@@ -104,10 +124,12 @@ doctorsRouter.get(
           affiliation: doctor.affiliation,
           speciality: doctor.speciality,
           educationalBackground: doctor.educationalBackground,
-          sessionRate: doctor.hourlyRate * 1.1 - Math.random() * 10, // this is a random discount till the pachage part is done
+          sessionRate:
+            doctor.hourlyRate * 1.1 - (discount * doctor.hourlyRate) / 100,
           // TODO: retrieve available times from the Appointments. Since we aren't required to make appointments for this sprint, I will
           // assume available times is a field in the doctors schema for now.
           availableTimes: doctor.availableTimes as [string],
+          requestStatus: doctor.requestStatus as DoctorStatus,
         }))
       )
     )
@@ -129,8 +151,9 @@ doctorsRouter.get(
         doctor.dateOfBirth,
         doctor.hourlyRate,
         doctor.affiliation,
+        doctor.educationalBackground,
         doctor.speciality,
-        doctor.educationalBackground
+        doctor.requestStatus as DoctorStatus
       )
     )
   })
@@ -141,6 +164,18 @@ doctorsRouter.get(
   '/approved/:id',
   asyncWrapper(async (req, res) => {
     const doctor = await getApprovedDoctorById(req.params.id)
+
+    const user = await UserModel.findOne({ username: req.username })
+
+    if (user == null) throw new NotAuthenticatedError()
+
+    const patient = await PatientModel.findOne({ user: user.id })
+      .populate<{ healthPackage: HealthPackageDocument }>('healthPackage')
+      .exec()
+
+    if (patient == null) throw new NotAuthenticatedError()
+
+    const discount = patient.healthPackage?.sessionDiscount ?? 0
 
     res.send(
       new GetApprovedDoctorResponse(
@@ -153,8 +188,52 @@ doctorsRouter.get(
         doctor.affiliation,
         doctor.educationalBackground,
         doctor.speciality,
+        doctor.requestStatus as DoctorStatus,
         doctor.availableTimes as [string],
-        doctor.hourlyRate * 1.1 - Math.random() * 10 // this is a random discount till the pachage part is done
+        doctor.hourlyRate * 1.1 - (discount * doctor.hourlyRate) / 100
+      )
+    )
+  })
+)
+
+doctorsRouter.patch(
+  '/rejectDoctorRequest/:id',
+  asyncWrapper(allowAdmins),
+  asyncWrapper(async (req, res) => {
+    const doctor = await rejectDoctor(req.params.id)
+    res.send(
+      new UpdateDoctorResponse(
+        doctor.id,
+        doctor.user.username,
+        doctor.name,
+        doctor.email,
+        doctor.dateOfBirth,
+        doctor.hourlyRate,
+        doctor.affiliation,
+        doctor.educationalBackground,
+        doctor.speciality,
+        doctor.requestStatus as DoctorStatus
+      )
+    )
+  })
+)
+doctorsRouter.patch(
+  '/acceptDoctorRequest/:id',
+  asyncWrapper(allowAdmins),
+  asyncWrapper(async (req, res) => {
+    const doctor = await approveDoctor(req.params.id)
+    res.send(
+      new UpdateDoctorResponse(
+        doctor.id,
+        doctor.user.username,
+        doctor.name,
+        doctor.email,
+        doctor.dateOfBirth,
+        doctor.hourlyRate,
+        doctor.affiliation,
+        doctor.educationalBackground,
+        doctor.speciality,
+        doctor.requestStatus as DoctorStatus
       )
     )
   })

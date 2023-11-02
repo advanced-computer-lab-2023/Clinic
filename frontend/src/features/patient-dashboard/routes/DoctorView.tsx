@@ -4,6 +4,7 @@ import { Card, CardContent, Grid, Stack, Typography } from '@mui/material'
 import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'react-router-dom'
 import { CardPlaceholder } from '@/components/CardPlaceholder'
+
 export function DoctorView() {
   const { id } = useParams()
 
@@ -63,6 +64,14 @@ export function DoctorView() {
               </Typography>
               <Typography variant="body1">
                 {query.data?.educationalBackground}
+              </Typography>
+            </Stack>
+            <Stack spacing={-1}>
+              <Typography variant="overline" color="text.secondary">
+                Session Rate
+              </Typography>
+              <Typography variant="body1">
+                {query.data?.sessionRate.toFixed(2)}
               </Typography>
             </Stack>
           </Stack>

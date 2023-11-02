@@ -17,11 +17,15 @@ export class AppointmentResponseBase {
     public doctorID: string,
     public date: string
   ) {
-    const appointmentDate = new Date(date).getTime();
-    const currentDate = Date.now();
-    this.status = appointmentDate > currentDate ? AppointmentStatus.Upcoming : AppointmentStatus.Completed;
+    const appointmentDate = new Date(date).getTime()
+    const currentDate = Date.now()
+    this.status =
+      appointmentDate > currentDate
+        ? AppointmentStatus.Upcoming
+        : AppointmentStatus.Completed
   }
-  public status: AppointmentStatus;
+
+  public status: AppointmentStatus
 }
 
 export class GetFilteredAppointmentsResponse {

@@ -11,13 +11,17 @@ export function Patient() {
     queryKey: ['get-patient'],
     queryFn: () => getPatient(id!),
   })
+
   if (query.isLoading) {
     return <CardPlaceholder />
   }
+
   const patient = query.data
+
   if (patient == null) {
     return <AlertsBox />
   }
+
   return (
     <Card variant="outlined">
       <CardContent>
@@ -95,6 +99,14 @@ export function Patient() {
               className="Screenshot"
               alt="showing screen capture"
             />
+          </Stack>
+          <Stack spacing={-1}>
+            <Typography variant="overline" color="text.secondary">
+              Medical Records
+            </Typography>
+            {patient.notes.map((note) => (
+              <Typography variant="body1">{note}</Typography>
+            ))}
           </Stack>
         </Stack>
       </CardContent>
