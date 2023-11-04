@@ -4,11 +4,10 @@ import { useAuth } from '@/hooks/auth'
 
 import { RegisterDoctorRequestValidator } from 'clinic-common/validators/doctor.validator'
 import { RegisterDoctorRequest } from 'clinic-common/types/doctor.types'
-// import { useState } from 'react'
+
 export const RequestDoctor = () => {
   const { refreshUser } = useAuth()
 
-  
   return (
     <ApiForm<RegisterDoctorRequest>
       fields={[
@@ -26,15 +25,12 @@ export const RequestDoctor = () => {
         { label: 'Affiliation', property: 'affiliation' },
         { label: 'Educational background', property: 'educationalBackground' },
         { label: 'Speciality', property: 'speciality' },
-        {label:'Documents',property:'documents',type:'file'}
       ]}
-      // onDocumentPathsChange={setDocumentPaths}
       validator={RegisterDoctorRequestValidator}
       successMessage="Register successfully."
       action={requestDoctor}
-      onSuccess={() => {refreshUser(); }}
+      onSuccess={() => refreshUser()}
       buttonText="Register"
-      file={true}
     />
   )
 }
