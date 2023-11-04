@@ -9,6 +9,11 @@ export const UpdateDoctorRequestValidator = zod.object({
   educationalBackground: zod.string().min(1).optional(),
 })
 
+const fileSchema = zod.object({
+  name: zod.string(), // File name should be a string
+  type: zod.string(),
+})
+
 export const RegisterDoctorRequestValidator = zod.object({
   username: zod
     .string()
@@ -24,4 +29,5 @@ export const RegisterDoctorRequestValidator = zod.object({
   affiliation: zod.string().min(1),
   educationalBackground: zod.string().min(1),
   speciality: zod.string().min(1),
+  documents: zod.array(fileSchema).optional(),
 })
