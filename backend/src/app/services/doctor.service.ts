@@ -132,3 +132,26 @@ export async function rejectDoctor(
 
   return doctor
 }
+
+export async function addAvailableTimeSlots(
+  username: string,
+  time: string
+): Promise<DoctorDocumentWithUser> {
+  const user = await UserModel.findOne({ username })
+
+  if (user == null) throw new NotFoundError()
+
+  const doctor = await DoctorModel.findOneAndUpdate(
+    { user: user.id },
+    { $push: { availableTimes: time } },
+    {
+      new: true,
+    }
+  ).populate<{
+    user: UserDocument
+  }>('user')
+
+  if (doctor == null) throw new NotFoundError()
+
+  return doctor
+}

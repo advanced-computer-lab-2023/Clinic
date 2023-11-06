@@ -9,6 +9,10 @@ export const UpdateDoctorRequestValidator = zod.object({
   educationalBackground: zod.string().min(1).optional(),
 })
 
+export const AddAvailableTimeSlotsRequestValidator = zod.object({
+  time: zod.coerce.date(),
+})
+
 export const RegisterDoctorRequestValidator = zod.object({
   username: zod
     .string()

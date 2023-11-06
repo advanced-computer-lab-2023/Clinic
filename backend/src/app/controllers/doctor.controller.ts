@@ -1,6 +1,7 @@
 import { Router } from 'express'
 
 import {
+  addAvailableTimeSlots,
   approveDoctor,
   getAllDoctors,
   getApprovedDoctorById,
@@ -10,7 +11,11 @@ import {
   updateDoctorByUsername,
 } from '../services/doctor.service'
 import { asyncWrapper } from '../utils/asyncWrapper'
-import { allowAdmins, allowAuthenticated } from '../middlewares/auth.middleware'
+import {
+  allowAdmins,
+  allowApprovedDoctors,
+  allowAuthenticated,
+} from '../middlewares/auth.middleware'
 import {
   GetApprovedDoctorsResponse,
   GetApprovedDoctorResponse,
@@ -19,12 +24,16 @@ import {
   UpdateDoctorResponse,
   type DoctorStatus,
   type UpdateDoctorRequest,
+  AddAvailableTimeSlotsResponse,
 } from 'clinic-common/types/doctor.types'
 import { isAdmin } from '../services/auth.service'
 import { NotAuthenticatedError } from '../errors/auth.errors'
 import { APIError } from '../errors'
 import { validate } from '../middlewares/validation.middleware'
-import { UpdateDoctorRequestValidator } from 'clinic-common/validators/doctor.validator'
+import {
+  AddAvailableTimeSlotsRequestValidator,
+  UpdateDoctorRequestValidator,
+} from 'clinic-common/validators/doctor.validator'
 import { type UserDocument, UserModel } from '../models/user.model'
 import { PatientModel } from '../models/patient.model'
 import { type HydratedDocument } from 'mongoose'
@@ -234,6 +243,30 @@ doctorsRouter.patch(
         doctor.educationalBackground,
         doctor.speciality,
         doctor.requestStatus as DoctorStatus
+      )
+    )
+  })
+)
+doctorsRouter.patch(
+  '/addAvailableTimeSlots/:username',
+  validate(AddAvailableTimeSlotsRequestValidator),
+  asyncWrapper(allowApprovedDoctors),
+  asyncWrapper(async (req, res) => {
+    const doctor = await addAvailableTimeSlots(req.params.username, req.body)
+    res.send(
+      new AddAvailableTimeSlotsResponse(
+        doctor.id,
+        doctor.user.username,
+        doctor.name,
+        doctor.email,
+        doctor.dateOfBirth,
+        doctor.hourlyRate,
+        doctor.affiliation,
+        doctor.educationalBackground,
+        doctor.speciality,
+        doctor.requestStatus as DoctorStatus,
+        doctor.availableTimes as [string],
+        doctor.hourlyRate
       )
     )
   })

@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-import { DoctorStatus } from 'clinic-common/types/doctor.types'
+import { ContractStatus, DoctorStatus } from 'clinic-common/types/doctor.types'
 
 const Schema = mongoose.Schema
 
@@ -18,6 +18,12 @@ const doctorSchema = new Schema(
       required: true,
       enum: DoctorStatus,
       default: DoctorStatus.Pending,
+    },
+    contractStatus: {
+      type: String,
+      required: true,
+      enum: ContractStatus,
+      default: ContractStatus.Pending,
     },
     availableTimes: { type: [String], required: false, default: [] },
   },

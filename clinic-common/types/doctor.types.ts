@@ -2,11 +2,18 @@ import type { z } from 'zod'
 import type {
   UpdateDoctorRequestValidator,
   RegisterDoctorRequestValidator,
+  AddAvailableTimeSlotsRequestValidator,
 } from '../validators/doctor.validator'
 
 export enum DoctorStatus {
   Pending = 'pending',
   Approved = 'approved',
+  Rejected = 'rejected',
+}
+
+export enum ContractStatus {
+  Pending = 'pending',
+  Accepted = 'accepted',
   Rejected = 'rejected',
 }
 
@@ -77,8 +84,14 @@ export type RegisterDoctorRequest = z.infer<
   typeof RegisterDoctorRequestValidator
 >
 
+export type AddAvailableTimeSlotsRwquest = z.infer<
+  typeof AddAvailableTimeSlotsRequestValidator
+>
+
 export class UpdateDoctorResponse extends DoctorResponseBase {}
 
 export class RegisterDoctorRequestResponse extends DoctorResponseBase {}
 
 export class GetDoctorResponse extends DoctorResponseBase {}
+
+export class AddAvailableTimeSlotsResponse extends GetApprovedDoctorResponse {}
