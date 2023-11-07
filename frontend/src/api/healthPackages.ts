@@ -42,3 +42,9 @@ export async function addHealthPackage(
 export async function deleteHealthPackage(id: string): Promise<void> {
   await api.delete(`/health-packages/${id}`).then((res) => res.data)
 }
+
+export async function subscribeToHealthPackage(id: string): Promise<void> {
+  return await api
+    .post<void>(`/health-packages/${id}/subscribe`)
+    .then((res) => res.data)
+}

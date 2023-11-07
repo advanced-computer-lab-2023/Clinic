@@ -21,7 +21,7 @@
   "scripts": {
     "start": "tsx src/app.ts",
     "build": "tsc",
-    "dev": "tsx src/app.ts",
+    "dev": "tsx watch src/app.ts",
     "compile": "tsc --noEmit"
   }
 }

@@ -59,7 +59,7 @@ export function FilteredList<T>({
   component: (item: T) => JSX.Element
 }) {
   const query = useQuery({
-    queryKey: queryKey,
+    queryKey,
     queryFn: dataFetcher,
   })
 

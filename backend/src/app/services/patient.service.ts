@@ -3,12 +3,13 @@ import {
   type AppointmentDocument,
   AppointmentModel,
 } from '../models/appointment.model'
+import { HealthPackageModel } from '../models/healthPackage.model'
 import { type PatientDocument, PatientModel } from '../models/patient.model'
 import {
   type PrescriptionDocument,
   PrescriptionModel,
 } from '../models/prescription.model'
-import { type UserDocument } from '../models/user.model'
+import { UserModel, type UserDocument } from '../models/user.model'
 import { type WithUser } from '../utils/typeUtils'
 import { type HydratedDocument, type ObjectId } from 'mongoose'
 
@@ -130,4 +131,36 @@ export async function addNoteToPatient(
   await patient.save()
 
   return { patient }
+
+export async function subscribeToHealthPackage(params: {
+  patientUsername: string
+  healthPackageId: string
+}): Promise<void> {
+  const patient = await getPatientByUsername(params.patientUsername)
+
+  if (!patient) {
+    throw new NotFoundError()
+  }
+
+  const healthPackage = await HealthPackageModel.findById(
+    params.healthPackageId
+  )
+
+  if (!healthPackage) {
+    throw new NotFoundError()
+  }
+
+  patient.healthPackage = healthPackage.id
+
+  console.log(await patient.save())
+}
+
+export async function getPatientByUsername(username: string) {
+  const user = await UserModel.findOne({ username })
+
+  if (!user) {
+    throw new NotFoundError()
+  }
+
+  return await PatientModel.findOne({ user: user.id })
 }

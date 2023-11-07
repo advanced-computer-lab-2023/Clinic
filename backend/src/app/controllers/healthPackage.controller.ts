@@ -9,7 +9,11 @@ import {
   GetHealthPackageResponse,
 } from 'clinic-common/types/healthPackage.types'
 import { asyncWrapper } from '../utils/asyncWrapper'
-import { allowAdmins } from '../middlewares/auth.middleware'
+import {
+  allowAdmins,
+  allowAuthenticated,
+  allowPatients,
+} from '../middlewares/auth.middleware'
 import {
   addHealthPackages,
   getAllHealthPackages,
@@ -21,6 +25,8 @@ import {
   CreateHealthPackageRequestValidator,
   UpdateHealthPackageRequestValidator,
 } from 'clinic-common/validators/healthPackage.validator'
+import { subscribeToHealthPackage } from '../services/patient.service'
+import { getPatientByUsername } from '../services/patient.service'
 
 export const healthPackagesRouter = Router()
 
@@ -42,6 +48,7 @@ healthPackagesRouter.post(
     )
   })
 )
+
 healthPackagesRouter.patch(
   '/:id',
   asyncWrapper(allowAdmins),
@@ -63,6 +70,7 @@ healthPackagesRouter.patch(
     )
   })
 )
+
 healthPackagesRouter.delete(
   '/:id',
   asyncWrapper(allowAdmins),
@@ -76,6 +84,8 @@ healthPackagesRouter.get(
   '/',
   asyncWrapper(async (req, res) => {
     const healthPackages = await getAllHealthPackages()
+    const patient = await getPatientByUsername(req.username!)
+
     res.send(
       new GetAllHealthPackagesResponse(
         healthPackages.map((healthPackage) => ({
@@ -86,6 +96,7 @@ healthPackagesRouter.get(
           medicineDiscount: healthPackage.medicineDiscount,
           familyMemberSubscribtionDiscount:
             healthPackage.familyMemberSubscribtionDiscount,
+          isSubscribed: patient?.healthPackage?.toString() === healthPackage.id,
         }))
       )
     )
@@ -96,6 +107,7 @@ healthPackagesRouter.get(
   '/:id',
   asyncWrapper(async (req, res) => {
     const healthPackage = await getHealthPackageById(req.params.id)
+
     res.send(
       new GetHealthPackageResponse(
         healthPackage.name,
@@ -106,5 +118,18 @@ healthPackagesRouter.get(
         healthPackage.familyMemberSubscribtionDiscount
       )
     )
+  })
+)
+
+healthPackagesRouter.post(
+  '/:id/subscribe',
+  [allowAuthenticated, asyncWrapper(allowPatients)],
+  asyncWrapper(async (req, res) => {
+    await subscribeToHealthPackage({
+      patientUsername: req.username!,
+      healthPackageId: req.params.id,
+    })
+
+    res.status(200).send()
   })
 )
