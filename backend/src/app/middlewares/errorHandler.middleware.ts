@@ -3,7 +3,7 @@ import { APIError } from '../errors'
 import { ZodError } from 'zod'
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const errorHandler: ErrorRequestHandler = (err, req, res, error) => {
+export const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
   console.log(err)
 
   if (err instanceof APIError) {
