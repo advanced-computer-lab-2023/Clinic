@@ -28,7 +28,13 @@ export class UpdateHealthPackageResponse extends HealthPackageResponseBase {}
 export class AddHealthPackageResponse extends HealthPackageResponseBase {}
 
 export class GetAllHealthPackagesResponse {
-  constructor(public healthPackages: HealthPackageResponseBase[]) {}
+  constructor(
+    public healthPackages: Array<
+      HealthPackageResponseBase & {
+        isSubscribed: boolean
+      }
+    >
+  ) {}
 }
 
 export class GetHealthPackageResponse extends HealthPackageResponseBase {}
