@@ -7,3 +7,9 @@ export const AddFamilyMemberRequestValidator = zod.object({
   gender: zod.string().min(3).max(255),
   relation: zod.string().min(3).max(255),
 })
+
+export const LinkFamilyMemberRequestValidator = zod.object({
+  email: zod.string().optional(),
+  phonenumber: zod.string().optional(),
+  relation: zod.string().min(3).max(255),
+})
