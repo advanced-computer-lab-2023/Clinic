@@ -6,6 +6,7 @@ import {
 } from 'clinic-common/types/doctor.types'
 import { APIError, NotFoundError } from '../errors'
 import { type WithUser } from '../utils/typeUtils'
+
 /**
  * TODO: Replace DoctorDocumentWithUser with WithUser<DoctorDocument>,
  * leaving it for now not to break other PRs
@@ -18,6 +19,7 @@ export async function getPendingDoctorRequests(): Promise<
   const models = await DoctorModel.find({
     requestStatus: DoctorStatus.Pending,
   }).populate<{ user: UserDocument }>('user')
+
   return models
 }
 
@@ -92,6 +94,40 @@ export async function getApprovedDoctorById(
     user: UserDocument
   }>('user')
 
+  if (doctor == null) throw new NotFoundError()
+
+  return doctor
+}
+
+export async function approveDoctor(
+  doctorId: string
+): Promise<DoctorDocumentWithUser> {
+  const doctor = await DoctorModel.findByIdAndUpdate(
+    doctorId,
+    { requestStatus: 'approved' },
+    {
+      new: true,
+    }
+  ).populate<{
+    user: UserDocument
+  }>('user')
+  if (doctor == null) throw new NotFoundError()
+
+  return doctor
+}
+
+export async function rejectDoctor(
+  doctorId: string
+): Promise<DoctorDocumentWithUser> {
+  const doctor = await DoctorModel.findByIdAndUpdate(
+    doctorId,
+    { requestStatus: 'rejected' },
+    {
+      new: true,
+    }
+  ).populate<{
+    user: UserDocument
+  }>('user')
   if (doctor == null) throw new NotFoundError()
 
   return doctor

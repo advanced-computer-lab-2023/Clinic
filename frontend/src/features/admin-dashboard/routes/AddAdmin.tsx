@@ -4,7 +4,7 @@ import { AddAdminApi } from '@/api/admin'
 
 export function AddAdmin() {
   return (
-    <ApiForm<AddAdminValidator>
+    <ApiForm
       fields={[
         { label: 'Username', property: 'username' },
         { label: 'Password', property: 'password' },

@@ -1,10 +1,16 @@
-import { getPendingDoctors } from '@/api/doctor'
+import {
+  acceptDoctorRequest,
+  getPendingDoctors,
+  rejectDoctorRequest,
+} from '@/api/doctor'
 import { CardPlaceholder } from '@/components/CardPlaceholder'
 import { Box, Button, ButtonGroup } from '@mui/material'
 import { useQuery } from '@tanstack/react-query'
 import { GridColDef, DataGrid } from '@mui/x-data-grid'
 import { GetPendingDoctorsResponse } from 'clinic-common/types/doctor.types'
 import { useNavigate } from 'react-router-dom'
+import { toast, ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 
 export function PendingDoctors() {
   const navigate = useNavigate()
@@ -15,6 +21,28 @@ export function PendingDoctors() {
 
   if (query.isLoading) {
     return <CardPlaceholder />
+  }
+
+  function handleApprove(id: string) {
+    const promise = acceptDoctorRequest(id).then(() => {
+      query.refetch()
+    })
+    toast.promise(promise, {
+      pending: 'Loading',
+      success: 'Doctor Request Approved Successfully!',
+      error: 'error',
+    })
+  }
+
+  function handleReject(id: string) {
+    const promise = rejectDoctorRequest(id).then(() => {
+      query.refetch()
+    })
+    toast.promise(promise, {
+      pending: 'Loading',
+      success: 'Doctor Request Rejected Successfully!',
+      error: 'error',
+    })
   }
 
   const columns: GridColDef<GetPendingDoctorsResponse['doctors'][0]>[] = [
@@ -60,7 +88,7 @@ export function PendingDoctors() {
       hideable: false,
       disableColumnMenu: true,
       headerName: 'Actions',
-      width: 150,
+      width: 250,
       renderCell: (column) => (
         <ButtonGroup>
           <Button
@@ -78,10 +106,20 @@ export function PendingDoctors() {
             size="small"
             color="success"
             onClick={() => {
-              alert(`TODO: Approve doctor ${column.row.name} (Sprint 2)`)
+              handleApprove(column.row.id)
             }}
           >
             Approve
+          </Button>
+          <Button
+            variant="contained"
+            size="small"
+            color="error"
+            onClick={() => {
+              handleReject(column.row.id)
+            }}
+          >
+            Reject
           </Button>
         </ButtonGroup>
       ),
@@ -90,6 +128,7 @@ export function PendingDoctors() {
 
   return (
     <Box sx={{ height: 400, width: '100%' }}>
+      <ToastContainer />
       <DataGrid rows={query.data?.doctors || []} columns={columns} autoHeight />
     </Box>
   )

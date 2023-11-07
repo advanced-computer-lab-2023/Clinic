@@ -7,9 +7,7 @@ import { prescriptionsRouter } from './app/controllers/prescription.controller'
 import { familyMemberRouter } from './app/controllers/familyMember.controller'
 import { patientRouter } from './app/controllers/patient.controller'
 import { appointmentsRouter } from './app/controllers/appointment.controller'
-import {
-  allowAdmins,
-} from './app/middlewares/auth.middleware'
+import { allowAdmins } from './app/middlewares/auth.middleware'
 
 import { adminRouter } from './app/controllers/admin.controller'
 import { asyncWrapper } from './app/utils/asyncWrapper'

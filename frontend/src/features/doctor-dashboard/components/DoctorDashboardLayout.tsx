@@ -31,6 +31,7 @@ export function DoctorDashboardLayout() {
 
     if (doctorQuery.data?.requestStatus != DoctorStatus.Approved) {
       setSidebarLinks([])
+
       return
     }
 

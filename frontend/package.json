@@ -1,15 +1,13 @@
 {
-  "name": "acl",
+  "name": "frontend",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
-    "prepare": "cd .. && husky install frontend/.husky",
-    "format": "prettier . --write -u"
+    "compile": "tsc --noEmit"
   },
   "dependencies": {
     "@emotion/react": "^11.11.1",
@@ -23,14 +21,16 @@
     "@mui/x-date-pickers": "^6.16.1",
     "@tanstack/react-query": "^4.36.1",
     "axios": "^1.5.1",
-    "clinic-common": "file:../clinic-common",
+    "clinic-common": "*",
     "dayjs": "^1.11.10",
     "localforage": "^1.10.0",
     "match-sorter": "^6.3.1",
+    "notistack": "^3.0.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.47.0",
     "react-router-dom": "^6.16.0",
+    "react-toastify": "^9.1.3",
     "sort-by": "^1.2.0",
     "uuid": "^9.0.1",
     "vite-tsconfig-paths": "^4.2.1",
@@ -40,23 +40,9 @@
     "@types/react": "^18.2.15",
     "@types/react-dom": "^18.2.7",
     "@types/uuid": "^9.0.5",
-    "@typescript-eslint/eslint-plugin": "^6.0.0",
-    "@typescript-eslint/parser": "^6.0.0",
     "@vitejs/plugin-react": "^4.0.3",
-    "eslint": "^8.45.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.3",
-    "husky": "^8.0.3",
-    "lint-staged": "^14.0.1",
-    "prettier": "3.0.3",
-    "typescript": "^5.0.2",
     "vite": "^4.4.5"
-  },
-  "lint-staged": {
-    "{src,test}/**/*.{js,ts,jsx,tsx}": [
-      "eslint --fix",
-      "prettier --write -u"
-    ],
-    "!**/*.{js,ts,jsx,tsx}": "prettier --write -u"
   }
 }

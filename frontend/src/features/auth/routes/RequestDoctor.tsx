@@ -4,8 +4,10 @@ import { useAuth } from '@/hooks/auth'
 
 import { RegisterDoctorRequestValidator } from 'clinic-common/validators/doctor.validator'
 import { RegisterDoctorRequest } from 'clinic-common/types/doctor.types'
+
 export const RequestDoctor = () => {
   const { refreshUser } = useAuth()
+
   return (
     <ApiForm<RegisterDoctorRequest>
       fields={[

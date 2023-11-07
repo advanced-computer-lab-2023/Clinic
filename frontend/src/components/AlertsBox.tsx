@@ -4,8 +4,6 @@ import { Alert, Stack } from '@mui/material'
 export function AlertsBox({ scope }: { scope?: string }) {
   const { alerts } = useAlerts()
 
-  scope = scope || 'global'
-
   return (
     <Stack spacing={1}>
       {alerts

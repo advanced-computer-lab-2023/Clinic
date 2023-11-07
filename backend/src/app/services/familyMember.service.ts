@@ -65,7 +65,7 @@ export async function getFamilyMemberById(
   if (familyMember == null) {
     throw new NotFoundError()
   }
-  
+
   return familyMember
 }
 

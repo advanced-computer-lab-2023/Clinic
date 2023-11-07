@@ -63,9 +63,11 @@ export async function registerPatient(
       mobileNumber: emergencyMobileNumber,
     },
   } = request
+
   if (await isUsernameTaken(request.username)) {
     throw new UsernameAlreadyTakenError()
   }
+
   const hashedPassword = await bcrypt.hash(request.password, bcryptSalt)
 
   const newUser = await UserModel.create({
@@ -87,6 +89,7 @@ export async function registerPatient(
     },
   })
   await newPatient.save()
+
   return await generateJWTToken(new JwtPayload(newUser.username))
 }
 
@@ -124,9 +127,11 @@ export async function generateJWTToken(payload: JwtPayload): Promise<string> {
 
 export async function isAdmin(username: string): Promise<boolean> {
   const user = await UserModel.findOne({ username })
+
   if (user == null) {
     return false
   }
+
   return user.type === UserType.Admin
 }
 
@@ -148,11 +153,13 @@ export async function submitDoctorRequest(
   if (await isUsernameTaken(doctor.username)) {
     throw new UsernameAlreadyTakenError()
   }
+
   const existingDoctor = await DoctorModel.findOne({ email: doctor.email })
 
   if (existingDoctor !== null && existingDoctor !== undefined) {
     throw new EmailAlreadyTakenError()
   }
+
   const user = await UserModel.create({
     username: doctor.username,
     password: await hash(doctor.password, bcryptSalt),
@@ -171,6 +178,7 @@ export async function submitDoctorRequest(
     requestStatus: DoctorStatus.Pending,
   })
   await newDoctor.save()
+
   return (await newDoctor.populate<{ user: UserDocument }>(
     'user'
   )) as WithUser<DoctorDocument>

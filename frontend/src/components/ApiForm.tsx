@@ -1,7 +1,6 @@
 import { AlertsBox } from '@/components/AlertsBox'
 import { CardPlaceholder } from '@/components/CardPlaceholder'
 import { useAlerts } from '@/hooks/alerts'
-import { Alert } from '@/providers/AlertsProvider'
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
   Card,
@@ -112,11 +111,19 @@ export function ApiForm<Request extends ObjectWithStringKeys>({
       queryClient.invalidateQueries({
         queryKey,
       })
-      addAlert(new Alert(successMessage, 'success', alertScope))
+      addAlert({
+        message: successMessage,
+        severity: 'success',
+        scope: alertScope,
+      })
       onSuccess?.()
     },
     onError: (e: Error) => {
-      addAlert(new Alert(e.message ?? 'Failed! Try again', 'error', alertScope))
+      addAlert({
+        message: e.message ?? 'Failed! Try again',
+        severity: 'error',
+        scope: alertScope,
+      })
     },
   })
 
@@ -216,6 +223,7 @@ const TextInputField = <T extends ObjectWithStringKeys>({
           } else {
             fieldItem.onChange(Number(e.target.value))
           }
+
           setOriginalValue(e.target.value)
         }}
         value={fieldState.isDirty ? originalValue : defaultValue}
@@ -261,6 +269,7 @@ const SelectInputField = <T extends ObjectWithStringKeys>({
     </FormControl>
   )
 }
+
 const DateInputField = <T extends ObjectWithStringKeys>({
   field,
   fieldState,
