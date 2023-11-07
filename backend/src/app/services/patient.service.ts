@@ -131,6 +131,7 @@ export async function addNoteToPatient(
   await patient.save()
 
   return { patient }
+}
 
 export async function subscribeToHealthPackage(params: {
   patientUsername: string
