@@ -115,3 +115,19 @@ export async function getMyPatients(
   // Return the list of patients
   return filteredPatients
 }
+
+export async function addNoteToPatient(
+  id: string,
+  newNote: string
+): Promise<{
+  patient: PatientDocumentWithUser
+}> {
+  const patient = await PatientModel.findOne({ _id: id })
+    .populate<{ user: UserDocument }>('user')
+    .exec()
+  if (patient == null) throw new NotFoundError()
+  patient.notes.push(newNote)
+  await patient.save()
+
+  return { patient }
+}
