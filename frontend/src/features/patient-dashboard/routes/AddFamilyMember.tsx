@@ -1,7 +1,7 @@
 import { useAuth } from '@/hooks/auth'
-import { AddFamilyMemberRequest, LinkFamilyMemberRequest } from 'clinic-common/types/familyMember.types'
-import { AddFamilyMemberRequestValidator, LinkFamilyMemberRequestValidator } from 'clinic-common/validators/familyMembers.validator'
-import { addFamilyMember, linkFamilyMember } from '@/api/familyMembers'
+import { AddFamilyMemberRequest } from 'clinic-common/types/familyMember.types'
+import { AddFamilyMemberRequestValidator } from 'clinic-common/validators/familyMembers.validator'
+import { addFamilyMember } from '@/api/familyMembers'
 import { ApiForm } from '@/components/ApiForm'
 import { useState } from 'react'
 import { LinkFamilyMember } from './LinkFamilyMember'
@@ -10,9 +10,11 @@ export function AddFamilyMember({ onSuccess }: { onSuccess: () => void }) {
   const [isLinkingExistingAccount, setIsLinkingExistingAccount] =
     useState(false)
   const { user } = useAuth()
+
   const handleLinkExistingAccount = () => {
     setIsLinkingExistingAccount(true)
   }
+
   return (
     <div>
       {(isLinkingExistingAccount==false)&&<ApiForm<AddFamilyMemberRequest>
