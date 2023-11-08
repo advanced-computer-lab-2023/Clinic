@@ -1,6 +1,7 @@
 import {
   GetAPatientResponse,
   GetMyPatientsResponse,
+  GetWalletMoneyResponse,
 } from 'clinic-common/types/patient.types'
 import { api } from '.'
 
@@ -41,3 +42,11 @@ export async function getPatient(id: string): Promise<GetAPatientResponse> {
     return res.data
   })
 }
+
+export async function getWalletMoney(username: string): Promise<GetWalletMoneyResponse> {
+  return await api.get<GetWalletMoneyResponse>('/patients/wallet/' + username).then((res) => {
+    console.log(res.data + 'getWalletMoney' + username)
+
+    return res.data
+  })
+} 

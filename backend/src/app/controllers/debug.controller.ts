@@ -175,6 +175,7 @@ async function createDummyPatient(
       undefined,
     ]),
     notes: [faker.lorem.sentence()],
+    walletMoney: faker.number.int(3000),
   })
 
   for (let i = 0; i < 3; i++) {
