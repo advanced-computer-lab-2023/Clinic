@@ -13,6 +13,7 @@ const doctorSchema = new Schema(
     affiliation: { type: String, required: true },
     educationalBackground: { type: String, required: true },
     speciality: { type: String, required: true },
+    documents: { type: [String], required: true },
     requestStatus: {
       type: String,
       required: true,
@@ -20,7 +21,9 @@ const doctorSchema = new Schema(
       default: DoctorStatus.Pending,
     },
     availableTimes: { type: [String], required: false, default: [] },
+    walletMoney: { type: Number, required: false, default: 0 },
   },
+
   { timestamps: true }
 )
 
