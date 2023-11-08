@@ -2,10 +2,11 @@ import { useAuth } from '@/hooks/auth'
 import { LinkFamilyMemberRequest } from 'clinic-common/types/familyMember.types'
 import { linkFamilyMember } from '@/api/familyMembers'
 import { ApiForm } from '@/components/ApiForm'
-import { AddFamilyMemberRequestValidator, LinkFamilyMemberRequestValidator } from 'clinic-common/validators/familyMembers.validator'
+import { LinkFamilyMemberRequestValidator } from 'clinic-common/validators/familyMembers.validator'
 
 export function LinkFamilyMember({ onSuccess }: { onSuccess: () => void }) {
   useAuth()
+
   return (
     <ApiForm<LinkFamilyMemberRequest>
     fields={[
