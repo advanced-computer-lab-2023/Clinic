@@ -1,6 +1,6 @@
 import { AuthenticatedRoute } from '@/components/AuthenticatedRoute'
 import { useSidebar } from '@/hooks/sidebar'
-import { Group, Healing, MedicalInformation } from '@mui/icons-material'
+import { Group, Healing, MedicalInformation, Wallet } from '@mui/icons-material'
 import { UserType } from 'clinic-common/types/user.types'
 import { Container } from '@mui/material'
 import { useEffect } from 'react'
@@ -29,13 +29,19 @@ export function PatientDashboardLayout() {
       },
       {
         to: '/patient-dashboard/appointments',
-        text: 'Appoitments',
+        text: 'Appointments',
         icon: <AccessTimeIcon />,
       },
       {
         to: '/patient-dashboard/health-packages',
         text: 'Health Packages',
         icon: <Healing />,
+      },
+      // wallet
+      {
+        to: '/patient-dashboard/wallet',
+        text: 'Wallet',
+        icon: <Wallet />,
       },
     ])
   }, [setSidebarLinks])
