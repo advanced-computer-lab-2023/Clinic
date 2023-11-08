@@ -55,7 +55,7 @@ export function DoctorDashboardLayout() {
         to: '/doctor-dashboard/wallet',
         text: 'Wallet',
         icon: <Wallet />,
-      }
+      },
     ])
   }, [setSidebarLinks, user, doctorQuery.data?.requestStatus])
 
