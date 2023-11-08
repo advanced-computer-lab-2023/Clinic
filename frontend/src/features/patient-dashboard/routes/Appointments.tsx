@@ -12,10 +12,16 @@ import { getAppointments } from '@/api/appointments'
 import { AppointmentStatus } from 'clinic-common/types/appointment.types'
 import { useState } from 'react'
 import axios from 'axios'
+import { useAuth } from '@/hooks/auth'
+import { UserType } from 'clinic-common/types/user.types'
 
 export function Appointments() {
   const [followUpDate, setFollowUpDate] = useState('')
   const [followUpDateError, setFollowUpDateError] = useState(false)
+  const { user } = useAuth()
+  // console.log(user)
+  // console.log(user?.type)
+  // console.log(user?.type === UserType.Doctor)
 
   async function handleFollowUpButton(doctorID: string, patientID: string) {
     //  console.log(followUpDate)
@@ -120,28 +126,31 @@ export function Appointments() {
                   </Typography>
                   <Typography variant="body1">{appointment.status}</Typography>
                 </Stack>
-                {appointment.status === 'completed' && (
-                  <TextField
-                    type="datetime-local"
-                    onChange={(e) => setFollowUpDate(e.target.value)}
-                    inputProps={{ min: currentDate }}
-                    error={followUpDateError}
-                  />
-                )}
-                {appointment.status === 'completed' && (
-                  <Button
-                    variant="contained"
-                    size="small"
-                    onClick={() =>
-                      handleFollowUpButton(
-                        appointment.doctorID,
-                        appointment.patientID
-                      )
-                    }
-                  >
-                    Schedule Follow-up
-                  </Button>
-                )}
+
+                {user?.type === UserType.Doctor &&
+                  appointment.status === 'completed' && (
+                    <TextField
+                      type="datetime-local"
+                      onChange={(e) => setFollowUpDate(e.target.value)}
+                      inputProps={{ min: currentDate }}
+                      error={followUpDateError}
+                    />
+                  )}
+                {user?.type === UserType.Doctor &&
+                  appointment.status === 'completed' && (
+                    <Button
+                      variant="contained"
+                      size="small"
+                      onClick={() =>
+                        handleFollowUpButton(
+                          appointment.doctorID,
+                          appointment.patientID
+                        )
+                      }
+                    >
+                      Schedule Follow-up
+                    </Button>
+                  )}
               </Stack>
             </CardContent>
           </Card>
