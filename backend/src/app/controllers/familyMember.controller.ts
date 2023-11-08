@@ -1,4 +1,3 @@
- 
 import { Router } from 'express'
 import { asyncWrapper } from '../utils/asyncWrapper'
 import {
@@ -58,9 +57,8 @@ familyMemberRouter.post(
   '/link',
   validate(LinkFamilyMemberRequestValidator),
   asyncWrapper<LinkFamilyMemberRequest>(async (req: any, res: any) => {
-
     let familyMember = null
-    
+
     if (req.body.email != null) {
       const familyMemberEmail = req.body.email
       familyMember = await findFamilyMemberByEmail(familyMemberEmail)

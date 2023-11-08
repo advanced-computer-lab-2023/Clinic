@@ -1,5 +1,8 @@
 import { type z } from 'zod'
-import { LinkFamilyMemberRequestValidator, type AddFamilyMemberRequestValidator } from '../validators/familyMembers.validator'
+import {
+  LinkFamilyMemberRequestValidator,
+  type AddFamilyMemberRequestValidator,
+} from '../validators/familyMembers.validator'
 import { Gender } from './gender.types'
 import { PatientResponseBase } from './patient.types'
 
