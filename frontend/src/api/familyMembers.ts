@@ -35,6 +35,7 @@ export async function linkFamilyMember(
   req: LinkFamilyMemberRequest
 ): Promise<LinkFamilyMemberResponse> {
   console.log("I'm here");
+
   return await api
     .post<LinkFamilyMemberResponse>(`/family-members/link`, req)
     .then((res) => res.data)
