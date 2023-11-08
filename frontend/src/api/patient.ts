@@ -47,8 +47,7 @@ export async function getWalletMoney(
   return await api
     .get<GetWalletMoneyResponse>('/patients/wallet/' + username)
     .then((res) => {
-      console.log(res.data + 'getWalletMoney' + username)
-
+      
       return res.data
     })
 }
