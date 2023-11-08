@@ -157,7 +157,7 @@ export async function unSubscribeToHealthPackage(params: {
   if (!healthPackage) {
     throw new NotFoundError()
   }
-  
+
   patient.healthPackage = undefined
 
   await patient.save()

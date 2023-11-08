@@ -52,14 +52,14 @@ export function SubscribeToHealthPackages() {
   const cancelMutation = useMutation({
     mutationFn: unsubscribeToHealthPackage,
     onSuccess: () => {
-      queryClient.invalidateQueries(['health-packages']);
-      setSelectedHealthPackage(null);
+      queryClient.invalidateQueries(['health-packages'])
+      setSelectedHealthPackage(null)
       alerts.addAlert({
         severity: 'success',
         message: 'Unsubscribed from health package successfully.',
-      });
+      })
     },
-  });
+  })
 
   const isSubscribed = useMemo(() => {
     return (
@@ -142,28 +142,29 @@ export function SubscribeToHealthPackages() {
                 </Stack>
               </CardContent>
               <CardActions>
-              {healthPackage.isSubscribed ? (
-          <Button
-            variant="contained"
-            fullWidth
-            color="secondary"  // Set the color as desired
-            startIcon={<AddModerator />}  // Replace with the icon you prefer
-            onClick={() => cancelMutation.mutateAsync(healthPackage.id)}  
-          >
-            Unsubscribe
-          </Button>
-        ) : (
-                <Button
-                  variant="contained"
-                  fullWidth
-                  startIcon={<AddModerator />}
-                  onClick={() => {
-                    setSelectedHealthPackage(healthPackage.id)
-                  }}
-                  disabled={healthPackage.isSubscribed}
-                >
-                  {healthPackage.isSubscribed ? 'Subscribed' : 'Subscribe'}
-                </Button>)}
+                {healthPackage.isSubscribed ? (
+                  <Button
+                    variant="contained"
+                    fullWidth
+                    color="secondary" // Set the color as desired
+                    startIcon={<AddModerator />} // Replace with the icon you prefer
+                    onClick={() => cancelMutation.mutateAsync(healthPackage.id)}
+                  >
+                    Unsubscribe
+                  </Button>
+                ) : (
+                  <Button
+                    variant="contained"
+                    fullWidth
+                    startIcon={<AddModerator />}
+                    onClick={() => {
+                      setSelectedHealthPackage(healthPackage.id)
+                    }}
+                    disabled={healthPackage.isSubscribed}
+                  >
+                    {healthPackage.isSubscribed ? 'Subscribed' : 'Subscribe'}
+                  </Button>
+                )}
               </CardActions>
             </Card>
           </Grid>

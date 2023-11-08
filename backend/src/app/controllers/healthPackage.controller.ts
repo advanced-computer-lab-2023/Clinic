@@ -25,7 +25,10 @@ import {
   CreateHealthPackageRequestValidator,
   UpdateHealthPackageRequestValidator,
 } from 'clinic-common/validators/healthPackage.validator'
-import { subscribeToHealthPackage, unSubscribeToHealthPackage } from '../services/patient.service'
+import {
+  subscribeToHealthPackage,
+  unSubscribeToHealthPackage,
+} from '../services/patient.service'
 import { getPatientByUsername } from '../services/patient.service'
 
 export const healthPackagesRouter = Router()
