@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-misused-promises */
+ 
 import { Router } from 'express'
 import { asyncWrapper } from '../utils/asyncWrapper'
 import {
@@ -59,6 +59,7 @@ familyMemberRouter.post(
   validate(LinkFamilyMemberRequestValidator),
   asyncWrapper<LinkFamilyMemberRequest>(async (req: any, res: any) => {
     let familyMember = null
+
     if (req.body.email != null) {
       const familyMemberEmail = req.body.email
       familyMember = await findFamilyMemberByEmail(familyMemberEmail)
@@ -68,6 +69,7 @@ familyMemberRouter.post(
         familyMemberMobileNumber
       )
     }
+
     // else{
     // TODO: throw error
     // }
