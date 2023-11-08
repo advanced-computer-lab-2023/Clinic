@@ -27,3 +27,15 @@ export async function getfilteredAppointments(
     return await AppointmentModel.find()
   }
 }
+
+export async function createFollowUpAppointment(
+  appointment: AppointmentDocument
+): Promise<AppointmentDocument> {
+  const newAppointment = new AppointmentModel({
+    ...appointment,
+    date: new Date(appointment.date),
+    status: 'upcoming',
+  })
+
+  return await newAppointment.save()
+}

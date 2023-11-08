@@ -1,9 +1,58 @@
-import { Card, CardContent, Grid, Stack, Typography } from '@mui/material'
+import {
+  Card,
+  CardContent,
+  Grid,
+  Stack,
+  Typography,
+  Button,
+  TextField,
+} from '@mui/material'
 import { DateRange, FilteredList } from '@/components/FilteredList'
 import { getAppointments } from '@/api/appointments'
 import { AppointmentStatus } from 'clinic-common/types/appointment.types'
+import { useState } from 'react'
+import axios from 'axios'
 
 export function Appointments() {
+  const [followUpDate, setFollowUpDate] = useState('')
+  const [followUpDateError, setFollowUpDateError] = useState(false)
+
+  async function handleFollowUpButton(doctorID: string, patientID: string) {
+    //  console.log(followUpDate)
+    //   console.log(typeof(followUpDate))
+    //  console.log(followUpDate+":00")
+
+    if (followUpDate === '') {
+      setFollowUpDateError(true)
+      alert('Please select a date')
+    } else {
+      setFollowUpDateError(false)
+
+      // console.log(typeof(doctorID))
+      // console.log(patientID)
+      // console.log(followUpDate)
+      // console.log(followUpDate.toString())
+
+      await axios
+        .post(`http://localhost:3000/appointment/createFollowUp`, {
+          doctorID,
+          patientID,
+          date: followUpDate,
+        })
+        .then(() => {
+          alert('Follow-up scheduled successfully')
+        })
+        .catch((err) => {
+          alert('Error in scheduling follow-up')
+          console.log(err)
+        })
+
+      setFollowUpDate('')
+    }
+  }
+
+  const currentDate = new Date().toISOString().slice(0, 16)
+
   return (
     <FilteredList
       dataFetcher={getAppointments}
@@ -71,6 +120,28 @@ export function Appointments() {
                   </Typography>
                   <Typography variant="body1">{appointment.status}</Typography>
                 </Stack>
+                {appointment.status === 'completed' && (
+                  <TextField
+                    type="datetime-local"
+                    onChange={(e) => setFollowUpDate(e.target.value)}
+                    inputProps={{ min: currentDate }}
+                    error={followUpDateError}
+                  />
+                )}
+                {appointment.status === 'completed' && (
+                  <Button
+                    variant="contained"
+                    size="small"
+                    onClick={() =>
+                      handleFollowUpButton(
+                        appointment.doctorID,
+                        appointment.patientID
+                      )
+                    }
+                  >
+                    Schedule Follow-up
+                  </Button>
+                )}
               </Stack>
             </CardContent>
           </Card>
