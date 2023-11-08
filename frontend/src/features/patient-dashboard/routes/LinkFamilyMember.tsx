@@ -9,32 +9,32 @@ export function LinkFamilyMember({ onSuccess }: { onSuccess: () => void }) {
 
   return (
     <ApiForm<LinkFamilyMemberRequest>
-    fields={[
-      { label: 'Email', property: 'email' },
-      { label: 'Phone Number', property: 'phonenumber' },
-      {
-        label: 'Relation',
-        property: 'relation',
-        selectedValues: [
-          {
-            label: 'Wife',
-            value: 'wife',
-          },
-          {
-            label: 'Husband',
-            value: 'husband',
-          },
-          {
-            label: 'Son',
-            value: 'son',
-          },
-          {
-            label: 'Daughter',
-            value: 'daughter',
-          },
-        ],
-      },
-    ]}
+      fields={[
+        { label: 'Email', property: 'email' },
+        { label: 'Phone Number', property: 'phonenumber' },
+        {
+          label: 'Relation',
+          property: 'relation',
+          selectedValues: [
+            {
+              label: 'Wife',
+              value: 'wife',
+            },
+            {
+              label: 'Husband',
+              value: 'husband',
+            },
+            {
+              label: 'Son',
+              value: 'son',
+            },
+            {
+              label: 'Daughter',
+              value: 'daughter',
+            },
+          ],
+        },
+      ]}
       validator={LinkFamilyMemberRequestValidator}
       successMessage="Account linked successfully"
       action={(data) => linkFamilyMember(data)}
