@@ -29,14 +29,14 @@ export async function filterPatients(): Promise<
   return await api
     .post<GetMyPatientsResponse>('/patients/filter')
     .then((res) => {
+      
       return res.data.patients
     })
 }
 
 export async function getPatient(id: string): Promise<GetAPatientResponse> {
   return await api.get<GetAPatientResponse>('/patients/' + id).then((res) => {
-    console.log(res.data + 'getPatient' + id)
-
+    
     return res.data
   })
 }
