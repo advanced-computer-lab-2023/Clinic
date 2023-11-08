@@ -11,8 +11,6 @@ export async function viewPatients(): Promise<
   return await api
     .get<GetMyPatientsResponse>('/patients/myPatients')
     .then((res) => {
-      console.log('res.data', res.data)
-
       return res.data.patients
     })
 }
