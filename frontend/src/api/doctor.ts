@@ -3,6 +3,7 @@ import {
   GetApprovedDoctorsResponse,
   GetDoctorResponse,
   GetPendingDoctorsResponse,
+  GetWalletMoneyResponse,
   UpdateDoctorRequest,
   UpdateDoctorResponse,
 } from 'clinic-common/types/doctor.types'
@@ -61,4 +62,16 @@ export async function rejectDoctorRequest(
   return await api
     .patch<UpdateDoctorResponse>(`/doctors/rejectDoctorRequest/${id}`)
     .then((res) => res.data)
+}
+
+export async function getWalletMoney(
+  username: string
+): Promise<GetWalletMoneyResponse> {
+  return await api
+    .get<GetWalletMoneyResponse>('/doctors/wallet/' + username)
+    .then((res) => {
+      console.log(res.data + 'getWalletMoney' + username)
+
+      return res.data
+    })
 }

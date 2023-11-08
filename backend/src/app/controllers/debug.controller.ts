@@ -93,6 +93,7 @@ async function createDummyDoctor(
     speciality: faker.helpers.arrayElement(specialities),
     requestStatus: status,
     availableTimes: randomFutureDates(),
+    walletMoney: faker.number.int(3000),
   })
 
   if (withAppointments) {
