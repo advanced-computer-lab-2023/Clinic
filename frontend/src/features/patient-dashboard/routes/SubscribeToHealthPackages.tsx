@@ -1,6 +1,7 @@
 import {
   getHealthPackages,
   subscribeToHealthPackage,
+  unsubscribeToHealthPackage,
 } from '@/api/healthPackages'
 import { CardPlaceholder } from '@/components/CardPlaceholder'
 import {
@@ -129,6 +130,18 @@ export function SubscribeToHealthPackages() {
                 </Stack>
               </CardContent>
               <CardActions>
+              {healthPackage.isSubscribed ? (
+          <Button
+            variant="contained"
+            fullWidth
+            color="secondary"  // Set the color as desired
+            startIcon={<AddModerator />}  // Replace with the icon you prefer
+            onClick={() => unsubscribeToHealthPackage(healthPackage.id)} 
+            disabled={healthPackage.isSubscribed}
+          >
+            Unsubscribe
+          </Button>
+        ) : (
                 <Button
                   variant="contained"
                   fullWidth
@@ -139,7 +152,7 @@ export function SubscribeToHealthPackages() {
                   disabled={healthPackage.isSubscribed}
                 >
                   {healthPackage.isSubscribed ? 'Subscribed' : 'Subscribe'}
-                </Button>
+                </Button>)}
               </CardActions>
             </Card>
           </Grid>

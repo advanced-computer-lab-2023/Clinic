@@ -25,7 +25,7 @@ import {
   CreateHealthPackageRequestValidator,
   UpdateHealthPackageRequestValidator,
 } from 'clinic-common/validators/healthPackage.validator'
-import { subscribeToHealthPackage } from '../services/patient.service'
+import { subscribeToHealthPackage, unSubscribeToHealthPackage } from '../services/patient.service'
 import { getPatientByUsername } from '../services/patient.service'
 
 export const healthPackagesRouter = Router()
@@ -126,6 +126,19 @@ healthPackagesRouter.post(
   [allowAuthenticated, asyncWrapper(allowPatients)],
   asyncWrapper(async (req, res) => {
     await subscribeToHealthPackage({
+      patientUsername: req.username!,
+      healthPackageId: req.params.id,
+    })
+
+    res.status(200).send()
+  })
+)
+
+healthPackagesRouter.post(
+  '/:id/unsubscribe',
+  [allowAuthenticated, asyncWrapper(allowPatients)],
+  asyncWrapper(async (req, res) => {
+    await unSubscribeToHealthPackage({
       patientUsername: req.username!,
       healthPackageId: req.params.id,
     })
