@@ -19,10 +19,11 @@ import {
   UpdateDoctorResponse,
   type DoctorStatus,
   type UpdateDoctorRequest,
+  GetWalletMoneyResponse,
 } from 'clinic-common/types/doctor.types'
 import { isAdmin } from '../services/auth.service'
 import { NotAuthenticatedError } from '../errors/auth.errors'
-import { APIError } from '../errors'
+import { APIError, NotFoundError } from '../errors'
 import { validate } from '../middlewares/validation.middleware'
 import { UpdateDoctorRequestValidator } from 'clinic-common/validators/doctor.validator'
 import { type UserDocument, UserModel } from '../models/user.model'
@@ -236,5 +237,15 @@ doctorsRouter.patch(
         doctor.requestStatus as DoctorStatus
       )
     )
+  })
+)
+
+// get walletmoney of a doctor with a given username
+doctorsRouter.get(
+  '/wallet/:username',
+  asyncWrapper(async (req, res) => {
+    const doctor = await getDoctorByUsername(req.params.username)
+    if (!doctor || !doctor.walletMoney) throw new NotFoundError()
+    res.send(new GetWalletMoneyResponse(doctor.walletMoney))
   })
 )

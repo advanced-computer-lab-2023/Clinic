@@ -82,3 +82,7 @@ export class UpdateDoctorResponse extends DoctorResponseBase {}
 export class RegisterDoctorRequestResponse extends DoctorResponseBase {}
 
 export class GetDoctorResponse extends DoctorResponseBase {}
+
+export class GetWalletMoneyResponse {
+  constructor(public money: number) {}
+}

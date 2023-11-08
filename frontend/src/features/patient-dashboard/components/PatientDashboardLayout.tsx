@@ -37,7 +37,6 @@ export function PatientDashboardLayout() {
         text: 'Health Packages',
         icon: <Healing />,
       },
-      // wallet
       {
         to: '/patient-dashboard/wallet',
         text: 'Wallet',

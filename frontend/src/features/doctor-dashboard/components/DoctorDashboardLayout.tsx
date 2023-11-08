@@ -1,7 +1,7 @@
 import { AuthenticatedRoute } from '@/components/AuthenticatedRoute'
 import { useSidebar } from '@/hooks/sidebar'
 import { UserType } from 'clinic-common/types/user.types'
-import { Person } from '@mui/icons-material'
+import { Person, Wallet } from '@mui/icons-material'
 import Container from '@mui/material/Container'
 import { useEffect } from 'react'
 import { Navigate, Outlet } from 'react-router-dom'
@@ -51,6 +51,11 @@ export function DoctorDashboardLayout() {
         text: 'View Patients',
         icon: <GroupIcon />,
       },
+      {
+        to: '/doctor-dashboard/wallet',
+        text: 'Wallet',
+        icon: <Wallet />,
+      }
     ])
   }, [setSidebarLinks, user, doctorQuery.data?.requestStatus])
 

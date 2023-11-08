@@ -21,6 +21,7 @@ const doctorSchema = new Schema(
       default: DoctorStatus.Pending,
     },
     availableTimes: { type: [String], required: false, default: [] },
+    walletMoney: { type: Number, required: false, default: 0 },
   },
 
   { timestamps: true }
