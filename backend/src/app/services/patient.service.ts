@@ -117,6 +117,22 @@ export async function getMyPatients(
   return filteredPatients
 }
 
+export async function addNoteToPatient(
+  id: string,
+  newNote: string
+): Promise<{
+  patient: PatientDocumentWithUser
+}> {
+  const patient = await PatientModel.findOne({ _id: id })
+    .populate<{ user: UserDocument }>('user')
+    .exec()
+  if (patient == null) throw new NotFoundError()
+  patient.notes.push(newNote)
+  await patient.save()
+
+  return { patient }
+}
+
 export async function subscribeToHealthPackage(params: {
   patientUsername: string
   healthPackageId: string

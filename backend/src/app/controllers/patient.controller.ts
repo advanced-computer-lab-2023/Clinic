@@ -6,6 +6,7 @@ import {
   getPatientByID,
   getPatientByName,
   getMyPatients,
+  addNoteToPatient,
 } from '../services/patient.service'
 import {
   GetAPatientResponse,
@@ -187,5 +188,15 @@ patientRouter.get(
         patient.notes
       )
     )
+  })
+)
+
+patientRouter.patch(
+  '/addNote/:id',
+  asyncWrapper(async (req, res) => {
+    const id = req.params.id
+    const newNote = req.body.newNote
+    const result = await addNoteToPatient(id, newNote)
+    res.send(result)
   })
 )
