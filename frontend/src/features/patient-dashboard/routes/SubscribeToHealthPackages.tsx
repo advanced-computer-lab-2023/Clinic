@@ -49,6 +49,18 @@ export function SubscribeToHealthPackages() {
     },
   })
 
+  const cancelMutation = useMutation({
+    mutationFn: unsubscribeToHealthPackage,
+    onSuccess: () => {
+      queryClient.invalidateQueries(['health-packages']);
+      setSelectedHealthPackage(null);
+      alerts.addAlert({
+        severity: 'success',
+        message: 'Unsubscribed from health package successfully.',
+      });
+    },
+  });
+
   const isSubscribed = useMemo(() => {
     return (
       query.data?.healthPackages.some((healthPackage) => {
@@ -136,8 +148,7 @@ export function SubscribeToHealthPackages() {
             fullWidth
             color="secondary"  // Set the color as desired
             startIcon={<AddModerator />}  // Replace with the icon you prefer
-            onClick={() => unsubscribeToHealthPackage(healthPackage.id)} 
-            disabled={healthPackage.isSubscribed}
+            onClick={() => cancelMutation.mutateAsync(healthPackage.id)}  
           >
             Unsubscribe
           </Button>
