@@ -38,7 +38,6 @@ export function ViewMyAvailableTimeSlots() {
   }
 
   function handleAdd() {
-    console.log('inHandleAdd')
     const fromTime = fromDate.toDate()
     const toTime = ToDate.toDate()
     const currentDate = new Date()
