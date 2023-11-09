@@ -1,6 +1,9 @@
 import { Router } from 'express'
 import { asyncWrapper } from '../utils/asyncWrapper'
-import { getfilteredAppointments } from '../services/appointment.service'
+import {
+  createAndRemoveTime,
+  getfilteredAppointments,
+} from '../services/appointment.service'
 import {
   AppointmentStatus,
   GetFilteredAppointmentsResponse,
@@ -44,5 +47,42 @@ appointmentsRouter.get(
         }))
       )
     )
+  })
+)
+appointmentsRouter.post(
+  '/makeappointment',
+  asyncWrapper(async (req, res) => {
+    const { date } = req.body // Assuming the date is sent in the request body
+
+    const user = await UserModel.findOne({ username: req.username })
+
+    if (user != null) {
+      if (user.type === 'Patient') {
+        const patient = await PatientModel.findOne({ user: user.id })
+
+        if (patient) {
+          // Assuming 'doctorID' is known or can be retrieved from the request
+          const doctorID = req.body.doctorid
+
+          const appointment = await createAndRemoveTime(
+            patient.id,
+            doctorID,
+            date
+          )
+
+          if (appointment) {
+            res.status(201).json(appointment)
+          } else {
+            res.status(500).send('Appointment creation failed')
+          }
+        } else {
+          res.status(404).send('Patient not found')
+        }
+      } else {
+        res.status(403).send('Only patients can make appointments')
+      }
+    } else {
+      res.status(401).send('User not found')
+    }
   })
 )
