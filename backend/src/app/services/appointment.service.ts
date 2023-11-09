@@ -3,6 +3,7 @@ import {
   AppointmentModel,
   type AppointmentDocument,
 } from '../models/appointment.model'
+import { AppointmentStatus } from 'clinic-common/types/appointment.types'
 
 export async function getfilteredAppointments(
   query: any
@@ -26,4 +27,16 @@ export async function getfilteredAppointments(
   } else {
     return await AppointmentModel.find()
   }
+}
+
+export async function createFollowUpAppointment(
+  appointment: AppointmentDocument
+): Promise<AppointmentDocument> {
+  const newAppointment = new AppointmentModel({
+    ...appointment,
+    date: new Date(appointment.date),
+    status: AppointmentStatus.Upcoming,
+  })
+
+  return await newAppointment.save()
 }

@@ -1,6 +1,9 @@
 import { Router } from 'express'
 import { asyncWrapper } from '../utils/asyncWrapper'
-import { getfilteredAppointments } from '../services/appointment.service'
+import {
+  getfilteredAppointments,
+  createFollowUpAppointment,
+} from '../services/appointment.service'
 import {
   AppointmentStatus,
   GetFilteredAppointmentsResponse,
@@ -44,5 +47,14 @@ appointmentsRouter.get(
         }))
       )
     )
+  })
+)
+
+appointmentsRouter.post(
+  '/createFollowUp',
+  asyncWrapper(async (req, res) => {
+    const appointment = req.body
+    const newAppointment = await createFollowUpAppointment(appointment)
+    res.send(newAppointment)
   })
 )
