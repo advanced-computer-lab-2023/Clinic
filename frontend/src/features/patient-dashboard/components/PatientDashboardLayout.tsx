@@ -1,6 +1,12 @@
 import { AuthenticatedRoute } from '@/components/AuthenticatedRoute'
 import { useSidebar } from '@/hooks/sidebar'
-import { Group, Healing, MedicalInformation, Wallet } from '@mui/icons-material'
+import {
+  DocumentScannerOutlined,
+  Group,
+  Healing,
+  MedicalInformation,
+  Wallet,
+} from '@mui/icons-material'
 import { UserType } from 'clinic-common/types/user.types'
 import { Container } from '@mui/material'
 import { useEffect } from 'react'
@@ -41,6 +47,11 @@ export function PatientDashboardLayout() {
         to: '/patient-dashboard/wallet',
         text: 'Wallet',
         icon: <Wallet />,
+      },
+      {
+        to: '/patient-dashboard/MyHealthRecords',
+        text: 'MyHealthRecords',
+        icon: <DocumentScannerOutlined />,
       },
     ])
   }, [setSidebarLinks])

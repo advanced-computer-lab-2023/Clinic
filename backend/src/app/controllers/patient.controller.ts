@@ -8,6 +8,7 @@ import {
   getMyPatients,
   addNoteToPatient,
   getPatientByUsername,
+  getPatientNotes,
 } from '../services/patient.service'
 import {
   GetAPatientResponse,
@@ -34,6 +35,23 @@ import {
 } from 'clinic-common/types/appointment.types'
 
 export const patientRouter = Router()
+
+patientRouter.get(
+  '/viewHealthRecords/me',
+  asyncWrapper(async (req, res) => {
+    const result = await getPatientNotes(req.username || '')
+    res.send(result)
+  })
+)
+patientRouter.patch(
+  '/addNote/:id',
+  asyncWrapper(async (req, res) => {
+    const id = req.params.id
+    const newNote = req.body.newNote
+    const result = await addNoteToPatient(id, newNote)
+    res.send(result)
+  })
+)
 
 patientRouter.get(
   '/myPatients', //  allowAuthenticated,
@@ -202,15 +220,5 @@ patientRouter.get(
         patient.walletMoney
       )
     )
-  })
-)
-
-patientRouter.patch(
-  '/addNote/:id',
-  asyncWrapper(async (req, res) => {
-    const id = req.params.id
-    const newNote = req.body.newNote
-    const result = await addNoteToPatient(id, newNote)
-    res.send(result)
   })
 )

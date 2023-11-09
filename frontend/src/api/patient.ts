@@ -48,3 +48,9 @@ export async function getWalletMoney(
       return res.data
     })
 }
+
+export async function getPatientHealthRecords() {
+  return await api.get('/patients/viewHealthRecords/me').then((res) => {
+    return res.data
+  })
+}
