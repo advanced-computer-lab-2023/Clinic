@@ -133,6 +133,13 @@ export async function addNoteToPatient(
   return { patient }
 }
 
+export async function getPatientNotes(username: string) {
+  const user = await UserModel.findOne({ username })
+  const patient = await PatientModel.findOne({ user: user?._id })
+
+  return patient?.notes
+}
+
 export async function subscribeToHealthPackage(params: {
   patientUsername: string
   healthPackageId: string
