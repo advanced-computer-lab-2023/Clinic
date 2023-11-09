@@ -20,7 +20,8 @@ export class FamilyMemberResponseBase {
     public nationalId: string,
     public age: number,
     public gender: Gender,
-    public relation: Relation
+    public relation: Relation,
+    public healthPackageName: string | undefined, //has the name not id
   ) {}
 }
 
