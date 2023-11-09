@@ -20,7 +20,6 @@ const doctorSchema = new Schema(
       enum: DoctorStatus,
       default: DoctorStatus.Pending,
     },
- FEATURE/add-available-time-slots
     contractStatus: {
       type: String,
       required: true,
@@ -28,10 +27,7 @@ const doctorSchema = new Schema(
       default: ContractStatus.Accepted,
     },
     availableTimes: { type: [Date], required: true, default: [] },
-
-    
     walletMoney: { type: Number, required: false, default: 0 },
- main
   },
 
   { timestamps: true }

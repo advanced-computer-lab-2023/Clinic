@@ -24,11 +24,8 @@ import {
   UpdateDoctorResponse,
   type DoctorStatus,
   type UpdateDoctorRequest,
- FEATURE/add-available-time-slots
   AddAvailableTimeSlotsResponse,
-
   GetWalletMoneyResponse,
- main
 } from 'clinic-common/types/doctor.types'
 import { isAdmin } from '../services/auth.service'
 import { NotAuthenticatedError } from '../errors/auth.errors'
@@ -252,7 +249,6 @@ doctorsRouter.patch(
     )
   })
 )
- FEATURE/add-available-time-slots
 doctorsRouter.patch(
   '/addAvailableTimeSlots',
   validate(AddAvailableTimeSlotsRequestValidator),
@@ -275,7 +271,8 @@ doctorsRouter.patch(
         doctor.hourlyRate
       )
     )
-
+  })
+)
 
 // get walletmoney of a doctor with a given username
 doctorsRouter.get(
@@ -284,6 +281,5 @@ doctorsRouter.get(
     const doctor = await getDoctorByUsername(req.params.username)
     if (!doctor || !doctor.walletMoney) throw new NotFoundError()
     res.send(new GetWalletMoneyResponse(doctor.walletMoney))
- main
   })
 )

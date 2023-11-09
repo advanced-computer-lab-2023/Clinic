@@ -66,13 +66,13 @@ export async function rejectDoctorRequest(
     .then((res) => res.data)
 }
 
- FEATURE/add-available-time-slots
 export async function addAvailableTimeSlots(
   req: AddAvailableTimeSlotsRequest
 ): Promise<AddAvailableTimeSlotsResponse> {
   return await api
     .patch<AddAvailableTimeSlotsResponse>(`/doctors/addAvailableTimeSlots`, req)
     .then((res) => res.data)
+}
 
 export async function getWalletMoney(
   username: string
@@ -84,5 +84,4 @@ export async function getWalletMoney(
 
       return res.data
     })
- main
 }
