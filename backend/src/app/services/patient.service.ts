@@ -153,7 +153,30 @@ export async function subscribeToHealthPackage(params: {
 
   patient.healthPackage = healthPackage.id
 
-  console.log(await patient.save())
+  await patient.save() //removed console.log
+}
+
+export async function unSubscribeToHealthPackage(params: {
+  patientUsername: string
+  healthPackageId: string
+}): Promise<void> {
+  const patient = await getPatientByUsername(params.patientUsername)
+
+  if (!patient) {
+    throw new NotFoundError()
+  }
+
+  const healthPackage = await HealthPackageModel.findById(
+    params.healthPackageId
+  )
+
+  if (!healthPackage) {
+    throw new NotFoundError()
+  }
+
+  patient.healthPackage = undefined
+
+  await patient.save()
 }
 
 export async function getPatientByUsername(username: string) {
