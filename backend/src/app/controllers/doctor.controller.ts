@@ -283,17 +283,3 @@ doctorsRouter.get(
     res.send(new GetWalletMoneyResponse(doctor.walletMoney))
   })
 )
-
-// update wallet money of a doctor with a given username and amount to be subtracted
-doctorsRouter.patch(
-  '/wallet/:username',
-  asyncWrapper(async (req, res) => {
-    const doctor = await getDoctorByUsername(req.params.username)
-    if (!doctor || !doctor.walletMoney) throw new NotFoundError()
-    if (doctor.walletMoney - req.body.subtractedMoney < 0)
-      throw new APIError('Not enough money in wallet', 400)
-    doctor.walletMoney -= req.body.subtractedMoney
-    await doctor.save()
-    res.send(new GetWalletMoneyResponse(doctor.walletMoney))
-  })
-)
