@@ -12,7 +12,7 @@ const port = process.env.PORT ?? 3000
 const MongoURL =
   process.env.MONGO_URI ??
   process.env.URL ?? // Keeping this for backwards compatibility
-  'mongodb+srv://admin:admin@cluster0.ugek6la.mongodb.net/'
+  ' '
 
 app.use(cors())
 app.use(express.json())
