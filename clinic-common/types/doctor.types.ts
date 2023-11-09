@@ -121,4 +121,12 @@ export class UpdateDoctorResponse extends DoctorResponseBase {}
 
 export class RegisterDoctorRequestResponse extends DoctorResponseBase {}
 
+ FEATURE/add-available-time-slots
 export class AddAvailableTimeSlotsResponse extends GetApprovedDoctorResponse {}
+
+export class GetDoctorResponse extends DoctorResponseBase {}
+
+export class GetWalletMoneyResponse {
+  constructor(public money: number) {}
+}
+ main

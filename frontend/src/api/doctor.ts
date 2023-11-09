@@ -5,6 +5,7 @@ import {
   GetApprovedDoctorsResponse,
   GetDoctorResponse,
   GetPendingDoctorsResponse,
+  GetWalletMoneyResponse,
   UpdateDoctorRequest,
   UpdateDoctorResponse,
 } from 'clinic-common/types/doctor.types'
@@ -65,10 +66,23 @@ export async function rejectDoctorRequest(
     .then((res) => res.data)
 }
 
+ FEATURE/add-available-time-slots
 export async function addAvailableTimeSlots(
   req: AddAvailableTimeSlotsRequest
 ): Promise<AddAvailableTimeSlotsResponse> {
   return await api
     .patch<AddAvailableTimeSlotsResponse>(`/doctors/addAvailableTimeSlots`, req)
     .then((res) => res.data)
+
+export async function getWalletMoney(
+  username: string
+): Promise<GetWalletMoneyResponse> {
+  return await api
+    .get<GetWalletMoneyResponse>('/doctors/wallet/' + username)
+    .then((res) => {
+      console.log(res.data + 'getWalletMoney' + username)
+
+      return res.data
+    })
+ main
 }

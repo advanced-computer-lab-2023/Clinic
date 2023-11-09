@@ -28,4 +28,5 @@ export const RegisterDoctorRequestValidator = zod.object({
   affiliation: zod.string().min(1),
   educationalBackground: zod.string().min(1),
   speciality: zod.string().min(1),
+  documents: zod.array(zod.string()),
 })

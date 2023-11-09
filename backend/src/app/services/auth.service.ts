@@ -176,6 +176,7 @@ export async function submitDoctorRequest(
     educationalBackground: doctor.educationalBackground,
     speciality: doctor.speciality,
     requestStatus: DoctorStatus.Pending,
+    documents: doctor.documents,
   })
   await newDoctor.save()
 

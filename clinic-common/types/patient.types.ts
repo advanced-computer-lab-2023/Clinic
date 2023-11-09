@@ -58,8 +58,13 @@ export class APatientResponseBase {
     public documents: string[],
     public appointments: GetFilteredAppointmentsResponse,
     public prescriptions: any[],
-    public notes: string[]
+    public notes: string[],
+    public walletMoney: number
   ) {}
 }
 
 export class GetAPatientResponse extends APatientResponseBase {}
+
+export class GetWalletMoneyResponse {
+  constructor(public money: number) {}
+}

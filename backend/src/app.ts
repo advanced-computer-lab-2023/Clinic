@@ -5,6 +5,7 @@ import mongoose from 'mongoose'
 import { authenticate } from './app/middlewares/auth.middleware'
 import { errorHandler } from './app/middlewares/errorHandler.middleware'
 import { asyncWrapper } from './app/utils/asyncWrapper'
+import { logger } from './app/middlewares/logger.middleware'
 
 const app = express()
 const port = process.env.PORT ?? 3000
@@ -15,6 +16,7 @@ const MongoURL =
 
 app.use(cors())
 app.use(express.json())
+app.use(logger)
 app.use(asyncWrapper(authenticate))
 app.use(router)
 app.use(errorHandler)

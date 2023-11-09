@@ -1,7 +1,7 @@
 import { AuthenticatedRoute } from '@/components/AuthenticatedRoute'
 import { useSidebar } from '@/hooks/sidebar'
 import { UserType } from 'clinic-common/types/user.types'
-import { Person } from '@mui/icons-material'
+import { Person, Wallet } from '@mui/icons-material'
 import Container from '@mui/material/Container'
 import { useEffect } from 'react'
 import { Navigate, Outlet } from 'react-router-dom'
@@ -53,9 +53,15 @@ export function DoctorDashboardLayout() {
         icon: <GroupIcon />,
       },
       {
+ FEATURE/add-available-time-slots
         to: '/doctor-dashboard/view-my-available-time-slots',
         text: 'View My Available Time Slots',
         icon: <VisibilityIcon />,
+
+        to: '/doctor-dashboard/wallet',
+        text: 'Wallet',
+        icon: <Wallet />,
+ main
       },
     ])
   }, [setSidebarLinks, user, doctorQuery.data?.requestStatus])
