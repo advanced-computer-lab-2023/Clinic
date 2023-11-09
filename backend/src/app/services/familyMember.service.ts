@@ -86,20 +86,34 @@ export async function getPatientForFamilyMember(
   return patient
 }
 
-export async function findFamilyMemberByEmail(familyMemberEmail: string) {
+export async function findFamilyMemberByEmail(
+  familyMemberEmail: string
+): Promise<WithUser<PatientDocument>> {
   const patient = await PatientModel.findOne({
     email: familyMemberEmail,
-  }).populate('user')
+  }).populate<{
+    user: UserDocument
+  }>('user')
+
+  if (patient == null) {
+    throw new NotFoundError()
+  }
 
   return patient
 }
 
 export async function findFamilyMemberByMobileNumber(
   familyMemberMobileNumber: string
-) {
+): Promise<WithUser<PatientDocument>> {
   const patient = await PatientModel.findOne({
     mobileNumber: familyMemberMobileNumber,
-  }).populate('user')
+  }).populate<{
+    user: UserDocument
+  }>('user')
+
+  if (patient == null) {
+    throw new NotFoundError()
+  }
 
   return patient
 }

@@ -83,6 +83,7 @@ familyMemberRouter.post(
       age: calculatedAge,
       gender: familyMember?.gender,
       relation: req.body.relation,
+      healthPackage: familyMember?.healthPackage,
       patient: familyMember?._id,
     })
     await newFamilyMember.save()
