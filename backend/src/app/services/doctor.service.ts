@@ -1,6 +1,7 @@
 import { DoctorModel, type DoctorDocument } from '../models/doctor.model'
 import { UserModel, type UserDocument } from '../models/user.model'
 import {
+  AddAvailableTimeSlotsRequest,
   DoctorStatus,
   type UpdateDoctorRequest,
 } from 'clinic-common/types/doctor.types'
@@ -135,7 +136,7 @@ export async function rejectDoctor(
 
 export async function addAvailableTimeSlots(
   username: string,
-  time: string
+  req: AddAvailableTimeSlotsRequest
 ): Promise<DoctorDocumentWithUser> {
   const user = await UserModel.findOne({ username })
 
@@ -143,14 +144,14 @@ export async function addAvailableTimeSlots(
 
   const doctor = await DoctorModel.findOneAndUpdate(
     { user: user.id },
-    { $push: { availableTimes: time } },
+    { $push: { availableTimes: new Date(req.time) } },
     {
       new: true,
     }
   ).populate<{
     user: UserDocument
   }>('user')
-
+  console.log(doctor?.availableTimes)
   if (doctor == null) throw new NotFoundError()
 
   return doctor

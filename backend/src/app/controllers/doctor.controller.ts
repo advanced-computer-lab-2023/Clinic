@@ -67,7 +67,7 @@ doctorsRouter.get(
 )
 
 doctorsRouter.patch(
-  '/:username',
+  '/updateDoctor/:username',
   validate(UpdateDoctorRequestValidator),
   asyncWrapper<UpdateDoctorRequest>(async (req, res) => {
     if (req.username == null) {
@@ -137,7 +137,7 @@ doctorsRouter.get(
             doctor.hourlyRate * 1.1 - (discount * doctor.hourlyRate) / 100,
           // TODO: retrieve available times from the Appointments. Since we aren't required to make appointments for this sprint, I will
           // assume available times is a field in the doctors schema for now.
-          availableTimes: doctor.availableTimes as [string],
+          availableTimes: doctor.availableTimes as [Date],
           requestStatus: doctor.requestStatus as DoctorStatus,
         }))
       )
@@ -162,7 +162,8 @@ doctorsRouter.get(
         doctor.affiliation,
         doctor.educationalBackground,
         doctor.speciality,
-        doctor.requestStatus as DoctorStatus
+        doctor.requestStatus as DoctorStatus,
+        doctor.availableTimes as [Date]
       )
     )
   })
@@ -198,7 +199,7 @@ doctorsRouter.get(
         doctor.educationalBackground,
         doctor.speciality,
         doctor.requestStatus as DoctorStatus,
-        doctor.availableTimes as [string],
+        doctor.availableTimes as [Date],
         doctor.hourlyRate * 1.1 - (discount * doctor.hourlyRate) / 100
       )
     )
@@ -248,11 +249,11 @@ doctorsRouter.patch(
   })
 )
 doctorsRouter.patch(
-  '/addAvailableTimeSlots/:username',
+  '/addAvailableTimeSlots',
   validate(AddAvailableTimeSlotsRequestValidator),
   asyncWrapper(allowApprovedDoctors),
   asyncWrapper(async (req, res) => {
-    const doctor = await addAvailableTimeSlots(req.params.username, req.body)
+    const doctor = await addAvailableTimeSlots(req.username!, req.body)
     res.send(
       new AddAvailableTimeSlotsResponse(
         doctor.id,
@@ -265,7 +266,7 @@ doctorsRouter.patch(
         doctor.educationalBackground,
         doctor.speciality,
         doctor.requestStatus as DoctorStatus,
-        doctor.availableTimes as [string],
+        doctor.availableTimes as [Date],
         doctor.hourlyRate
       )
     )

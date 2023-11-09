@@ -5,6 +5,7 @@ import { UpdateProfile } from './UpdateProfile'
 import { Appointments } from '@/features/patient-dashboard/routes/Appointments'
 import { ViewPatients } from './ViewPatients'
 import { Patient } from '@/features/doctor-dashboard/routes/Patient'
+import { ViewMyAvailableTimeSlots } from './ViewMyAvailableTimeSlots'
 
 export const doctorDashboardRoutes: RouteObject[] = [
   {
@@ -29,6 +30,10 @@ export const doctorDashboardRoutes: RouteObject[] = [
       {
         path: 'patient/:id',
         element: <Patient />,
+      },
+      {
+        path: 'view-my-available-time-slots',
+        element: <ViewMyAvailableTimeSlots />,
       },
     ],
   },

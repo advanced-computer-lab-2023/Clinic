@@ -23,9 +23,9 @@ const doctorSchema = new Schema(
       type: String,
       required: true,
       enum: ContractStatus,
-      default: ContractStatus.Pending,
+      default: ContractStatus.Accepted,
     },
-    availableTimes: { type: [String], required: false, default: [] },
+    availableTimes: { type: [Date], required: true, default: [] },
   },
   { timestamps: true }
 )
