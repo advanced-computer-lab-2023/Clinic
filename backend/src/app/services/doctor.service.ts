@@ -151,7 +151,6 @@ export async function addAvailableTimeSlots(
   ).populate<{
     user: UserDocument
   }>('user')
-  console.log(doctor?.availableTimes)
   if (doctor == null) throw new NotFoundError()
 
   return doctor
