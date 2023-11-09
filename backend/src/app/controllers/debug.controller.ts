@@ -22,7 +22,7 @@ import {
 } from '../models/prescription.model'
 import { Relation } from 'clinic-common/types/familyMember.types'
 import { Gender } from 'clinic-common/types/gender.types'
-import { type HydratedDocument } from 'mongoose'
+import mongoose, { type HydratedDocument } from 'mongoose'
 import { createDefaultHealthPackages } from '../services/healthPackage.service'
 import { AppointmentStatus } from 'clinic-common/types/appointment.types'
 import {
@@ -93,6 +93,7 @@ async function createDummyDoctor(
     speciality: faker.helpers.arrayElement(specialities),
     requestStatus: status,
     availableTimes: randomFutureDates(),
+    walletMoney: faker.number.int(3000),
   })
 
   if (withAppointments) {
@@ -175,6 +176,7 @@ async function createDummyPatient(
       undefined,
     ]),
     notes: [faker.lorem.sentence()],
+    walletMoney: faker.number.int(3000),
   })
 
   for (let i = 0; i < 3; i++) {
@@ -236,31 +238,31 @@ debugRouter.post(
   })
 )
 
-// debugRouter.post(
-//   '/create-patient',
-//   asyncWrapper(async (req, res) => {
-//     const user = await UserModel.create({
-//       username: 'patient' + Math.random(),
-//       password: await hash('patient', bcryptSalt),
-//       type: UserType.Patient,
-//     })
+debugRouter.post(
+  '/create-patient',
+  asyncWrapper(async (req, res) => {
+    const user = await UserModel.create({
+      username: 'patient' + Math.random(),
+      password: await hash('patient', bcryptSalt),
+      type: UserType.Patient,
+    })
 
-//     const patient = await PatientModel.create({
-//       user: user.id,
-//       name: 'Patient',
-//       email: user.username + '@gmail.com',
-//       mobileNumber: '01001111111',
-//       dateOfBirth: new Date(),
-//       gender: 'female',
-//       emergencyContact: {
-//         name: 'Emergency1',
-//         mobileNumber: '0100111111',
-//       },
-//     })
+    const patient = await PatientModel.create({
+      user: user.id,
+      name: 'Patient',
+      email: user.username + '@gmail.com',
+      mobileNumber: '01001111111',
+      dateOfBirth: new Date(),
+      gender: 'female',
+      emergencyContact: {
+        name: 'Emergency1',
+        mobileNumber: '0100111111',
+      },
+    })
 
-//     res.send(patient)
-//   })
-// )
+    res.send(patient)
+  })
+)
 
 debugRouter.post(
   '/create-patient-onlyonce',
@@ -365,6 +367,8 @@ debugRouter.post(
 debugRouter.post(
   '/seed',
   asyncWrapper(async (req, res) => {
+    await mongoose.connection.db.dropDatabase()
+
     await createDefaultHealthPackages()
 
     const admin = await createDummyAdmin('admin')

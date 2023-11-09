@@ -3,12 +3,13 @@ import {
   type AppointmentDocument,
   AppointmentModel,
 } from '../models/appointment.model'
+import { HealthPackageModel } from '../models/healthPackage.model'
 import { type PatientDocument, PatientModel } from '../models/patient.model'
 import {
   type PrescriptionDocument,
   PrescriptionModel,
 } from '../models/prescription.model'
-import { type UserDocument } from '../models/user.model'
+import { UserModel, type UserDocument } from '../models/user.model'
 import { type WithUser } from '../utils/typeUtils'
 import { type HydratedDocument, type ObjectId } from 'mongoose'
 
@@ -114,4 +115,83 @@ export async function getMyPatients(
 
   // Return the list of patients
   return filteredPatients
+}
+
+export async function addNoteToPatient(
+  id: string,
+  newNote: string
+): Promise<{
+  patient: PatientDocumentWithUser
+}> {
+  const patient = await PatientModel.findOne({ _id: id })
+    .populate<{ user: UserDocument }>('user')
+    .exec()
+  if (patient == null) throw new NotFoundError()
+  patient.notes.push(newNote)
+  await patient.save()
+
+  return { patient }
+}
+
+export async function getPatientNotes(username: string) {
+  const user = await UserModel.findOne({ username })
+  const patient = await PatientModel.findOne({ user: user?._id })
+
+  return patient?.notes
+}
+
+export async function subscribeToHealthPackage(params: {
+  patientUsername: string
+  healthPackageId: string
+}): Promise<void> {
+  const patient = await getPatientByUsername(params.patientUsername)
+
+  if (!patient) {
+    throw new NotFoundError()
+  }
+
+  const healthPackage = await HealthPackageModel.findById(
+    params.healthPackageId
+  )
+
+  if (!healthPackage) {
+    throw new NotFoundError()
+  }
+
+  patient.healthPackage = healthPackage.id
+
+  await patient.save() //removed console.log
+}
+
+export async function unSubscribeToHealthPackage(params: {
+  patientUsername: string
+  healthPackageId: string
+}): Promise<void> {
+  const patient = await getPatientByUsername(params.patientUsername)
+
+  if (!patient) {
+    throw new NotFoundError()
+  }
+
+  const healthPackage = await HealthPackageModel.findById(
+    params.healthPackageId
+  )
+
+  if (!healthPackage) {
+    throw new NotFoundError()
+  }
+
+  patient.healthPackage = undefined
+
+  await patient.save()
+}
+
+export async function getPatientByUsername(username: string) {
+  const user = await UserModel.findOne({ username })
+
+  if (!user) {
+    throw new NotFoundError()
+  }
+
+  return await PatientModel.findOne({ user: user.id })
 }
