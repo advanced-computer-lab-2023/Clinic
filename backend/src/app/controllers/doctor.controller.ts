@@ -1,6 +1,7 @@
 import { Router } from 'express'
 
 import {
+  addAvailableTimeSlots,
   approveDoctor,
   getAllDoctors,
   getApprovedDoctorById,
@@ -10,7 +11,11 @@ import {
   updateDoctorByUsername,
 } from '../services/doctor.service'
 import { asyncWrapper } from '../utils/asyncWrapper'
-import { allowAdmins, allowAuthenticated } from '../middlewares/auth.middleware'
+import {
+  allowAdmins,
+  allowApprovedDoctors,
+  allowAuthenticated,
+} from '../middlewares/auth.middleware'
 import {
   GetApprovedDoctorsResponse,
   GetApprovedDoctorResponse,
@@ -19,13 +24,17 @@ import {
   UpdateDoctorResponse,
   type DoctorStatus,
   type UpdateDoctorRequest,
+  AddAvailableTimeSlotsResponse,
   GetWalletMoneyResponse,
 } from 'clinic-common/types/doctor.types'
 import { isAdmin } from '../services/auth.service'
 import { NotAuthenticatedError } from '../errors/auth.errors'
 import { APIError, NotFoundError } from '../errors'
 import { validate } from '../middlewares/validation.middleware'
-import { UpdateDoctorRequestValidator } from 'clinic-common/validators/doctor.validator'
+import {
+  AddAvailableTimeSlotsRequestValidator,
+  UpdateDoctorRequestValidator,
+} from 'clinic-common/validators/doctor.validator'
 import { type UserDocument, UserModel } from '../models/user.model'
 import { PatientModel } from '../models/patient.model'
 import { type HydratedDocument } from 'mongoose'
@@ -59,7 +68,7 @@ doctorsRouter.get(
 )
 
 doctorsRouter.patch(
-  '/:username',
+  '/updateDoctor/:username',
   validate(UpdateDoctorRequestValidator),
   asyncWrapper<UpdateDoctorRequest>(async (req, res) => {
     if (req.username == null) {
@@ -129,7 +138,7 @@ doctorsRouter.get(
             doctor.hourlyRate * 1.1 - (discount * doctor.hourlyRate) / 100,
           // TODO: retrieve available times from the Appointments. Since we aren't required to make appointments for this sprint, I will
           // assume available times is a field in the doctors schema for now.
-          availableTimes: doctor.availableTimes as [string],
+          availableTimes: doctor.availableTimes as [Date],
           requestStatus: doctor.requestStatus as DoctorStatus,
         }))
       )
@@ -154,7 +163,8 @@ doctorsRouter.get(
         doctor.affiliation,
         doctor.educationalBackground,
         doctor.speciality,
-        doctor.requestStatus as DoctorStatus
+        doctor.requestStatus as DoctorStatus,
+        doctor.availableTimes as [Date]
       )
     )
   })
@@ -190,7 +200,7 @@ doctorsRouter.get(
         doctor.educationalBackground,
         doctor.speciality,
         doctor.requestStatus as DoctorStatus,
-        doctor.availableTimes as [string],
+        doctor.availableTimes as [Date],
         doctor.hourlyRate * 1.1 - (discount * doctor.hourlyRate) / 100
       )
     )
@@ -235,6 +245,30 @@ doctorsRouter.patch(
         doctor.educationalBackground,
         doctor.speciality,
         doctor.requestStatus as DoctorStatus
+      )
+    )
+  })
+)
+doctorsRouter.patch(
+  '/addAvailableTimeSlots',
+  validate(AddAvailableTimeSlotsRequestValidator),
+  asyncWrapper(allowApprovedDoctors),
+  asyncWrapper(async (req, res) => {
+    const doctor = await addAvailableTimeSlots(req.username!, req.body)
+    res.send(
+      new AddAvailableTimeSlotsResponse(
+        doctor.id,
+        doctor.user.username,
+        doctor.name,
+        doctor.email,
+        doctor.dateOfBirth,
+        doctor.hourlyRate,
+        doctor.affiliation,
+        doctor.educationalBackground,
+        doctor.speciality,
+        doctor.requestStatus as DoctorStatus,
+        doctor.availableTimes as [Date],
+        doctor.hourlyRate
       )
     )
   })

@@ -2,11 +2,18 @@ import type { z } from 'zod'
 import type {
   UpdateDoctorRequestValidator,
   RegisterDoctorRequestValidator,
+  AddAvailableTimeSlotsRequestValidator,
 } from '../validators/doctor.validator'
 
 export enum DoctorStatus {
   Pending = 'pending',
   Approved = 'approved',
+  Rejected = 'rejected',
+}
+
+export enum ContractStatus {
+  Pending = 'pending',
+  Accepted = 'accepted',
   Rejected = 'rejected',
 }
 
@@ -49,8 +56,37 @@ export class GetApprovedDoctorResponse extends DoctorResponseBase {
     educationalBackground: string,
     speciality: string,
     requestStatus: DoctorStatus,
-    public availableTimes: [string],
+    public availableTimes: [Date],
     public sessionRate: number // Additional property
+  ) {
+    super(
+      id,
+      username,
+      name,
+      email,
+      dateOfBirth,
+      hourlyRate,
+      affiliation,
+      educationalBackground,
+      speciality,
+      requestStatus
+    )
+  }
+}
+
+export class GetDoctorResponse extends DoctorResponseBase {
+  constructor(
+    id: string,
+    username: string,
+    name: string,
+    email: string,
+    dateOfBirth: Date,
+    hourlyRate: number,
+    affiliation: string,
+    educationalBackground: string,
+    speciality: string,
+    requestStatus: DoctorStatus,
+    public availableTimes: [Date]
   ) {
     super(
       id,
@@ -77,11 +113,15 @@ export type RegisterDoctorRequest = z.infer<
   typeof RegisterDoctorRequestValidator
 >
 
+export type AddAvailableTimeSlotsRequest = z.infer<
+  typeof AddAvailableTimeSlotsRequestValidator
+>
+
 export class UpdateDoctorResponse extends DoctorResponseBase {}
 
 export class RegisterDoctorRequestResponse extends DoctorResponseBase {}
 
-export class GetDoctorResponse extends DoctorResponseBase {}
+export class AddAvailableTimeSlotsResponse extends GetApprovedDoctorResponse {}
 
 export class GetWalletMoneyResponse {
   constructor(public money: number) {}

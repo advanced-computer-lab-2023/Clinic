@@ -1,4 +1,6 @@
 import {
+  AddAvailableTimeSlotsRequest,
+  AddAvailableTimeSlotsResponse,
   GetApprovedDoctorResponse,
   GetApprovedDoctorsResponse,
   GetDoctorResponse,
@@ -14,7 +16,7 @@ export async function updateDoctor(
   req: UpdateDoctorRequest
 ): Promise<UpdateDoctorResponse> {
   return await api
-    .patch<UpdateDoctorResponse>(`/doctors/${username}`, req)
+    .patch<UpdateDoctorResponse>(`/doctors/updateDoctor/${username}`, req)
     .then((res) => res.data)
 }
 
@@ -61,6 +63,14 @@ export async function rejectDoctorRequest(
 ): Promise<UpdateDoctorResponse> {
   return await api
     .patch<UpdateDoctorResponse>(`/doctors/rejectDoctorRequest/${id}`)
+    .then((res) => res.data)
+}
+
+export async function addAvailableTimeSlots(
+  req: AddAvailableTimeSlotsRequest
+): Promise<AddAvailableTimeSlotsResponse> {
+  return await api
+    .patch<AddAvailableTimeSlotsResponse>(`/doctors/addAvailableTimeSlots`, req)
     .then((res) => res.data)
 }
 
