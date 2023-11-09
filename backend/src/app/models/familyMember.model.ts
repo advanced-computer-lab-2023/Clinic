@@ -19,7 +19,7 @@ const familyMemberSchema = new Schema(
       required: true,
       enum: Relation,
     },
-    healthPackage: { type: Schema.Types.ObjectId, ref: 'HealthPackage'},
+    healthPackage: { type: Schema.Types.ObjectId, ref: 'HealthPackage' },
     patient: { type: Schema.Types.ObjectId, ref: 'Patient' },
   },
   { timestamps: true }

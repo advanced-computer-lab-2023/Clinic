@@ -33,7 +33,7 @@ export function FamilyMemberDetails() {
           {
             label: 'Health Package',
             value: query.data?.familyMember.healthPackageName,
-          }
+          },
         ]}
       />
     </Grid>

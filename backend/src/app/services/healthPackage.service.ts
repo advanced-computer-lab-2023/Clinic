@@ -116,7 +116,6 @@ export async function getHealthPackageById(
 export async function getHealthPackageNameById(
   healthPackageId: string | undefined
 ): Promise<string> {
-
   try {
     if (
       healthPackageId == null ||
@@ -130,7 +129,6 @@ export async function getHealthPackageNameById(
       return healthPackage ? healthPackage.name : 'N/A'
     }
   } catch (err) {
-
     return 'N/A'
   }
 }

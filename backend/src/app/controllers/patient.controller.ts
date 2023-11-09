@@ -139,7 +139,7 @@ patientRouter.get(
         familyMembers.map(async (familyMember) => {
           const healthPackageName = await getHealthPackageNameById(
             familyMember?.healthPackage?.toString()
-          );
+          )
 
           return {
             id: familyMember.id,
@@ -149,10 +149,10 @@ patientRouter.get(
             gender: familyMember.gender as Gender,
             relation: familyMember.relation as Relation,
             healthPackageName,
-          };
+          }
         })
       )
-    );
+    )
 
     res.send(familyMembersResponse)
   })

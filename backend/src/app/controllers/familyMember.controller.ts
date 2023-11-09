@@ -44,7 +44,7 @@ familyMemberRouter.get(
         familyMembers.map(async (familyMember) => {
           const healthPackageName = await getHealthPackageNameById(
             familyMember?.healthPackage?.toString()
-          );
+          )
 
           return {
             id: familyMember.id,
@@ -54,10 +54,10 @@ familyMemberRouter.get(
             gender: familyMember.gender as Gender,
             relation: familyMember.relation as Relation,
             healthPackageName,
-          };
+          }
         })
       )
-    );
+    )
 
     res.send(familyMembersResponse)
   })
@@ -126,7 +126,7 @@ familyMemberRouter.post(
         newFamilyMember.age,
         newFamilyMember.gender as Gender,
         newFamilyMember.relation as Relation,
-        "N/A",
+        'N/A'
       )
     )
   })
@@ -138,7 +138,9 @@ familyMemberRouter.get(
   asyncWrapper(async (req, res) => {
     const familyMember = await getFamilyMemberById(req.params.familyMemberId)
     const patient = await getPatientForFamilyMember(req.params.familyMemberId)
-    const healthPackageName = await getHealthPackageNameById(familyMember?.healthPackage?.toString())
+    const healthPackageName = await getHealthPackageNameById(
+      familyMember?.healthPackage?.toString()
+    )
 
     res.send(
       new GetFamilyMemberResponse(
@@ -149,7 +151,7 @@ familyMemberRouter.get(
           familyMember.age,
           familyMember.gender as Gender,
           familyMember.relation as Relation,
-          healthPackageName,
+          healthPackageName
         ),
         new PatientResponseBase(
           patient.id,
