@@ -1,6 +1,6 @@
 import { getMyMedicalHistory } from '@/api/patient'
-import axios from 'axios'
 import { useEffect, useState } from 'react'
+import { api } from '@/api'
 
 function FileViewer() {
   const [downloadURLs, setDownloadURLs] = useState([])
@@ -64,11 +64,11 @@ function FileViewer() {
 
     console.log(imageValue.file)
     const formData = new FormData()
-    formData.append('file', imageValue.file)
+    formData.append('medicalHistory', imageValue.file)
 
     try {
       // Send a POST request with the uploaded file
-      await axios.post(
+      await api.post(
         'http://localhost:3000/patients/uploadMedicalHistory/mine',
         formData,
         {

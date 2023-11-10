@@ -45,13 +45,14 @@ patientRouter.post(
   '/uploadMedicalHistory/mine',
   upload.single('medicalHistory'),
   asyncWrapper(async (req: any, res) => {
-    console.log('entered endpoint')
-    console.log(req.file)
+    // console.log('entered endpoint')
+    // console.log(req.file)
+    console.log(req.username)
     const user: HydratedDocument<UserDocument> | null = await UserModel.findOne(
       { username: req.username }
     )
     if (user == null) throw new NotAuthenticatedError()
-
+    console.log(req.file)
     const patient = await uploadMedicalHistory({
       id: user.id,
       medicalHistory: req.file,
