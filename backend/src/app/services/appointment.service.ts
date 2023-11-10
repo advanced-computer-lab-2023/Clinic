@@ -31,27 +31,26 @@ export async function getfilteredAppointments(
   }
 }
 
-
 export async function createAndRemoveTime(
   patientID: string,
   doctorID: string,
-  date: string
+  date: Date
 ): Promise<AppointmentDocument | null> {
   // Create a new appointment
+  const newDate = new Date(date).toISOString()
+  console.log(newDate)
   const newAppointment = new AppointmentModel({
     patientID,
     doctorID,
-    date,
+    date: newDate,
     status: AppointmentStatus.Upcoming,
   })
-
+  await removeTimeFromDoctorAvailability(doctorID, date)
   // Save the new appointment
   await newAppointment.save()
 
   // Now, you need to remove the 'date' from the doctor's available times.
   // You should have a function in your doctor service to handle this.
-
-  await removeTimeFromDoctorAvailability(doctorID, date)
 
   return newAppointment
 }
@@ -66,5 +65,4 @@ export async function createFollowUpAppointment(
   })
 
   return await newAppointment.save()
-
 }

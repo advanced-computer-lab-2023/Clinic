@@ -9,7 +9,7 @@ export async function getAppointments(): Promise<
     .then((res) => res.data.appointments)
 }
 
-export async function reserveTimes(doctorid: string, date: string) {
+export async function reserveTimes(doctorid: string, date: Date) {
   const response = await api.post('/appointment/makeappointment', {
     doctorid,
     date,

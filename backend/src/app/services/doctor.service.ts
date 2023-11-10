@@ -1,7 +1,6 @@
 import { DoctorModel, type DoctorDocument } from '../models/doctor.model'
 import { UserModel, type UserDocument } from '../models/user.model'
 import {
-  AddAvailableTimeSlotsRequest,
   DoctorStatus,
   type UpdateDoctorRequest,
 } from 'clinic-common/types/doctor.types'
@@ -134,10 +133,9 @@ export async function rejectDoctor(
   return doctor
 }
 
-
 export async function removeTimeFromDoctorAvailability(
   doctorID: string,
-  timeToRemove: string
+  timeToRemove: Date
 ): Promise<DoctorDocument | null> {
   // Find the doctor by ID
   const doctor = await DoctorModel.findById(doctorID)
@@ -152,7 +150,10 @@ export async function removeTimeFromDoctorAvailability(
   }
 
   // Check if the time exists in the doctor's availableTimes array
-  const indexOfTimeToRemove = doctor.availableTimes.indexOf(timeToRemove)
+  const removed = new Date(timeToRemove)
+  const indexOfTimeToRemove = doctor.availableTimes.findIndex(
+    (time) => time.getTime() === removed.getTime()
+  )
 
   if (indexOfTimeToRemove === -1) {
     // The time is not found in the availableTimes array
@@ -166,27 +167,4 @@ export async function removeTimeFromDoctorAvailability(
   const updatedDoctor = await doctor.save()
 
   return updatedDoctor
-}
-
-export async function addAvailableTimeSlots(
-  username: string,
-  req: AddAvailableTimeSlotsRequest
-): Promise<DoctorDocumentWithUser> {
-  const user = await UserModel.findOne({ username })
-
-  if (user == null) throw new NotFoundError()
-
-  const doctor = await DoctorModel.findOneAndUpdate(
-    { user: user.id },
-    { $push: { availableTimes: new Date(req.time) } },
-    {
-      new: true,
-    }
-  ).populate<{
-    user: UserDocument
-  }>('user')
-  if (doctor == null) throw new NotFoundError()
-
-  return doctor
-
 }

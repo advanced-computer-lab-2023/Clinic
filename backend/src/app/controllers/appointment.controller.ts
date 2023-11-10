@@ -1,11 +1,9 @@
 import { Router } from 'express'
 import { asyncWrapper } from '../utils/asyncWrapper'
 import {
-
   createAndRemoveTime,
   getfilteredAppointments,
   createFollowUpAppointment,
-
 } from '../services/appointment.service'
 import {
   AppointmentStatus,
@@ -56,7 +54,7 @@ appointmentsRouter.get(
 appointmentsRouter.post(
   '/makeappointment',
   asyncWrapper(async (req, res) => {
-    const { date } = req.body // Assuming the date is sent in the request body
+    const { date } = req.body // Assuming the date is sent in the request body intype DaTe
 
     const user = await UserModel.findOne({ username: req.username })
 
@@ -97,6 +95,5 @@ appointmentsRouter.post(
     const appointment = req.body
     const newAppointment = await createFollowUpAppointment(appointment)
     res.send(newAppointment)
-
   })
 )

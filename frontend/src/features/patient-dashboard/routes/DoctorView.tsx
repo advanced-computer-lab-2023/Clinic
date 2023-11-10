@@ -30,7 +30,7 @@ export function DoctorView() {
     return <h1>error</h1>
   }
 
-  const reserveTime = async (selectedTime: string) => {
+  const reserveTime = async (selectedTime: Date) => {
     try {
       if (id) {
         // Check if id is defined
