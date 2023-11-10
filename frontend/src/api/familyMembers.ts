@@ -7,17 +7,10 @@ import {
 import { api } from '.'
 import { AddFamilyMemberRequest } from 'clinic-common/types/familyMember.types'
 import { AddFamilyMemberResponse } from 'clinic-common/types/familyMember.types'
-import { GetPatientLinkingMeResponse } from 'clinic-common/types/patient.types'
 
 export async function getFamilyMembers(): Promise<GetFamilyMembersResponse> {
   return await api
     .get<GetFamilyMembersResponse>(`/family-members/mine`)
-    .then((res) => res.data)
-}
-
-export async function getUsersLinkingMe(): Promise<GetPatientLinkingMeResponse> {
-  return await api
-    .get<GetPatientLinkingMeResponse>(`/family-members/linking-me`)
     .then((res) => res.data)
 }
 
