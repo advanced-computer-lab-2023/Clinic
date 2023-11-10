@@ -9,8 +9,8 @@ function HealthRecords() {
     const fetchHealthRecords = async () => {
       try {
         const records = await getPatientHealthRecords()
-        console.log(records)
-        setHealthRecords(records)
+        if (records == '') setHealthRecords([])
+        else setHealthRecords(records)
       } catch (error) {
         console.error('Error fetching health records:', error)
       }
