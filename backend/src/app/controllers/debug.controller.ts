@@ -184,6 +184,11 @@ async function createDummyPatient(
     ],
   })
 
+  const healthPackage = faker.helpers.arrayElement([
+    ...(await HealthPackageModel.find()).map((hp) => hp.id),
+    undefined,
+  ])
+
   const patient = await PatientModel.create({
     user: user.id,
     name: faker.person.fullName(),
@@ -195,10 +200,8 @@ async function createDummyPatient(
       name: faker.person.fullName(),
       mobileNumber: faker.phone.number(),
     },
-    healthPackage: faker.helpers.arrayElement([
-      ...(await HealthPackageModel.find()).map((hp) => hp.id),
-      undefined,
-    ]),
+    healthPackage,
+    healthPackageRenewalDate: healthPackage ? faker.date.anytime() : undefined,
     notes: [faker.lorem.sentence()],
     walletMoney: faker.number.int({
       min: 10000,

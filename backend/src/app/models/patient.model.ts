@@ -34,6 +34,7 @@ const patientSchema = new Schema(
         date: { type: Date, required: true },
       },
     ],
+    healthPackageRenewalDate: { type: Date },
   },
   { timestamps: true }
 )
