@@ -93,7 +93,10 @@ async function createDummyDoctor(
     speciality: faker.helpers.arrayElement(specialities),
     requestStatus: status,
     availableTimes: randomFutureDates(),
-    walletMoney: faker.number.int(3000),
+    walletMoney: faker.number.int({
+      min: 10000,
+      max: 20000,
+    }),
   })
 
   if (withAppointments) {
@@ -140,11 +143,22 @@ async function createDummyAppointment(
   patientId: string,
   doctorId: string
 ): Promise<HydratedDocument<AppointmentDocument>> {
+  const patient = await PatientModel.findById(patientId)
+  const familyMemberIds = patient?.familyMembers ?? []
+  const forFamilyMember = familyMemberIds.length > 0 && faker.datatype.boolean()
+  const chosenFamilyMember = forFamilyMember
+    ? await FamilyMemberModel.findById(
+        faker.helpers.arrayElement(familyMemberIds)
+      )
+    : undefined
+
   return await AppointmentModel.create({
     patientID: patientId,
     doctorID: doctorId,
     date: faker.date.anytime(),
     status: faker.helpers.enumValue(AppointmentStatus),
+    familyID: forFamilyMember ? chosenFamilyMember?.id : undefined,
+    reservedFor: forFamilyMember ? chosenFamilyMember?.name : patient?.name,
   })
 }
 
@@ -186,7 +200,10 @@ async function createDummyPatient(
       undefined,
     ]),
     notes: [faker.lorem.sentence()],
-    walletMoney: faker.number.int(3000),
+    walletMoney: faker.number.int({
+      min: 10000,
+      max: 20000,
+    }),
   })
 
   for (let i = 0; i < 3; i++) {
