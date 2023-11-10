@@ -1,5 +1,5 @@
 import { Router } from 'express'
-
+import multer from 'multer'
 import { asyncWrapper } from '../utils/asyncWrapper'
 import {
   filterPatientByAppointment,
@@ -9,6 +9,8 @@ import {
   addNoteToPatient,
   getPatientByUsername,
   getPatientNotes,
+  getMyMedicalHistory,
+  uploadMedicalHistory,
 } from '../services/patient.service'
 import {
   GetAPatientResponse,
@@ -34,7 +36,28 @@ import {
   GetFilteredAppointmentsResponse,
 } from 'clinic-common/types/appointment.types'
 
+const storage = multer.memoryStorage()
+const upload = multer({ storage })
+
 export const patientRouter = Router()
+
+patientRouter.post(
+  'uploadMedicalHistory/mine',
+  upload.single('medicalHistory'),
+  asyncWrapper(async (req: any, res) => {
+    const user: HydratedDocument<UserDocument> | null = await UserModel.findOne(
+      { username: req.username }
+    )
+    if (user == null) throw new NotAuthenticatedError()
+
+    const patient = await uploadMedicalHistory({
+      id: user.id,
+      medicalHistory: req.file,
+    })
+
+    res.send(patient)
+  })
+)
 
 patientRouter.get(
   '/viewHealthRecords/me',
@@ -43,6 +66,7 @@ patientRouter.get(
     res.send(result)
   })
 )
+
 patientRouter.patch(
   '/addNote/:id',
   asyncWrapper(async (req, res) => {
@@ -82,6 +106,18 @@ patientRouter.get(
         }))
       )
     )
+  })
+)
+
+patientRouter.get(
+  'myMedicalHistory',
+  asyncWrapper(async (req, res) => {
+    const user: HydratedDocument<UserDocument> | null = await UserModel.findOne(
+      { username: req.username }
+    )
+    if (user == null) throw new NotAuthenticatedError()
+    const documents = await getMyMedicalHistory(user.id)
+    res.send(documents)
   })
 )
 

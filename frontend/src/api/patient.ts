@@ -54,3 +54,9 @@ export async function getPatientHealthRecords() {
     return res.data
   })
 }
+
+export async function getMyMedicalHistory() {
+  return await api.get('/patients/viewMedicalHistory').then((res) => {
+    return res.data
+  })
+}
