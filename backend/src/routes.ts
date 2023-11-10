@@ -12,6 +12,7 @@ import { allowAdmins } from './app/middlewares/auth.middleware'
 import { adminRouter } from './app/controllers/admin.controller'
 import { asyncWrapper } from './app/utils/asyncWrapper'
 import { healthPackagesRouter } from './app/controllers/healthPackage.controller'
+import { notificationRouter } from './app/controllers/notification.controller'
 
 export const router = Router()
 
@@ -26,3 +27,5 @@ router.use('/health-packages', healthPackagesRouter)
 router.use('/patients', patientRouter)
 router.use('/appointment', appointmentsRouter)
 router.use('/admins', asyncWrapper(allowAdmins), adminRouter)
+
+router.use(notificationRouter)
