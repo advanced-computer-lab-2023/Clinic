@@ -13,6 +13,13 @@ const userSchema = new Schema(
      * then send a request to the correct endpoint to fetch additional information.
      */
     type: { type: String, enum: UserType, required: true },
+
+    notifications: [
+      {
+        title: { type: String, required: true },
+        description: { type: String },
+      },
+    ],
   },
   { timestamps: true }
 )

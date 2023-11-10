@@ -114,6 +114,14 @@ export function Appointments() {
                 </Stack>
                 <Stack spacing={-1}>
                   <Typography variant="overline" color="text.secondary">
+                    reserved For
+                  </Typography>
+                  <Typography variant="body1">
+                    {appointment.reservedFor}
+                  </Typography>
+                </Stack>
+                <Stack spacing={-1}>
+                  <Typography variant="overline" color="text.secondary">
                     Date
                   </Typography>
                   <Typography variant="body1">

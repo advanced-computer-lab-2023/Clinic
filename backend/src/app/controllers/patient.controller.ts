@@ -38,6 +38,7 @@ import {
   AppointmentResponseBase,
   GetFilteredAppointmentsResponse,
 } from 'clinic-common/types/appointment.types'
+import { getHealthPackageNameById } from '../services/healthPackage.service'
 
 const storage = multer.memoryStorage()
 const upload = multer({ storage })
@@ -220,18 +221,28 @@ patientRouter.get(
   asyncWrapper(async (req, res) => {
     const familyMembers = await getFamilyMembers(req.params.username)
 
-    res.send(
-      new GetFamilyMembersResponse(
-        familyMembers.map((familyMember) => ({
-          id: familyMember.id,
-          name: familyMember.name,
-          nationalId: familyMember.nationalId,
-          age: familyMember.age,
-          gender: familyMember.gender as Gender,
-          relation: familyMember.relation as Relation,
-        }))
+    const familyMembersResponse = new GetFamilyMembersResponse(
+      await Promise.all(
+        familyMembers.map(async (familyMember) => {
+          const healthPackageName = await getHealthPackageNameById(
+            familyMember?.healthPackage?.toString()
+          )
+
+          return {
+            id: familyMember.id,
+            name: familyMember.name,
+            nationalId: familyMember.nationalId,
+            age: familyMember.age,
+            gender: familyMember.gender as Gender,
+            relation: familyMember.relation as Relation,
+            currentHealthPackage: { healthPackageName, renewalDate: 'N/A' },
+            healthPackageHistory: [], //empty array because we dont really need it
+          }
+        })
       )
     )
+
+    res.send(familyMembersResponse)
   })
 )
 
@@ -262,7 +273,9 @@ patientRouter.get(
           appointment.id,
           appointment.patientID.toString(),
           appointment.doctorID.toString(),
-          appointment.date
+          appointment.date,
+          appointment.familyID,
+          appointment.reservedFor
         )
       })
 
