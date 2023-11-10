@@ -30,6 +30,10 @@ export function FamilyMemberDetails() {
             label: 'Related to',
             value: query.data?.patient.name,
           },
+          {
+            label: 'Health Package',
+            value: query.data?.familyMember.healthPackageName,
+          },
         ]}
       />
     </Grid>

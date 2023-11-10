@@ -28,6 +28,7 @@ import { PatientResponseBase } from 'clinic-common/types/patient.types'
 import { FamilyMemberModel } from '../models/familyMember.model'
 import { PatientModel } from '../models/patient.model'
 import { UserModel } from '../models/user.model'
+import { getHealthPackageNameById } from '../services/healthPackage.service'
 
 export const familyMemberRouter = Router()
 
@@ -38,18 +39,27 @@ familyMemberRouter.get(
   asyncWrapper(async (req, res) => {
     const familyMembers = await getFamilyMembers(req.username as string)
 
-    res.send(
-      new GetFamilyMembersResponse(
-        familyMembers.map((familyMember) => ({
-          id: familyMember.id,
-          name: familyMember.name,
-          nationalId: familyMember.nationalId,
-          age: familyMember.age,
-          gender: familyMember.gender as Gender,
-          relation: familyMember.relation as Relation,
-        }))
+    const familyMembersResponse = new GetFamilyMembersResponse(
+      await Promise.all(
+        familyMembers.map(async (familyMember) => {
+          const healthPackageName = await getHealthPackageNameById(
+            familyMember?.healthPackage?.toString()
+          )
+
+          return {
+            id: familyMember.id,
+            name: familyMember.name,
+            nationalId: familyMember.nationalId,
+            age: familyMember.age,
+            gender: familyMember.gender as Gender,
+            relation: familyMember.relation as Relation,
+            healthPackageName,
+          }
+        })
       )
     )
+
+    res.send(familyMembersResponse)
   })
 )
 
@@ -83,6 +93,7 @@ familyMemberRouter.post(
       age: calculatedAge,
       gender: familyMember?.gender,
       relation: req.body.relation,
+      healthPackage: familyMember?.healthPackage,
       patient: familyMember?._id,
     })
     await newFamilyMember.save()
@@ -114,7 +125,8 @@ familyMemberRouter.post(
         newFamilyMember.nationalId,
         newFamilyMember.age,
         newFamilyMember.gender as Gender,
-        newFamilyMember.relation as Relation
+        newFamilyMember.relation as Relation,
+        'N/A'
       )
     )
   })
@@ -126,6 +138,9 @@ familyMemberRouter.get(
   asyncWrapper(async (req, res) => {
     const familyMember = await getFamilyMemberById(req.params.familyMemberId)
     const patient = await getPatientForFamilyMember(req.params.familyMemberId)
+    const healthPackageName = await getHealthPackageNameById(
+      familyMember?.healthPackage?.toString()
+    )
 
     res.send(
       new GetFamilyMemberResponse(
@@ -135,7 +150,8 @@ familyMemberRouter.get(
           familyMember.nationalId,
           familyMember.age,
           familyMember.gender as Gender,
-          familyMember.relation as Relation
+          familyMember.relation as Relation,
+          healthPackageName
         ),
         new PatientResponseBase(
           patient.id,
