@@ -10,7 +10,7 @@ import {
 import { useQuery } from '@tanstack/react-query'
 import { GridColDef, DataGrid } from '@mui/x-data-grid'
 import { GetFamilyMembersResponse } from 'clinic-common/types/familyMember.types'
-import { getFamilyMembers } from '@/api/familyMembers'
+import { getFamilyMembers, getUsersLinkingMe } from '@/api/familyMembers'
 import { useState } from 'react'
 import { AddFamilyMember } from './AddFamilyMember'
 import { useNavigate } from 'react-router-dom'
@@ -25,7 +25,12 @@ export function FamilyMembers() {
     queryFn: getFamilyMembers,
   })
 
-  if (query.isLoading) {
+  const reverseQuery = useQuery({
+    queryKey: ['reverseFamilyMembers'],
+    queryFn: getUsersLinkingMe,
+  })
+
+  if (query.isLoading || reverseQuery.isLoading) {
     return <CardPlaceholder />
   }
 
@@ -92,7 +97,16 @@ export function FamilyMembers() {
       ),
     },
   ]
+  const columnsLinkingMe: GridColDef<{ name: string }>[] = [
+    { field: 'name', headerName: 'The following patients have you linked', width: 300 },
+    // Additional columns for linkingMe data
+  ]
 
+  const linkingMeRows = reverseQuery.data?.names.map((name, index) => ({
+    id: index.toString(), // Use index as a simple identifier, you may need a more robust solution
+    name,
+  }));
+  
   return (
     <Box sx={{ height: 400, width: '100%' }}>
       <Modal
@@ -117,6 +131,12 @@ export function FamilyMembers() {
       <DataGrid
         rows={query.data?.familyMembers || []}
         columns={columns}
+        autoHeight
+      />
+      <Divider sx={{ my: 2 }} />
+      <DataGrid
+        rows={linkingMeRows || []}
+        columns={columnsLinkingMe}
         autoHeight
       />
     </Box>

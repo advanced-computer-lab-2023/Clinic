@@ -4,6 +4,7 @@ import {
   createFamilyMember,
   findFamilyMemberByEmail,
   findFamilyMemberByMobileNumber,
+  findLinkingMe,
   getFamilyMemberById,
   getFamilyMembers,
   getPatientForFamilyMember,
@@ -24,7 +25,10 @@ import {
 } from 'clinic-common/validators/familyMembers.validator'
 import { validate } from '../middlewares/validation.middleware'
 import { type Gender } from 'clinic-common/types/gender.types'
-import { PatientResponseBase } from 'clinic-common/types/patient.types'
+import {
+  GetPatientLinkingMeResponse,
+  PatientResponseBase,
+} from 'clinic-common/types/patient.types'
 import { FamilyMemberModel } from '../models/familyMember.model'
 import { PatientModel } from '../models/patient.model'
 import { UserModel } from '../models/user.model'
@@ -97,6 +101,20 @@ familyMemberRouter.post(
     res.send(familyMember)
   })
 )
+
+// Get all patients that are linked to the currently logged in family member
+
+familyMemberRouter.get(
+  '/linking-me',
+  asyncWrapper(async (req, res) => {
+    const patients = await findLinkingMe(req.username as string)
+    // Extract only the names from the patients array
+    const patientNames = patients.map((patient) => patient.name)
+
+    res.send(new GetPatientLinkingMeResponse(patientNames))
+  })
+)
+
 // Create a family member for the patient with the given username
 familyMemberRouter.post(
   '/:patientUsername',
