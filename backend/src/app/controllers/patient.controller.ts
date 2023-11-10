@@ -166,7 +166,8 @@ patientRouter.get(
             age: familyMember.age,
             gender: familyMember.gender as Gender,
             relation: familyMember.relation as Relation,
-            healthPackageName,
+            currentHealthPackage: { healthPackageName, renewalDate: 'N/A' },
+            healthPackageHistory: [], //empty array because we dont really need it
           }
         })
       )

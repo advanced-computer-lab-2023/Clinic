@@ -46,10 +46,6 @@ familyMemberRouter.get(
     const familyMembersResponse = new GetFamilyMembersResponse(
       await Promise.all(
         familyMembers.map(async (familyMember) => {
-          const healthPackageName = await getHealthPackageNameById(
-            familyMember?.healthPackage?.toString()
-          )
-
           return {
             id: familyMember.id,
             name: familyMember.name,
@@ -57,7 +53,11 @@ familyMemberRouter.get(
             age: familyMember.age,
             gender: familyMember.gender as Gender,
             relation: familyMember.relation as Relation,
-            healthPackageName,
+            currentHealthPackage: {
+              healthPackageName: 'N/A',
+              renewalDate: 'N/A',
+            },
+            healthPackageHistory: [], //empty array because we dont really need it
           }
         })
       )
@@ -144,7 +144,8 @@ familyMemberRouter.post(
         newFamilyMember.age,
         newFamilyMember.gender as Gender,
         newFamilyMember.relation as Relation,
-        'N/A'
+        { healthPackageName: 'N/A', renewalDate: 'N/A' },
+        []
       )
     )
   })
@@ -160,6 +161,24 @@ familyMemberRouter.get(
       familyMember?.healthPackage?.toString()
     )
 
+    let renewalDate = 'N/A'
+    const healthPackageHistory = await Promise.all(
+      familyMember.healthPackageHistory.map(async (historyEntry) => {
+        if (historyEntry.healthPackage == familyMember.healthPackage)
+          renewalDate = historyEntry.date.toDateString()
+        else {
+          const healthPackageName = await getHealthPackageNameById(
+            historyEntry.healthPackage?.toString()
+          )
+
+          return {
+            package: healthPackageName,
+            date: historyEntry.date,
+          }
+        }
+      })
+    )
+
     res.send(
       new GetFamilyMemberResponse(
         new FamilyMemberResponseBase(
@@ -169,7 +188,10 @@ familyMemberRouter.get(
           familyMember.age,
           familyMember.gender as Gender,
           familyMember.relation as Relation,
-          healthPackageName
+          { healthPackageName, renewalDate },
+          healthPackageHistory.filter(
+            (historyEntry) => historyEntry !== undefined
+          ) as { package: string; date: Date }[]
         ),
         new PatientResponseBase(
           patient.id,
