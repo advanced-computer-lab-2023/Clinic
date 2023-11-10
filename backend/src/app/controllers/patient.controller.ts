@@ -42,9 +42,11 @@ const upload = multer({ storage })
 export const patientRouter = Router()
 
 patientRouter.post(
-  'uploadMedicalHistory/mine',
+  '/uploadMedicalHistory/mine',
   upload.single('medicalHistory'),
   asyncWrapper(async (req: any, res) => {
+    console.log('entered endpoint')
+    console.log(req.file)
     const user: HydratedDocument<UserDocument> | null = await UserModel.findOne(
       { username: req.username }
     )

@@ -62,6 +62,7 @@ function FileViewer() {
       return
     }
 
+    console.log(imageValue.file)
     const formData = new FormData()
     formData.append('file', imageValue.file)
 

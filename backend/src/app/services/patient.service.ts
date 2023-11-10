@@ -41,6 +41,8 @@ export async function uploadMedicalHistory(
   info: uploadMedicalHistoryRequest
 ): Promise<void> {
   const { id, medicalHistory } = info
+  console.log('History' + medicalHistory)
+
   const fileRef = ref(storageRef, Date.now().toString())
   uploadBytes(fileRef, medicalHistory.buffer, {
     contentType: medicalHistory.mimetype,
