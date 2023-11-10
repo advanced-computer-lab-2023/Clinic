@@ -33,5 +33,8 @@
       "prettier --write -u"
     ],
     "!**/*.{js,ts,jsx,tsx}": "prettier --write -u"
+  },
+  "dependencies": {
+    "@stripe/stripe-js": "^2.1.11"
   }
 }

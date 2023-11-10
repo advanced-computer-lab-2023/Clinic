@@ -22,7 +22,7 @@ import { type Gender } from 'clinic-common/types/gender.types'
 import { type HydratedDocument } from 'mongoose'
 import { type UserDocument, UserModel } from '../models/user.model'
 import { NotAuthenticatedError } from '../errors/auth.errors'
-import { APIError, NotFoundError } from '../errors/index'
+import { NotFoundError } from '../errors/index'
 import { DoctorModel } from '../models/doctor.model'
 import { getFamilyMembers } from '../services/familyMember.service'
 import {
@@ -220,19 +220,5 @@ patientRouter.get(
         patient.walletMoney
       )
     )
-  })
-)
-
-// update wallet money of a patient with a given username and amount to be subtracted
-patientRouter.patch(
-  '/wallet/:username',
-  asyncWrapper(async (req, res) => {
-    const patient = await getPatientByUsername(req.params.username)
-    if (!patient || !patient.walletMoney) throw new NotFoundError()
-    if (patient.walletMoney - req.body.subtractedMoney < 0)
-      throw new APIError('Not enough money in wallet', 400)
-    patient.walletMoney -= req.body.subtractedMoney
-    await patient.save()
-    res.send(new GetWalletMoneyResponse(patient.walletMoney))
   })
 )

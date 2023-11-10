@@ -30,6 +30,8 @@ import {
   unSubscribeToHealthPackage,
 } from '../services/patient.service'
 import { getPatientByUsername } from '../services/patient.service'
+import { APIError, NotFoundError } from '../errors'
+import { GetWalletMoneyResponse } from 'clinic-common/types/patient.types'
 
 export const healthPackagesRouter = Router()
 
@@ -145,7 +147,39 @@ healthPackagesRouter.post(
       patientUsername: req.username!,
       healthPackageId: req.params.id,
     })
-
     res.status(200).send()
+  })
+)
+
+healthPackagesRouter.patch(
+  '/wallet/subscriptions/:packageId',
+  asyncWrapper(async (req, res) => {
+    const packageId = req.params.packageId
+    const userName = req.username
+    const packageInfo = await getHealthPackageById(packageId)
+    const patient = await getPatientByUsername(userName!)
+    if (!patient || !patient.walletMoney) throw new NotFoundError()
+    if (patient.walletMoney - packageInfo.pricePerYear < 0)
+      throw new APIError('Not enough money in wallet', 400)
+    patient.walletMoney -= packageInfo.pricePerYear
+    await subscribeToHealthPackage({
+      patientUsername: req.username!,
+      healthPackageId: packageId,
+    })
+    res.send(new GetWalletMoneyResponse(patient.walletMoney))
+  })
+)
+
+healthPackagesRouter.patch(
+  '/credit-card/subscriptions/:packageId',
+  asyncWrapper(async (req, res) => {
+    const packageId = req.params.packageId
+    const patient = await getPatientByUsername(req.username!)
+    if (!patient) throw new NotFoundError()
+    await subscribeToHealthPackage({
+      patientUsername: req.username!,
+      healthPackageId: packageId,
+    })
+    res.send(new GetWalletMoneyResponse(patient.walletMoney))
   })
 )
