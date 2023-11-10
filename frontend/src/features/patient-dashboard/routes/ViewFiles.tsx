@@ -1,5 +1,6 @@
+import { api } from '@/api'
 import { getMyMedicalHistory } from '@/api/patient'
-import axios from 'axios'
+import { Button, TextField } from '@mui/material'
 import { useEffect, useState } from 'react'
 
 function FileViewer() {
@@ -8,17 +9,12 @@ function FileViewer() {
   const [imageValue, setImageValue] = useState({ file: null } as any)
 
   useEffect(() => {
-    // Fetch download URLs from the backend API when the component mounts
     const fetchDownloadURLs = async () => {
       try {
-        const response = await getMyMedicalHistory() // Replace with your backend API endpoint
+        const response = await getMyMedicalHistory()
 
-        if (!response.ok) {
-          throw new Error('Network response was not ok')
-        }
-
-        const data = await response.json()
-        setDownloadURLs(data.downloadURLs)
+        setDownloadURLs(response)
+        console.log(response)
       } catch (err: any) {
         console.error('Error fetching download URLs:', err)
       }
@@ -63,11 +59,11 @@ function FileViewer() {
     }
 
     const formData = new FormData()
-    formData.append('file', imageValue.file)
+    formData.append('medicalHistory', imageValue.file)
 
     try {
       // Send a POST request with the uploaded file
-      await axios.post(
+      await api.post(
         'http://localhost:3000/patients/uploadMedicalHistory/mine',
         formData,
         {
@@ -76,17 +72,10 @@ function FileViewer() {
           },
         }
       )
-
       // Fetch updated download URLs after the upload is complete
       const downloadURLsResponse = await getMyMedicalHistory()
 
-      if (!downloadURLsResponse.ok) {
-        throw new Error('Failed to fetch download URLs')
-      }
-
-      const data = await downloadURLsResponse.json()
-
-      setDownloadURLs(data.downloadURLs)
+      setDownloadURLs(downloadURLsResponse)
     } catch (err) {
       console.error('Error uploading file:', err)
     }
@@ -97,18 +86,30 @@ function FileViewer() {
   // }
 
   // Render files using <img> elements with delete buttons
+
   return (
     <div>
+      {/* Upload file input and button */}
+      <TextField
+        type="file"
+        onChange={handleFileInputChange}
+        variant="outlined"
+      />
+      <Button onClick={handleUpload}>Upload File</Button>
       {downloadURLs.map((url, index) => (
         <div key={index}>
-          <img src={url} alt={`File ${index}`} />
-          <button onClick={() => handleDelete(url)}>Delete</button>
+          <h2>{'File ' + (index + 1)}</h2>
+          <iframe title={'File' + index} src={url} width="80%" height="400px" />
+          <br />
+          <Button
+            color="error"
+            variant="outlined"
+            onClick={() => handleDelete(url)}
+          >
+            Delete
+          </Button>
         </div>
       ))}
-
-      {/* Upload file input and button */}
-      <input type="file" onChange={handleFileInputChange} />
-      <button onClick={handleUpload}>Upload File</button>
     </div>
   )
 }

@@ -42,7 +42,7 @@ const upload = multer({ storage })
 export const patientRouter = Router()
 
 patientRouter.post(
-  'uploadMedicalHistory/mine',
+  '/uploadMedicalHistory/mine',
   upload.single('medicalHistory'),
   asyncWrapper(async (req: any, res) => {
     const user: HydratedDocument<UserDocument> | null = await UserModel.findOne(
@@ -110,7 +110,7 @@ patientRouter.get(
 )
 
 patientRouter.get(
-  'myMedicalHistory',
+  '/viewMedicalHistory',
   asyncWrapper(async (req, res) => {
     const user: HydratedDocument<UserDocument> | null = await UserModel.findOne(
       { username: req.username }

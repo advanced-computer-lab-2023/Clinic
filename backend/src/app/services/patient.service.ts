@@ -42,22 +42,23 @@ export async function uploadMedicalHistory(
 ): Promise<void> {
   const { id, medicalHistory } = info
   const fileRef = ref(storageRef, Date.now().toString())
-  uploadBytes(fileRef, medicalHistory.buffer, {
-    contentType: medicalHistory.mimetype,
-  })
-    .then((snapshot) => {
-      console.log('Uploaded a blob or file!', snapshot)
-    })
-    .catch((error) => {
-      console.log('Error uploading file:', error)
+
+  try {
+    await uploadBytes(fileRef, medicalHistory.buffer, {
+      contentType: medicalHistory.mimetype,
     })
 
-  const fullPath = await getDownloadURL(fileRef)
+    console.log('Uploaded a blob or file!')
 
-  const patient = await PatientModel.findOne({ user: id }).exec()
-  if (patient == null) throw new NotFoundError()
-  patient.documents.push(fullPath)
-  await patient.save()
+    const fullPath = await getDownloadURL(fileRef)
+
+    const patient = await PatientModel.findOne({ user: id }).exec()
+    if (patient == null) throw new NotFoundError()
+    patient.documents.push(fullPath)
+    await patient.save()
+  } catch (error) {
+    console.log('Error uploading file:', error)
+  }
 }
 
 export async function getMyMedicalHistory(id: string): Promise<string[]> {
