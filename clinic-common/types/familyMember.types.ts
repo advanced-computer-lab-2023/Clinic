@@ -21,7 +21,11 @@ export class FamilyMemberResponseBase {
     public age: number,
     public gender: Gender,
     public relation: Relation,
-    public healthPackageName: string | undefined //has the name not id
+    public currentHealthPackage: {
+      healthPackageName: string | undefined
+      renewalDate: string
+    },
+    public healthPackageHistory: Array<{ package: string; date: Date }> //has the name not id
   ) {}
 }
 
