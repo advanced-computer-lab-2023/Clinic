@@ -82,3 +82,7 @@ export class GetAPatientResponse extends APatientResponseBase {}
 export class GetWalletMoneyResponse {
   constructor(public money: number) {}
 }
+
+export class GetPatientLinkingMeResponse {
+  constructor(public names: string[]) {}
+}
