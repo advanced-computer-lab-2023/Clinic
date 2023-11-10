@@ -49,7 +49,7 @@ patientRouter.post(
     // console.log(req.file)
     console.log(req.username)
     const user: HydratedDocument<UserDocument> | null = await UserModel.findOne(
-      { username: req.username }
+      { _id: req.user.id }
     )
     if (user == null) throw new NotAuthenticatedError()
     console.log(req.file)
