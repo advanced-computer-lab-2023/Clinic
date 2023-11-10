@@ -93,10 +93,7 @@ async function createDummyDoctor(
     speciality: faker.helpers.arrayElement(specialities),
     requestStatus: status,
     availableTimes: randomFutureDates(),
-    walletMoney: faker.number.int({
-      min: 10000,
-      max: 20000,
-    }),
+    walletMoney: faker.number.int(3000),
   })
 
   if (withAppointments) {
@@ -143,22 +140,11 @@ async function createDummyAppointment(
   patientId: string,
   doctorId: string
 ): Promise<HydratedDocument<AppointmentDocument>> {
-  const patient = await PatientModel.findById(patientId)
-  const familyMemberIds = patient?.familyMembers ?? []
-  const forFamilyMember = familyMemberIds.length > 0 && faker.datatype.boolean()
-  const chosenFamilyMember = forFamilyMember
-    ? await FamilyMemberModel.findById(
-        faker.helpers.arrayElement(familyMemberIds)
-      )
-    : undefined
-
   return await AppointmentModel.create({
     patientID: patientId,
     doctorID: doctorId,
     date: faker.date.anytime(),
     status: faker.helpers.enumValue(AppointmentStatus),
-    familyID: forFamilyMember ? chosenFamilyMember?.id : undefined,
-    reservedFor: forFamilyMember ? chosenFamilyMember?.name : patient?.name,
   })
 }
 
@@ -172,16 +158,6 @@ async function createDummyPatient(
     username,
     password: await hash('patient', bcryptSalt),
     type: UserType.Patient,
-    notifications: [
-      {
-        title: faker.lorem.sentence(),
-        description: faker.lorem.sentence(),
-      },
-      {
-        title: faker.lorem.sentence(),
-        description: faker.lorem.sentence(),
-      },
-    ],
   })
 
   const patient = await PatientModel.create({
@@ -200,10 +176,7 @@ async function createDummyPatient(
       undefined,
     ]),
     notes: [faker.lorem.sentence()],
-    walletMoney: faker.number.int({
-      min: 10000,
-      max: 20000,
-    }),
+    walletMoney: faker.number.int(3000),
   })
 
   for (let i = 0; i < 3; i++) {
@@ -268,7 +241,26 @@ debugRouter.post(
 debugRouter.post(
   '/create-patient',
   asyncWrapper(async (req, res) => {
-    res.send(await createDummyPatient())
+    const user = await UserModel.create({
+      username: 'patient' + Math.random(),
+      password: await hash('patient', bcryptSalt),
+      type: UserType.Patient,
+    })
+
+    const patient = await PatientModel.create({
+      user: user.id,
+      name: 'Patient',
+      email: user.username + '@gmail.com',
+      mobileNumber: '01001111111',
+      dateOfBirth: new Date(),
+      gender: 'female',
+      emergencyContact: {
+        name: 'Emergency1',
+        mobileNumber: '0100111111',
+      },
+    })
+
+    res.send(patient)
   })
 )
 

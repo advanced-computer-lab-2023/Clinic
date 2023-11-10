@@ -8,8 +8,6 @@ export interface Appointment {
 export enum AppointmentStatus {
   Upcoming = 'upcoming',
   Completed = 'completed',
-  Cancelled = 'cancelled',
-  Rescheduled = 'rescheduled',
 }
 
 export class AppointmentResponseBase {
@@ -17,9 +15,7 @@ export class AppointmentResponseBase {
     public id: string,
     public patientID: string,
     public doctorID: string,
-    public date: string,
-    public familyID: string,
-    public reservedFor: string
+    public date: string
   ) {
     const appointmentDate = new Date(date).getTime()
     const currentDate = Date.now()

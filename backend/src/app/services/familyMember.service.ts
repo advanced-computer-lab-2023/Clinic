@@ -8,7 +8,6 @@ import { NotFoundError } from '../errors'
 import { type PatientDocument, PatientModel } from '../models/patient.model'
 import { type AddFamilyMemberRequest } from 'clinic-common/types/familyMember.types'
 import { type WithUser } from '../utils/typeUtils'
-import { getPatientByUsername } from './patient.service'
 
 export async function getFamilyMembers(
   username: string
@@ -87,55 +86,20 @@ export async function getPatientForFamilyMember(
   return patient
 }
 
-export async function findFamilyMemberByEmail(
-  familyMemberEmail: string
-): Promise<WithUser<PatientDocument>> {
+export async function findFamilyMemberByEmail(familyMemberEmail: string) {
   const patient = await PatientModel.findOne({
     email: familyMemberEmail,
-  }).populate<{
-    user: UserDocument
-  }>('user')
-
-  if (patient == null) {
-    throw new NotFoundError()
-  }
+  }).populate('user')
 
   return patient
 }
 
 export async function findFamilyMemberByMobileNumber(
   familyMemberMobileNumber: string
-): Promise<WithUser<PatientDocument>> {
+) {
   const patient = await PatientModel.findOne({
     mobileNumber: familyMemberMobileNumber,
-  }).populate<{
-    user: UserDocument
-  }>('user')
-
-  if (patient == null) {
-    throw new NotFoundError()
-  }
+  }).populate('user')
 
   return patient
-}
-
-export async function findLinkingMe(
-  username: string
-): Promise<Array<PatientDocument>> {
-  const patient: HydratedDocument<PatientDocument> | null =
-    await getPatientByUsername(username)
-
-  if (!patient) {
-    throw new NotFoundError()
-  }
-
-  const meAsFamily = await FamilyMemberModel.find({ patient: patient.id })
-
-  const familyMembers = await PatientModel.find({
-    familyMembers: {
-      $in: meAsFamily.map((family) => family.id),
-    },
-  })
-
-  return familyMembers
 }

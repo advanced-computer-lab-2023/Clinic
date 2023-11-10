@@ -13,8 +13,6 @@ const appointmentSchema = new Schema(
       required: true,
       enum: AppointmentStatus,
     },
-    familyID: { type: String, default: '' },
-    reservedFor: { type: String, required: true },
   },
   { timestamps: true }
 )

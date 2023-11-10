@@ -25,16 +25,6 @@ const patientSchema = new Schema(
     notes: [{ type: String }],
     healthRecords: [{ type: String }],
     walletMoney: { type: Number, default: 0 },
-    healthPackageHistory: [
-      {
-        healthPackage: {
-          type: Schema.Types.ObjectId,
-          ref: 'HealthPackage',
-          required: true,
-        },
-        date: { type: Date, required: true },
-      },
-    ],
   },
   { timestamps: true }
 )
