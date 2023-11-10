@@ -18,6 +18,20 @@ export class PatientResponseBase {
   ) {}
 }
 
+type MulterFile = {
+  fieldname: string
+  originalname: string
+  encoding: string
+  mimetype: string
+  buffer: Buffer
+  size: number
+}
+
+export interface uploadMedicalHistoryRequest {
+  id: string
+  medicalHistory: MulterFile
+}
+
 export class GetPatientResponse {
   constructor(public patients: PatientResponseBase[]) {}
 }

@@ -1,5 +1,5 @@
 import { Router } from 'express'
-
+import multer from 'multer'
 import { asyncWrapper } from '../utils/asyncWrapper'
 import {
   filterPatientByAppointment,
@@ -9,6 +9,11 @@ import {
   addNoteToPatient,
   getPatientByUsername,
   getPatientNotes,
+  getMyMedicalHistory,
+  uploadMedicalHistory,
+  uploadHealthRecords,
+  getHealthRecordsFiles,
+  getPatientHealthRecords,
 } from '../services/patient.service'
 import {
   GetAPatientResponse,
@@ -35,15 +40,67 @@ import {
 } from 'clinic-common/types/appointment.types'
 import { getHealthPackageNameById } from '../services/healthPackage.service'
 
+const storage = multer.memoryStorage()
+const upload = multer({ storage })
+
 export const patientRouter = Router()
 
+patientRouter.post(
+  '/uploadMedicalHistory/mine',
+  upload.single('medicalHistory'),
+  asyncWrapper(async (req: any, res) => {
+    const user: HydratedDocument<UserDocument> | null = await UserModel.findOne(
+      { username: req.username }
+    )
+    if (user == null) throw new NotAuthenticatedError()
+
+    const patient = await uploadMedicalHistory({
+      id: user.id,
+      medicalHistory: req.file,
+    })
+
+    res.send(patient)
+  })
+)
+
+patientRouter.post(
+  '/uploadHealthRecords/:id',
+  upload.single('HealthRecord'),
+  asyncWrapper(async (req: any, res) => {
+    const patient = await uploadHealthRecords({
+      id: req.params.id,
+      HealthRecord: req.file,
+    })
+
+    res.send(patient)
+  })
+)
 patientRouter.get(
+  //Health Records Uploads for doctor
+  '/viewHealthRecords/Files/:id',
+  asyncWrapper(async (req, res) => {
+    const healthRecords = await getHealthRecordsFiles(req.params.id)
+    res.send(healthRecords)
+  })
+)
+
+patientRouter.get(
+  //Health Records Uploads for patient
+  '/viewHealthRecordsFiles',
+  asyncWrapper(async (req, res) => {
+    const result = await getPatientHealthRecords(req.username || '')
+    res.send(result)
+  })
+)
+patientRouter.get(
+  //Health Records Notes
   '/viewHealthRecords/me',
   asyncWrapper(async (req, res) => {
     const result = await getPatientNotes(req.username || '')
     res.send(result)
   })
 )
+
 patientRouter.patch(
   '/addNote/:id',
   asyncWrapper(async (req, res) => {
@@ -83,6 +140,18 @@ patientRouter.get(
         }))
       )
     )
+  })
+)
+
+patientRouter.get(
+  '/viewMedicalHistory',
+  asyncWrapper(async (req, res) => {
+    const user: HydratedDocument<UserDocument> | null = await UserModel.findOne(
+      { username: req.username }
+    )
+    if (user == null) throw new NotAuthenticatedError()
+    const documents = await getMyMedicalHistory(user.id)
+    res.send(documents)
   })
 )
 

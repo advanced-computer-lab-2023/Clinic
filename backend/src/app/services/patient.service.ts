@@ -1,3 +1,4 @@
+import { uploadMedicalHistoryRequest } from 'clinic-common/types/patient.types'
 import { NotFoundError } from '../errors'
 import {
   type AppointmentDocument,
@@ -12,8 +13,13 @@ import {
 import { UserModel, type UserDocument } from '../models/user.model'
 import { type WithUser } from '../utils/typeUtils'
 import { type HydratedDocument, type ObjectId } from 'mongoose'
-
+import { getStorage, ref, uploadBytes } from 'firebase/storage'
+import { getDownloadURL } from 'firebase/storage'
+import FireBase from '../../../../firebase.config'
 type PatientDocumentWithUser = WithUser<PatientDocument>
+const storage = getStorage(FireBase)
+const storageRef = ref(storage, 'petients/medicalHistory')
+const storageRef2 = ref(storage, 'petients/HealthRecord')
 
 export async function getPatientByName(
   name: string
@@ -30,6 +36,37 @@ export async function getPatientByName(
     .exec()
 
   return patients
+}
+
+export async function uploadMedicalHistory(
+  info: uploadMedicalHistoryRequest
+): Promise<void> {
+  const { id, medicalHistory } = info
+  const fileRef = ref(storageRef, Date.now().toString())
+
+  try {
+    await uploadBytes(fileRef, medicalHistory.buffer, {
+      contentType: medicalHistory.mimetype,
+    })
+
+    console.log('Uploaded a blob or file!')
+
+    const fullPath = await getDownloadURL(fileRef)
+
+    const patient = await PatientModel.findOne({ user: id }).exec()
+    if (patient == null) throw new NotFoundError()
+    patient.documents.push(fullPath)
+    await patient.save()
+  } catch (error) {
+    console.log('Error uploading file:', error)
+  }
+}
+
+export async function getMyMedicalHistory(id: string): Promise<string[]> {
+  const patient = await PatientModel.findOne({ user: id }).exec()
+  if (patient == null) throw new NotFoundError()
+
+  return patient.documents
 }
 
 export async function getPatientByID(id: string): Promise<{
@@ -196,4 +233,41 @@ export async function getPatientByUsername(
   }
 
   return await PatientModel.findOne({ user: user.id })
+}
+
+export async function uploadHealthRecords(info: any): Promise<void> {
+  const { id, HealthRecord } = info
+  const fileRef = ref(storageRef2, Date.now().toString())
+
+  try {
+    await uploadBytes(fileRef, HealthRecord.buffer, {
+      contentType: HealthRecord.mimetype,
+    })
+
+    console.log('Uploaded a blob or file!')
+
+    const fullPath = await getDownloadURL(fileRef)
+
+    const patient = await PatientModel.findOne({ _id: id }).exec()
+    if (patient == null) throw new NotFoundError()
+    patient.healthRecords.push(fullPath)
+    await patient.save()
+  } catch (error) {
+    console.log('Error uploading file:', error)
+  }
+}
+
+export async function getHealthRecordsFiles(id: string): Promise<string[]> {
+  const patient = await PatientModel.findOne({ _id: id })
+
+  return patient?.healthRecords || []
+}
+
+export async function getPatientHealthRecords(
+  username: string
+): Promise<string[]> {
+  const user = await UserModel.findOne({ username })
+  const patient = await PatientModel.findOne({ user: user?._id })
+
+  return patient?.healthRecords || []
 }

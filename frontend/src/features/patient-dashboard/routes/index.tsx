@@ -11,6 +11,7 @@ import { PrescriptionView } from './PrescriptionView'
 import { SubscribeToHealthPackages } from './SubscribeToHealthPackages'
 import { Wallet } from './Wallet'
 import HealthRecords from './HealthRecords'
+import FileViewer from './ViewFiles'
 
 export const patientDashboardRoutes: RouteObject[] = [
   {
@@ -60,6 +61,10 @@ export const patientDashboardRoutes: RouteObject[] = [
       {
         path: 'MyHealthRecords',
         element: <HealthRecords />,
+      },
+      {
+        path: 'MyMedicalHistory',
+        element: <FileViewer />,
       },
     ],
   },

@@ -10,7 +10,7 @@ import {
   TextField,
 } from '@mui/material'
 import { useQuery } from '@tanstack/react-query'
-import { useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import AddIcon from '@mui/icons-material/Add'
 import { useState } from 'react'
 import axios from 'axios'
@@ -173,6 +173,13 @@ export function Patient() {
               ADD
             </Button>
           )}
+          <Link
+            to={'http://localhost:5173/doctor-dashboard/healthRecords/' + id}
+          >
+            <Button variant="contained" color="primary">
+              Health Records Files
+            </Button>
+          </Link>
         </Stack>
       </CardContent>
     </Card>
