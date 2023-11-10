@@ -64,7 +64,7 @@ function FileViewer() {
 
     console.log(imageValue.file)
     const formData = new FormData()
-    formData.append('file', imageValue.file)
+    formData.append('medicalHistory', imageValue.file)
 
     try {
       // Send a POST request with the uploaded file

@@ -48,10 +48,9 @@ patientRouter.post(
     console.log('entered endpoint')
     console.log(req.file)
     const user: HydratedDocument<UserDocument> | null = await UserModel.findOne(
-      { username: req.username }
+      { _id: req.user.id }
     )
     if (user == null) throw new NotAuthenticatedError()
-
     const patient = await uploadMedicalHistory({
       id: user.id,
       medicalHistory: req.file,
