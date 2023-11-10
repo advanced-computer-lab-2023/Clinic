@@ -35,6 +35,8 @@
     "!**/*.{js,ts,jsx,tsx}": "prettier --write -u"
   },
   "dependencies": {
-    "@stripe/stripe-js": "^2.1.11"
+    "@stripe/react-stripe-js": "^2.3.1",
+    "@stripe/stripe-js": "^2.1.11",
+    "react-toastify": "^9.1.3"
   }
 }
