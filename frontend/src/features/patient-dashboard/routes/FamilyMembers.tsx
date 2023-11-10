@@ -98,15 +98,19 @@ export function FamilyMembers() {
     },
   ]
   const columnsLinkingMe: GridColDef<{ name: string }>[] = [
-    { field: 'name', headerName: 'The following patients have you linked', width: 300 },
+    {
+      field: 'name',
+      headerName: 'The following patients have you linked',
+      width: 300,
+    },
     // Additional columns for linkingMe data
   ]
 
   const linkingMeRows = reverseQuery.data?.names.map((name, index) => ({
     id: index.toString(), // Use index as a simple identifier, you may need a more robust solution
     name,
-  }));
-  
+  }))
+
   return (
     <Box sx={{ height: 400, width: '100%' }}>
       <Modal

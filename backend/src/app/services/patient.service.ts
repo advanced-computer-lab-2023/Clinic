@@ -186,7 +186,9 @@ export async function unSubscribeToHealthPackage(params: {
   await patient.save()
 }
 
-export async function getPatientByUsername(username: string): Promise<HydratedDocument<PatientDocument> | null> {
+export async function getPatientByUsername(
+  username: string
+): Promise<HydratedDocument<PatientDocument> | null> {
   const user = await UserModel.findOne({ username })
 
   if (!user) {

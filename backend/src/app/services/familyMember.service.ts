@@ -107,14 +107,15 @@ export async function findFamilyMemberByMobileNumber(
 
 export async function findLinkingMe(
   username: string
-) : Promise<Array<PatientDocument>>{
-  const patient : HydratedDocument<PatientDocument> |null = await getPatientByUsername(username)
+): Promise<Array<PatientDocument>> {
+  const patient: HydratedDocument<PatientDocument> | null =
+    await getPatientByUsername(username)
 
   if (!patient) {
     throw new NotFoundError()
   }
 
-  const meAsFamily = await FamilyMemberModel.find({patient: patient.id})
+  const meAsFamily = await FamilyMemberModel.find({ patient: patient.id })
 
   const familyMembers = await PatientModel.find({
     familyMembers: {
@@ -123,5 +124,4 @@ export async function findLinkingMe(
   })
 
   return familyMembers
-
 }
