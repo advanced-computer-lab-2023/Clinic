@@ -74,6 +74,67 @@ export class GetApprovedDoctorResponse extends DoctorResponseBase {
   }
 }
 
+export class AcceptOrRejectContractResponse extends DoctorResponseBase {
+  constructor(
+    id: string,
+    username: string,
+    name: string,
+    email: string,
+    dateOfBirth: Date,
+    hourlyRate: number,
+    affiliation: string,
+    educationalBackground: string,
+    speciality: string,
+    requestStatus: DoctorStatus,
+    public contractStatus: ContractStatus,
+    public availableTimes: [Date],
+    public employmentContract: [string]
+  ) {
+    super(
+      id,
+      username,
+      name,
+      email,
+      dateOfBirth,
+      hourlyRate,
+      affiliation,
+      educationalBackground,
+      speciality,
+      requestStatus
+    )
+  }
+}
+
+export class ApproveDoctorResponse extends DoctorResponseBase {
+  constructor(
+    id: string,
+    username: string,
+    name: string,
+    email: string,
+    dateOfBirth: Date,
+    hourlyRate: number,
+    affiliation: string,
+    educationalBackground: string,
+    speciality: string,
+    requestStatus: DoctorStatus,
+    public availableTimes: [Date],
+    public employmentContract: [string]
+  ) {
+    super(
+      id,
+      username,
+      name,
+      email,
+      dateOfBirth,
+      hourlyRate,
+      affiliation,
+      educationalBackground,
+      speciality,
+      requestStatus
+    )
+  }
+}
+
 export class GetDoctorResponse extends DoctorResponseBase {
   constructor(
     id: string,

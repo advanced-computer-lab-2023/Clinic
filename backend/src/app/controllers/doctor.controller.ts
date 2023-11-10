@@ -1,6 +1,7 @@
 import { Router } from 'express'
 
 import {
+  acceptEmploymentContract,
   addAvailableTimeSlots,
   approveDoctor,
   getAllDoctors,
@@ -8,12 +9,14 @@ import {
   getDoctorByUsername,
   getPendingDoctorRequests,
   rejectDoctor,
+  rejectEmploymentContract,
   updateDoctorByUsername,
 } from '../services/doctor.service'
 import { asyncWrapper } from '../utils/asyncWrapper'
 import {
   allowAdmins,
   allowApprovedDoctors,
+  allowApprovedandAcceptsDoctors,
   allowAuthenticated,
 } from '../middlewares/auth.middleware'
 import {
@@ -26,6 +29,9 @@ import {
   type UpdateDoctorRequest,
   AddAvailableTimeSlotsResponse,
   GetWalletMoneyResponse,
+  ApproveDoctorResponse,
+  ContractStatus,
+  AcceptOrRejectContractResponse,
 } from 'clinic-common/types/doctor.types'
 import { isAdmin } from '../services/auth.service'
 import { NotAuthenticatedError } from '../errors/auth.errors'
@@ -234,7 +240,7 @@ doctorsRouter.patch(
   asyncWrapper(async (req, res) => {
     const doctor = await approveDoctor(req.params.id)
     res.send(
-      new UpdateDoctorResponse(
+      new ApproveDoctorResponse(
         doctor.id,
         doctor.user.username,
         doctor.name,
@@ -244,15 +250,68 @@ doctorsRouter.patch(
         doctor.affiliation,
         doctor.educationalBackground,
         doctor.speciality,
-        doctor.requestStatus as DoctorStatus
+        doctor.requestStatus as DoctorStatus,
+        doctor.availableTimes as [Date],
+        doctor.employmentContract as [string]
       )
     )
   })
 )
+//reject employment contract
+doctorsRouter.patch(
+  '/rejectEmploymentContract',
+  asyncWrapper(allowApprovedDoctors),
+  asyncWrapper(async (req, res) => {
+    const doctor = await rejectEmploymentContract(req.username!)
+    res.send(
+      new AcceptOrRejectContractResponse(
+        doctor.id,
+        doctor.user.username,
+        doctor.name,
+        doctor.email,
+        doctor.dateOfBirth,
+        doctor.hourlyRate,
+        doctor.affiliation,
+        doctor.educationalBackground,
+        doctor.speciality,
+        doctor.requestStatus as DoctorStatus,
+        doctor.contractStatus as ContractStatus,
+        doctor.availableTimes as [Date],
+        doctor.employmentContract as [string]
+      )
+    )
+  })
+)
+//accept employment contract
+doctorsRouter.patch(
+  '/acceptEmploymentContract',
+  asyncWrapper(allowApprovedDoctors),
+  asyncWrapper(async (req, res) => {
+    const doctor = await acceptEmploymentContract(req.username!)
+    res.send(
+      new AcceptOrRejectContractResponse(
+        doctor.id,
+        doctor.user.username,
+        doctor.name,
+        doctor.email,
+        doctor.dateOfBirth,
+        doctor.hourlyRate,
+        doctor.affiliation,
+        doctor.educationalBackground,
+        doctor.speciality,
+        doctor.requestStatus as DoctorStatus,
+        doctor.contractStatus as ContractStatus,
+        doctor.availableTimes as [Date],
+        doctor.employmentContract as [string]
+      )
+    )
+  })
+)
+
 doctorsRouter.patch(
   '/addAvailableTimeSlots',
   validate(AddAvailableTimeSlotsRequestValidator),
-  asyncWrapper(allowApprovedDoctors),
+  asyncWrapper(allowApprovedandAcceptsDoctors),
   asyncWrapper(async (req, res) => {
     const doctor = await addAvailableTimeSlots(req.username!, req.body)
     res.send(

@@ -113,8 +113,28 @@ export async function approveDoctor(
     user: UserDocument
   }>('user')
   if (doctor == null) throw new NotFoundError()
+  const doctorWithContract = await DoctorModel.findByIdAndUpdate(
+    doctorId,
+    {
+      $push: {
+        employmentContract: [
+          `Name:${doctor.name}`,
+          `Fees:${doctor.hourlyRate}`,
+          `ClinicMarkUp:10%`,
+          `ContractStatus:${doctor.contractStatus}`,
+          `ContractDuration:1 Year`,
+        ],
+      },
+    },
+    {
+      new: true,
+    }
+  ).populate<{
+    user: UserDocument
+  }>('user')
+  if (doctorWithContract == null) throw new NotFoundError()
 
-  return doctor
+  return doctorWithContract
 }
 
 export async function rejectDoctor(
@@ -145,6 +165,54 @@ export async function addAvailableTimeSlots(
   const doctor = await DoctorModel.findOneAndUpdate(
     { user: user.id },
     { $push: { availableTimes: new Date(req.time) } },
+    {
+      new: true,
+    }
+  ).populate<{
+    user: UserDocument
+  }>('user')
+  if (doctor == null) throw new NotFoundError()
+
+  return doctor
+}
+
+export async function rejectEmploymentContract(
+  username: string
+): Promise<DoctorDocumentWithUser> {
+  const user = await UserModel.findOne({ username })
+
+  if (user == null) throw new NotFoundError()
+
+  const doctor = await DoctorModel.findOneAndUpdate(
+    { user: user.id },
+    {
+      contractStatus: 'rejected',
+      'employmentContract.3': `ContractStatus:rejected`,
+    },
+    {
+      new: true,
+    }
+  ).populate<{
+    user: UserDocument
+  }>('user')
+  if (doctor == null) throw new NotFoundError()
+
+  return doctor
+}
+
+export async function acceptEmploymentContract(
+  username: string
+): Promise<DoctorDocumentWithUser> {
+  const user = await UserModel.findOne({ username })
+
+  if (user == null) throw new NotFoundError()
+
+  const doctor = await DoctorModel.findOneAndUpdate(
+    { user: user.id },
+    {
+      contractStatus: 'accepted',
+      'employmentContract.3': `ContractStatus:accepted`,
+    },
     {
       new: true,
     }

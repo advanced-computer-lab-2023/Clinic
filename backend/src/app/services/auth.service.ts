@@ -209,7 +209,9 @@ export async function isPatient(username: string): Promise<boolean> {
   return patient != null
 }
 
-export async function isDoctorAndApproved(username: string): Promise<boolean> {
+export async function isDoctorAndApprovedAndAccepts(
+  username: string
+): Promise<boolean> {
   const user = await UserModel.findOne({ username })
 
   if (user == null) {
@@ -223,6 +225,18 @@ export async function isDoctorAndApproved(username: string): Promise<boolean> {
     doctor.requestStatus === 'approved' &&
     doctor.contractStatus === 'accepted'
   )
+}
+
+export async function isDoctorAndApproved(username: string): Promise<boolean> {
+  const user = await UserModel.findOne({ username })
+
+  if (user == null) {
+    return false
+  }
+
+  const doctor = await DoctorModel.findOne({ user: user.id })
+
+  return doctor != null && doctor.requestStatus === 'approved'
 }
 
 export async function isDoctorPatientAuthorized(
@@ -241,7 +255,10 @@ export async function isDoctorPatientAuthorized(
     return false
   }
 
-  if (doctor.requestStatus !== 'approved') {
+  if (
+    doctor.requestStatus !== 'approved' ||
+    doctor.contractStatus !== 'accepted'
+  ) {
     return false
   }
 

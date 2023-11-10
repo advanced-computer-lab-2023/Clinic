@@ -17,7 +17,7 @@ import {
   GetWalletMoneyResponse,
 } from 'clinic-common/types/patient.types'
 
-import { allowApprovedDoctors } from '../middlewares/auth.middleware'
+import { allowApprovedandAcceptsDoctors } from '../middlewares/auth.middleware'
 import { type Gender } from 'clinic-common/types/gender.types'
 import { type HydratedDocument } from 'mongoose'
 import { type UserDocument, UserModel } from '../models/user.model'
@@ -87,7 +87,7 @@ patientRouter.get(
 
 patientRouter.get(
   '/search',
-  asyncWrapper(allowApprovedDoctors),
+  asyncWrapper(allowApprovedandAcceptsDoctors),
   asyncWrapper(async (req, res) => {
     const name = req.query.name as string
 
@@ -115,7 +115,7 @@ patientRouter.get(
 
 patientRouter.post(
   '/filter',
-  asyncWrapper(allowApprovedDoctors),
+  asyncWrapper(allowApprovedandAcceptsDoctors),
   asyncWrapper(async (req, res) => {
     const user: HydratedDocument<UserDocument> | null = await UserModel.findOne(
       { username: req.username }
