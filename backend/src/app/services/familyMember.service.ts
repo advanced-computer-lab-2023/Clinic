@@ -8,6 +8,7 @@ import { NotFoundError } from '../errors'
 import { type PatientDocument, PatientModel } from '../models/patient.model'
 import { type AddFamilyMemberRequest } from 'clinic-common/types/familyMember.types'
 import { type WithUser } from '../utils/typeUtils'
+import { getPatientByUsername } from './patient.service'
 
 export async function getFamilyMembers(
   username: string
@@ -116,4 +117,25 @@ export async function findFamilyMemberByMobileNumber(
   }
 
   return patient
+}
+
+export async function findLinkingMe(
+  username: string
+): Promise<Array<PatientDocument>> {
+  const patient: HydratedDocument<PatientDocument> | null =
+    await getPatientByUsername(username)
+
+  if (!patient) {
+    throw new NotFoundError()
+  }
+
+  const meAsFamily = await FamilyMemberModel.find({ patient: patient.id })
+
+  const familyMembers = await PatientModel.find({
+    familyMembers: {
+      $in: meAsFamily.map((family) => family.id),
+    },
+  })
+
+  return familyMembers
 }
