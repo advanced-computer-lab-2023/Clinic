@@ -162,6 +162,7 @@ healthPackagesRouter.patch(
     if (patient.walletMoney - packageInfo.pricePerYear < 0)
       throw new APIError('Not enough money in wallet', 400)
     patient.walletMoney -= packageInfo.pricePerYear
+    await patient.save()
     await subscribeToHealthPackage({
       patientUsername: req.username!,
       healthPackageId: packageId,
