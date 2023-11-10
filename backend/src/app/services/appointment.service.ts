@@ -6,6 +6,7 @@ import {
 import { AppointmentStatus } from 'clinic-common/types/appointment.types'
 
 import { removeTimeFromDoctorAvailability } from './doctor.service'
+import { PatientModel } from '../models/patient.model'
 
 export async function getfilteredAppointments(
   query: any
@@ -40,21 +41,36 @@ export async function createAndRemoveTime(
 ): Promise<AppointmentDocument | null> {
   // Create a new appointment
   const newDate = new Date(date).toISOString()
-  console.log(newDate)
-  const newAppointment = new AppointmentModel({
-    patientID,
-    doctorID,
-    date: newDate,
-    familyID,
-    reservedFor,
-    status: AppointmentStatus.Upcoming,
-  })
+  let newAppointment
+
+  if (reservedFor == 'Me') {
+    const patient = await PatientModel.findById(patientID)
+    const patientName = patient?.name
+    console.log(patientName)
+
+    newAppointment = new AppointmentModel({
+      patientID,
+      doctorID,
+      date: newDate,
+      familyID,
+      reservedFor: patientName,
+      status: AppointmentStatus.Upcoming,
+    })
+  } else {
+    newAppointment = new AppointmentModel({
+      patientID,
+      doctorID,
+      date: newDate,
+      familyID,
+      reservedFor,
+      status: AppointmentStatus.Upcoming,
+    })
+  }
+
   await removeTimeFromDoctorAvailability(doctorID, date)
   // Save the new appointment
   await newAppointment.save()
 
-  // Now, you need to remove the 'date' from the doctor's available times.
-  // You should have a function in your doctor service to handle this.
   console.log(newAppointment)
 
   return newAppointment

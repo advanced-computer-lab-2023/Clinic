@@ -193,7 +193,9 @@ patientRouter.get(
           appointment.id,
           appointment.patientID.toString(),
           appointment.doctorID.toString(),
-          appointment.date
+          appointment.date,
+          appointment.familyID,
+          appointment.reservedFor
         )
       })
 
