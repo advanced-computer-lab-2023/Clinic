@@ -6,6 +6,10 @@ import {
   Stack,
   Typography,
   Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  CardActions,
 } from '@mui/material'
 
 import { useQuery, useQueryClient } from '@tanstack/react-query'
@@ -13,13 +17,28 @@ import { useParams } from 'react-router-dom'
 import { CardPlaceholder } from '@/components/CardPlaceholder'
 import { reserveTimes } from '@/api/appointments'
 import { toast } from 'react-toastify'
+import { getFamilyMembers } from '@/api/familyMembers'
+import { useState } from 'react'
 
 export function DoctorView() {
+  // State to manage the modal visibility
+
+  const [isModalOpen, setModalOpen] = useState(false)
+
+  const [selectedTime, setSelectedTime] = useState<Date | null>(null)
+
+  // State to track the selected family member for reservation
+
   const { id } = useParams()
   const queryClient = useQueryClient()
   const query = useQuery({
     queryKey: ['DoctorView'],
     queryFn: () => getApprovedDoctor(id!),
+  })
+
+  const query2 = useQuery({
+    queryKey: ['familyMembers'],
+    queryFn: getFamilyMembers,
   })
 
   if (query.isLoading) {
@@ -30,11 +49,85 @@ export function DoctorView() {
     return <h1>error</h1>
   }
 
-  const reserveTime = async (selectedTime: Date) => {
+  const openModal = () => {
+    setModalOpen(true)
+  }
+
+  const closeModal = () => {
+    setModalOpen(false)
+  }
+
+  const renderModalContent = (date: Date | null) => {
+    return (
+      <Dialog open={isModalOpen} onClose={closeModal}>
+        <DialogTitle>Reserve @ time {date?.toLocaleString()}</DialogTitle>
+        <DialogContent>
+          {/* Button to register for self */}
+          <Button
+            variant="contained"
+            color="primary"
+            fullWidth
+            onClick={() => {
+              reserveTime(date, '', '')
+              closeModal()
+            }}
+          >
+            Register for self
+          </Button>
+
+          {/* Iterate through family members and create cards */}
+          {query2.data?.familyMembers.map((familyMember) => (
+            <Card key={familyMember.id} style={{ marginTop: '16px' }}>
+              <CardContent>
+                <Typography variant="h6">{familyMember.name}</Typography>
+                <Typography variant="subtitle1">
+                  {familyMember.relation}
+                </Typography>
+              </CardContent>
+              <CardActions>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  fullWidth
+                  onClick={() => {
+                    reserveTime(date, familyMember.name, familyMember.id)
+                    closeModal()
+                  }}
+                >
+                  Reserve for family member
+                </Button>
+              </CardActions>
+            </Card>
+          ))}
+        </DialogContent>
+      </Dialog>
+    )
+  }
+
+  const reserveTime = async (
+    selectedTime: Date | null,
+    familyName: string,
+    selectedFamilyMember: string
+  ) => {
     try {
+      let response = null
+      console.log(selectedFamilyMember)
+
       if (id) {
+        if (selectedFamilyMember !== '') {
+          console.log("i'm working somehow")
+
+          response = await reserveTimes(
+            id,
+            selectedTime,
+            selectedFamilyMember,
+            familyName
+          )
+        }
         // Check if id is defined
-        const response = await reserveTimes(id, selectedTime)
+        else {
+          response = await reserveTimes(id, selectedTime, '', 'Me')
+        }
 
         if (response.status === 201) {
           // Handle successful reservation, if needed
@@ -166,7 +259,10 @@ export function DoctorView() {
                     <Button
                       variant="contained"
                       color="primary"
-                      onClick={() => reserveTime(time)}
+                      onClick={() => {
+                        setSelectedTime(new Date(time))
+                        openModal()
+                      }}
                     >
                       Reserve Time
                     </Button>
@@ -177,6 +273,9 @@ export function DoctorView() {
           </CardContent>
         </Card>
       </Grid>
+
+      {/* Render the modal content */}
+      {renderModalContent(selectedTime)}
     </>
   )
 }
