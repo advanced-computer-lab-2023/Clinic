@@ -11,6 +11,9 @@ import {
   getPatientNotes,
   getMyMedicalHistory,
   uploadMedicalHistory,
+  uploadHealthRecords,
+  getHealthRecordsFiles,
+  getPatientHealthRecords,
 } from '../services/patient.service'
 import {
   GetAPatientResponse,
@@ -59,7 +62,37 @@ patientRouter.post(
   })
 )
 
+patientRouter.post(
+  '/uploadHealthRecords/:id',
+  upload.single('HealthRecord'),
+  asyncWrapper(async (req: any, res) => {
+    const patient = await uploadHealthRecords({
+      id: req.params.id,
+      HealthRecord: req.file,
+    })
+
+    res.send(patient)
+  })
+)
 patientRouter.get(
+  //Health Records Uploads for doctor
+  '/viewHealthRecords/Files/:id',
+  asyncWrapper(async (req, res) => {
+    const healthRecords = await getHealthRecordsFiles(req.params.id)
+    res.send(healthRecords)
+  })
+)
+
+patientRouter.get(
+  //Health Records Uploads for patient
+  '/viewHealthRecordsFiles',
+  asyncWrapper(async (req, res) => {
+    const result = await getPatientHealthRecords(req.username || '')
+    res.send(result)
+  })
+)
+patientRouter.get(
+  //Health Records Notes
   '/viewHealthRecords/me',
   asyncWrapper(async (req, res) => {
     const result = await getPatientNotes(req.username || '')

@@ -19,6 +19,7 @@ import FireBase from '../../../../firebase.config'
 type PatientDocumentWithUser = WithUser<PatientDocument>
 const storage = getStorage(FireBase)
 const storageRef = ref(storage, 'petients/medicalHistory')
+const storageRef2 = ref(storage, 'petients/HealthRecord')
 
 export async function getPatientByName(
   name: string
@@ -230,4 +231,41 @@ export async function getPatientByUsername(username: string) {
   }
 
   return await PatientModel.findOne({ user: user.id })
+}
+
+export async function uploadHealthRecords(info: any): Promise<void> {
+  const { id, HealthRecord } = info
+  const fileRef = ref(storageRef2, Date.now().toString())
+
+  try {
+    await uploadBytes(fileRef, HealthRecord.buffer, {
+      contentType: HealthRecord.mimetype,
+    })
+
+    console.log('Uploaded a blob or file!')
+
+    const fullPath = await getDownloadURL(fileRef)
+
+    const patient = await PatientModel.findOne({ _id: id }).exec()
+    if (patient == null) throw new NotFoundError()
+    patient.healthRecords.push(fullPath)
+    await patient.save()
+  } catch (error) {
+    console.log('Error uploading file:', error)
+  }
+}
+
+export async function getHealthRecordsFiles(id: string): Promise<string[]> {
+  const patient = await PatientModel.findOne({ _id: id })
+
+  return patient?.healthRecords || []
+}
+
+export async function getPatientHealthRecords(
+  username: string
+): Promise<string[]> {
+  const user = await UserModel.findOne({ username })
+  const patient = await PatientModel.findOne({ user: user?._id })
+
+  return patient?.healthRecords || []
 }
