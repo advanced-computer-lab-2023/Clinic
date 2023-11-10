@@ -41,6 +41,8 @@ appointmentsRouter.get(
           patientID: appointment.patientID.toString(),
           doctorID: appointment.doctorID.toString(),
           date: appointment.date,
+          familyID: appointment.familyID || '',
+          reservedFor: appointment.reservedFor || 'Me',
           status:
             new Date(appointment.date) > new Date()
               ? AppointmentStatus.Upcoming
@@ -54,7 +56,7 @@ appointmentsRouter.get(
 appointmentsRouter.post(
   '/makeappointment',
   asyncWrapper(async (req, res) => {
-    const { date } = req.body // Assuming the date is sent in the request body intype DaTe
+    const { date, familyID, reservedFor } = req.body // Assuming the date is sent in the request body intype DaTe
 
     const user = await UserModel.findOne({ username: req.username })
 
@@ -69,7 +71,9 @@ appointmentsRouter.post(
           const appointment = await createAndRemoveTime(
             patient.id,
             doctorID,
-            date
+            date,
+            familyID,
+            reservedFor
           )
 
           if (appointment) {
