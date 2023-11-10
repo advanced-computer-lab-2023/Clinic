@@ -1,8 +1,11 @@
 import { Router } from 'express'
 import { asyncWrapper } from '../utils/asyncWrapper'
 import {
+
   createAndRemoveTime,
   getfilteredAppointments,
+  createFollowUpAppointment,
+
 } from '../services/appointment.service'
 import {
   AppointmentStatus,
@@ -49,6 +52,7 @@ appointmentsRouter.get(
     )
   })
 )
+
 appointmentsRouter.post(
   '/makeappointment',
   asyncWrapper(async (req, res) => {
@@ -84,5 +88,15 @@ appointmentsRouter.post(
     } else {
       res.status(401).send('User not found')
     }
+  })
+)
+
+appointmentsRouter.post(
+  '/createFollowUp',
+  asyncWrapper(async (req, res) => {
+    const appointment = req.body
+    const newAppointment = await createFollowUpAppointment(appointment)
+    res.send(newAppointment)
+
   })
 )

@@ -113,7 +113,7 @@ export function ApprovedDoctors() {
                   </Typography>
                   <Stack spacing={-1}>
                     {doctor.availableTimes
-                      .map((data) => new Date(data as string))
+                      .map((data) => new Date(data))
                       .sort((a, b) => a.getTime() - b.getTime())
                       .map((data, i) => (
                         <Typography variant="body1" key={i}>

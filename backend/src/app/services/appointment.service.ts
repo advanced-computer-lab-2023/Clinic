@@ -4,6 +4,7 @@ import {
   type AppointmentDocument,
 } from '../models/appointment.model'
 import { AppointmentStatus } from 'clinic-common/types/appointment.types'
+
 import { removeTimeFromDoctorAvailability } from './doctor.service'
 
 export async function getfilteredAppointments(
@@ -30,6 +31,7 @@ export async function getfilteredAppointments(
   }
 }
 
+
 export async function createAndRemoveTime(
   patientID: string,
   doctorID: string,
@@ -52,4 +54,17 @@ export async function createAndRemoveTime(
   await removeTimeFromDoctorAvailability(doctorID, date)
 
   return newAppointment
+}
+
+export async function createFollowUpAppointment(
+  appointment: AppointmentDocument
+): Promise<AppointmentDocument> {
+  const newAppointment = new AppointmentModel({
+    ...appointment,
+    date: new Date(appointment.date),
+    status: AppointmentStatus.Upcoming,
+  })
+
+  return await newAppointment.save()
+
 }

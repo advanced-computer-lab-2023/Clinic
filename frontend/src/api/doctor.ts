@@ -1,8 +1,11 @@
 import {
+  AddAvailableTimeSlotsRequest,
+  AddAvailableTimeSlotsResponse,
   GetApprovedDoctorResponse,
   GetApprovedDoctorsResponse,
   GetDoctorResponse,
   GetPendingDoctorsResponse,
+  GetWalletMoneyResponse,
   UpdateDoctorRequest,
   UpdateDoctorResponse,
 } from 'clinic-common/types/doctor.types'
@@ -13,7 +16,7 @@ export async function updateDoctor(
   req: UpdateDoctorRequest
 ): Promise<UpdateDoctorResponse> {
   return await api
-    .patch<UpdateDoctorResponse>(`/doctors/${username}`, req)
+    .patch<UpdateDoctorResponse>(`/doctors/updateDoctor/${username}`, req)
     .then((res) => res.data)
 }
 
@@ -61,4 +64,24 @@ export async function rejectDoctorRequest(
   return await api
     .patch<UpdateDoctorResponse>(`/doctors/rejectDoctorRequest/${id}`)
     .then((res) => res.data)
+}
+
+export async function addAvailableTimeSlots(
+  req: AddAvailableTimeSlotsRequest
+): Promise<AddAvailableTimeSlotsResponse> {
+  return await api
+    .patch<AddAvailableTimeSlotsResponse>(`/doctors/addAvailableTimeSlots`, req)
+    .then((res) => res.data)
+}
+
+export async function getWalletMoney(
+  username: string
+): Promise<GetWalletMoneyResponse> {
+  return await api
+    .get<GetWalletMoneyResponse>('/doctors/wallet/' + username)
+    .then((res) => {
+      console.log(res.data + 'getWalletMoney' + username)
+
+      return res.data
+    })
 }

@@ -7,11 +7,14 @@ import {
   getPatientByName,
   getMyPatients,
   addNoteToPatient,
+  getPatientByUsername,
+  getPatientNotes,
 } from '../services/patient.service'
 import {
   GetAPatientResponse,
   GetMyPatientsResponse,
   GetPatientResponse,
+  GetWalletMoneyResponse,
 } from 'clinic-common/types/patient.types'
 
 import { allowApprovedDoctors } from '../middlewares/auth.middleware'
@@ -19,6 +22,7 @@ import { type Gender } from 'clinic-common/types/gender.types'
 import { type HydratedDocument } from 'mongoose'
 import { type UserDocument, UserModel } from '../models/user.model'
 import { NotAuthenticatedError } from '../errors/auth.errors'
+import { NotFoundError } from '../errors/index'
 import { DoctorModel } from '../models/doctor.model'
 import { getFamilyMembers } from '../services/familyMember.service'
 import {
@@ -31,6 +35,23 @@ import {
 } from 'clinic-common/types/appointment.types'
 
 export const patientRouter = Router()
+
+patientRouter.get(
+  '/viewHealthRecords/me',
+  asyncWrapper(async (req, res) => {
+    const result = await getPatientNotes(req.username || '')
+    res.send(result)
+  })
+)
+patientRouter.patch(
+  '/addNote/:id',
+  asyncWrapper(async (req, res) => {
+    const id = req.params.id
+    const newNote = req.body.newNote
+    const result = await addNoteToPatient(id, newNote)
+    res.send(result)
+  })
+)
 
 patientRouter.get(
   '/myPatients', //  allowAuthenticated,
@@ -145,6 +166,16 @@ patientRouter.get(
   })
 )
 
+// get the wallet money of a patient with the given username
+patientRouter.get(
+  '/wallet/:username',
+  asyncWrapper(async (req, res) => {
+    const patient = await getPatientByUsername(req.params.username)
+    if (!patient) throw new NotFoundError()
+    res.send(new GetWalletMoneyResponse(patient.walletMoney))
+  })
+)
+
 patientRouter.get(
   '/:id',
   // asyncWrapper(allowApprovedDoctorOfPatient),
@@ -185,18 +216,9 @@ patientRouter.get(
         patient.documents,
         appointmentsRefactored,
         prescriptions,
-        patient.notes
+        patient.notes,
+        patient.walletMoney
       )
     )
-  })
-)
-
-patientRouter.patch(
-  '/addNote/:id',
-  asyncWrapper(async (req, res) => {
-    const id = req.params.id
-    const newNote = req.body.newNote
-    const result = await addNoteToPatient(id, newNote)
-    res.send(result)
   })
 )

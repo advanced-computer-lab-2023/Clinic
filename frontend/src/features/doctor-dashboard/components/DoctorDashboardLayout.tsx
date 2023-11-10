@@ -1,7 +1,7 @@
 import { AuthenticatedRoute } from '@/components/AuthenticatedRoute'
 import { useSidebar } from '@/hooks/sidebar'
 import { UserType } from 'clinic-common/types/user.types'
-import { Person } from '@mui/icons-material'
+import { Person, Wallet } from '@mui/icons-material'
 import Container from '@mui/material/Container'
 import { useEffect } from 'react'
 import { Navigate, Outlet } from 'react-router-dom'
@@ -13,6 +13,7 @@ import { CardPlaceholder } from '@/components/CardPlaceholder'
 import { Typography } from '@mui/material'
 import { getDoctor } from '@/api/doctor'
 import { DoctorStatus } from 'clinic-common/types/doctor.types'
+import VisibilityIcon from '@mui/icons-material/Visibility'
 
 export function DoctorDashboardLayout() {
   const { setSidebarLinks } = useSidebar()
@@ -50,6 +51,16 @@ export function DoctorDashboardLayout() {
         to: '/doctor-dashboard/view-patients',
         text: 'View Patients',
         icon: <GroupIcon />,
+      },
+      {
+        to: '/doctor-dashboard/view-my-available-time-slots',
+        text: 'View My Available Time Slots',
+        icon: <VisibilityIcon />,
+      },
+      {
+        to: '/doctor-dashboard/wallet',
+        text: 'Wallet',
+        icon: <Wallet />,
       },
     ])
   }, [setSidebarLinks, user, doctorQuery.data?.requestStatus])

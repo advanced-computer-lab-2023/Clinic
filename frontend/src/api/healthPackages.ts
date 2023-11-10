@@ -48,3 +48,25 @@ export async function subscribeToHealthPackage(id: string): Promise<void> {
     .post<void>(`/health-packages/${id}/subscribe`)
     .then((res) => res.data)
 }
+
+export async function subscribeWalletToHealthPackage(
+  id: string
+): Promise<void> {
+  return await api
+    .patch<void>(`/health-packages/wallet/subscriptions/${id}`)
+    .then((res) => res.data)
+}
+
+export async function subscribeCreditToHealthPackage(
+  id: string
+): Promise<void> {
+  return await api
+    .patch<void>(`/health-packages/credit-card/subscriptions/${id}`)
+    .then((res) => res.data)
+}
+
+export async function unsubscribeToHealthPackage(id: string): Promise<void> {
+  return await api
+    .post<void>(`/health-packages/${id}/unsubscribe`)
+    .then((res) => res.data)
+}
