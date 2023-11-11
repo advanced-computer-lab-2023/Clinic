@@ -56,7 +56,7 @@ appointmentsRouter.get(
 appointmentsRouter.post(
   '/makeappointment',
   asyncWrapper(async (req, res) => {
-    const { date, familyID, reservedFor } = req.body // Assuming the date is sent in the request body intype DaTe
+    const { date, familyID, reservedFor, toPayUsingWallet } = req.body // Assuming the date is sent in the request body intype DaTe
 
     const user = await UserModel.findOne({ username: req.username })
 
@@ -66,20 +66,30 @@ appointmentsRouter.post(
 
         if (patient) {
           // Assuming 'doctorID' is known or can be retrieved from the request
+
           const doctorID = req.body.doctorid
 
-          const appointment = await createAndRemoveTime(
-            patient.id,
-            doctorID,
-            date,
-            familyID,
-            reservedFor
-          )
-
-          if (appointment) {
-            res.status(201).json(appointment)
+          if (patient.walletMoney - toPayUsingWallet < 0) {
+            res.status(403).send('Not enough money in wallet')
           } else {
-            res.status(500).send('Appointment creation failed')
+            patient.walletMoney -= toPayUsingWallet
+            await patient.save()
+
+            const appointment = await createAndRemoveTime(
+              patient.id,
+              doctorID,
+              date,
+              familyID,
+              reservedFor
+            )
+
+            if (appointment) {
+              res.status(201).json(appointment)
+            } else {
+              patient.walletMoney += toPayUsingWallet //reverting the wallet money
+              await patient.save()
+              res.status(500).send('Appointment creation failed')
+            }
           }
         } else {
           res.status(404).send('Patient not found')
