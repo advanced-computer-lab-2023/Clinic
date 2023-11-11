@@ -42,3 +42,7 @@ export interface GetHealthPackageForPatientResponse {
     remainingMonths: number
   }
 }
+
+export interface GetCancelledHealthPackagesForPatientResponse {
+  healthPackageHistory: [string]
+}

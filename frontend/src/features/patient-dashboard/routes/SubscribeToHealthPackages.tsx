@@ -1,4 +1,6 @@
 import {
+  getCancelledHealthPackagesForPatient,
+  getCanellationDate,
   getHealthPackageForPatient,
   getHealthPackages,
   subscribeCreditToHealthPackage,
@@ -43,6 +45,7 @@ export function SubscribeToHealthPackages() {
   const [creditMethodIdPackage, setCreditMethodIdPackage] = useState<
     null | string
   >()
+  /*let allHealthPackageId: string = ''*/
 
   const alerts = useAlerts()
   const { user } = useAuth()
@@ -55,6 +58,11 @@ export function SubscribeToHealthPackages() {
   const subscribedHealthPackageQuery = useQuery({
     queryKey: ['subscribed-health-packages'],
     queryFn: () => getHealthPackageForPatient({ username: user!.username }),
+  })
+
+  const cancelledHealthPackagesQuery = useQuery({
+    queryKey: ['cancelled-health-packages'],
+    queryFn: () => getCancelledHealthPackagesForPatient,
   })
 
   const onSuccess =
@@ -117,6 +125,28 @@ export function SubscribeToHealthPackages() {
     [query, selectedHealthPackageId]
   )
 
+  /*const getCancelledPackages = async () => {
+    // Assuming cancelledPackages is an asynchronous function that returns a promise
+    const cancelledPackagesData = await cancelledHealthPackagesQuery
+
+    return cancelledPackagesData || []
+  }*/
+
+  /*const cancelledPackagesArray = useQuery({
+    queryKey: ['cancelled-packages'],
+    queryFn: getCancelledPackages,
+  })*/
+
+  /*const isPackageCancelled = useMemo(() => {
+    const cancelledPackages = cancelledPackagesArray.data || []
+
+    return (
+      allHealthPackageId &&
+      cancelledPackages &&
+      allHealthPackageId in cancelledPackages
+    )
+  }, [allHealthPackageId, cancelledPackagesArray.data])*/
+
   if (query.isLoading) {
     return <CardPlaceholder />
   }
@@ -134,6 +164,7 @@ export function SubscribeToHealthPackages() {
           </Grid>
         )}
         {query.data?.healthPackages.map((healthPackage) => (
+          /*allHealthPackageId = healthPackage.id,*/
           <Grid
             item
             xl={4}
@@ -171,6 +202,16 @@ export function SubscribeToHealthPackages() {
                         label="Subscribed"
                       />
                     )}
+                    {cancelledHealthPackagesQuery.data &&
+                      healthPackage.id in cancelledHealthPackagesQuery.data && (
+                        <Chip
+                          label={`Cancelled on ${getCanellationDate(
+                            healthPackage.id
+                          )}`}
+                          color="error"
+                          size="small"
+                        />
+                      )}
                   </Stack>
 
                   <Stack spacing={-1}>
@@ -225,9 +266,9 @@ export function SubscribeToHealthPackages() {
                   <Button
                     variant="contained"
                     fullWidth
-                    color="secondary" // Set the color as desired
-                    startIcon={<AddModerator />} // Replace with the icon you prefer
-                    onClick={() => cancelMutation.mutateAsync(healthPackage.id)}
+                    color="secondary"
+                    startIcon={<AddModerator />} // Replace with cancel icon
+                    onClick={() => cancelMutation.mutateAsync()}
                   >
                     Unsubscribe
                   </Button>

@@ -169,27 +169,34 @@ export async function subscribeToHealthPackage(params: {
 }
 
 export async function unSubscribeToHealthPackage(params: {
-  patientUsername: string
-  healthPackageId: string
+  id: string
 }): Promise<void> {
-  const patient = await getPatientByUsername(params.patientUsername)
+  const patient = await PatientModel.findById(params.id)
+  const familyMember = await PatientModel.findById(params.id)
 
-  if (!patient) {
+  if (!patient && !familyMember) {
     throw new NotFoundError()
   }
 
-  const healthPackage = await HealthPackageModel.findById(
-    params.healthPackageId
-  )
-
-  if (!healthPackage) {
-    throw new NotFoundError()
+  if (patient && patient.healthPackage) {
+    patient.healthPackageHistory.push({
+      healthPackage: patient.healthPackage,
+      date: new Date(),
+    })
+    patient.healthPackage = undefined
+    patient.healthPackageRenewalDate = undefined
+    await patient.save()
   }
 
-  patient.healthPackage = undefined
-  patient.healthPackageRenewalDate = undefined
-
-  await patient.save()
+  if (familyMember && familyMember.healthPackage) {
+    familyMember.healthPackageHistory.push({
+      healthPackage: familyMember.healthPackage,
+      date: new Date(),
+    })
+    familyMember.healthPackage = undefined
+    familyMember.healthPackageRenewalDate = undefined
+    await familyMember.save()
+  }
 }
 
 export async function getPatientByUsername(
