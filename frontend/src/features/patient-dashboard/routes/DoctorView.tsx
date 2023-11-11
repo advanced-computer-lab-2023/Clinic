@@ -10,7 +10,10 @@ import {
   DialogTitle,
   DialogContent,
   CardActions,
+  DialogActions,
 } from '@mui/material'
+import WalletIcon from '@mui/icons-material/Wallet'
+import CreditCardIcon from '@mui/icons-material/CreditCard'
 
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'react-router-dom'
@@ -19,6 +22,8 @@ import { reserveTimes } from '@/api/appointments'
 import { toast } from 'react-toastify'
 import { getFamilyMembers } from '@/api/familyMembers'
 import { useState } from 'react'
+import { LoadingButton } from '@mui/lab'
+import Checkout from '@/components/StripeCheckout'
 
 export function DoctorView() {
   // State to manage the modal visibility
@@ -26,6 +31,15 @@ export function DoctorView() {
   const [isModalOpen, setModalOpen] = useState(false)
 
   const [selectedTime, setSelectedTime] = useState<Date | null>(null)
+  const [selectedFamilyMemberId, setSelectedFamilyMemberId] = useState<
+    string | null
+  >(null) // state to track the selected person's (me or fam member) id
+  const [selectedFamilyMemberName, setSelectedFamilyMemberName] = useState<
+    string | null
+  >(null)
+  const [creditMethod, setCreditMethod] = useState(false)
+  const [selectedAFamilyMember, setSelectedAFamilyMember] = useState(false) // state to track if a someone is selected (me or family member)
+  const [sessionRate, setSessionRate] = useState<number | null>(null)
 
   // State to track the selected family member for reservation
 
@@ -59,55 +73,147 @@ export function DoctorView() {
 
   const renderModalContent = (date: Date | null) => {
     return (
-      <Dialog open={isModalOpen} onClose={closeModal}>
-        <DialogTitle>Reserve @ time {date?.toLocaleString()}</DialogTitle>
-        <DialogContent>
-          {/* Button to register for self */}
-          <Button
-            variant="contained"
-            color="primary"
-            fullWidth
-            onClick={() => {
-              reserveTime(date, '', '')
-              closeModal()
-            }}
-          >
-            Register for self
-          </Button>
+      <>
+        <Dialog open={isModalOpen} onClose={closeModal}>
+          <DialogTitle>Reserve @ time {date?.toLocaleString()}</DialogTitle>
+          <DialogContent>
+            {/* Button to register for self */}
+            <Button
+              variant="contained"
+              color="primary"
+              fullWidth
+              onClick={() => {
+                closeModal()
+                setSelectedAFamilyMember(true)
+                setSelectedFamilyMemberId('')
+                setSelectedFamilyMemberName('')
+              }}
+            >
+              Reserve for self
+            </Button>
 
-          {/* Iterate through family members and create cards */}
-          {query2.data?.familyMembers.map((familyMember) => (
-            <Card key={familyMember.id} style={{ marginTop: '16px' }}>
-              <CardContent>
-                <Typography variant="h6">{familyMember.name}</Typography>
-                <Typography variant="subtitle1">
-                  {familyMember.relation}
-                </Typography>
-              </CardContent>
-              <CardActions>
-                <Button
+            {/* Iterate through family members and create cards */}
+            {query2.data?.familyMembers.map((familyMember) => (
+              <Card key={familyMember.id} style={{ marginTop: '16px' }}>
+                <CardContent>
+                  <Typography variant="h6">{familyMember.name}</Typography>
+                  <Typography variant="subtitle1">
+                    {familyMember.relation}
+                  </Typography>
+                </CardContent>
+                <CardActions>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    fullWidth
+                    onClick={() => {
+                      closeModal()
+                      setSelectedFamilyMemberId(familyMember.id)
+                      setSelectedFamilyMemberName(familyMember.name)
+                      setSelectedAFamilyMember(true)
+                    }}
+                  >
+                    Reserve for family member
+                  </Button>
+                </CardActions>
+              </Card>
+            ))}
+          </DialogContent>
+        </Dialog>
+        <Dialog open={selectedAFamilyMember}>
+          <DialogTitle>Payment Methods</DialogTitle>
+          <DialogContent>
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '1rem',
+              }}
+            >
+              <Stack
+                direction="row"
+                spacing={12}
+                style={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  gap: '1rem',
+                  marginTop: '1rem',
+                  padding: '1rem',
+                }}
+              >
+                <LoadingButton
                   variant="contained"
-                  color="primary"
-                  fullWidth
                   onClick={() => {
-                    reserveTime(date, familyMember.name, familyMember.id)
-                    closeModal()
+                    reserveTime(
+                      date,
+                      selectedFamilyMemberName!,
+                      selectedFamilyMemberId!,
+                      sessionRate!
+                    )
+                    setSelectedAFamilyMember(false)
                   }}
                 >
-                  Reserve for family member
+                  Wallet
+                  <WalletIcon
+                    sx={{
+                      ml: 1,
+                    }}
+                  />
+                </LoadingButton>
+                <Button
+                  variant="contained"
+                  onClick={() => {
+                    setCreditMethod(true)
+                    setSelectedAFamilyMember(false)
+                  }}
+                >
+                  Card
+                  <CreditCardIcon
+                    sx={{
+                      ml: 1,
+                    }}
+                  />
                 </Button>
-              </CardActions>
-            </Card>
-          ))}
-        </DialogContent>
-      </Dialog>
+              </Stack>
+            </div>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              autoFocus
+              onClick={() => {
+                setSelectedAFamilyMember(false)
+              }}
+            >
+              Cancel
+            </Button>
+          </DialogActions>
+        </Dialog>
+        <Dialog open={creditMethod} onClose={() => setCreditMethod(false)}>
+          <DialogTitle>
+            {' '}
+            <Checkout
+              handleSubmit={() => {
+                console.log('handleSubmit')
+                reserveTime(
+                  date,
+                  selectedFamilyMemberName!,
+                  selectedFamilyMemberId!,
+                  0
+                )
+                setCreditMethod(false)
+              }}
+            />
+          </DialogTitle>
+        </Dialog>
+      </>
     )
   }
 
   const reserveTime = async (
     selectedTime: Date | null,
     familyName: string,
-    selectedFamilyMember: string
+    selectedFamilyMember: string,
+    payUsingWallet: number
   ) => {
     try {
       let response = null
@@ -121,12 +227,19 @@ export function DoctorView() {
             id,
             selectedTime,
             selectedFamilyMember,
-            familyName
+            familyName,
+            payUsingWallet
           )
         }
         // Check if id is defined
         else {
-          response = await reserveTimes(id, selectedTime, '', 'Me')
+          response = await reserveTimes(
+            id,
+            selectedTime,
+            '',
+            'Me',
+            payUsingWallet
+          )
         }
 
         if (response.status === 201) {
@@ -262,6 +375,7 @@ export function DoctorView() {
                       onClick={() => {
                         setSelectedTime(new Date(time))
                         openModal()
+                        setSessionRate(query.data?.sessionRate)
                       }}
                     >
                       Reserve Time
