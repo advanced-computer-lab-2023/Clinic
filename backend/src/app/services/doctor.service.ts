@@ -176,7 +176,6 @@ export async function addAvailableTimeSlots(
   return doctor
 }
 
-
 export async function rejectEmploymentContract(
   username: string
 ): Promise<DoctorDocumentWithUser> {
@@ -223,6 +222,7 @@ export async function acceptEmploymentContract(
   if (doctor == null) throw new NotFoundError()
 
   return doctor
+}
 
 export async function removeTimeFromDoctorAvailability(
   doctorID: string,
