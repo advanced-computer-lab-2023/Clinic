@@ -11,7 +11,6 @@ import { Wallet } from './Wallet'
 import { EmploymentContract } from './EmploymentContract'
 import AddHealthRecord from './AddHealthRecord'
 
-
 export const doctorDashboardRoutes: RouteObject[] = [
   {
     element: <DoctorDashboardLayout />,
