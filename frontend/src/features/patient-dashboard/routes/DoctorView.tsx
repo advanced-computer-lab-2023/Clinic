@@ -40,7 +40,7 @@ export function DoctorView() {
   const [creditMethod, setCreditMethod] = useState(false)
   const [selectedAFamilyMember, setSelectedAFamilyMember] = useState(false) // state to track if a someone is selected (me or family member)
   const [sessionRate, setSessionRate] = useState<number | null>(null)
-
+  const [loading, setLoading] = useState(false)
   // State to track the selected family member for reservation
 
   const { id } = useParams()
@@ -144,14 +144,20 @@ export function DoctorView() {
                 <LoadingButton
                   variant="contained"
                   onClick={() => {
+                    setLoading(true)
                     reserveTime(
                       date,
                       selectedFamilyMemberName!,
                       selectedFamilyMemberId!,
                       sessionRate!
                     )
-                    setSelectedAFamilyMember(false)
+                      .then(() => {
+                        setLoading(false)
+                        setSelectedAFamilyMember(false)
+                      })
+                      .catch(() => setLoading(false))
                   }}
+                  loading={loading}
                 >
                   Wallet
                   <WalletIcon
@@ -191,16 +197,31 @@ export function DoctorView() {
         <Dialog open={creditMethod} onClose={() => setCreditMethod(false)}>
           <DialogTitle>
             {' '}
+            {
+              /* create a spinner */
+              loading ? (
+                <div className="spinner-border text-primary" role="status">
+                  <span className="visually-hidden">Loading...</span>
+                </div>
+              ) : null
+            }
             <Checkout
               handleSubmit={() => {
                 console.log('handleSubmit')
+                setLoading(true)
                 reserveTime(
                   date,
                   selectedFamilyMemberName!,
                   selectedFamilyMemberId!,
                   0
                 )
-                setCreditMethod(false)
+                  .then(() => {
+                    setCreditMethod(false)
+                    setLoading(false)
+                  })
+                  .catch(() => {
+                    setLoading(false)
+                  })
               }}
             />
           </DialogTitle>
