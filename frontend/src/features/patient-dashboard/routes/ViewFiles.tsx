@@ -26,17 +26,10 @@ function FileViewer() {
   const handleDelete = async (urlToDelete: string) => {
     try {
       // Send a POST request to delete the URL
-      const response = await fetch('/api/deleteURL', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ urlToDelete }),
-      })
-
-      if (!response.ok) {
-        throw new Error('Failed to delete URL')
-      }
+      await api.post(
+        'http://localhost:3000/patients/deleteMedicalHistory/mine',
+        { url: urlToDelete }
+      )
 
       // Remove the deleted URL from the state
       setDownloadURLs((prevURLs) =>

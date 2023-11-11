@@ -62,6 +62,16 @@ export async function uploadMedicalHistory(
   }
 }
 
+export async function deleteMedicalHistory(
+  id: string,
+  url: string
+): Promise<void> {
+  const patient = await PatientModel.findOne({ user: id }).exec()
+  if (patient == null) throw new NotFoundError()
+  patient.documents.filter((doc) => doc !== url)
+  await patient.save()
+}
+
 export async function getMyMedicalHistory(id: string): Promise<string[]> {
   const patient = await PatientModel.findOne({ user: id }).exec()
   if (patient == null) throw new NotFoundError()
