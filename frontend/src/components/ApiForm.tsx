@@ -1,7 +1,6 @@
 import { AlertsBox } from '@/components/AlertsBox'
 import { CardPlaceholder } from '@/components/CardPlaceholder'
 import { useAlerts } from '@/hooks/alerts'
-import { Alert } from '@/providers/AlertsProvider'
 import { zodResolver } from '@hookform/resolvers/zod'
 import FireBase  from 'clinic-common/firebase.config.ts'
 import { getStorage, ref , uploadBytes} from 'firebase/storage';
@@ -134,11 +133,19 @@ export function ApiForm<Request extends ObjectWithStringKeys>({
       queryClient.invalidateQueries({
         queryKey,
       })
-      addAlert(new Alert(successMessage, 'success', alertScope))
+      addAlert({
+        message: successMessage,
+        severity: 'success',
+        scope: alertScope,
+      })
       onSuccess?.()
     },
     onError: (e: Error) => {
-      addAlert(new Alert(e.message ?? 'Failed! Try again', 'error', alertScope))
+      addAlert({
+        message: e.message ?? 'Failed! Try again',
+        severity: 'error',
+        scope: alertScope,
+      })
     },
   })
 

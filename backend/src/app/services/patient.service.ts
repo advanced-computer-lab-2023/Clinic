@@ -1,18 +1,25 @@
+import { uploadMedicalHistoryRequest } from 'clinic-common/types/patient.types'
 import { NotFoundError } from '../errors'
 import {
   type AppointmentDocument,
   AppointmentModel,
 } from '../models/appointment.model'
+import { HealthPackageModel } from '../models/healthPackage.model'
 import { type PatientDocument, PatientModel } from '../models/patient.model'
 import {
   type PrescriptionDocument,
   PrescriptionModel,
 } from '../models/prescription.model'
-import { type UserDocument } from '../models/user.model'
+import { UserModel, type UserDocument } from '../models/user.model'
 import { type WithUser } from '../utils/typeUtils'
 import { type HydratedDocument, type ObjectId } from 'mongoose'
-
+import { getStorage, ref, uploadBytes } from 'firebase/storage'
+import { getDownloadURL } from 'firebase/storage'
+import FireBase from '../../../../firebase.config'
 type PatientDocumentWithUser = WithUser<PatientDocument>
+const storage = getStorage(FireBase)
+const storageRef = ref(storage, 'petients/medicalHistory')
+const storageRef2 = ref(storage, 'petients/HealthRecord')
 
 export async function getPatientByName(
   name: string
@@ -29,6 +36,37 @@ export async function getPatientByName(
     .exec()
 
   return patients
+}
+
+export async function uploadMedicalHistory(
+  info: uploadMedicalHistoryRequest
+): Promise<void> {
+  const { id, medicalHistory } = info
+  const fileRef = ref(storageRef, Date.now().toString())
+
+  try {
+    await uploadBytes(fileRef, medicalHistory.buffer, {
+      contentType: medicalHistory.mimetype,
+    })
+
+    console.log('Uploaded a blob or file!')
+
+    const fullPath = await getDownloadURL(fileRef)
+
+    const patient = await PatientModel.findOne({ user: id }).exec()
+    if (patient == null) throw new NotFoundError()
+    patient.documents.push(fullPath)
+    await patient.save()
+  } catch (error) {
+    console.log('Error uploading file:', error)
+  }
+}
+
+export async function getMyMedicalHistory(id: string): Promise<string[]> {
+  const patient = await PatientModel.findOne({ user: id }).exec()
+  if (patient == null) throw new NotFoundError()
+
+  return patient.documents
 }
 
 export async function getPatientByID(id: string): Promise<{
@@ -114,4 +152,128 @@ export async function getMyPatients(
 
   // Return the list of patients
   return filteredPatients
+}
+
+export async function addNoteToPatient(
+  id: string,
+  newNote: string
+): Promise<{
+  patient: PatientDocumentWithUser
+}> {
+  const patient = await PatientModel.findOne({ _id: id })
+    .populate<{ user: UserDocument }>('user')
+    .exec()
+  if (patient == null) throw new NotFoundError()
+  patient.notes.push(newNote)
+  await patient.save()
+
+  return { patient }
+}
+
+export async function getPatientNotes(username: string) {
+  const user = await UserModel.findOne({ username })
+  const patient = await PatientModel.findOne({ user: user?._id })
+
+  return patient?.notes
+}
+
+export async function subscribeToHealthPackage(params: {
+  patientUsername: string
+  healthPackageId: string
+}): Promise<void> {
+  const patient = await getPatientByUsername(params.patientUsername)
+
+  if (!patient) {
+    throw new NotFoundError()
+  }
+
+  const healthPackage = await HealthPackageModel.findById(
+    params.healthPackageId
+  )
+
+  if (!healthPackage) {
+    throw new NotFoundError()
+  }
+
+  patient.healthPackage = healthPackage.id
+
+  // Set renewal date to 1 year from now
+  const renewalDate = new Date()
+  renewalDate.setFullYear(renewalDate.getFullYear() + 1)
+  patient.healthPackageRenewalDate = renewalDate
+
+  await patient.save() //removed console.log
+}
+
+export async function unSubscribeToHealthPackage(params: {
+  patientUsername: string
+  healthPackageId: string
+}): Promise<void> {
+  const patient = await getPatientByUsername(params.patientUsername)
+
+  if (!patient) {
+    throw new NotFoundError()
+  }
+
+  const healthPackage = await HealthPackageModel.findById(
+    params.healthPackageId
+  )
+
+  if (!healthPackage) {
+    throw new NotFoundError()
+  }
+
+  patient.healthPackage = undefined
+  patient.healthPackageRenewalDate = undefined
+
+  await patient.save()
+}
+
+export async function getPatientByUsername(
+  username: string
+): Promise<HydratedDocument<PatientDocument> | null> {
+  const user = await UserModel.findOne({ username })
+
+  if (!user) {
+    throw new NotFoundError()
+  }
+
+  return await PatientModel.findOne({ user: user.id })
+}
+
+export async function uploadHealthRecords(info: any): Promise<void> {
+  const { id, HealthRecord } = info
+  const fileRef = ref(storageRef2, Date.now().toString())
+
+  try {
+    await uploadBytes(fileRef, HealthRecord.buffer, {
+      contentType: HealthRecord.mimetype,
+    })
+
+    console.log('Uploaded a blob or file!')
+
+    const fullPath = await getDownloadURL(fileRef)
+
+    const patient = await PatientModel.findOne({ _id: id }).exec()
+    if (patient == null) throw new NotFoundError()
+    patient.healthRecords.push(fullPath)
+    await patient.save()
+  } catch (error) {
+    console.log('Error uploading file:', error)
+  }
+}
+
+export async function getHealthRecordsFiles(id: string): Promise<string[]> {
+  const patient = await PatientModel.findOne({ _id: id })
+
+  return patient?.healthRecords || []
+}
+
+export async function getPatientHealthRecords(
+  username: string
+): Promise<string[]> {
+  const user = await UserModel.findOne({ username })
+  const patient = await PatientModel.findOne({ user: user?._id })
+
+  return patient?.healthRecords || []
 }

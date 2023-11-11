@@ -18,6 +18,20 @@ export class PatientResponseBase {
   ) {}
 }
 
+type MulterFile = {
+  fieldname: string
+  originalname: string
+  encoding: string
+  mimetype: string
+  buffer: Buffer
+  size: number
+}
+
+export interface uploadMedicalHistoryRequest {
+  id: string
+  medicalHistory: MulterFile
+}
+
 export class GetPatientResponse {
   constructor(public patients: PatientResponseBase[]) {}
 }
@@ -58,8 +72,17 @@ export class APatientResponseBase {
     public documents: string[],
     public appointments: GetFilteredAppointmentsResponse,
     public prescriptions: any[],
-    public notes: string[]
+    public notes: string[],
+    public walletMoney: number
   ) {}
 }
 
 export class GetAPatientResponse extends APatientResponseBase {}
+
+export class GetWalletMoneyResponse {
+  constructor(public money: number) {}
+}
+
+export class GetPatientLinkingMeResponse {
+  constructor(public names: string[]) {}
+}

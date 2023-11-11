@@ -14,6 +14,8 @@ import '@fontsource/roboto/700.css'
 
 import { AuthProvider } from './providers/AuthProvider'
 import { AlertsProvider } from './providers/AlertsProvider'
+import { SnackbarProvider } from 'notistack'
+import { ToastContainer } from 'react-toastify'
 
 const queryClient = new QueryClient()
 const router = createBrowserRouter(routes)
@@ -22,6 +24,12 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <AuthProvider>
       <QueryClientProvider client={queryClient}>
+        <SnackbarProvider
+          anchorOrigin={{
+            vertical: 'top',
+            horizontal: 'right',
+          }}
+        />
         <AlertsProvider>
           <LocalizationProvider dateAdapter={AdapterDayjs}>
             <RouterProvider router={router} />
@@ -29,5 +37,6 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         </AlertsProvider>
       </QueryClientProvider>
     </AuthProvider>
+    <ToastContainer />
   </React.StrictMode>
 )

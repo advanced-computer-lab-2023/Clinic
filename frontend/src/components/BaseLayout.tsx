@@ -1,4 +1,4 @@
-import { Logout } from '@mui/icons-material'
+import { AccountCircle, Logout } from '@mui/icons-material'
 import {
   Box,
   CssBaseline,
@@ -11,13 +11,14 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
+  IconButton,
 } from '@mui/material'
 import React from 'react'
 import { Link, Outlet } from 'react-router-dom'
 import { OnlyAuthenticated } from './OnlyAuthenticated'
-import { AlertsBox } from './AlertsBox'
 import { LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
+import { NotificationsList } from './Notifications'
 
 interface ListItemLinkProps {
   icon?: React.ReactElement
@@ -65,6 +66,21 @@ export function BaseLayout() {
           <Typography variant="h6" noWrap component="div">
             Clinic
           </Typography>
+          <Box sx={{ flexGrow: 1 }} />
+          <OnlyAuthenticated>
+            <NotificationsList />
+            <IconButton
+              size="large"
+              edge="end"
+              aria-label="account of current user"
+              // aria-controls={menuId}
+              aria-haspopup="true"
+              // onClick={handleProfileMenuOpen}
+              color="inherit"
+            >
+              <AccountCircle />
+            </IconButton>
+          </OnlyAuthenticated>
         </Toolbar>
       </AppBar>
       <Drawer
@@ -105,7 +121,6 @@ export function BaseLayout() {
         sx={{ flexGrow: 1, bgcolor: 'background.default', p: 3 }}
       >
         <Toolbar />
-        <AlertsBox />
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <Outlet
             context={

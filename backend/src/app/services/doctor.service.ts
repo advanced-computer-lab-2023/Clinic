@@ -1,6 +1,7 @@
 import { DoctorModel, type DoctorDocument } from '../models/doctor.model'
 import { UserModel, type UserDocument } from '../models/user.model'
 import {
+  AddAvailableTimeSlotsRequest,
   DoctorStatus,
   type UpdateDoctorRequest,
 } from 'clinic-common/types/doctor.types'
@@ -131,4 +132,62 @@ export async function rejectDoctor(
   if (doctor == null) throw new NotFoundError()
 
   return doctor
+}
+
+export async function addAvailableTimeSlots(
+  username: string,
+  req: AddAvailableTimeSlotsRequest
+): Promise<DoctorDocumentWithUser> {
+  const user = await UserModel.findOne({ username })
+
+  if (user == null) throw new NotFoundError()
+
+  const doctor = await DoctorModel.findOneAndUpdate(
+    { user: user.id },
+    { $push: { availableTimes: new Date(req.time) } },
+    {
+      new: true,
+    }
+  ).populate<{
+    user: UserDocument
+  }>('user')
+  if (doctor == null) throw new NotFoundError()
+
+  return doctor
+}
+
+export async function removeTimeFromDoctorAvailability(
+  doctorID: string,
+  timeToRemove: Date
+): Promise<DoctorDocument | null> {
+  // Find the doctor by ID
+  const doctor = await DoctorModel.findById(doctorID)
+
+  if (!doctor) {
+    throw new NotFoundError()
+  }
+
+  // Ensure doctor.availableTimes exists before accessing it
+  if (!doctor.availableTimes) {
+    throw new APIError("Doctor's availableTimes is undefined", 400)
+  }
+
+  // Check if the time exists in the doctor's availableTimes array
+  const removed = new Date(timeToRemove)
+  const indexOfTimeToRemove = doctor.availableTimes.findIndex(
+    (time) => time.getTime() === removed.getTime()
+  )
+
+  if (indexOfTimeToRemove === -1) {
+    // The time is not found in the availableTimes array
+    throw new APIError("Time not found in doctor's available times", 400)
+  }
+
+  // Remove the time from the availableTimes array
+  doctor.availableTimes.splice(indexOfTimeToRemove, 1)
+
+  // Save the updated doctor document
+  const updatedDoctor = await doctor.save()
+
+  return updatedDoctor
 }

@@ -176,6 +176,7 @@ export async function submitDoctorRequest(
     educationalBackground: doctor.educationalBackground,
     speciality: doctor.speciality,
     requestStatus: DoctorStatus.Pending,
+    documents: doctor.documents,
   })
   await newDoctor.save()
 
@@ -217,7 +218,11 @@ export async function isDoctorAndApproved(username: string): Promise<boolean> {
 
   const doctor = await DoctorModel.findOne({ user: user.id })
 
-  return doctor != null && doctor.requestStatus === 'approved'
+  return (
+    doctor != null &&
+    doctor.requestStatus === 'approved' &&
+    doctor.contractStatus === 'accepted'
+  )
 }
 
 export async function isDoctorPatientAuthorized(

@@ -22,7 +22,7 @@ import {
 } from '../models/prescription.model'
 import { Relation } from 'clinic-common/types/familyMember.types'
 import { Gender } from 'clinic-common/types/gender.types'
-import { type HydratedDocument } from 'mongoose'
+import mongoose, { type HydratedDocument } from 'mongoose'
 import { createDefaultHealthPackages } from '../services/healthPackage.service'
 import { AppointmentStatus } from 'clinic-common/types/appointment.types'
 import {
@@ -93,6 +93,10 @@ async function createDummyDoctor(
     speciality: faker.helpers.arrayElement(specialities),
     requestStatus: status,
     availableTimes: randomFutureDates(),
+    walletMoney: faker.number.int({
+      min: 10000,
+      max: 20000,
+    }),
   })
 
   if (withAppointments) {
@@ -139,11 +143,22 @@ async function createDummyAppointment(
   patientId: string,
   doctorId: string
 ): Promise<HydratedDocument<AppointmentDocument>> {
+  const patient = await PatientModel.findById(patientId)
+  const familyMemberIds = patient?.familyMembers ?? []
+  const forFamilyMember = familyMemberIds.length > 0 && faker.datatype.boolean()
+  const chosenFamilyMember = forFamilyMember
+    ? await FamilyMemberModel.findById(
+        faker.helpers.arrayElement(familyMemberIds)
+      )
+    : undefined
+
   return await AppointmentModel.create({
     patientID: patientId,
     doctorID: doctorId,
     date: faker.date.anytime(),
     status: faker.helpers.enumValue(AppointmentStatus),
+    familyID: forFamilyMember ? chosenFamilyMember?.id : undefined,
+    reservedFor: forFamilyMember ? chosenFamilyMember?.name : patient?.name,
   })
 }
 
@@ -157,7 +172,22 @@ async function createDummyPatient(
     username,
     password: await hash('patient', bcryptSalt),
     type: UserType.Patient,
+    notifications: [
+      {
+        title: faker.lorem.sentence(),
+        description: faker.lorem.sentence(),
+      },
+      {
+        title: faker.lorem.sentence(),
+        description: faker.lorem.sentence(),
+      },
+    ],
   })
+
+  const healthPackage = faker.helpers.arrayElement([
+    ...(await HealthPackageModel.find()).map((hp) => hp.id),
+    undefined,
+  ])
 
   const patient = await PatientModel.create({
     user: user.id,
@@ -170,11 +200,13 @@ async function createDummyPatient(
       name: faker.person.fullName(),
       mobileNumber: faker.phone.number(),
     },
-    healthPackage: faker.helpers.arrayElement([
-      ...(await HealthPackageModel.find()).map((hp) => hp.id),
-      undefined,
-    ]),
+    healthPackage,
+    healthPackageRenewalDate: healthPackage ? faker.date.anytime() : undefined,
     notes: [faker.lorem.sentence()],
+    walletMoney: faker.number.int({
+      min: 10000,
+      max: 20000,
+    }),
   })
 
   for (let i = 0; i < 3; i++) {
@@ -236,31 +268,12 @@ debugRouter.post(
   })
 )
 
-// debugRouter.post(
-//   '/create-patient',
-//   asyncWrapper(async (req, res) => {
-//     const user = await UserModel.create({
-//       username: 'patient' + Math.random(),
-//       password: await hash('patient', bcryptSalt),
-//       type: UserType.Patient,
-//     })
-
-//     const patient = await PatientModel.create({
-//       user: user.id,
-//       name: 'Patient',
-//       email: user.username + '@gmail.com',
-//       mobileNumber: '01001111111',
-//       dateOfBirth: new Date(),
-//       gender: 'female',
-//       emergencyContact: {
-//         name: 'Emergency1',
-//         mobileNumber: '0100111111',
-//       },
-//     })
-
-//     res.send(patient)
-//   })
-// )
+debugRouter.post(
+  '/create-patient',
+  asyncWrapper(async (req, res) => {
+    res.send(await createDummyPatient())
+  })
+)
 
 debugRouter.post(
   '/create-patient-onlyonce',
@@ -365,6 +378,8 @@ debugRouter.post(
 debugRouter.post(
   '/seed',
   asyncWrapper(async (req, res) => {
+    await mongoose.connection.db.dropDatabase()
+
     await createDefaultHealthPackages()
 
     const admin = await createDummyAdmin('admin')

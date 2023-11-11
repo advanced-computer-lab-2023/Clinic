@@ -2,6 +2,8 @@ import { api } from '.'
 import {
   AddHealthPackageResponse,
   GetAllHealthPackagesResponse,
+  GetHealthPackageForPatientRequest,
+  GetHealthPackageForPatientResponse,
   GetHealthPackageResponse,
   UpdateHealthPackageRequest,
   UpdateHealthPackageResponse,
@@ -41,4 +43,43 @@ export async function addHealthPackage(
 
 export async function deleteHealthPackage(id: string): Promise<void> {
   await api.delete(`/health-packages/${id}`).then((res) => res.data)
+}
+
+export async function subscribeToHealthPackage(id: string): Promise<void> {
+  return await api
+    .post<void>(`/health-packages/${id}/subscribe`)
+    .then((res) => res.data)
+}
+
+export async function subscribeWalletToHealthPackage(
+  id: string
+): Promise<void> {
+  return await api
+    .patch<void>(`/health-packages/wallet/subscriptions/${id}`)
+    .then((res) => res.data)
+}
+
+export async function subscribeCreditToHealthPackage(
+  id: string
+): Promise<void> {
+  return await api
+    .patch<void>(`/health-packages/credit-card/subscriptions/${id}`)
+    .then((res) => res.data)
+}
+
+export async function unsubscribeToHealthPackage(id: string): Promise<void> {
+  return await api
+    .post<void>(`/health-packages/${id}/unsubscribe`)
+    .then((res) => res.data)
+}
+
+export async function getHealthPackageForPatient(
+  params: GetHealthPackageForPatientRequest
+): Promise<GetHealthPackageForPatientResponse> {
+  return await api
+    .post<GetHealthPackageForPatientResponse>(
+      `/health-packages/for-patient`,
+      params
+    )
+    .then((res) => res.data)
 }

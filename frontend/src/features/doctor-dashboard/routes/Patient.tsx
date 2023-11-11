@@ -1,11 +1,28 @@
 import { getPatient } from '@/api/patient'
 import { AlertsBox } from '@/components/AlertsBox'
 import { CardPlaceholder } from '@/components/CardPlaceholder'
-import { Card, CardContent, Stack, Typography } from '@mui/material'
+import {
+  Card,
+  CardContent,
+  Stack,
+  Typography,
+  Button,
+  TextField,
+} from '@mui/material'
 import { useQuery } from '@tanstack/react-query'
-import { useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
+import AddIcon from '@mui/icons-material/Add'
+import { useState } from 'react'
+import axios from 'axios'
 
 export function Patient() {
+  const [showTextField, setShowTextField] = useState(false)
+  const [showButton, setShowButton] = useState(false)
+
+  const [notes, setNotes] = useState('')
+
+  const [notesError, setNotesError] = useState(false)
+
   const { id } = useParams()
   const query = useQuery({
     queryKey: ['get-patient'],
@@ -20,6 +37,36 @@ export function Patient() {
 
   if (patient == null) {
     return <AlertsBox />
+  }
+
+  const handleButtonClick = () => {
+    setShowTextField(true)
+    setShowButton(true)
+  }
+
+  async function submit() {
+    if (notes === '') {
+      setNotesError(true)
+      alert('Please enter a health record ')
+    } else {
+      setNotesError(false)
+      setShowTextField(false)
+      setShowButton(false)
+      console.log(notes)
+      console.log(id)
+      await axios
+        .patch(`http://localhost:3000/patients/addNote/${id}`, {
+          newNote: notes,
+        })
+        .then(() => {
+          alert('Note added successfully')
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+
+      setNotes('')
+    }
   }
 
   return (
@@ -103,11 +150,36 @@ export function Patient() {
           <Stack spacing={-1}>
             <Typography variant="overline" color="text.secondary">
               Medical Records
+              <Button onClick={handleButtonClick}>
+                <AddIcon />
+              </Button>
             </Typography>
+
             {patient.notes.map((note) => (
               <Typography variant="body1">{note}</Typography>
             ))}
           </Stack>
+          {showTextField && (
+            <TextField
+              onChange={(e) => setNotes(e.target.value)}
+              label="Add health record"
+              variant="outlined"
+              color="secondary"
+              error={notesError}
+            />
+          )}
+          {showButton && (
+            <Button type="submit" onClick={submit} variant="contained">
+              ADD
+            </Button>
+          )}
+          <Link
+            to={'http://localhost:5173/doctor-dashboard/healthRecords/' + id}
+          >
+            <Button variant="contained" color="primary">
+              Health Records Files
+            </Button>
+          </Link>
         </Stack>
       </CardContent>
     </Card>

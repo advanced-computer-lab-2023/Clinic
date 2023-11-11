@@ -19,12 +19,18 @@ const familyMemberSchema = new Schema(
       required: true,
       enum: Relation,
     },
-    /**
-     * Removed this in favor of PatientModel.familyMembers, it makes the query
-     * easier and more efficient. And we usually start from the patient and get
-     * their family members, not the other way around.
-     */
-    // relatedTo: { type: Schema.Types.ObjectId, ref: 'Patient', required: true },
+    healthPackage: { type: Schema.Types.ObjectId, ref: 'HealthPackage' },
+    patient: { type: Schema.Types.ObjectId, ref: 'Patient' },
+    healthPackageHistory: [
+      {
+        healthPackage: {
+          type: Schema.Types.ObjectId,
+          ref: 'HealthPackage',
+          required: true,
+        },
+        date: { type: Date, required: true },
+      },
+    ],
   },
   { timestamps: true }
 )
