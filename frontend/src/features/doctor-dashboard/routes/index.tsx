@@ -8,6 +8,7 @@ import { Patient } from '@/features/doctor-dashboard/routes/Patient'
 import { ViewMyAvailableTimeSlots } from './ViewMyAvailableTimeSlots'
 
 import { Wallet } from './Wallet'
+import AddHealthRecord from './AddHealthRecord'
 
 export const doctorDashboardRoutes: RouteObject[] = [
   {
@@ -40,6 +41,10 @@ export const doctorDashboardRoutes: RouteObject[] = [
       {
         path: 'wallet',
         element: <Wallet />,
+      },
+      {
+        path: 'healthRecords/:id',
+        element: <AddHealthRecord />,
       },
     ],
   },
