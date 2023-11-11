@@ -66,10 +66,18 @@ export async function deleteMedicalHistory(
   id: string,
   url: string
 ): Promise<void> {
-  const patient = await PatientModel.findOne({ user: id }).exec()
-  if (patient == null) throw new NotFoundError()
-  patient.documents.filter((doc) => doc !== url)
-  await patient.save()
+  const updateResult = await PatientModel.updateOne(
+    { user: id },
+    { $pull: { documents: url } }
+  ).exec()
+
+  if (updateResult.matchedCount === 0) {
+    throw new NotFoundError() // If no document was found
+  }
+
+  if (updateResult.modifiedCount === 0) {
+    throw new Error('No document was modified') // If the document was found but not modified
+  }
 }
 
 export async function getMyMedicalHistory(id: string): Promise<string[]> {

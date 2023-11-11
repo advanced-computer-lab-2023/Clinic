@@ -73,6 +73,7 @@ patientRouter.post(
     if (user == null) throw new NotAuthenticatedError()
 
     const url = req.body.url
+    console.log(url)
     const response = await deleteMedicalHistory(user.id, url)
     res.send(response)
   })
