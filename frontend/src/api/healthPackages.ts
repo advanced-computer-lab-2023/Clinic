@@ -94,8 +94,8 @@ export async function getCancelledHealthPackagesForPatient(): Promise<
 
 export async function getCanellationDate(
   healthPackageId: string
-): Promise<Date> {
+): Promise<string> {
   return await api
-    .get<Date>(`/health-packages/cancellation-date/${healthPackageId}`)
+    .post<string>(`/health-packages/cancellation-date/${healthPackageId}`)
     .then((res) => res.data)
 }

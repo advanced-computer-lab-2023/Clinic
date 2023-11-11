@@ -246,13 +246,17 @@ healthPackagesRouter.post(
 healthPackagesRouter.post(
   '/cancellation-date/:healthPackageId',
   asyncWrapper(async (req, res) => {
-    const patient = await getPatientByUsername(req.body.username)
+    if (!req.username) throw new NotFoundError()
+    const patient = await getPatientByUsername(req.username)
     if (!patient) throw new NotFoundError()
+    console.log('looking for' + req.params.healthPackageId)
     patient.healthPackageHistory.forEach((healthPackage) => {
+      console.log('history' + healthPackage.healthPackage.toString())
+
       if (
         healthPackage.healthPackage.toString() === req.params.healthPackageId
       ) {
-        res.send(healthPackage.date)
+        res.send(healthPackage.date.toDateString())
       }
     })
   })
