@@ -147,7 +147,9 @@ export class GetDoctorResponse extends DoctorResponseBase {
     educationalBackground: string,
     speciality: string,
     requestStatus: DoctorStatus,
-    public availableTimes: [Date]
+    public contractStatus: ContractStatus,
+    public availableTimes: [Date],
+    public employmentContract: [string]
   ) {
     super(
       id,

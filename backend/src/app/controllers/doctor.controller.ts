@@ -170,7 +170,9 @@ doctorsRouter.get(
         doctor.educationalBackground,
         doctor.speciality,
         doctor.requestStatus as DoctorStatus,
-        doctor.availableTimes as [Date]
+        doctor.contractStatus as ContractStatus,
+        doctor.availableTimes as [Date],
+        doctor.employmentContract as [string]
       )
     )
   })

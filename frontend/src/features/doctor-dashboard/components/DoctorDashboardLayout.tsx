@@ -12,8 +12,9 @@ import { useQuery } from '@tanstack/react-query'
 import { CardPlaceholder } from '@/components/CardPlaceholder'
 import { Typography } from '@mui/material'
 import { getDoctor } from '@/api/doctor'
-import { DoctorStatus } from 'clinic-common/types/doctor.types'
+import { ContractStatus, DoctorStatus } from 'clinic-common/types/doctor.types'
 import VisibilityIcon from '@mui/icons-material/Visibility'
+import AssignmentIcon from '@mui/icons-material/Assignment'
 
 export function DoctorDashboardLayout() {
   const { setSidebarLinks } = useSidebar()
@@ -32,6 +33,18 @@ export function DoctorDashboardLayout() {
 
     if (doctorQuery.data?.requestStatus != DoctorStatus.Approved) {
       setSidebarLinks([])
+
+      return
+    }
+
+    if (doctorQuery.data?.contractStatus != ContractStatus.Accepted) {
+      setSidebarLinks([
+        {
+          to: '/doctor-dashboard/employmentContract',
+          text: 'Employment Contract',
+          icon: <AssignmentIcon />,
+        },
+      ])
 
       return
     }
@@ -62,8 +75,18 @@ export function DoctorDashboardLayout() {
         text: 'Wallet',
         icon: <Wallet />,
       },
+      {
+        to: '/doctor-dashboard/employmentContract',
+        text: 'Employment Contract',
+        icon: <AssignmentIcon />,
+      },
     ])
-  }, [setSidebarLinks, user, doctorQuery.data?.requestStatus])
+  }, [
+    setSidebarLinks,
+    user,
+    doctorQuery.data?.requestStatus,
+    doctorQuery.data?.contractStatus,
+  ])
 
   if (!user) {
     return <Navigate to="/" />

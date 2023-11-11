@@ -1,4 +1,5 @@
 import {
+  AcceptOrRejectContractResponse,
   AddAvailableTimeSlotsRequest,
   AddAvailableTimeSlotsResponse,
   GetApprovedDoctorResponse,
@@ -71,6 +72,18 @@ export async function addAvailableTimeSlots(
 ): Promise<AddAvailableTimeSlotsResponse> {
   return await api
     .patch<AddAvailableTimeSlotsResponse>(`/doctors/addAvailableTimeSlots`, req)
+    .then((res) => res.data)
+}
+
+export async function acceptEmploymentContract(): Promise<AcceptOrRejectContractResponse> {
+  return await api
+    .patch<AcceptOrRejectContractResponse>(`/doctors/acceptEmploymentContract`)
+    .then((res) => res.data)
+}
+
+export async function rejectEmploymentContract(): Promise<AcceptOrRejectContractResponse> {
+  return await api
+    .patch<AcceptOrRejectContractResponse>(`/doctors/rejectEmploymentContract`)
     .then((res) => res.data)
 }
 
