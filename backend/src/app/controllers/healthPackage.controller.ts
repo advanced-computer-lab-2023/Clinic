@@ -233,7 +233,7 @@ healthPackagesRouter.post(
 healthPackagesRouter.post(
   '/patient-cancelled',
   asyncWrapper(async (req, res) => {
-    const patient = await getPatientByUsername(req.body.username)
+    const patient = await getPatientByUsername(req.username!)
     const cancelled: Types.ObjectId[] = []
     if (!patient) throw new NotFoundError()
     patient.healthPackageHistory.forEach((healthPackage) => {

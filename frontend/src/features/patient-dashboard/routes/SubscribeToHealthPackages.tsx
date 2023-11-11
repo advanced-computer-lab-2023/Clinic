@@ -28,7 +28,7 @@ import {
   Typography,
 } from '@mui/material'
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { LoadingButton } from '@mui/lab'
 import { AddModerator } from '@mui/icons-material'
 import { useAlerts } from '@/hooks/alerts'
@@ -59,11 +59,27 @@ export function SubscribeToHealthPackages() {
     queryKey: ['subscribed-health-packages'],
     queryFn: () => getHealthPackageForPatient({ username: user!.username }),
   })
-
   const cancelledHealthPackagesQuery = useQuery({
     queryKey: ['cancelled-health-packages'],
-    queryFn: () => getCancelledHealthPackagesForPatient,
+    queryFn: () => getCancelledHealthPackagesForPatient(),
   })
+  useEffect(() => {
+    console.log(
+      'cancelledHealthPackagesQuery',
+      cancelledHealthPackagesQuery.data
+    )
+  }, [cancelledHealthPackagesQuery.data])
+  useEffect(() => {
+    console.log(
+      'subscribedHealthPackageQuery',
+      cancelledHealthPackagesQuery.data
+    )
+    console.log('query.data', query.data)
+  }, [cancelledHealthPackagesQuery.data, query.data])
+  //execute the query
+  useEffect(() => {
+    console.log('query', cancelledHealthPackagesQuery.data)
+  }, [])
 
   const onSuccess =
     (message: string = 'Subscribed to health package successfully.') =>
@@ -126,26 +142,26 @@ export function SubscribeToHealthPackages() {
   )
 
   /*const getCancelledPackages = async () => {
-    // Assuming cancelledPackages is an asynchronous function that returns a promise
-    const cancelledPackagesData = await cancelledHealthPackagesQuery
+      // Assuming cancelledPackages is an asynchronous function that returns a promise
+      const cancelledPackagesData = await cancelledHealthPackagesQuery
 
-    return cancelledPackagesData || []
-  }*/
+      return cancelledPackagesData || []
+    }*/
 
   /*const cancelledPackagesArray = useQuery({
-    queryKey: ['cancelled-packages'],
-    queryFn: getCancelledPackages,
-  })*/
+      queryKey: ['cancelled-packages'],
+      queryFn: getCancelledPackages,
+    })*/
 
   /*const isPackageCancelled = useMemo(() => {
-    const cancelledPackages = cancelledPackagesArray.data || []
+      const cancelledPackages = cancelledPackagesArray.data || []
 
-    return (
-      allHealthPackageId &&
-      cancelledPackages &&
-      allHealthPackageId in cancelledPackages
-    )
-  }, [allHealthPackageId, cancelledPackagesArray.data])*/
+      return (
+        allHealthPackageId &&
+        cancelledPackages &&
+        allHealthPackageId in cancelledPackages
+      )
+    }, [allHealthPackageId, cancelledPackagesArray.data])*/
 
   if (query.isLoading) {
     return <CardPlaceholder />
@@ -202,8 +218,10 @@ export function SubscribeToHealthPackages() {
                         label="Subscribed"
                       />
                     )}
-                    {cancelledHealthPackagesQuery.data &&
-                      healthPackage.id in cancelledHealthPackagesQuery.data && (
+                    {cancelledHealthPackagesQuery.data?.includes(
+                      healthPackage.id
+                    ) && (
+                      <>
                         <Chip
                           label={`Cancelled on ${getCanellationDate(
                             healthPackage.id
@@ -211,7 +229,8 @@ export function SubscribeToHealthPackages() {
                           color="error"
                           size="small"
                         />
-                      )}
+                      </>
+                    )}
                   </Stack>
 
                   <Stack spacing={-1}>
