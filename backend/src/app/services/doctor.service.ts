@@ -176,6 +176,7 @@ export async function addAvailableTimeSlots(
   return doctor
 }
 
+
 export async function rejectEmploymentContract(
   username: string
 ): Promise<DoctorDocumentWithUser> {
@@ -222,4 +223,39 @@ export async function acceptEmploymentContract(
   if (doctor == null) throw new NotFoundError()
 
   return doctor
+
+export async function removeTimeFromDoctorAvailability(
+  doctorID: string,
+  timeToRemove: Date
+): Promise<DoctorDocument | null> {
+  // Find the doctor by ID
+  const doctor = await DoctorModel.findById(doctorID)
+
+  if (!doctor) {
+    throw new NotFoundError()
+  }
+
+  // Ensure doctor.availableTimes exists before accessing it
+  if (!doctor.availableTimes) {
+    throw new APIError("Doctor's availableTimes is undefined", 400)
+  }
+
+  // Check if the time exists in the doctor's availableTimes array
+  const removed = new Date(timeToRemove)
+  const indexOfTimeToRemove = doctor.availableTimes.findIndex(
+    (time) => time.getTime() === removed.getTime()
+  )
+
+  if (indexOfTimeToRemove === -1) {
+    // The time is not found in the availableTimes array
+    throw new APIError("Time not found in doctor's available times", 400)
+  }
+
+  // Remove the time from the availableTimes array
+  doctor.availableTimes.splice(indexOfTimeToRemove, 1)
+
+  // Save the updated doctor document
+  const updatedDoctor = await doctor.save()
+
+  return updatedDoctor
 }

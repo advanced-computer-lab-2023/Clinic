@@ -4,6 +4,7 @@ import {
   createFamilyMember,
   findFamilyMemberByEmail,
   findFamilyMemberByMobileNumber,
+  findLinkingMe,
   getFamilyMemberById,
   getFamilyMembers,
   getPatientForFamilyMember,
@@ -24,10 +25,14 @@ import {
 } from 'clinic-common/validators/familyMembers.validator'
 import { validate } from '../middlewares/validation.middleware'
 import { type Gender } from 'clinic-common/types/gender.types'
-import { PatientResponseBase } from 'clinic-common/types/patient.types'
+import {
+  GetPatientLinkingMeResponse,
+  PatientResponseBase,
+} from 'clinic-common/types/patient.types'
 import { FamilyMemberModel } from '../models/familyMember.model'
 import { PatientModel } from '../models/patient.model'
 import { UserModel } from '../models/user.model'
+import { getHealthPackageNameById } from '../services/healthPackage.service'
 
 export const familyMemberRouter = Router()
 
@@ -38,18 +43,27 @@ familyMemberRouter.get(
   asyncWrapper(async (req, res) => {
     const familyMembers = await getFamilyMembers(req.username as string)
 
-    res.send(
-      new GetFamilyMembersResponse(
-        familyMembers.map((familyMember) => ({
-          id: familyMember.id,
-          name: familyMember.name,
-          nationalId: familyMember.nationalId,
-          age: familyMember.age,
-          gender: familyMember.gender as Gender,
-          relation: familyMember.relation as Relation,
-        }))
+    const familyMembersResponse = new GetFamilyMembersResponse(
+      await Promise.all(
+        familyMembers.map(async (familyMember) => {
+          return {
+            id: familyMember.id,
+            name: familyMember.name,
+            nationalId: familyMember.nationalId,
+            age: familyMember.age,
+            gender: familyMember.gender as Gender,
+            relation: familyMember.relation as Relation,
+            currentHealthPackage: {
+              healthPackageName: 'N/A',
+              renewalDate: 'N/A',
+            },
+            healthPackageHistory: [], //empty array because we dont really need it
+          }
+        })
       )
     )
+
+    res.send(familyMembersResponse)
   })
 )
 
@@ -83,6 +97,7 @@ familyMemberRouter.post(
       age: calculatedAge,
       gender: familyMember?.gender,
       relation: req.body.relation,
+      healthPackage: familyMember?.healthPackage,
       patient: familyMember?._id,
     })
     await newFamilyMember.save()
@@ -97,6 +112,20 @@ familyMemberRouter.post(
     res.send(familyMember)
   })
 )
+
+// Get all patients that are linked to the currently logged in family member
+
+familyMemberRouter.get(
+  '/linking-me',
+  asyncWrapper(async (req, res) => {
+    const patients = await findLinkingMe(req.username as string)
+    // Extract only the names from the patients array
+    const patientNames = patients.map((patient) => patient.name)
+
+    res.send(new GetPatientLinkingMeResponse(patientNames))
+  })
+)
+
 // Create a family member for the patient with the given username
 familyMemberRouter.post(
   '/:patientUsername',
@@ -114,7 +143,9 @@ familyMemberRouter.post(
         newFamilyMember.nationalId,
         newFamilyMember.age,
         newFamilyMember.gender as Gender,
-        newFamilyMember.relation as Relation
+        newFamilyMember.relation as Relation,
+        { healthPackageName: 'N/A', renewalDate: 'N/A' },
+        []
       )
     )
   })
@@ -126,6 +157,27 @@ familyMemberRouter.get(
   asyncWrapper(async (req, res) => {
     const familyMember = await getFamilyMemberById(req.params.familyMemberId)
     const patient = await getPatientForFamilyMember(req.params.familyMemberId)
+    const healthPackageName = await getHealthPackageNameById(
+      familyMember?.healthPackage?.toString()
+    )
+
+    let renewalDate = 'N/A'
+    const healthPackageHistory = await Promise.all(
+      familyMember.healthPackageHistory.map(async (historyEntry) => {
+        if (historyEntry.healthPackage == familyMember.healthPackage)
+          renewalDate = historyEntry.date.toDateString()
+        else {
+          const healthPackageName = await getHealthPackageNameById(
+            historyEntry.healthPackage?.toString()
+          )
+
+          return {
+            package: healthPackageName,
+            date: historyEntry.date,
+          }
+        }
+      })
+    )
 
     res.send(
       new GetFamilyMemberResponse(
@@ -135,7 +187,11 @@ familyMemberRouter.get(
           familyMember.nationalId,
           familyMember.age,
           familyMember.gender as Gender,
-          familyMember.relation as Relation
+          familyMember.relation as Relation,
+          { healthPackageName, renewalDate },
+          healthPackageHistory.filter(
+            (historyEntry) => historyEntry !== undefined
+          ) as { package: string; date: Date }[]
         ),
         new PatientResponseBase(
           patient.id,

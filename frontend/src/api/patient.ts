@@ -54,3 +54,23 @@ export async function getPatientHealthRecords() {
     return res.data
   })
 }
+
+export async function getMyMedicalHistory() {
+  return await api.get('/patients/viewMedicalHistory').then((res) => {
+    return res.data
+  })
+}
+
+export async function getPatientHealthRecordsFiles(id: string) {
+  return await api
+    .get(`/patients/viewHealthRecords/Files/${id}`)
+    .then((res) => {
+      return res.data
+    })
+}
+
+export async function getMyHealthRecordsFiles() {
+  return await api.get(`/patients//viewHealthRecordsFiles`).then((res) => {
+    return res.data
+  })
+}

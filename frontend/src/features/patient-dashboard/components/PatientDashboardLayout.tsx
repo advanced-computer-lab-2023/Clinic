@@ -53,6 +53,11 @@ export function PatientDashboardLayout() {
         text: 'MyHealthRecords',
         icon: <DocumentScannerOutlined />,
       },
+      {
+        to: '/patient-dashboard/MyMedicalHistory',
+        text: 'MyMedicalHistory',
+        icon: <DocumentScannerOutlined />,
+      },
     ])
   }, [setSidebarLinks])
 
