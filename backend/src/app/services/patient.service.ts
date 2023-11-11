@@ -197,6 +197,11 @@ export async function subscribeToHealthPackage(params: {
 
   patient.healthPackage = healthPackage.id
 
+  // Set renewal date to 1 year from now
+  const renewalDate = new Date()
+  renewalDate.setFullYear(renewalDate.getFullYear() + 1)
+  patient.healthPackageRenewalDate = renewalDate
+
   await patient.save() //removed console.log
 }
 
@@ -219,6 +224,7 @@ export async function unSubscribeToHealthPackage(params: {
   }
 
   patient.healthPackage = undefined
+  patient.healthPackageRenewalDate = undefined
 
   await patient.save()
 }

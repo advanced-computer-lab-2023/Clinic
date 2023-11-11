@@ -2,6 +2,8 @@ import { api } from '.'
 import {
   AddHealthPackageResponse,
   GetAllHealthPackagesResponse,
+  GetHealthPackageForPatientRequest,
+  GetHealthPackageForPatientResponse,
   GetHealthPackageResponse,
   UpdateHealthPackageRequest,
   UpdateHealthPackageResponse,
@@ -68,5 +70,16 @@ export async function subscribeCreditToHealthPackage(
 export async function unsubscribeToHealthPackage(id: string): Promise<void> {
   return await api
     .post<void>(`/health-packages/${id}/unsubscribe`)
+    .then((res) => res.data)
+}
+
+export async function getHealthPackageForPatient(
+  params: GetHealthPackageForPatientRequest
+): Promise<GetHealthPackageForPatientResponse> {
+  return await api
+    .post<GetHealthPackageForPatientResponse>(
+      `/health-packages/for-patient`,
+      params
+    )
     .then((res) => res.data)
 }
