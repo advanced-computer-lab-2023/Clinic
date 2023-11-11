@@ -12,29 +12,33 @@ export type UpdateHealthPackageRequest = z.infer<
   typeof UpdateHealthPackageRequestValidator
 >
 
-export class HealthPackageResponseBase {
-  constructor(
-    public name: string,
-    public id: string,
-    public pricePerYear: number,
-    public sessionDiscount: number,
-    public medicineDiscount: number,
-    public familyMemberSubscribtionDiscount: number
-  ) {}
+export interface HealthPackageResponseBase {
+  name: string
+  id: string
+  pricePerYear: number
+  sessionDiscount: number
+  medicineDiscount: number
+  familyMemberSubscribtionDiscount: number
 }
 
-export class UpdateHealthPackageResponse extends HealthPackageResponseBase {}
+export interface UpdateHealthPackageResponse
+  extends HealthPackageResponseBase {}
 
-export class AddHealthPackageResponse extends HealthPackageResponseBase {}
+export interface AddHealthPackageResponse extends HealthPackageResponseBase {}
 
-export class GetAllHealthPackagesResponse {
-  constructor(
-    public healthPackages: Array<
-      HealthPackageResponseBase & {
-        isSubscribed: boolean
-      }
-    >
-  ) {}
+export interface GetAllHealthPackagesResponse {
+  healthPackages: HealthPackageResponseBase[]
 }
 
-export class GetHealthPackageResponse extends HealthPackageResponseBase {}
+export interface GetHealthPackageResponse extends HealthPackageResponseBase {}
+
+export interface GetHealthPackageForPatientRequest {
+  username: string
+}
+
+export interface GetHealthPackageForPatientResponse {
+  healthPackage?: HealthPackageResponseBase & {
+    renewalDate: string
+    remainingMonths: number
+  }
+}
