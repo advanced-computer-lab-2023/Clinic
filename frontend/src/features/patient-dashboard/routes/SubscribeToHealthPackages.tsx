@@ -45,7 +45,6 @@ export function SubscribeToHealthPackages() {
   const [creditMethodIdPackage, setCreditMethodIdPackage] = useState<
     null | string
   >()
-  /*let allHealthPackageId: string = ''*/
 
   const alerts = useAlerts()
   const { user } = useAuth()
@@ -141,13 +140,35 @@ export function SubscribeToHealthPackages() {
     [query, selectedHealthPackageId]
   )
 
-  const [cancellationDateLabel, setCancellationDateLabel] = useState<
-    string | null
-  >(null)
-  let hp = ''
+  const [cancellationDatesMap, setCancellationDatesMap] = useState<
+    Record<string, string>
+  >({})
+
   useEffect(() => {
-    if (hp !== '') getCanellationDate(hp).then(setCancellationDateLabel)
-  }, [hp, setCancellationDateLabel])
+    // Fetch cancellation date for each health package
+    const fetchCancellationDates = async () => {
+      try {
+        const dates = await Promise.all(
+          cancelledHealthPackagesQuery.data?.map(async (healthPackage) => {
+            const date = await getCanellationDate(healthPackage)
+
+            return { id: healthPackage, date }
+          }) ?? []
+        )
+
+        const cancellationDatesMap = Object.fromEntries(
+          dates.map(({ id, date }) => [id, date])
+        )
+
+        // Set the dates in the state
+        setCancellationDatesMap(cancellationDatesMap)
+      } catch (error) {
+        console.error('Error fetching cancellation dates:', error)
+      }
+    }
+
+    fetchCancellationDates()
+  }, [cancelledHealthPackagesQuery.data]) // Dependency on query.data
 
   if (query.isLoading) {
     return <CardPlaceholder />
@@ -165,145 +186,140 @@ export function SubscribeToHealthPackages() {
             </Alert>
           </Grid>
         )}
-        {query.data?.healthPackages.map(
-          (healthPackage) => (
-            (hp = healthPackage.id),
-            (
-              <Grid
-                item
-                xl={4}
-                key={healthPackage.id}
-                zIndex={subscribedPackage?.id == healthPackage.id ? 1 : 0}
-              >
-                <Card
-                  variant="outlined"
-                  style={{
-                    transform:
-                      subscribedPackage?.id == healthPackage.id
-                        ? 'scale(1.027)'
-                        : 'scale(1)',
-                    transition: 'all 0.2s',
-                    boxShadow:
-                      subscribedPackage?.id == healthPackage.id
-                        ? '0 2px 10px rgba(199, 127, 255, 0.91)'
-                        : '',
-                  }}
-                >
-                  <CardContent>
-                    <Stack spacing={2}>
-                      <Stack
-                        direction="row"
-                        spacing={1}
-                        justifyContent="space-between"
-                        alignItems="center"
-                      >
-                        <Typography variant="h6">
-                          {healthPackage.name}
-                        </Typography>
+        {query.data?.healthPackages.map((healthPackage) => (
+          <Grid
+            item
+            xl={4}
+            key={healthPackage.id}
+            zIndex={subscribedPackage?.id == healthPackage.id ? 1 : 0}
+          >
+            <Card
+              variant="outlined"
+              style={{
+                transform:
+                  subscribedPackage?.id == healthPackage.id
+                    ? 'scale(1.027)'
+                    : 'scale(1)',
+                transition: 'all 0.2s',
+                boxShadow:
+                  subscribedPackage?.id == healthPackage.id
+                    ? '0 2px 10px rgba(199, 127, 255, 0.91)'
+                    : '',
+              }}
+            >
+              <CardContent>
+                <Stack spacing={2}>
+                  <Stack
+                    direction="row"
+                    spacing={1}
+                    justifyContent="space-between"
+                    alignItems="center"
+                  >
+                    <Typography variant="h6">{healthPackage.name}</Typography>
 
-                        {subscribedPackage?.id == healthPackage.id && (
-                          <Chip
-                            variant="filled"
-                            color="success"
-                            label="Subscribed"
-                          />
-                        )}
-                        {cancelledHealthPackagesQuery.data?.includes(
-                          healthPackage.id
-                        ) && (
-                          <>
-                            <Chip
-                              label={`cancelled on ${cancellationDateLabel}`}
-                              color="error"
-                              size="small"
-                            />
-                          </>
-                        )}
-                      </Stack>
-
-                      <Stack spacing={-1}>
-                        <Typography variant="overline" color="text.secondary">
-                          Price per year
-                        </Typography>
-                        <Typography variant="body1">
-                          {healthPackage.pricePerYear}
-                        </Typography>
-                      </Stack>
-                      <Stack spacing={-1}>
-                        <Typography variant="overline" color="text.secondary">
-                          Session Discount
-                        </Typography>
-                        <Typography variant="body1">
-                          {healthPackage.sessionDiscount}%
-                        </Typography>
-                      </Stack>
-                      <Stack spacing={-1}>
-                        <Typography variant="overline" color="text.secondary">
-                          Medicine From Our Pharmacy Discount
-                        </Typography>
-                        <Typography variant="body1">
-                          {healthPackage.medicineDiscount}%
-                        </Typography>
-                      </Stack>
-                      <Stack spacing={-1}>
-                        <Typography variant="overline" color="text.secondary">
-                          Family Member Subscription Discount
-                        </Typography>
-                        <Typography variant="body1">
-                          {healthPackage.familyMemberSubscribtionDiscount}%
-                        </Typography>
-                      </Stack>
-                      {subscribedPackage?.id == healthPackage.id && (
-                        <Stack spacing={-1}>
-                          <Typography variant="overline" color="text.secondary">
-                            Renewal Date
-                          </Typography>
-                          <Typography variant="body1">
-                            {new Date(
-                              subscribedPackage?.renewalDate
-                            ).toLocaleDateString()}
-                          </Typography>
-                        </Stack>
-                      )}
-                    </Stack>
-                  </CardContent>
-                  <CardActions>
-                    {subscribedPackage?.id == healthPackage.id &&
-                    new Date(subscribedPackage?.renewalDate) > new Date() ? (
-                      <Button
-                        variant="contained"
-                        fullWidth
-                        color="secondary"
-                        startIcon={<AddModerator />} // Replace with cancel icon
-                        onClick={() => cancelMutation.mutateAsync()}
-                      >
-                        Unsubscribe
-                      </Button>
-                    ) : (
-                      <Button
-                        variant="contained"
-                        fullWidth
-                        startIcon={<AddModerator />}
-                        onClick={() => {
-                          setSelectedHealthPackageId(healthPackage.id)
-                        }}
-                        color={
-                          subscribedPackage?.id == healthPackage.id
-                            ? 'success'
-                            : 'primary'
-                        }
-                      >
-                        {subscribedPackage?.id == healthPackage.id
-                          ? 'Renew'
-                          : 'Subscribe'}
-                      </Button>
+                    {subscribedPackage?.id == healthPackage.id && (
+                      <Chip
+                        variant="filled"
+                        color="success"
+                        label="Subscribed"
+                      />
                     )}
-                  </CardActions>
-                </Card>
-              </Grid>
-            )
-          )
-        )}
+                    {cancelledHealthPackagesQuery.data?.includes(
+                      healthPackage.id
+                    ) && (
+                      <>
+                        <Chip
+                          label={`Cancelled on ${
+                            cancellationDatesMap[healthPackage.id]
+                          }`}
+                          color="error"
+                          size="small"
+                        />
+                      </>
+                    )}
+                  </Stack>
+
+                  <Stack spacing={-1}>
+                    <Typography variant="overline" color="text.secondary">
+                      Price per year
+                    </Typography>
+                    <Typography variant="body1">
+                      {healthPackage.pricePerYear}
+                    </Typography>
+                  </Stack>
+                  <Stack spacing={-1}>
+                    <Typography variant="overline" color="text.secondary">
+                      Session Discount
+                    </Typography>
+                    <Typography variant="body1">
+                      {healthPackage.sessionDiscount}%
+                    </Typography>
+                  </Stack>
+                  <Stack spacing={-1}>
+                    <Typography variant="overline" color="text.secondary">
+                      Medicine From Our Pharmacy Discount
+                    </Typography>
+                    <Typography variant="body1">
+                      {healthPackage.medicineDiscount}%
+                    </Typography>
+                  </Stack>
+                  <Stack spacing={-1}>
+                    <Typography variant="overline" color="text.secondary">
+                      Family Member Subscription Discount
+                    </Typography>
+                    <Typography variant="body1">
+                      {healthPackage.familyMemberSubscribtionDiscount}%
+                    </Typography>
+                  </Stack>
+                  {subscribedPackage?.id == healthPackage.id && (
+                    <Stack spacing={-1}>
+                      <Typography variant="overline" color="text.secondary">
+                        Renewal Date
+                      </Typography>
+                      <Typography variant="body1">
+                        {new Date(
+                          subscribedPackage?.renewalDate
+                        ).toLocaleDateString()}
+                      </Typography>
+                    </Stack>
+                  )}
+                </Stack>
+              </CardContent>
+              <CardActions>
+                {subscribedPackage?.id == healthPackage.id &&
+                new Date(subscribedPackage?.renewalDate) > new Date() ? (
+                  <Button
+                    variant="contained"
+                    fullWidth
+                    color="secondary"
+                    startIcon={<AddModerator />} // Replace with cancel icon
+                    onClick={() => cancelMutation.mutateAsync()}
+                  >
+                    Unsubscribe
+                  </Button>
+                ) : (
+                  <Button
+                    variant="contained"
+                    fullWidth
+                    startIcon={<AddModerator />}
+                    onClick={() => {
+                      setSelectedHealthPackageId(healthPackage.id)
+                    }}
+                    color={
+                      subscribedPackage?.id == healthPackage.id
+                        ? 'success'
+                        : 'primary'
+                    }
+                  >
+                    {subscribedPackage?.id == healthPackage.id
+                      ? 'Renew'
+                      : 'Subscribe'}
+                  </Button>
+                )}
+              </CardActions>
+            </Card>
+          </Grid>
+        ))}
       </Grid>
       <Dialog
         open={!!selectedHealthPackageId}

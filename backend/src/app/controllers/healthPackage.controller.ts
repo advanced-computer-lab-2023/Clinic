@@ -256,6 +256,7 @@ healthPackagesRouter.post(
       if (
         healthPackage.healthPackage.toString() === req.params.healthPackageId
       ) {
+        console.log(healthPackage.date.toDateString())
         res.send(healthPackage.date.toDateString())
       }
     })
