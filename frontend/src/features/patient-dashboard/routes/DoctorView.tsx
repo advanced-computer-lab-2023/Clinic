@@ -51,7 +51,7 @@ export function DoctorView() {
   })
 
   const query2 = useQuery({
-    queryKey: ['familyMembers'],
+    queryKey: ['family-members'],
     queryFn: getFamilyMembers,
   })
 
@@ -93,7 +93,7 @@ export function DoctorView() {
             </Button>
 
             {/* Iterate through family members and create cards */}
-            {query2.data?.familyMembers.map((familyMember) => (
+            {query2.data?.map((familyMember) => (
               <Card key={familyMember.id} style={{ marginTop: '16px' }}>
                 <CardContent>
                   <Typography variant="h6">{familyMember.name}</Typography>

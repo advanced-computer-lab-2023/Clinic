@@ -7,16 +7,16 @@ import {
   findLinkingMe,
   getFamilyMemberById,
   getFamilyMembers,
+  getLinkedFamilyMembers,
   getPatientForFamilyMember,
 } from '../services/familyMember.service'
 import {
   type AddFamilyMemberRequest,
-  AddFamilyMemberResponse,
   GetFamilyMembersResponse,
   type Relation,
   GetFamilyMemberResponse,
-  FamilyMemberResponseBase,
   type LinkFamilyMemberRequest,
+  GetLinkedFamilyMembersResponse,
 } from 'clinic-common/types/familyMember.types'
 import { allowAuthenticated } from '../middlewares/auth.middleware'
 import {
@@ -25,10 +25,7 @@ import {
 } from 'clinic-common/validators/familyMembers.validator'
 import { validate } from '../middlewares/validation.middleware'
 import { type Gender } from 'clinic-common/types/gender.types'
-import {
-  GetPatientLinkingMeResponse,
-  PatientResponseBase,
-} from 'clinic-common/types/patient.types'
+import { GetPatientLinkingMeResponse } from 'clinic-common/types/patient.types'
 import { FamilyMemberModel } from '../models/familyMember.model'
 import { PatientModel } from '../models/patient.model'
 import { UserModel } from '../models/user.model'
@@ -43,25 +40,47 @@ familyMemberRouter.get(
   asyncWrapper(async (req, res) => {
     const familyMembers = await getFamilyMembers(req.username as string)
 
-    const familyMembersResponse = new GetFamilyMembersResponse(
-      await Promise.all(
-        familyMembers.map(async (familyMember) => {
-          return {
-            id: familyMember.id,
-            name: familyMember.name,
-            nationalId: familyMember.nationalId,
-            age: familyMember.age,
-            gender: familyMember.gender as Gender,
-            relation: familyMember.relation as Relation,
-            currentHealthPackage: {
-              healthPackageName: 'N/A',
-              renewalDate: 'N/A',
-            },
-            healthPackageHistory: [], //empty array because we dont really need it
-          }
-        })
-      )
-    )
+    const familyMembersResponse = familyMembers.map((familyMember) => ({
+      id: familyMember.id,
+      name: familyMember.name,
+      nationalId: familyMember.nationalId,
+      age: familyMember.age,
+      gender: familyMember.gender as Gender,
+      relation: familyMember.relation as Relation,
+      healthPackage: {
+        name: familyMember.healthPackage?.name,
+        id: familyMember.healthPackage?.id.toString(),
+        renewalDate: familyMember.healthPackageRenewalDate?.toDateString(),
+      },
+      healthPackageHistory: [], //empty array because we dont really need it
+    })) satisfies GetFamilyMembersResponse
+
+    res.send(familyMembersResponse)
+  })
+)
+
+// Get all family members of the currently logged in patient
+familyMemberRouter.get(
+  '/mine/linked',
+  allowAuthenticated,
+  asyncWrapper(async (req, res) => {
+    const familyMembers = await getLinkedFamilyMembers(req.username as string)
+
+    const familyMembersResponse = familyMembers.map((familyMember) => ({
+      id: familyMember.id,
+      patientId: familyMember.patient.id.toString(),
+      username: familyMember.patient!.user.username,
+      mobileNumber: familyMember.patient!.mobileNumber,
+      email: familyMember.patient!.email,
+      dateOfBirth: familyMember.patient!.dateOfBirth?.toDateString(),
+      name: familyMember.patient.name,
+      gender: familyMember.patient.gender,
+      relation: familyMember.relation as Relation,
+      healthPackage: {
+        name: familyMember.patient.healthPackage?.name,
+        id: familyMember.patient.healthPackage?.id.toString(),
+      },
+    })) satisfies GetLinkedFamilyMembersResponse
 
     res.send(familyMembersResponse)
   })
@@ -131,23 +150,9 @@ familyMemberRouter.post(
   '/:patientUsername',
   validate(AddFamilyMemberRequestValidator),
   asyncWrapper<AddFamilyMemberRequest>(async (req, res) => {
-    const newFamilyMember = await createFamilyMember(
-      req.params.patientUsername,
-      req.body
-    )
+    await createFamilyMember(req.params.patientUsername, req.body)
 
-    res.send(
-      new AddFamilyMemberResponse(
-        newFamilyMember.id,
-        newFamilyMember.name,
-        newFamilyMember.nationalId,
-        newFamilyMember.age,
-        newFamilyMember.gender as Gender,
-        newFamilyMember.relation as Relation,
-        { healthPackageName: 'N/A', renewalDate: 'N/A' },
-        []
-      )
-    )
+    res.status(201).send()
   })
 )
 
@@ -157,16 +162,15 @@ familyMemberRouter.get(
   asyncWrapper(async (req, res) => {
     const familyMember = await getFamilyMemberById(req.params.familyMemberId)
     const patient = await getPatientForFamilyMember(req.params.familyMemberId)
-    const healthPackageName = await getHealthPackageNameById(
-      familyMember?.healthPackage?.toString()
-    )
 
-    let renewalDate = 'N/A'
     const healthPackageHistory = await Promise.all(
-      familyMember.healthPackageHistory.map(async (historyEntry) => {
-        if (historyEntry.healthPackage == familyMember.healthPackage)
-          renewalDate = historyEntry.date.toDateString()
-        else {
+      familyMember.healthPackageHistory
+        .filter(
+          (hp) =>
+            hp.healthPackage.toString() !=
+            familyMember.healthPackage?.id.toString()
+        )
+        .map(async (historyEntry) => {
           const healthPackageName = await getHealthPackageNameById(
             historyEntry.healthPackage?.toString()
           )
@@ -175,39 +179,38 @@ familyMemberRouter.get(
             package: healthPackageName,
             date: historyEntry.date,
           }
-        }
-      })
+        })
     )
 
-    res.send(
-      new GetFamilyMemberResponse(
-        new FamilyMemberResponseBase(
-          familyMember.id,
-          familyMember.name,
-          familyMember.nationalId,
-          familyMember.age,
-          familyMember.gender as Gender,
-          familyMember.relation as Relation,
-          { healthPackageName, renewalDate },
-          healthPackageHistory.filter(
-            (historyEntry) => historyEntry !== undefined
-          ) as { package: string; date: Date }[]
-        ),
-        new PatientResponseBase(
-          patient.id,
-          patient.user.username,
-          patient.name,
-          patient.email,
-          patient.mobileNumber,
-          patient.dateOfBirth,
-          patient.gender as Gender,
-          {
-            name: patient.emergencyContact?.name ?? '',
-            mobileNumber: patient.emergencyContact?.mobileNumber ?? '',
-          },
-          patient.notes
-        )
-      )
-    )
+    res.send({
+      familyMember: {
+        id: familyMember.id,
+        name: familyMember.name,
+        nationalId: familyMember.nationalId,
+        age: familyMember.age,
+        gender: familyMember.gender as Gender,
+        relation: familyMember.relation as Relation,
+        healthPackage: {
+          name: familyMember.healthPackage?.name,
+          renewalDate: familyMember.healthPackageRenewalDate?.toDateString(),
+          id: familyMember.healthPackage?.toString(),
+        },
+        healthPackageHistory,
+      },
+      patient: {
+        id: patient.id,
+        username: patient.user.username,
+        name: patient.name,
+        email: patient.email,
+        mobileNumber: patient.mobileNumber,
+        dateOfBirth: patient.dateOfBirth,
+        gender: patient.gender as Gender,
+        emergencyContact: {
+          name: patient.emergencyContact?.name ?? '',
+          mobileNumber: patient.emergencyContact?.mobileNumber ?? '',
+        },
+        notes: patient.notes,
+      },
+    } satisfies GetFamilyMemberResponse)
   })
 )

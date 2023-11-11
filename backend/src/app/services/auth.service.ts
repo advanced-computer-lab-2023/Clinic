@@ -20,6 +20,7 @@ import { type DoctorDocument, DoctorModel } from '../models/doctor.model'
 import { hash } from 'bcrypt'
 import { type WithUser } from '../utils/typeUtils'
 import { AppointmentModel } from '../models/appointment.model'
+import { AdminModel } from '../models/admin.model'
 
 const jwtSecret = process.env.JWT_TOKEN ?? 'secret'
 const bcryptSalt = process.env.BCRYPT_SALT ?? '$2b$10$13bXTGGukQXsCf5hokNe2u'
@@ -272,4 +273,28 @@ export async function isDoctorPatientAuthorized(
   }
 
   return true
+}
+
+export async function getModelIdForUsername(username: string): Promise<string> {
+  const user = await getUserByUsername(username)
+
+  switch (user.type) {
+    case UserType.Doctor:
+      return (await DoctorModel.findOne({
+        user: user.id,
+      }))!.id
+
+    case UserType.Patient:
+      return (await PatientModel.findOne({
+        user: user.id,
+      }))!.id
+
+    case UserType.Admin:
+      return (await AdminModel.findOne({
+        user: user.id,
+      }))!.id
+
+    default:
+      throw new Error('Invalid user type')
+  }
 }

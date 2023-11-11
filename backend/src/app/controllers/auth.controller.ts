@@ -30,6 +30,7 @@ import {
   type DoctorStatus,
   RegisterDoctorRequestResponse,
 } from 'clinic-common/types/doctor.types'
+import { getModelIdForUsername } from '../services/auth.service'
 
 export const authRouter = Router()
 
@@ -60,9 +61,13 @@ authRouter.get(
   allowAuthenticated,
   asyncWrapper(async (req, res) => {
     const user = await getUserByUsername(req.username as string)
-    res.send(
-      new GetCurrentUserResponse(user.id, user.username, user.type as UserType)
-    )
+
+    res.send({
+      id: user.id,
+      username: user.username,
+      type: user.type as UserType,
+      modelId: await getModelIdForUsername(user.username),
+    } satisfies GetCurrentUserResponse)
   })
 )
 
@@ -80,13 +85,12 @@ authRouter.get(
 
     const user = await getUserByUsername(req.params.username)
 
-    res.send(
-      new GetUserByUsernameResponse(
-        user.id,
-        user.username,
-        user.type as UserType
-      )
-    )
+    res.send({
+      id: user.id,
+      username: user.username,
+      type: user.type as UserType,
+      modelId: await getModelIdForUsername(user.username),
+    } satisfies GetUserByUsernameResponse)
   })
 )
 

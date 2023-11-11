@@ -38,7 +38,6 @@ import {
   AppointmentResponseBase,
   GetFilteredAppointmentsResponse,
 } from 'clinic-common/types/appointment.types'
-import { getHealthPackageNameById } from '../services/healthPackage.service'
 
 const storage = multer.memoryStorage()
 const upload = multer({ storage })
@@ -221,26 +220,24 @@ patientRouter.get(
   asyncWrapper(async (req, res) => {
     const familyMembers = await getFamilyMembers(req.params.username)
 
-    const familyMembersResponse = new GetFamilyMembersResponse(
-      await Promise.all(
-        familyMembers.map(async (familyMember) => {
-          const healthPackageName = await getHealthPackageNameById(
-            familyMember?.healthPackage?.toString()
-          )
-
-          return {
-            id: familyMember.id,
-            name: familyMember.name,
-            nationalId: familyMember.nationalId,
-            age: familyMember.age,
-            gender: familyMember.gender as Gender,
-            relation: familyMember.relation as Relation,
-            currentHealthPackage: { healthPackageName, renewalDate: 'N/A' },
-            healthPackageHistory: [], //empty array because we dont really need it
-          }
-        })
-      )
-    )
+    const familyMembersResponse = (await Promise.all(
+      familyMembers.map(async (familyMember) => {
+        return {
+          id: familyMember.id,
+          name: familyMember.name,
+          nationalId: familyMember.nationalId,
+          age: familyMember.age,
+          gender: familyMember.gender as Gender,
+          relation: familyMember.relation as Relation,
+          healthPackage: {
+            id: familyMember.healthPackage.id,
+            name: familyMember.healthPackage.name,
+            renewalDate: familyMember.healthPackageRenewalDate?.toDateString(),
+          },
+          healthPackageHistory: [], //empty array because we dont really need it
+        }
+      })
+    )) satisfies GetFamilyMembersResponse
 
     res.send(familyMembersResponse)
   })

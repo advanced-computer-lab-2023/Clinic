@@ -20,6 +20,7 @@ const familyMemberSchema = new Schema(
       enum: Relation,
     },
     healthPackage: { type: Schema.Types.ObjectId, ref: 'HealthPackage' },
+    healthPackageRenewalDate: { type: Date },
     patient: { type: Schema.Types.ObjectId, ref: 'Patient' },
     healthPackageHistory: [
       {
@@ -31,7 +32,6 @@ const familyMemberSchema = new Schema(
         date: { type: Date, required: true },
       },
     ],
-    healthPackageRenewalDate: { type: Date },
   },
   { timestamps: true }
 )

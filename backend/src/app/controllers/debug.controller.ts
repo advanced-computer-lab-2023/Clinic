@@ -125,9 +125,16 @@ async function createDummyPrescription(
   })
 }
 
-async function createDummyFamilyMember(): Promise<
-  HydratedDocument<FamilyMemberDocument>
-> {
+async function createDummyFamilyMember({
+  isLinked = false,
+}: {
+  isLinked?: boolean
+} = {}): Promise<HydratedDocument<FamilyMemberDocument>> {
+  const healthPackage = faker.helpers.arrayElement([
+    ...(await HealthPackageModel.find()).map((hp) => hp.id),
+    undefined,
+  ])
+
   return await FamilyMemberModel.create({
     name: faker.person.fullName(),
     nationalId: faker.string.numeric(14),
@@ -136,6 +143,15 @@ async function createDummyFamilyMember(): Promise<
     }),
     gender: faker.helpers.enumValue(Gender),
     relation: faker.helpers.enumValue(Relation),
+    healthPackage,
+    healthPackageRenewalDate: healthPackage ? faker.date.anytime() : undefined,
+    patient: isLinked
+      ? (
+          await createDummyPatient({
+            withFamilyMembers: false,
+          })
+        ).id
+      : undefined,
   })
 }
 
@@ -163,11 +179,13 @@ async function createDummyAppointment(
 }
 
 // Creates a random patient with random data and password 'patient',
-async function createDummyPatient(
+async function createDummyPatient({
+  username = randomUsername('patient'),
+  withFamilyMembers = true,
+}: {
   username?: string
-): Promise<WithUser<PatientDocument>> {
-  username = username ?? randomUsername('patient')
-
+  withFamilyMembers?: boolean
+} = {}): Promise<WithUser<PatientDocument>> {
   const user = await UserModel.create({
     username,
     password: await hash('patient', bcryptSalt),
@@ -209,9 +227,18 @@ async function createDummyPatient(
     }),
   })
 
-  for (let i = 0; i < 3; i++) {
-    const familyMember = await createDummyFamilyMember()
-    patient.familyMembers.push(familyMember.id)
+  if (withFamilyMembers) {
+    for (let i = 0; i < 3; i++) {
+      const familyMember = await createDummyFamilyMember()
+      patient.familyMembers.push(familyMember.id)
+    }
+
+    for (let i = 0; i < 2; i++) {
+      const familyMember = await createDummyFamilyMember({
+        isLinked: true,
+      })
+      patient.familyMembers.push(familyMember.id)
+    }
   }
 
   for (let i = 0; i < 6; i++) {
@@ -383,7 +410,7 @@ debugRouter.post(
     await createDefaultHealthPackages()
 
     const admin = await createDummyAdmin('admin')
-    const patient = await createDummyPatient('patient')
+    const patient = await createDummyPatient({ username: 'patient' })
     const doctor = await createDummyDoctor(
       'doctor',
       DoctorStatus.Approved,

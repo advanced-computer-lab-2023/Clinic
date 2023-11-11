@@ -22,6 +22,7 @@ const patientSchema = new Schema(
     familyMembers: [{ type: Schema.Types.ObjectId, ref: 'FamilyMember' }],
     documents: [{ type: String }],
     healthPackage: { type: Schema.Types.ObjectId, ref: 'HealthPackage' },
+    healthPackageRenewalDate: { type: Date },
     notes: [{ type: String }],
     healthRecords: [{ type: String }],
     walletMoney: { type: Number, default: 0 },
@@ -35,7 +36,6 @@ const patientSchema = new Schema(
         date: { type: Date, required: true },
       },
     ],
-    healthPackageRenewalDate: { type: Date },
   },
   { timestamps: true }
 )
