@@ -14,12 +14,15 @@ import { type HydratedDocument } from 'mongoose'
 import { PatientModel } from '../models/patient.model'
 import {
   DoctorStatus,
-  type RegisterDoctorRequest,
+  IRegisterDoctorRequest,
 } from 'clinic-common/types/doctor.types'
 import { type DoctorDocument, DoctorModel } from '../models/doctor.model'
 import { hash } from 'bcrypt'
 import { type WithUser } from '../utils/typeUtils'
 import { AppointmentModel } from '../models/appointment.model'
+import FireBase from '../../../../firebase.config'
+import { getStorage, ref, uploadBytes } from 'firebase/storage'
+import { getDownloadURL } from 'firebase/storage'
 
 const jwtSecret = process.env.JWT_TOKEN ?? 'secret'
 const bcryptSalt = process.env.BCRYPT_SALT ?? '$2b$10$13bXTGGukQXsCf5hokNe2u'
@@ -148,8 +151,10 @@ export async function getUserByUsername(
 }
 
 export async function submitDoctorRequest(
-  doctor: RegisterDoctorRequest
+  doctor: IRegisterDoctorRequest
 ): Promise<WithUser<DoctorDocument>> {
+  console.log(doctor)
+
   if (await isUsernameTaken(doctor.username)) {
     throw new UsernameAlreadyTakenError()
   }
@@ -166,17 +171,30 @@ export async function submitDoctorRequest(
     type: UserType.Doctor,
   })
   await user.save()
+  const documentsPaths: string[] = []
+  const storage = getStorage(FireBase)
+  const storageRef = ref(storage, 'doctors/')
+
+  for (let i = 0; i < doctor.documents.length; i++) {
+    const fileRef = ref(storageRef, doctor.name + [i])
+    await uploadBytes(fileRef, doctor.documents[i].buffer, {
+      contentType: doctor.documents[i].mimetype,
+    })
+    const fullPath = await getDownloadURL(fileRef)
+    documentsPaths.push(fullPath.toString())
+  }
+
   const newDoctor = await DoctorModel.create({
     user: user.id,
     name: doctor.name,
     email: doctor.email,
     dateOfBirth: doctor.dateOfBirth,
-    hourlyRate: doctor.hourlyRate,
+    hourlyRate: parseInt(doctor.hourlyRate),
     affiliation: doctor.affiliation,
     educationalBackground: doctor.educationalBackground,
     speciality: doctor.speciality,
     requestStatus: DoctorStatus.Pending,
-    documents: doctor.documents,
+    documents: documentsPaths,
   })
   await newDoctor.save()
 

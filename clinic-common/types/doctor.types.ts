@@ -1,7 +1,6 @@
 import type { z } from 'zod'
 import type {
   UpdateDoctorRequestValidator,
-  RegisterDoctorRequestValidator,
   AddAvailableTimeSlotsRequestValidator,
 } from '../validators/doctor.validator'
 
@@ -109,9 +108,29 @@ export class GetApprovedDoctorsResponse {
 
 export type UpdateDoctorRequest = z.infer<typeof UpdateDoctorRequestValidator>
 
-export type RegisterDoctorRequest = z.infer<
-  typeof RegisterDoctorRequestValidator
->
+export type IRegisterDoctorRequest = {
+  username: string
+  password: string
+  name: string
+  email: string
+  mobileNumber: string
+  dateOfBirth: Date
+  hourlyRate: string
+  affiliation: string
+  educationalBackground: string
+  speciality: string
+
+  documents: MulterFile[]
+}
+
+type MulterFile = {
+  fieldname: string
+  originalname: string
+  encoding: string
+  mimetype: string
+  buffer: Buffer
+  size: number
+}
 
 export type AddAvailableTimeSlotsRequest = z.infer<
   typeof AddAvailableTimeSlotsRequestValidator
