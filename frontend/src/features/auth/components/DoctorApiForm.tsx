@@ -320,14 +320,14 @@ const handleMultipleFileUpload = async (
 
   const files: File[] = Array.from(fileList)
   const storage = getStorage(FireBase)
-  const storageRef = ref(storage, 'doctors/')
+  const storageRef = ref(storage, 'files')
 
   const newDocumentPaths = [] // Create an array to store the new document paths
 
   for (let i = 0; i < files.length; i++) {
     const file = files[i]
     const uniqueFilename = generateUniqueFilename() // Implement a function to generate unique filenames
-    const fileRef = ref(storageRef, uniqueFilename)
+    const fileRef = ref(storageRef, 'documents/' + uniqueFilename)
 
     try {
       await uploadBytes(fileRef, file)
@@ -342,6 +342,8 @@ const handleMultipleFileUpload = async (
   }
 
   setDocumentPaths(newDocumentPaths)
+
+  // alert("Files uploaded!");
 }
 
 const SelectInputField = <T extends ObjectWithStringKeys>({
