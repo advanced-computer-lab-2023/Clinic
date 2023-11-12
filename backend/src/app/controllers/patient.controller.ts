@@ -38,7 +38,6 @@ import {
   AppointmentStatus,
   GetFilteredAppointmentsResponse,
 } from 'clinic-common/types/appointment.types'
-import { getHealthPackageNameById } from '../services/healthPackage.service'
 import { getApprovedDoctorById } from '../services/doctor.service'
 
 const storage = multer.memoryStorage()
