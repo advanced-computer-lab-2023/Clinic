@@ -72,26 +72,12 @@ export function SubscribeToHealthPackages({
       }),
   })
   const cancelledHealthPackagesQuery = useQuery({
-    queryKey: ['cancelled-health-packages'],
-    queryFn: () => getCancelledHealthPackagesForPatient(),
+    queryKey: ['cancelled-health-packages', id, isFamilyMember],
+    queryFn: () => getCancelledHealthPackagesForPatient({ id, isFamilyMember }),
   })
   useEffect(() => {
-    console.log(
-      'cancelledHealthPackagesQuery',
-      cancelledHealthPackagesQuery.data
-    )
-  }, [cancelledHealthPackagesQuery.data])
-  useEffect(() => {
-    console.log(
-      'subscribedHealthPackageQuery',
-      cancelledHealthPackagesQuery.data
-    )
-    console.log('query.data', query.data)
-  }, [cancelledHealthPackagesQuery.data, query.data])
-  //execute the query
-  useEffect(() => {
-    console.log('query', cancelledHealthPackagesQuery.data)
-  }, [cancelledHealthPackagesQuery.data])
+    cancelledHealthPackagesQuery.refetch()
+  }, [subscribedHealthPackageQuery.data, cancelledHealthPackagesQuery])
 
   const onSuccess =
     (message: string = 'Subscribed to health package successfully.') =>
@@ -159,7 +145,10 @@ export function SubscribeToHealthPackages({
       try {
         const dates = await Promise.all(
           cancelledHealthPackagesQuery.data?.map(async (healthPackage) => {
-            const date = await getCanellationDate(healthPackage)
+            const date = await getCanellationDate(healthPackage, {
+              id,
+              isFamilyMember,
+            })
 
             return { id: healthPackage, date }
           }) ?? []
@@ -177,7 +166,7 @@ export function SubscribeToHealthPackages({
     }
 
     fetchCancellationDates()
-  }, [cancelledHealthPackagesQuery.data]) // Dependency on query.data
+  }, [cancelledHealthPackagesQuery.data, id, isFamilyMember]) // Dependency on query.data
 
   if (query.isLoading || subscribedHealthPackageQuery.isLoading) {
     return <CardPlaceholder />
@@ -302,7 +291,13 @@ export function SubscribeToHealthPackages({
                     fullWidth
                     color="secondary"
                     startIcon={<AddModerator />} // Replace with cancel icon
-                    onClick={() => cancelMutation.mutateAsync()}
+                    onClick={() =>
+                      cancelMutation.mutateAsync({
+                        subscriberId: id,
+                        payerUsername,
+                        isFamilyMember,
+                      })
+                    }
                   >
                     Unsubscribe
                   </Button>
