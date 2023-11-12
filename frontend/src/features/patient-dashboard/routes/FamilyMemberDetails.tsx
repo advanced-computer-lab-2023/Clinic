@@ -30,16 +30,15 @@ export function FamilyMemberDetails() {
             label: 'Related to',
             value: query.data?.patient.name,
           },
-          {
+          /*{
             label: 'Health Package',
             value:
-              query.data?.familyMember.currentHealthPackage.healthPackageName ||
+              query.data?.familyMember.healthPackage.name ||
               'No health package yet',
           },
           {
             label: 'Renewal Date',
-            value:
-              query.data?.familyMember.currentHealthPackage.renewalDate || '',
+            value: query.data?.familyMember.healthPackage.renewalDate || '',
           },
           {
             label: 'Cancelled Health Packages',
@@ -50,7 +49,7 @@ export function FamilyMemberDetails() {
                     `${historyEntry.package} was cancelled on (${historyEntry.date})`
                 )
                 .join(', ') || 'No cancelled health packages yet',
-          },
+          },*/
         ]}
       />
     </Grid>

@@ -4,16 +4,138 @@ import {
   Button,
   ButtonGroup,
   Container,
+  Dialog,
+  DialogContent,
   Divider,
   Modal,
+  Stack,
 } from '@mui/material'
 import { useQuery } from '@tanstack/react-query'
 import { GridColDef, DataGrid } from '@mui/x-data-grid'
-import { GetFamilyMembersResponse } from 'clinic-common/types/familyMember.types'
-import { getFamilyMembers, getUsersLinkingMe } from '@/api/familyMembers'
+import {
+  GetFamilyMembersResponse,
+  GetLinkedFamilyMembersResponse,
+} from 'clinic-common/types/familyMember.types'
+import {
+  getFamilyMembers,
+  getLinkedFamilyMembers,
+  getUsersLinkingMe,
+} from '@/api/familyMembers'
 import { useState } from 'react'
 import { AddFamilyMember } from './AddFamilyMember'
 import { useNavigate } from 'react-router-dom'
+import { SubscribeToHealthPackages } from './SubscribeToHealthPackages'
+
+function ManageHealthPackagesButton({
+  patientId,
+  isFamilyMember,
+}: {
+  patientId: string
+  isFamilyMember: boolean
+}) {
+  const [open, setOpen] = useState(false)
+
+  return (
+    <>
+      <Dialog
+        open={open}
+        onClose={() => setOpen(false)}
+        maxWidth="lg"
+        fullWidth
+      >
+        <DialogContent>
+          <SubscribeToHealthPackages
+            isFamilyMember={isFamilyMember}
+            subscriberId={patientId}
+          />
+        </DialogContent>
+      </Dialog>
+      <ButtonGroup
+        variant="contained"
+        aria-label="outlined primary button group"
+      >
+        <Button
+          variant="contained"
+          size="small"
+          color="primary"
+          onClick={() => {
+            setOpen(true)
+          }}
+        >
+          Manage Health Package
+        </Button>
+      </ButtonGroup>
+    </>
+  )
+}
+
+function LinkedFamilyMembers() {
+  const linkedFamilyMembersQuery = useQuery({
+    queryKey: ['family-members', 'linked'],
+    queryFn: getLinkedFamilyMembers,
+  })
+
+  const linkedMembers: GridColDef<GetLinkedFamilyMembersResponse[0]>[] = [
+    {
+      field: 'name',
+      headerName: 'Name',
+      width: 150,
+    },
+    {
+      field: 'username',
+      headerName: 'Username',
+      width: 200,
+    },
+    {
+      field: 'mobileNumber',
+      headerName: 'Mobile Number',
+      width: 200,
+    },
+    {
+      field: 'gender',
+      headerName: 'Gender',
+      width: 150,
+    },
+    {
+      field: 'relation',
+      headerName: 'Relation',
+      width: 100,
+    },
+    {
+      field: 'healthPackage',
+      valueGetter: (params) => params.row.healthPackage?.name || 'None',
+      headerName: 'Health Package',
+      width: 150,
+    },
+    {
+      field: 'actions',
+      sortable: false,
+      filterable: false,
+      hideable: false,
+      disableColumnMenu: true,
+      headerName: 'Actions',
+      width: 400,
+      renderCell: (column) => (
+        <ManageHealthPackagesButton
+          patientId={column.row.patientId}
+          isFamilyMember={false}
+        />
+      ),
+    },
+  ]
+
+  if (linkedFamilyMembersQuery.isLoading) {
+    return <CardPlaceholder />
+  }
+
+  return (
+    <DataGrid
+      rows={linkedFamilyMembersQuery.data || []}
+      columns={linkedMembers}
+      autoHeight
+    />
+  )
+}
 
 export function FamilyMembers() {
   const navigate = useNavigate()
@@ -21,7 +143,7 @@ export function FamilyMembers() {
     useState(false)
 
   const query = useQuery({
-    queryKey: ['familyMembers'],
+    queryKey: ['family-members'],
     queryFn: getFamilyMembers,
   })
 
@@ -34,7 +156,7 @@ export function FamilyMembers() {
     return <CardPlaceholder />
   }
 
-  const columns: GridColDef<GetFamilyMembersResponse['familyMembers'][0]>[] = [
+  const columns: GridColDef<GetFamilyMembersResponse[0]>[] = [
     {
       field: 'name',
       headerName: 'Name',
@@ -61,18 +183,20 @@ export function FamilyMembers() {
       width: 100,
     },
     {
+      field: 'healthPackage',
+      valueGetter: (params) => params.row.healthPackage.name || 'None',
+      headerName: 'Health Package',
+    },
+    {
       field: 'actions',
       sortable: false,
       filterable: false,
       hideable: false,
       disableColumnMenu: true,
       headerName: 'Actions',
-      width: 150,
+      width: 300,
       renderCell: (column) => (
-        <ButtonGroup
-          variant="contained"
-          aria-label="outlined primary button group"
-        >
+        <Stack direction="row" spacing={1}>
           <Button
             variant="contained"
             size="small"
@@ -83,20 +207,15 @@ export function FamilyMembers() {
           >
             View
           </Button>
-          <Button
-            variant="contained"
-            size="small"
-            color="error"
-            onClick={() => {
-              alert(`TODO: Remove ${column.row.name}`)
-            }}
-          >
-            Remove
-          </Button>
-        </ButtonGroup>
+          <ManageHealthPackagesButton
+            patientId={column.row.id}
+            isFamilyMember={true}
+          />
+        </Stack>
       ),
     },
   ]
+
   const columnsLinkingMe: GridColDef<{ name: string }>[] = [
     {
       field: 'name',
@@ -132,11 +251,9 @@ export function FamilyMembers() {
         Add Family Member
       </Button>
       <Divider sx={{ my: 2 }} />
-      <DataGrid
-        rows={query.data?.familyMembers || []}
-        columns={columns}
-        autoHeight
-      />
+      <DataGrid rows={query.data || []} columns={columns} autoHeight />
+      <Divider sx={{ my: 2 }} />
+      <LinkedFamilyMembers />
       <Divider sx={{ my: 2 }} />
       <DataGrid
         rows={linkingMeRows || []}

@@ -22,7 +22,7 @@ import {
   GetWalletMoneyResponse,
 } from 'clinic-common/types/patient.types'
 
-import { allowApprovedDoctors } from '../middlewares/auth.middleware'
+import { allowApprovedandAcceptsDoctors } from '../middlewares/auth.middleware'
 import { type Gender } from 'clinic-common/types/gender.types'
 import { type HydratedDocument } from 'mongoose'
 import { type UserDocument, UserModel } from '../models/user.model'
@@ -158,7 +158,7 @@ patientRouter.get(
 
 patientRouter.get(
   '/search',
-  asyncWrapper(allowApprovedDoctors),
+  asyncWrapper(allowApprovedandAcceptsDoctors),
   asyncWrapper(async (req, res) => {
     const name = req.query.name as string
 
@@ -186,7 +186,7 @@ patientRouter.get(
 
 patientRouter.post(
   '/filter',
-  asyncWrapper(allowApprovedDoctors),
+  asyncWrapper(allowApprovedandAcceptsDoctors),
   asyncWrapper(async (req, res) => {
     const user: HydratedDocument<UserDocument> | null = await UserModel.findOne(
       { username: req.username }
@@ -222,26 +222,24 @@ patientRouter.get(
   asyncWrapper(async (req, res) => {
     const familyMembers = await getFamilyMembers(req.params.username)
 
-    const familyMembersResponse = new GetFamilyMembersResponse(
-      await Promise.all(
-        familyMembers.map(async (familyMember) => {
-          const healthPackageName = await getHealthPackageNameById(
-            familyMember?.healthPackage?.toString()
-          )
-
-          return {
-            id: familyMember.id,
-            name: familyMember.name,
-            nationalId: familyMember.nationalId,
-            age: familyMember.age,
-            gender: familyMember.gender as Gender,
-            relation: familyMember.relation as Relation,
-            currentHealthPackage: { healthPackageName, renewalDate: 'N/A' },
-            healthPackageHistory: [], //empty array because we dont really need it
-          }
-        })
-      )
-    )
+    const familyMembersResponse = (await Promise.all(
+      familyMembers.map(async (familyMember) => {
+        return {
+          id: familyMember.id,
+          name: familyMember.name,
+          nationalId: familyMember.nationalId,
+          age: familyMember.age,
+          gender: familyMember.gender as Gender,
+          relation: familyMember.relation as Relation,
+          healthPackage: {
+            id: familyMember.healthPackage.id,
+            name: familyMember.healthPackage.name,
+            renewalDate: familyMember.healthPackageRenewalDate?.toDateString(),
+          },
+          healthPackageHistory: [], //empty array because we dont really need it
+        }
+      })
+    )) satisfies GetFamilyMembersResponse
 
     res.send(familyMembersResponse)
   })

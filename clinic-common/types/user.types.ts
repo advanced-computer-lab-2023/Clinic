@@ -4,14 +4,13 @@ export enum UserType {
   Admin = 'Admin',
 }
 
-export class GetUserResponse {
-  constructor(
-    public id: string,
-    public username: string,
-    public type: UserType
-  ) {}
+export interface GetUserResponse {
+  id: string
+  username: string
+  type: UserType
+  modelId: string
 }
 
-export class GetUserByUsernameResponse extends GetUserResponse {}
+export interface GetUserByUsernameResponse extends GetUserResponse {}
 
-export class GetCurrentUserResponse extends GetUserResponse {}
+export interface GetCurrentUserResponse extends GetUserResponse {}

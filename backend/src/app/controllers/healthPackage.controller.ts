@@ -9,6 +9,7 @@ import {
   GetHealthPackageResponse,
   GetHealthPackageForPatientResponse,
   GetHealthPackageForPatientRequest,
+  SubscribeToHealthPackageRequest,
 } from 'clinic-common/types/healthPackage.types'
 import { asyncWrapper } from '../utils/asyncWrapper'
 import {
@@ -28,6 +29,7 @@ import {
   UpdateHealthPackageRequestValidator,
 } from 'clinic-common/validators/healthPackage.validator'
 import {
+  getDiscount,
   subscribeToHealthPackage,
   unSubscribeToHealthPackage,
 } from '../services/patient.service'
@@ -35,6 +37,8 @@ import { getPatientByUsername } from '../services/patient.service'
 import { APIError, NotFoundError } from '../errors'
 import { GetWalletMoneyResponse } from 'clinic-common/types/patient.types'
 import { Types } from 'mongoose'
+import { FamilyMemberModel } from '../models/familyMember.model'
+import { PatientModel } from '../models/patient.model'
 
 export const healthPackagesRouter = Router()
 
@@ -123,82 +127,91 @@ healthPackagesRouter.get(
   })
 )
 
-healthPackagesRouter.post(
-  '/:id/subscribe',
-  [allowAuthenticated, asyncWrapper(allowPatients)],
-  asyncWrapper(async (req, res) => {
-    await subscribeToHealthPackage({
-      patientUsername: req.username!,
-      healthPackageId: req.params.id,
-    })
+// healthPackagesRouter.post(
+//   '/:id/subscribe',
+//   [allowAuthenticated, asyncWrapper(allowPatients)],
+//   asyncWrapper(async (req, res) => {
+//     const patientId = getPatientIdFromUsername(req.username!)
 
-    res.status(200).send()
-  })
-)
+//     await subscribeToHealthPackage({
+//       patientId,
+//       healthPackageId: req.params.id,
+//     })
+
+//     res.status(200).send()
+//   })
+// )
 
 healthPackagesRouter.post(
   '/unsubscribe',
   [allowAuthenticated, asyncWrapper(allowPatients)],
   asyncWrapper(async (req, res) => {
-    const patient = await getPatientByUsername(req.username!)
-    if (!patient) throw new NotFoundError()
-    await unSubscribeToHealthPackage({
-      id: patient.id,
-    })
-    console.log(patient.healthPackageHistory)
-    res.status(200).send()
-  })
-)
+    const { subscriberId, isFamilyMember } = req.body
 
-healthPackagesRouter.post(
-  '/:id/unsubscribe',
-  [allowAuthenticated, asyncWrapper(allowPatients)],
-  asyncWrapper(async (req, res) => {
     await unSubscribeToHealthPackage({
-      id: req.params.id,
+      id: subscriberId,
+      isFamilyMember,
     })
     res.status(200).send()
   })
 )
 
 healthPackagesRouter.patch(
-  '/wallet/subscriptions/:packageId',
-  asyncWrapper(async (req, res) => {
-    const packageId = req.params.packageId
-    const userName = req.username
-    const packageInfo = await getHealthPackageById(packageId)
-    const patient = await getPatientByUsername(userName!)
-    if (!patient || !patient.walletMoney) throw new NotFoundError()
+  '/wallet/subscriptions',
+  asyncWrapper<SubscribeToHealthPackageRequest>(async (req, res) => {
+    const { healthPackageId, subscriberId, isFamilyMember, payerUsername } =
+      req.body
+
+    const packageInfo = await getHealthPackageById(healthPackageId)
+    const patient = await getPatientByUsername(payerUsername)
+
+    if (!packageInfo || !patient || !patient.walletMoney)
+      throw new NotFoundError()
+
     if (patient.walletMoney - packageInfo.pricePerYear < 0)
       throw new APIError('Not enough money in wallet', 400)
-    patient.walletMoney -= packageInfo.pricePerYear
-    await patient.save()
-    await subscribeToHealthPackage({
-      patientUsername: req.username!,
-      healthPackageId: packageId,
+
+    const discount = await getDiscount({
+      subscriberId,
+      isFamilyMember,
     })
+
+    patient.walletMoney -=
+      packageInfo.pricePerYear - packageInfo.pricePerYear * discount
+    await patient.save()
+
+    await subscribeToHealthPackage({
+      patientId: subscriberId,
+      healthPackageId,
+      isFamilyMember,
+    })
+
     res.send(new GetWalletMoneyResponse(patient.walletMoney))
   })
 )
 
 healthPackagesRouter.patch(
-  '/credit-card/subscriptions/:packageId',
-  asyncWrapper(async (req, res) => {
-    const packageId = req.params.packageId
-    const patient = await getPatientByUsername(req.username!)
-    if (!patient) throw new NotFoundError()
+  '/credit-card/subscriptions',
+  asyncWrapper<SubscribeToHealthPackageRequest>(async (req, res) => {
+    const { healthPackageId, subscriberId, isFamilyMember } = req.body
+
     await subscribeToHealthPackage({
-      patientUsername: req.username!,
-      healthPackageId: packageId,
+      patientId: subscriberId,
+      healthPackageId,
+      isFamilyMember,
     })
-    res.send(new GetWalletMoneyResponse(patient.walletMoney))
+
+    res.status(200).send()
   })
 )
 
 healthPackagesRouter.post(
   '/for-patient',
   asyncWrapper<GetHealthPackageForPatientRequest>(async (req, res) => {
-    const patient = await getPatientByUsername(req.body.username)
+    const { patientId, isFamilyMember } = req.body
+    const patient = isFamilyMember
+      ? await FamilyMemberModel.findById(patientId)
+      : await PatientModel.findById(patientId)
 
     if (!patient?.healthPackage || !patient.healthPackageRenewalDate) {
       res.status(204).send({} satisfies GetHealthPackageForPatientResponse)
@@ -233,10 +246,17 @@ healthPackagesRouter.post(
 healthPackagesRouter.post(
   '/patient-cancelled',
   asyncWrapper(async (req, res) => {
-    const patient = await getPatientByUsername(req.username!)
+    const { id, isFamilyMember } = req.body
+    const model = isFamilyMember
+      ? await FamilyMemberModel.findById(id)
+      : await PatientModel.findById(id)
+
+    if (!model) {
+      throw new NotFoundError()
+    }
+
     const cancelled: Types.ObjectId[] = []
-    if (!patient) throw new NotFoundError()
-    patient.healthPackageHistory.forEach((healthPackage) => {
+    model.healthPackageHistory.forEach((healthPackage) => {
       cancelled.push(healthPackage.healthPackage)
     })
     res.send(cancelled)
@@ -246,17 +266,15 @@ healthPackagesRouter.post(
 healthPackagesRouter.post(
   '/cancellation-date/:healthPackageId',
   asyncWrapper(async (req, res) => {
-    if (!req.username) throw new NotFoundError()
-    const patient = await getPatientByUsername(req.username)
-    if (!patient) throw new NotFoundError()
-    console.log('looking for' + req.params.healthPackageId)
-    patient.healthPackageHistory.forEach((healthPackage) => {
-      console.log('history' + healthPackage.healthPackage.toString())
-
+    const { id, isFamilyMember } = req.body
+    const model = isFamilyMember
+      ? await FamilyMemberModel.findById(id)
+      : await PatientModel.findById(id)
+    if (!model) throw new NotFoundError()
+    model.healthPackageHistory.forEach((healthPackage) => {
       if (
         healthPackage.healthPackage.toString() === req.params.healthPackageId
       ) {
-        console.log(healthPackage.date.toDateString())
         res.send(healthPackage.date.toDateString())
       }
     })

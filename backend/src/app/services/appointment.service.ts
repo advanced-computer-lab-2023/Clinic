@@ -7,6 +7,7 @@ import { AppointmentStatus } from 'clinic-common/types/appointment.types'
 
 import { removeTimeFromDoctorAvailability } from './doctor.service'
 import { PatientModel } from '../models/patient.model'
+import { NotFoundError } from '../errors'
 
 export async function getfilteredAppointments(
   query: any
@@ -79,10 +80,20 @@ export async function createAndRemoveTime(
 export async function createFollowUpAppointment(
   appointment: AppointmentDocument
 ): Promise<AppointmentDocument> {
+  console.log(appointment.patientID)
+  const patient = await PatientModel.findById(appointment.patientID)
+
+  if (patient == null) {
+    throw new NotFoundError()
+  }
+
+  const patientName = patient?.name
+
   const newAppointment = new AppointmentModel({
     ...appointment,
     date: new Date(appointment.date),
     status: AppointmentStatus.Upcoming,
+    reservedFor: patientName,
   })
 
   return await newAppointment.save()
