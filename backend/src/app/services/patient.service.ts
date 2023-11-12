@@ -207,8 +207,15 @@ export async function subscribeToHealthPackage({
   const renewalDate = new Date()
   renewalDate.setFullYear(renewalDate.getFullYear() + 1)
   model.healthPackageRenewalDate = renewalDate
+  const historyIndex = model.healthPackageHistory.findIndex(
+    (entry) => entry.healthPackage.toString() === healthPackage.id
+  )
 
-  await model.save() //removed console.log
+  if (historyIndex !== -1) {
+    model.healthPackageHistory.splice(historyIndex, 1)
+  }
+
+  await model.save()
 }
 
 export async function unSubscribeToHealthPackage(params: {
