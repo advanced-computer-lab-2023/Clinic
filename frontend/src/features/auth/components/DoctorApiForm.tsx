@@ -2,6 +2,9 @@ import { AlertsBox } from '@/components/AlertsBox'
 import { CardPlaceholder } from '@/components/CardPlaceholder'
 import { useAlerts } from '@/hooks/alerts'
 import { zodResolver } from '@hookform/resolvers/zod'
+import FireBase from '../../../../../firebase.config'
+import { getDownloadURL, getStorage, ref, uploadBytes } from 'firebase/storage'
+
 import {
   Card,
   CardContent,
@@ -33,7 +36,7 @@ export interface Field<Request extends ObjectWithStringKeys> {
   label: string
   property: Path<Request>
   valueAsNumber?: boolean
-  type?: string
+  type?: 'text' | 'number' | 'date' | 'file'
   selectedValues?: { label: string; value: string }[]
   customError?: string
   customComponent?: unknown
@@ -44,12 +47,13 @@ export interface Field<Request extends ObjectWithStringKeys> {
  *
  * @param fields The fields to display in the form.
  *               The `property` field is the property of the request object.
- *               The `label` field is the label of the text field.
- *              The `valueAsNumber` field is whether the value should be parsed as a number. (False by default)
+ *             
+ *   The `label` field is the label of the text field.
+ *              The `valueAsNumber` field iss whether the value should be parsed as a number. (False by default)
  * @param validator The validator to use for the form.
  * @param initialDataFetcher The function to fetch the initial data for the form,
  *                           if not provided, the form will be empty at first.
- * @param queryKey An array of strings that uniquely identifies the query that is used to fetch the initial data
+ * @param queryKey An array of strings that uniquely identsifies the query that is used to fetch the initial data
  *                 for the form. If not provided, the form will be empty at first.
  * @param successMessage The message to display when the form is successfully submitted.
  * @param action The function to call when the form is submitted.
@@ -72,7 +76,7 @@ export interface Field<Request extends ObjectWithStringKeys> {
  />
  ```
  */
-export function ApiForm<Request extends ObjectWithStringKeys>({
+export function DoctorApiForm<Request extends ObjectWithStringKeys>({
   fields,
   validator,
   initialDataFetcher,
@@ -81,6 +85,7 @@ export function ApiForm<Request extends ObjectWithStringKeys>({
   action,
   onSuccess,
   buttonText,
+  file,
 }: {
   fields: Field<Request>[]
   validator: Zod.AnyZodObject
@@ -88,15 +93,29 @@ export function ApiForm<Request extends ObjectWithStringKeys>({
   queryKey?: string[]
   successMessage: string
   action: (data: Request) => Promise<unknown>
+  // onDocumentPathsChange: (newPaths: string[]) => void;
   onSuccess?: () => void
   buttonText?: string
+  file?: boolean
 }) {
   const { handleSubmit, control } = useForm<Request>({
     resolver: zodResolver(validator),
   })
   const { addAlert } = useAlerts()
+  const [fileError, setFileError] = useState<string | null>(null)
   const queryClient = useQueryClient()
+  const [documents, setDocuments] = useState<FileList | null>(null)
+  const [documentPaths, setDocumentPaths] = useState<string[]>([])
 
+  console.log(file)
+  // useEffect(() => {
+  //   console.log(documents);
+  //   if(documents){
+  //      handleMultipleFileUpload(documents,setDocumentPaths);
+  //   console.log(documentPaths);
+
+  //   }
+  // },[documents]);
   const query = useQuery({
     queryKey,
     enabled: !!initialDataFetcher,
@@ -131,8 +150,26 @@ export function ApiForm<Request extends ObjectWithStringKeys>({
     return <CardPlaceholder />
   }
 
+  const changeData = (data: any) => {
+    console.log(file)
+
+    if (file) {
+      console.log(documents)
+
+      if (documents) {
+        handleMultipleFileUpload(documents, setDocumentPaths)
+        data.documents = documentPaths
+        setFileError(null)
+      } else {
+        setFileError('Please select a file')
+      }
+    }
+
+    mutation.mutateAsync(data)
+  }
+
   return (
-    <form onSubmit={handleSubmit((data) => mutation.mutateAsync(data))}>
+    <form onSubmit={handleSubmit((data) => changeData(data))}>
       <Card>
         <CardContent>
           <Stack spacing={2}>
@@ -145,6 +182,21 @@ export function ApiForm<Request extends ObjectWithStringKeys>({
                   control={control}
                   render={({ field: fieldItem, fieldState }) => (
                     <>
+                      {field.type === 'file' ? (
+                        <>
+                          <input
+                            type="file"
+                            multiple
+                            onChange={(e) => {
+                              setDocuments(e.target.files)
+                              setFileError(null)
+                            }}
+                          />
+                          {fileError && (
+                            <div style={{ color: 'red' }}>{fileError}</div>
+                          )}
+                        </> // <InputField/>
+                      ) : null}
                       {field.selectedValues ? (
                         <SelectInputField
                           field={field}
@@ -244,6 +296,51 @@ const TextInputField = <T extends ObjectWithStringKeys>({
       helperText={fieldState.error?.message as string}
     />
   )
+}
+
+function generateUniqueFilename() {
+  const timestamp = new Date().getTime() // Get the current timestamp
+  const randomString = Math.random().toString(36).substring(2, 8) // Generate a random string
+
+  // Combine the timestamp and random string to create a unique filename
+  const uniqueFilename = `${timestamp}_${randomString}`
+
+  return uniqueFilename
+}
+
+const handleMultipleFileUpload = async (
+  fileList: FileList | null,
+  setDocumentPaths: (newPaths: string[]) => void
+) => {
+  if (!fileList) {
+    return
+  }
+
+  const files: File[] = Array.from(fileList)
+  const storage = getStorage(FireBase)
+  const storageRef = ref(storage, 'files')
+
+  const newDocumentPaths = [] // Create an array to store the new document paths
+
+  for (let i = 0; i < files.length; i++) {
+    const file = files[i]
+    const uniqueFilename = generateUniqueFilename() // Implement a function to generate unique filenames
+    const fileRef = ref(storageRef, 'documents/' + uniqueFilename)
+
+    try {
+      await uploadBytes(fileRef, file)
+      const fullPath = await getDownloadURL(fileRef)
+      newDocumentPaths.push(fullPath) // Store the path, not the file
+      setDocumentPaths(newDocumentPaths)
+      console.log(`Uploaded ${file.name} successfully!`)
+    } catch (error) {
+      console.error(`Error uploading ${file.name}:`, error)
+    }
+  }
+
+  setDocumentPaths(newDocumentPaths)
+
+  // alert("Files uploaded!");
 }
 
 const SelectInputField = <T extends ObjectWithStringKeys>({
