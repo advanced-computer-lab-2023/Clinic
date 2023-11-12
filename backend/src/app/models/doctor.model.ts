@@ -24,10 +24,11 @@ const doctorSchema = new Schema(
       type: String,
       required: true,
       enum: ContractStatus,
-      default: ContractStatus.Accepted,
+      default: ContractStatus.Pending,
     },
     availableTimes: { type: [Date], required: true, default: [] },
     walletMoney: { type: Number, required: false, default: 0 },
+    employmentContract: { type: [String], required: true, default: [] },
   },
 
   { timestamps: true }

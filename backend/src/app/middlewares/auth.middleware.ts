@@ -11,6 +11,7 @@ import {
   isPatient,
   isDoctorAndApproved,
   isDoctorPatientAuthorized,
+  isDoctorAndApprovedAndAccepts,
 } from '../services/auth.service'
 
 export async function authenticate(
@@ -101,6 +102,24 @@ export async function allowApprovedDoctors(
   }
 
   if (await isDoctorAndApproved(req.username)) {
+    next()
+
+    return
+  }
+
+  throw new NotAuthorizedError()
+}
+
+export async function allowApprovedandAcceptsDoctors(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  if (req.username == null) {
+    throw new NotAuthenticatedError()
+  }
+
+  if (await isDoctorAndApprovedAndAccepts(req.username)) {
     next()
 
     return
