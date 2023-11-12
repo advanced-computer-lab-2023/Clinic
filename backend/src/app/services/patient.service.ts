@@ -205,7 +205,7 @@ export async function subscribeToHealthPackage({
   isFamilyMember?: boolean
   healthPackageId: string
 }): Promise<void> {
-  const model = isFamilyMember
+  let model = isFamilyMember
     ? await FamilyMemberModel.findById(patientId)
     : await PatientModel.findById(patientId)
 
@@ -219,8 +219,9 @@ export async function subscribeToHealthPackage({
     throw new NotFoundError()
   }
 
-  if (model.healthPackage)
-    await unSubscribeToHealthPackage({ id: patientId, isFamilyMember })
+  if (model.healthPackage) {
+    model = await unSubscribeToHealthPackage({ id: patientId, isFamilyMember })
+  }
 
   model.healthPackage = healthPackage.id
 
@@ -242,7 +243,7 @@ export async function subscribeToHealthPackage({
 export async function unSubscribeToHealthPackage(params: {
   id: string
   isFamilyMember: boolean
-}): Promise<void> {
+}) {
   const model = params.isFamilyMember
     ? await FamilyMemberModel.findById(params.id)
     : await PatientModel.findById(params.id)
@@ -273,6 +274,8 @@ export async function unSubscribeToHealthPackage(params: {
     model.healthPackageRenewalDate = undefined
     await model.save()
   }
+
+  return model
 }
 
 export async function getPatientByUsername(
