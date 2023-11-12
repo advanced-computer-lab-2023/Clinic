@@ -1,4 +1,6 @@
 import {
+  getCancelledHealthPackagesForPatient,
+  getCanellationDate,
   getHealthPackageForPatient,
   getHealthPackages,
   subscribeCreditToHealthPackage,
@@ -26,7 +28,7 @@ import {
   Typography,
 } from '@mui/material'
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { LoadingButton } from '@mui/lab'
 import { AddModerator } from '@mui/icons-material'
 import { useAlerts } from '@/hooks/alerts'
@@ -56,6 +58,27 @@ export function SubscribeToHealthPackages() {
     queryKey: ['subscribed-health-packages'],
     queryFn: () => getHealthPackageForPatient({ username: user!.username }),
   })
+  const cancelledHealthPackagesQuery = useQuery({
+    queryKey: ['cancelled-health-packages'],
+    queryFn: () => getCancelledHealthPackagesForPatient(),
+  })
+  useEffect(() => {
+    console.log(
+      'cancelledHealthPackagesQuery',
+      cancelledHealthPackagesQuery.data
+    )
+  }, [cancelledHealthPackagesQuery.data])
+  useEffect(() => {
+    console.log(
+      'subscribedHealthPackageQuery',
+      cancelledHealthPackagesQuery.data
+    )
+    console.log('query.data', query.data)
+  }, [cancelledHealthPackagesQuery.data, query.data])
+  //execute the query
+  useEffect(() => {
+    console.log('query', cancelledHealthPackagesQuery.data)
+  }, [cancelledHealthPackagesQuery.data])
 
   const onSuccess =
     (message: string = 'Subscribed to health package successfully.') =>
@@ -117,6 +140,36 @@ export function SubscribeToHealthPackages() {
     [query, selectedHealthPackageId]
   )
 
+  const [cancellationDatesMap, setCancellationDatesMap] = useState<
+    Record<string, string>
+  >({})
+
+  useEffect(() => {
+    // Fetch cancellation date for each health package
+    const fetchCancellationDates = async () => {
+      try {
+        const dates = await Promise.all(
+          cancelledHealthPackagesQuery.data?.map(async (healthPackage) => {
+            const date = await getCanellationDate(healthPackage)
+
+            return { id: healthPackage, date }
+          }) ?? []
+        )
+
+        const cancellationDatesMap = Object.fromEntries(
+          dates.map(({ id, date }) => [id, date])
+        )
+
+        // Set the dates in the state
+        setCancellationDatesMap(cancellationDatesMap)
+      } catch (error) {
+        console.error('Error fetching cancellation dates:', error)
+      }
+    }
+
+    fetchCancellationDates()
+  }, [cancelledHealthPackagesQuery.data]) // Dependency on query.data
+
   if (query.isLoading) {
     return <CardPlaceholder />
   }
@@ -170,6 +223,19 @@ export function SubscribeToHealthPackages() {
                         color="success"
                         label="Subscribed"
                       />
+                    )}
+                    {cancelledHealthPackagesQuery.data?.includes(
+                      healthPackage.id
+                    ) && (
+                      <>
+                        <Chip
+                          label={`Cancelled on ${
+                            cancellationDatesMap[healthPackage.id]
+                          }`}
+                          color="error"
+                          size="small"
+                        />
+                      </>
                     )}
                   </Stack>
 
@@ -225,9 +291,9 @@ export function SubscribeToHealthPackages() {
                   <Button
                     variant="contained"
                     fullWidth
-                    color="secondary" // Set the color as desired
-                    startIcon={<AddModerator />} // Replace with the icon you prefer
-                    onClick={() => cancelMutation.mutateAsync(healthPackage.id)}
+                    color="secondary"
+                    startIcon={<AddModerator />} // Replace with cancel icon
+                    onClick={() => cancelMutation.mutateAsync()}
                   >
                     Unsubscribe
                   </Button>

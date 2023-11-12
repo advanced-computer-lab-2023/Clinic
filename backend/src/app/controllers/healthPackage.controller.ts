@@ -34,6 +34,7 @@ import {
 import { getPatientByUsername } from '../services/patient.service'
 import { APIError, NotFoundError } from '../errors'
 import { GetWalletMoneyResponse } from 'clinic-common/types/patient.types'
+import { Types } from 'mongoose'
 
 export const healthPackagesRouter = Router()
 
@@ -136,12 +137,25 @@ healthPackagesRouter.post(
 )
 
 healthPackagesRouter.post(
+  '/unsubscribe',
+  [allowAuthenticated, asyncWrapper(allowPatients)],
+  asyncWrapper(async (req, res) => {
+    const patient = await getPatientByUsername(req.username!)
+    if (!patient) throw new NotFoundError()
+    await unSubscribeToHealthPackage({
+      id: patient.id,
+    })
+    console.log(patient.healthPackageHistory)
+    res.status(200).send()
+  })
+)
+
+healthPackagesRouter.post(
   '/:id/unsubscribe',
   [allowAuthenticated, asyncWrapper(allowPatients)],
   asyncWrapper(async (req, res) => {
     await unSubscribeToHealthPackage({
-      patientUsername: req.username!,
-      healthPackageId: req.params.id,
+      id: req.params.id,
     })
     res.status(200).send()
   })
@@ -213,5 +227,38 @@ healthPackagesRouter.post(
         },
       } satisfies GetHealthPackageForPatientResponse)
     }
+  })
+)
+
+healthPackagesRouter.post(
+  '/patient-cancelled',
+  asyncWrapper(async (req, res) => {
+    const patient = await getPatientByUsername(req.username!)
+    const cancelled: Types.ObjectId[] = []
+    if (!patient) throw new NotFoundError()
+    patient.healthPackageHistory.forEach((healthPackage) => {
+      cancelled.push(healthPackage.healthPackage)
+    })
+    res.send(cancelled)
+  })
+)
+
+healthPackagesRouter.post(
+  '/cancellation-date/:healthPackageId',
+  asyncWrapper(async (req, res) => {
+    if (!req.username) throw new NotFoundError()
+    const patient = await getPatientByUsername(req.username)
+    if (!patient) throw new NotFoundError()
+    console.log('looking for' + req.params.healthPackageId)
+    patient.healthPackageHistory.forEach((healthPackage) => {
+      console.log('history' + healthPackage.healthPackage.toString())
+
+      if (
+        healthPackage.healthPackage.toString() === req.params.healthPackageId
+      ) {
+        console.log(healthPackage.date.toDateString())
+        res.send(healthPackage.date.toDateString())
+      }
+    })
   })
 )

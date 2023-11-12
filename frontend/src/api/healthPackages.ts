@@ -67,9 +67,9 @@ export async function subscribeCreditToHealthPackage(
     .then((res) => res.data)
 }
 
-export async function unsubscribeToHealthPackage(id: string): Promise<void> {
+export async function unsubscribeToHealthPackage(): Promise<void> {
   return await api
-    .post<void>(`/health-packages/${id}/unsubscribe`)
+    .post<void>(`/health-packages/unsubscribe`)
     .then((res) => res.data)
 }
 
@@ -81,5 +81,21 @@ export async function getHealthPackageForPatient(
       `/health-packages/for-patient`,
       params
     )
+    .then((res) => res.data)
+}
+
+export async function getCancelledHealthPackagesForPatient(): Promise<
+  string[]
+> {
+  return await api
+    .post<string[]>(`/health-packages/patient-cancelled`)
+    .then((res) => res.data)
+}
+
+export async function getCanellationDate(
+  healthPackageId: string
+): Promise<string> {
+  return await api
+    .post<string>(`/health-packages/cancellation-date/${healthPackageId}`)
     .then((res) => res.data)
 }

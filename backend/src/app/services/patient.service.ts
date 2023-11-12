@@ -4,6 +4,7 @@ import {
   type AppointmentDocument,
   AppointmentModel,
 } from '../models/appointment.model'
+import { FamilyMemberModel } from '../models/familyMember.model'
 import { HealthPackageModel } from '../models/healthPackage.model'
 import { type PatientDocument, PatientModel } from '../models/patient.model'
 import {
@@ -206,27 +207,59 @@ export async function subscribeToHealthPackage(params: {
 }
 
 export async function unSubscribeToHealthPackage(params: {
-  patientUsername: string
-  healthPackageId: string
+  id: string
 }): Promise<void> {
-  const patient = await getPatientByUsername(params.patientUsername)
+  const patient = await PatientModel.findById(params.id)
+  const familyMember = await FamilyMemberModel.findById(params.id)
 
-  if (!patient) {
+  if (!patient && !familyMember) {
     throw new NotFoundError()
   }
 
-  const healthPackage = await HealthPackageModel.findById(
-    params.healthPackageId
-  )
+  if (patient && patient.healthPackage) {
+    // Check if there is existing history with the same healthPackage
+    const existingItemIndex = patient.healthPackageHistory.findIndex(
+      (item) =>
+        item.healthPackage.toString() === patient.healthPackage?.toString()
+    )
 
-  if (!healthPackage) {
-    throw new NotFoundError()
+    if (existingItemIndex !== -1) {
+      // Update the date attribute of the existing item
+      patient.healthPackageHistory[existingItemIndex].date = new Date()
+    } else {
+      // If no existing item, push a new item
+      patient.healthPackageHistory.push({
+        healthPackage: patient.healthPackage,
+        date: new Date(),
+      })
+    }
+
+    patient.healthPackage = undefined
+    patient.healthPackageRenewalDate = undefined
+    await patient.save()
   }
 
-  patient.healthPackage = undefined
-  patient.healthPackageRenewalDate = undefined
+  if (familyMember && familyMember.healthPackage) {
+    const existingItemIndex = familyMember.healthPackageHistory.findIndex(
+      (item) =>
+        item.healthPackage.toString() === familyMember.healthPackage?.toString()
+    )
 
-  await patient.save()
+    if (existingItemIndex !== -1) {
+      // Update the date attribute of the existing item
+      familyMember.healthPackageHistory[existingItemIndex].date = new Date()
+    } else {
+      // If no existing item, push a new item
+      familyMember.healthPackageHistory.push({
+        healthPackage: familyMember.healthPackage,
+        date: new Date(),
+      })
+    }
+
+    familyMember.healthPackage = undefined
+    familyMember.healthPackageRenewalDate = undefined
+    await familyMember.save()
+  }
 }
 
 export async function getPatientByUsername(
