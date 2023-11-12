@@ -1,8 +1,9 @@
 import {
+  getCancelledHealthPackagesForPatient,
+  getCanellationDate,
   getHealthPackageForPatient,
   getHealthPackages,
   subscribeCreditToHealthPackage,
-  subscribeToHealthPackage,
   subscribeWalletToHealthPackage,
   unsubscribeToHealthPackage,
 } from '@/api/healthPackages'
@@ -25,15 +26,21 @@ import {
   Stack,
   Typography,
 } from '@mui/material'
-import { useMutation, useQuery } from '@tanstack/react-query'
-import { useMemo, useState } from 'react'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useMemo, useState, useEffect } from 'react'
 import { LoadingButton } from '@mui/lab'
 import { AddModerator } from '@mui/icons-material'
 import { useAlerts } from '@/hooks/alerts'
 import Checkout from '@/components/StripeCheckout'
 import { useAuth } from '@/hooks/auth'
 
-export function SubscribeToHealthPackages() {
+export function SubscribeToHealthPackages({
+  subscriberId,
+  isFamilyMember = false,
+}: {
+  subscriberId?: string
+  isFamilyMember?: boolean
+}) {
   const [selectedHealthPackageId, setSelectedHealthPackageId] = useState<
     null | string
   >()
@@ -46,22 +53,38 @@ export function SubscribeToHealthPackages() {
 
   const alerts = useAlerts()
   const { user } = useAuth()
+  const queryClient = useQueryClient()
 
   const query = useQuery({
     queryKey: ['health-packages'],
     queryFn: getHealthPackages,
   })
 
+  const id = subscriberId || user!.modelId
+  const payerUsername = user!.username
+
   const subscribedHealthPackageQuery = useQuery({
-    queryKey: ['subscribed-health-packages'],
-    queryFn: () => getHealthPackageForPatient({ username: user!.username }),
+    queryKey: ['subscribed-health-packages', isFamilyMember, id],
+    queryFn: () =>
+      getHealthPackageForPatient({
+        patientId: id,
+        isFamilyMember,
+      }),
   })
+  const cancelledHealthPackagesQuery = useQuery({
+    queryKey: ['cancelled-health-packages', id, isFamilyMember],
+    queryFn: () => getCancelledHealthPackagesForPatient({ id, isFamilyMember }),
+  })
+  useEffect(() => {
+    cancelledHealthPackagesQuery.refetch()
+  }, [subscribedHealthPackageQuery.data, cancelledHealthPackagesQuery])
 
   const onSuccess =
     (message: string = 'Subscribed to health package successfully.') =>
     () => {
       query.refetch()
       subscribedHealthPackageQuery.refetch()
+      queryClient.invalidateQueries(['family-members'])
       setSelectedHealthPackageId(null)
       setWalletMethodIdPackage(null)
       setCreditMethodIdPackage(null)
@@ -70,11 +93,6 @@ export function SubscribeToHealthPackages() {
         message,
       })
     }
-
-  const mutation = useMutation({
-    mutationFn: subscribeToHealthPackage,
-    onSuccess: onSuccess(),
-  })
 
   const cancelMutation = useMutation({
     mutationFn: unsubscribeToHealthPackage,
@@ -117,7 +135,40 @@ export function SubscribeToHealthPackages() {
     [query, selectedHealthPackageId]
   )
 
-  if (query.isLoading) {
+  const [cancellationDatesMap, setCancellationDatesMap] = useState<
+    Record<string, string>
+  >({})
+
+  useEffect(() => {
+    // Fetch cancellation date for each health package
+    const fetchCancellationDates = async () => {
+      try {
+        const dates = await Promise.all(
+          cancelledHealthPackagesQuery.data?.map(async (healthPackage) => {
+            const date = await getCanellationDate(healthPackage, {
+              id,
+              isFamilyMember,
+            })
+
+            return { id: healthPackage, date }
+          }) ?? []
+        )
+
+        const cancellationDatesMap = Object.fromEntries(
+          dates.map(({ id, date }) => [id, date])
+        )
+
+        // Set the dates in the state
+        setCancellationDatesMap(cancellationDatesMap)
+      } catch (error) {
+        console.error('Error fetching cancellation dates:', error)
+      }
+    }
+
+    fetchCancellationDates()
+  }, [cancelledHealthPackagesQuery.data, id, isFamilyMember]) // Dependency on query.data
+
+  if (query.isLoading || subscribedHealthPackageQuery.isLoading) {
     return <CardPlaceholder />
   }
 
@@ -170,6 +221,19 @@ export function SubscribeToHealthPackages() {
                         color="success"
                         label="Subscribed"
                       />
+                    )}
+                    {cancelledHealthPackagesQuery.data?.includes(
+                      healthPackage.id
+                    ) && (
+                      <>
+                        <Chip
+                          label={`Cancelled on ${
+                            cancellationDatesMap[healthPackage.id]
+                          }`}
+                          color="error"
+                          size="small"
+                        />
+                      </>
                     )}
                   </Stack>
 
@@ -225,9 +289,15 @@ export function SubscribeToHealthPackages() {
                   <Button
                     variant="contained"
                     fullWidth
-                    color="secondary" // Set the color as desired
-                    startIcon={<AddModerator />} // Replace with the icon you prefer
-                    onClick={() => cancelMutation.mutateAsync(healthPackage.id)}
+                    color="secondary"
+                    startIcon={<AddModerator />} // Replace with cancel icon
+                    onClick={() =>
+                      cancelMutation.mutateAsync({
+                        subscriberId: id,
+                        payerUsername,
+                        isFamilyMember,
+                      })
+                    }
                   >
                     Unsubscribe
                   </Button>
@@ -333,7 +403,6 @@ export function SubscribeToHealthPackages() {
               setWalletMethodIdPackage(selectedHealthPackageId!)
               setSelectedHealthPackageId(null)
             }}
-            loading={mutation.isLoading}
           >
             Subscribe
           </LoadingButton>
@@ -367,7 +436,12 @@ export function SubscribeToHealthPackages() {
               <LoadingButton
                 variant="contained"
                 onClick={() => {
-                  subscribeWalletMutation.mutateAsync(walletMethodIdPackage!)
+                  subscribeWalletMutation.mutateAsync({
+                    healthPackageId: walletMethodIdPackage!,
+                    isFamilyMember,
+                    payerUsername,
+                    subscriberId: id,
+                  })
                 }}
                 loading={subscribeWalletMutation.isLoading}
               >
@@ -410,7 +484,12 @@ export function SubscribeToHealthPackages() {
           <Checkout
             handleSubmit={() => {
               console.log('handleSubmit')
-              subscribeCreditMutation.mutateAsync(creditMethodIdPackage!)
+              subscribeCreditMutation.mutateAsync({
+                healthPackageId: creditMethodIdPackage!,
+                isFamilyMember,
+                payerUsername,
+                subscriberId: id,
+              })
             }}
           />
         </DialogContent>

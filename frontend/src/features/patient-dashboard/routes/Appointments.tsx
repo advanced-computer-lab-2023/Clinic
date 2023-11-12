@@ -14,6 +14,7 @@ import { useState } from 'react'
 import axios from 'axios'
 import { useAuth } from '@/hooks/auth'
 import { UserType } from 'clinic-common/types/user.types'
+import { toast } from 'react-toastify'
 
 export function Appointments() {
   const [followUpDate, setFollowUpDate] = useState('')
@@ -30,7 +31,7 @@ export function Appointments() {
 
     if (followUpDate === '') {
       setFollowUpDateError(true)
-      alert('Please select a date')
+      toast.error('Please select a date')
     } else {
       setFollowUpDateError(false)
 
@@ -46,10 +47,10 @@ export function Appointments() {
           date: followUpDate,
         })
         .then(() => {
-          alert('Follow-up scheduled successfully')
+          toast.success('Follow-up scheduled successfully')
         })
         .catch((err) => {
-          alert('Error in scheduling follow-up')
+          toast.error('Error in scheduling follow-up')
           console.log(err)
         })
 
@@ -109,7 +110,7 @@ export function Appointments() {
                     Doctor Name
                   </Typography>
                   <Typography variant="body1">
-                    {appointment.doctorID}
+                    {appointment.doctorName}
                   </Typography>
                 </Stack>
                 <Stack spacing={-1}>

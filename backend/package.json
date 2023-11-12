@@ -19,6 +19,7 @@
     "@types/jsonwebtoken": "^9.0.3",
     "@types/multer": "^1.4.10",
     "@types/node": "20.8.2",
+    "dotenv": "^16.3.1",
     "tsx": "^3.14.0"
   },
   "scripts": {

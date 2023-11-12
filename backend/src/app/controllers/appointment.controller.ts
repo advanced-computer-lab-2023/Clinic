@@ -13,6 +13,7 @@ import { PatientModel } from '../models/patient.model'
 import { DoctorModel } from '../models/doctor.model'
 import { type HydratedDocument } from 'mongoose'
 import { type UserDocument, UserModel } from '../models/user.model'
+import { getApprovedDoctorById } from '../services/doctor.service'
 
 export const appointmentsRouter = Router()
 
@@ -34,12 +35,17 @@ appointmentsRouter.get(
     }
 
     const filterAppointments = await getfilteredAppointments(query)
-    res.send(
-      new GetFilteredAppointmentsResponse(
-        filterAppointments.map((appointment) => ({
+    const appointmentResponses = await Promise.all(
+      filterAppointments.map(async (appointment) => {
+        const doctor = await getApprovedDoctorById(
+          appointment.doctorID.toString()
+        )
+
+        return {
           id: appointment.id,
           patientID: appointment.patientID.toString(),
           doctorID: appointment.doctorID.toString(),
+          doctorName: doctor.name,
           date: appointment.date,
           familyID: appointment.familyID || '',
           reservedFor: appointment.reservedFor || 'Me',
@@ -47,9 +53,10 @@ appointmentsRouter.get(
             new Date(appointment.date) > new Date()
               ? AppointmentStatus.Upcoming
               : AppointmentStatus.Completed,
-        }))
-      )
+        }
+      })
     )
+    res.send(new GetFilteredAppointmentsResponse(appointmentResponses))
   })
 )
 

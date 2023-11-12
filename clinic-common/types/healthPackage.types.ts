@@ -33,7 +33,8 @@ export interface GetAllHealthPackagesResponse {
 export interface GetHealthPackageResponse extends HealthPackageResponseBase {}
 
 export interface GetHealthPackageForPatientRequest {
-  username: string
+  patientId: string // patientId or familyMemberId
+  isFamilyMember: boolean
 }
 
 export interface GetHealthPackageForPatientResponse {
@@ -41,4 +42,28 @@ export interface GetHealthPackageForPatientResponse {
     renewalDate: string
     remainingMonths: number
   }
+}
+
+export interface GetCancelledHealthPackagesForPatientResponse {
+  healthPackageHistory: [string]
+}
+
+export interface SubscribeToHealthPackageRequest {
+  // patientId or familyMemberId for the person that should be subscribed to the health package
+  subscriberId: string
+
+  /**
+   * The person that is paying for the subscription
+   */
+  payerUsername: string
+
+  // Indicates whether the subscribee is a the id for FamilyMember or Patient
+  isFamilyMember: boolean
+  healthPackageId: string
+}
+
+export interface UnsubscribeToHealthPackageRequest {
+  subscriberId: string
+  payerUsername: string
+  isFamilyMember: boolean
 }

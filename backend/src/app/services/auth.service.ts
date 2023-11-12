@@ -20,6 +20,7 @@ import { type DoctorDocument, DoctorModel } from '../models/doctor.model'
 import { hash } from 'bcrypt'
 import { type WithUser } from '../utils/typeUtils'
 import { AppointmentModel } from '../models/appointment.model'
+import { AdminModel } from '../models/admin.model'
 
 const jwtSecret = process.env.JWT_TOKEN ?? 'secret'
 const bcryptSalt = process.env.BCRYPT_SALT ?? '$2b$10$13bXTGGukQXsCf5hokNe2u'
@@ -209,7 +210,9 @@ export async function isPatient(username: string): Promise<boolean> {
   return patient != null
 }
 
-export async function isDoctorAndApproved(username: string): Promise<boolean> {
+export async function isDoctorAndApprovedAndAccepts(
+  username: string
+): Promise<boolean> {
   const user = await UserModel.findOne({ username })
 
   if (user == null) {
@@ -223,6 +226,18 @@ export async function isDoctorAndApproved(username: string): Promise<boolean> {
     doctor.requestStatus === 'approved' &&
     doctor.contractStatus === 'accepted'
   )
+}
+
+export async function isDoctorAndApproved(username: string): Promise<boolean> {
+  const user = await UserModel.findOne({ username })
+
+  if (user == null) {
+    return false
+  }
+
+  const doctor = await DoctorModel.findOne({ user: user.id })
+
+  return doctor != null && doctor.requestStatus === 'approved'
 }
 
 export async function isDoctorPatientAuthorized(
@@ -241,7 +256,10 @@ export async function isDoctorPatientAuthorized(
     return false
   }
 
-  if (doctor.requestStatus !== 'approved') {
+  if (
+    doctor.requestStatus !== 'approved' ||
+    doctor.contractStatus !== 'accepted'
+  ) {
     return false
   }
 
@@ -255,4 +273,28 @@ export async function isDoctorPatientAuthorized(
   }
 
   return true
+}
+
+export async function getModelIdForUsername(username: string): Promise<string> {
+  const user = await getUserByUsername(username)
+
+  switch (user.type) {
+    case UserType.Doctor:
+      return (await DoctorModel.findOne({
+        user: user.id,
+      }))!.id
+
+    case UserType.Patient:
+      return (await PatientModel.findOne({
+        user: user.id,
+      }))!.id
+
+    case UserType.Admin:
+      return (await AdminModel.findOne({
+        user: user.id,
+      }))!.id
+
+    default:
+      throw new Error('Invalid user type')
+  }
 }

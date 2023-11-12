@@ -14,6 +14,7 @@ import { Link, useParams } from 'react-router-dom'
 import AddIcon from '@mui/icons-material/Add'
 import { useState } from 'react'
 import axios from 'axios'
+import { toast } from 'react-toastify'
 
 export function Patient() {
   const [showTextField, setShowTextField] = useState(false)
@@ -47,7 +48,7 @@ export function Patient() {
   async function submit() {
     if (notes === '') {
       setNotesError(true)
-      alert('Please enter a health record ')
+      toast.error('Please enter a health record')
     } else {
       setNotesError(false)
       setShowTextField(false)
@@ -59,7 +60,7 @@ export function Patient() {
           newNote: notes,
         })
         .then(() => {
-          alert('Note added successfully')
+          toast.success('Note added successfully')
         })
         .catch((err) => {
           console.log(err)
@@ -173,9 +174,7 @@ export function Patient() {
               ADD
             </Button>
           )}
-          <Link
-            to={'http://localhost:5173/doctor-dashboard/healthRecords/' + id}
-          >
+          <Link to={'../healthRecords/' + id}>
             <Button variant="contained" color="primary">
               Health Records Files
             </Button>
