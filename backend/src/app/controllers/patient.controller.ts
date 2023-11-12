@@ -35,9 +35,10 @@ import {
   type Relation,
 } from 'clinic-common/types/familyMember.types'
 import {
-  AppointmentResponseBase,
+  AppointmentStatus,
   GetFilteredAppointmentsResponse,
 } from 'clinic-common/types/appointment.types'
+import { getApprovedDoctorById } from '../services/doctor.service'
 
 const storage = multer.memoryStorage()
 const upload = multer({ storage })
@@ -263,21 +264,33 @@ patientRouter.get(
 
     const { patient, appointments, prescriptions } = await getPatientByID(id)
 
-    const filteredAppointments = appointments
-      .filter((appointment) => appointment.doctorID.toString() === doctor?.id)
-      .map((appointment) => {
-        return new AppointmentResponseBase(
-          appointment.id,
-          appointment.patientID.toString(),
-          appointment.doctorID.toString(),
-          appointment.date,
-          appointment.familyID,
-          appointment.reservedFor
+    const filteredAppointments = appointments.filter(
+      (appointment) => appointment.doctorID.toString() === doctor?.id
+    )
+    const appointmentResponses = await Promise.all(
+      filteredAppointments.map(async (appointment) => {
+        const doctor = await getApprovedDoctorById(
+          appointment.doctorID.toString()
         )
+
+        return {
+          id: appointment.id,
+          patientID: appointment.patientID.toString(),
+          doctorID: appointment.doctorID.toString(),
+          doctorName: doctor.name,
+          date: appointment.date,
+          familyID: appointment.familyID || '',
+          reservedFor: appointment.reservedFor || 'Me',
+          status:
+            new Date(appointment.date) > new Date()
+              ? AppointmentStatus.Upcoming
+              : AppointmentStatus.Completed,
+        }
       })
+    )
 
     const appointmentsRefactored = new GetFilteredAppointmentsResponse(
-      filteredAppointments
+      appointmentResponses
     )
     res.send(
       new GetAPatientResponse(
