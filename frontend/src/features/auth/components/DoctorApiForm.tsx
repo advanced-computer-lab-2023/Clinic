@@ -150,14 +150,14 @@ export function DoctorApiForm<Request extends ObjectWithStringKeys>({
     return <CardPlaceholder />
   }
 
-  const changeData = (data: any) => {
+  const changeData = async (data: any) => {
     console.log(file)
 
     if (file) {
       console.log(documents)
 
       if (documents) {
-        handleMultipleFileUpload(documents, setDocumentPaths)
+        await handleMultipleFileUpload(documents, setDocumentPaths)
         data.documents = documentPaths
         setFileError(null)
       } else {
@@ -318,14 +318,14 @@ const handleMultipleFileUpload = async (
 
   const files: File[] = Array.from(fileList)
   const storage = getStorage(FireBase)
-  const storageRef = ref(storage, 'files')
+  const storageRef = ref(storage, 'doctors/')
 
   const newDocumentPaths = [] // Create an array to store the new document paths
 
   for (let i = 0; i < files.length; i++) {
     const file = files[i]
     const uniqueFilename = generateUniqueFilename() // Implement a function to generate unique filenames
-    const fileRef = ref(storageRef, 'documents/' + uniqueFilename)
+    const fileRef = ref(storageRef, uniqueFilename)
 
     try {
       await uploadBytes(fileRef, file)
