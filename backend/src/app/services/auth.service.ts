@@ -23,7 +23,9 @@ import { AppointmentModel } from '../models/appointment.model'
 import { AdminModel } from '../models/admin.model'
 
 const jwtSecret = process.env.JWT_TOKEN ?? 'secret'
-const bcryptSalt = process.env.BCRYPT_SALT ?? '$2b$10$13bXTGGukQXsCf5hokNe2u'
+
+export const bcryptSalt =
+  process.env.BCRYPT_SALT ?? '$2b$10$13bXTGGukQXsCf5hokNe2u'
 
 export class JwtPayload {
   constructor(public username: string) {}

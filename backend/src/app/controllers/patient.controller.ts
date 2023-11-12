@@ -38,6 +38,40 @@ import {
   AppointmentResponseBase,
   GetFilteredAppointmentsResponse,
 } from 'clinic-common/types/appointment.types'
+import { changePassowrd } from '../services/changePassword'
+import { SUCCESS } from '../utils/httpStatusText'
+import AppError from '../utils/appError'
+
+export const changeUserPassword = asyncWrapper(async (req, res) => {
+  try {
+    const { oldPassword, newPassword } = req.body
+    const username = req.username
+
+    await changePassowrd(username!, oldPassword, newPassword)
+
+    console.log(username)
+    res.json({
+      success: SUCCESS,
+      message: 'Password changed successfully',
+    })
+  } catch (error) {
+    // Handle errors appropriately
+    console.error('Error changing password:', error)
+
+    if (error instanceof AppError) {
+      res.status(error.statusCode).json({
+        success: 'FAILURE',
+        error: error.message,
+      })
+    } else {
+      // Handle unexpected errors
+      res.status(500).json({
+        success: 'FAILURE',
+        error: 'Internal Server Error',
+      })
+    }
+  }
+})
 
 const storage = multer.memoryStorage()
 const upload = multer({ storage })
@@ -61,6 +95,7 @@ patientRouter.post(
     res.send(patient)
   })
 )
+patientRouter.put('/changePassword', changeUserPassword)
 
 patientRouter.post(
   '/uploadHealthRecords/:id',
