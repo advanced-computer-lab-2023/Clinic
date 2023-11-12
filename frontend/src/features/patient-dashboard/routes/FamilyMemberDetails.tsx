@@ -33,13 +33,12 @@ export function FamilyMemberDetails() {
           {
             label: 'Health Package',
             value:
-              query.data?.familyMember.currentHealthPackage.healthPackageName ||
+              query.data?.familyMember.healthPackage.name ||
               'No health package yet',
           },
           {
             label: 'Renewal Date',
-            value:
-              query.data?.familyMember.currentHealthPackage.renewalDate || '',
+            value: query.data?.familyMember.healthPackage.renewalDate || '',
           },
           {
             label: 'Cancelled Health Packages',

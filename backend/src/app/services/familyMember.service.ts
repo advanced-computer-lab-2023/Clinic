@@ -9,10 +9,9 @@ import { type PatientDocument, PatientModel } from '../models/patient.model'
 import { type AddFamilyMemberRequest } from 'clinic-common/types/familyMember.types'
 import { type WithUser } from '../utils/typeUtils'
 import { getPatientByUsername } from './patient.service'
+import { HealthPackageDocument } from '../models/healthPackage.model'
 
-export async function getFamilyMembers(
-  username: string
-): Promise<Array<HydratedDocument<FamilyMemberDocument>>> {
+export async function getFamilyMembers(username: string) {
   const user = await UserModel.findOne({ username })
 
   if (user == null) {
@@ -20,16 +19,56 @@ export async function getFamilyMembers(
   }
 
   const patient = await PatientModel.findOne({ user: user.id }).populate<{
-    familyMembers: Array<HydratedDocument<FamilyMemberDocument>>
+    familyMembers: Array<
+      HydratedDocument<
+        FamilyMemberDocument & {
+          healthPackage: HydratedDocument<HealthPackageDocument>
+        }
+      >
+    >
   }>({
     path: 'familyMembers',
+    populate: 'healthPackage',
   })
 
   if (patient == null) {
     throw new NotFoundError()
   }
 
-  return patient.familyMembers
+  return patient.familyMembers.filter((familyMember) => !familyMember.patient)
+}
+
+export async function getLinkedFamilyMembers(username: string) {
+  const user = await UserModel.findOne({ username })
+
+  if (user == null) {
+    throw new NotFoundError()
+  }
+
+  const patient = await PatientModel.findOne({ user: user.id }).populate<{
+    familyMembers: Array<
+      HydratedDocument<
+        FamilyMemberDocument & {
+          patient: PatientDocument & {
+            user: UserDocument
+            healthPackage: HealthPackageDocument
+          }
+        }
+      >
+    >
+  }>({
+    path: 'familyMembers',
+    populate: {
+      path: 'patient',
+      populate: ['user', 'healthPackage'],
+    },
+  })
+
+  if (patient == null) {
+    throw new NotFoundError()
+  }
+
+  return patient.familyMembers.filter((familyMember) => familyMember.patient)
 }
 
 export async function createFamilyMember(
@@ -57,10 +96,10 @@ export async function createFamilyMember(
   return familyMember
 }
 
-export async function getFamilyMemberById(
-  id: string
-): Promise<HydratedDocument<FamilyMemberDocument>> {
-  const familyMember = await FamilyMemberModel.findById(id)
+export async function getFamilyMemberById(id: string) {
+  const familyMember = await FamilyMemberModel.findById(id).populate<{
+    healthPackage: HydratedDocument<HealthPackageDocument>
+  }>('healthPackage')
 
   if (familyMember == null) {
     throw new NotFoundError()
