@@ -25,12 +25,17 @@ import {
   GetUserByUsernameResponse,
   type UserType,
 } from 'clinic-common/types/user.types'
-import { RegisterDoctorRequestValidator } from 'clinic-common/validators/doctor.validator'
+
 import {
   type DoctorStatus,
   RegisterDoctorRequestResponse,
 } from 'clinic-common/types/doctor.types'
 import { getModelIdForUsername } from '../services/auth.service'
+import multer from 'multer'
+
+const storage = multer.memoryStorage() // You can choose a different storage method
+
+const upload = multer({ storage })
 
 export const authRouter = Router()
 
@@ -97,9 +102,12 @@ authRouter.get(
 // Submit a Request to Register as a Doctor
 authRouter.post(
   '/request-doctor',
-  validate(RegisterDoctorRequestValidator),
+  upload.array('documents', 50),
   asyncWrapper(async (req, res) => {
-    const doctor = await submitDoctorRequest(req.body)
+    const doctor = await submitDoctorRequest({
+      ...req.body,
+      documents: req.files as Express.Multer.File[],
+    })
     res.send(
       new RegisterDoctorRequestResponse(
         doctor.id,
