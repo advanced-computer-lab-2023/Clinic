@@ -107,7 +107,6 @@ export function DoctorApiForm<Request extends ObjectWithStringKeys>({
   const [documents, setDocuments] = useState<FileList | null>(null)
   const [documentPaths, setDocumentPaths] = useState<string[]>([])
 
-  console.log(documentPaths)
   console.log(file)
   // useEffect(() => {
   //   console.log(documents);
@@ -151,22 +150,22 @@ export function DoctorApiForm<Request extends ObjectWithStringKeys>({
     return <CardPlaceholder />
   }
 
-  const changeData = async (data: any) => {
+  const changeData = (data: any) => {
     console.log(file)
 
     if (file) {
-      console.log('documents ', documents)
+      console.log(documents)
 
       if (documents) {
-        await handleMultipleFileUpload(documents, setDocumentPaths, data)
-        // data.documents = documentPaths
+        handleMultipleFileUpload(documents, setDocumentPaths)
+        data.documents = documentPaths
         setFileError(null)
-        console.log('data', data)
-        mutation.mutateAsync(data)
       } else {
         setFileError('Please select a file')
       }
     }
+
+    mutation.mutateAsync(data)
   }
 
   return (
@@ -311,8 +310,7 @@ function generateUniqueFilename() {
 
 const handleMultipleFileUpload = async (
   fileList: FileList | null,
-  setDocumentPaths: (newPaths: string[]) => void,
-  data: any
+  setDocumentPaths: (newPaths: string[]) => void
 ) => {
   if (!fileList) {
     return
@@ -334,7 +332,6 @@ const handleMultipleFileUpload = async (
       const fullPath = await getDownloadURL(fileRef)
       newDocumentPaths.push(fullPath) // Store the path, not the file
       setDocumentPaths(newDocumentPaths)
-      data.documents = newDocumentPaths
       console.log(`Uploaded ${file.name} successfully!`)
     } catch (error) {
       console.error(`Error uploading ${file.name}:`, error)
