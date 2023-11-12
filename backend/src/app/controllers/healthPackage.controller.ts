@@ -146,22 +146,11 @@ healthPackagesRouter.post(
   '/unsubscribe',
   [allowAuthenticated, asyncWrapper(allowPatients)],
   asyncWrapper(async (req, res) => {
-    const patient = await getPatientByUsername(req.username!)
-    if (!patient) throw new NotFoundError()
-    await unSubscribeToHealthPackage({
-      id: patient.id,
-    })
-    console.log(patient.healthPackageHistory)
-    res.status(200).send()
-  })
-)
+    const { subscriberId, isFamilyMember } = req.body
 
-healthPackagesRouter.post(
-  '/:id/unsubscribe',
-  [allowAuthenticated, asyncWrapper(allowPatients)],
-  asyncWrapper(async (req, res) => {
     await unSubscribeToHealthPackage({
-      id: req.params.id,
+      id: subscriberId,
+      isFamilyMember,
     })
     res.status(200).send()
   })
@@ -257,10 +246,17 @@ healthPackagesRouter.post(
 healthPackagesRouter.post(
   '/patient-cancelled',
   asyncWrapper(async (req, res) => {
-    const patient = await getPatientByUsername(req.username!)
+    const { id, isFamilyMember } = req.body
+    const model = isFamilyMember
+      ? await FamilyMemberModel.findById(id)
+      : await PatientModel.findById(id)
+
+    if (!model) {
+      throw new NotFoundError()
+    }
+
     const cancelled: Types.ObjectId[] = []
-    if (!patient) throw new NotFoundError()
-    patient.healthPackageHistory.forEach((healthPackage) => {
+    model.healthPackageHistory.forEach((healthPackage) => {
       cancelled.push(healthPackage.healthPackage)
     })
     res.send(cancelled)
@@ -270,17 +266,15 @@ healthPackagesRouter.post(
 healthPackagesRouter.post(
   '/cancellation-date/:healthPackageId',
   asyncWrapper(async (req, res) => {
-    if (!req.username) throw new NotFoundError()
-    const patient = await getPatientByUsername(req.username)
-    if (!patient) throw new NotFoundError()
-    console.log('looking for' + req.params.healthPackageId)
-    patient.healthPackageHistory.forEach((healthPackage) => {
-      console.log('history' + healthPackage.healthPackage.toString())
-
+    const { id, isFamilyMember } = req.body
+    const model = isFamilyMember
+      ? await FamilyMemberModel.findById(id)
+      : await PatientModel.findById(id)
+    if (!model) throw new NotFoundError()
+    model.healthPackageHistory.forEach((healthPackage) => {
       if (
         healthPackage.healthPackage.toString() === req.params.healthPackageId
       ) {
-        console.log(healthPackage.date.toDateString())
         res.send(healthPackage.date.toDateString())
       }
     })
