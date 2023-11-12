@@ -61,3 +61,9 @@ export interface SubscribeToHealthPackageRequest {
   isFamilyMember: boolean
   healthPackageId: string
 }
+
+export interface UnsubscribeToHealthPackageRequest {
+  subscriberId: string
+  payerUsername: string
+  isFamilyMember: boolean
+}
