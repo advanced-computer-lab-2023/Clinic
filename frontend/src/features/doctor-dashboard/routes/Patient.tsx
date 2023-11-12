@@ -173,9 +173,7 @@ export function Patient() {
               ADD
             </Button>
           )}
-          <Link
-            to={'http://localhost:5173/doctor-dashboard/healthRecords/' + id}
-          >
+          <Link to={'../healthRecords/' + id}>
             <Button variant="contained" color="primary">
               Health Records Files
             </Button>
