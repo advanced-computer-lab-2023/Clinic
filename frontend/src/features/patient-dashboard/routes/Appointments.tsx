@@ -109,7 +109,7 @@ export function Appointments() {
                     Doctor Name
                   </Typography>
                   <Typography variant="body1">
-                    {appointment.doctorID}
+                    {appointment.doctorName}
                   </Typography>
                 </Stack>
                 <Stack spacing={-1}>
