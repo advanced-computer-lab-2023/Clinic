@@ -75,12 +75,18 @@ appointmentsRouter.post(
           // Assuming 'doctorID' is known or can be retrieved from the request
 
           const doctorID = req.body.doctorid
+          const doctor = await DoctorModel.findOne({ _id: doctorID })
 
           if (patient.walletMoney - toPayUsingWallet < 0) {
             res.status(403).send('Not enough money in wallet')
+          } else if (!doctor) {
+            res.status(404).send('Issues fetching doctor')
           } else {
             patient.walletMoney -= toPayUsingWallet
             await patient.save()
+
+            doctor.walletMoney! += doctor.hourlyRate
+            await doctor.save()
 
             const appointment = await createAndRemoveTime(
               patient.id,
@@ -95,6 +101,10 @@ appointmentsRouter.post(
             } else {
               patient.walletMoney += toPayUsingWallet //reverting the wallet money
               await patient.save()
+
+              doctor.walletMoney! -= doctor.hourlyRate
+              await doctor.save()
+
               res.status(500).send('Appointment creation failed')
             }
           }

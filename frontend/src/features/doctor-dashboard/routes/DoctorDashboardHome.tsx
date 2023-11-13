@@ -30,7 +30,7 @@ export function DoctorDashboardHome() {
       )}
       {doctorQuery.data?.contractStatus === ContractStatus.Accepted && (
         <div>
-          <h1>DoctorDashboardHome.</h1>
+          <h1>Doctor Dashboard Home.</h1>
         </div>
       )}
     </>
