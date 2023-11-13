@@ -50,12 +50,12 @@ export function PatientDashboardLayout() {
       },
       {
         to: '/patient-dashboard/MyHealthRecords',
-        text: 'MyHealthRecords',
+        text: 'Health Records',
         icon: <DocumentScannerOutlined />,
       },
       {
         to: '/patient-dashboard/MyMedicalHistory',
-        text: 'MyMedicalHistory',
+        text: 'Medical History',
         icon: <DocumentScannerOutlined />,
       },
     ])

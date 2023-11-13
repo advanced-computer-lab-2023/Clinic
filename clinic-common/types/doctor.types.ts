@@ -16,157 +16,50 @@ export enum ContractStatus {
   Rejected = 'rejected',
 }
 
-export class DoctorResponseBase {
-  constructor(
-    public id: string,
-    public username: string,
-    public name: string,
-    public email: string,
-    // public dateOfBirth: Date,
-    /**
-     * Changed this to also accept strings not just Dates, because JSON doesn't support Dates,
-     * and this object is sent to the frontend as JSON, so in the frontend it is actually
-     * received as a string not a Date, even if you send a Date.
-     *
-     **/
-    public dateOfBirth: Date,
-    public hourlyRate: number,
-    public affiliation: string,
-    public educationalBackground: string,
-    public speciality: string,
-    public requestStatus: DoctorStatus
-  ) {}
+export interface DoctorResponseBase {
+  id: string
+  username: string
+  name: string
+  email: string
+  dateOfBirth: Date
+  hourlyRate: number
+  affiliation: string
+  educationalBackground: string
+  speciality: string
+  requestStatus: DoctorStatus
 }
 
 // Used for getting pending doctors and for getting approved doctors
-export class GetPendingDoctorsResponse {
-  constructor(public doctors: DoctorResponseBase[]) {}
+export interface GetPendingDoctorsResponse {
+  doctors: DoctorResponseBase[]
 }
 
-export class GetApprovedDoctorResponse extends DoctorResponseBase {
-  constructor(
-    id: string,
-    username: string,
-    name: string,
-    email: string,
-    dateOfBirth: Date,
-    hourlyRate: number,
-    affiliation: string,
-    educationalBackground: string,
-    speciality: string,
-    requestStatus: DoctorStatus,
-    public availableTimes: [Date],
-    public sessionRate: number // Additional property
-  ) {
-    super(
-      id,
-      username,
-      name,
-      email,
-      dateOfBirth,
-      hourlyRate,
-      affiliation,
-      educationalBackground,
-      speciality,
-      requestStatus
-    )
-  }
+export interface GetApprovedDoctorResponse extends DoctorResponseBase {
+  availableTimes: [Date]
+  sessionRate: number
+  hasDiscount: boolean
+  hourlyRateWithMarkup: number
 }
 
-export class AcceptOrRejectContractResponse extends DoctorResponseBase {
-  constructor(
-    id: string,
-    username: string,
-    name: string,
-    email: string,
-    dateOfBirth: Date,
-    hourlyRate: number,
-    affiliation: string,
-    educationalBackground: string,
-    speciality: string,
-    requestStatus: DoctorStatus,
-    public contractStatus: ContractStatus,
-    public availableTimes: [Date],
-    public employmentContract: [string]
-  ) {
-    super(
-      id,
-      username,
-      name,
-      email,
-      dateOfBirth,
-      hourlyRate,
-      affiliation,
-      educationalBackground,
-      speciality,
-      requestStatus
-    )
-  }
+export interface AcceptOrRejectContractResponse extends DoctorResponseBase {
+  contractStatus: ContractStatus
+  availableTimes: [Date]
+  employmentContract: [string]
 }
 
-export class ApproveDoctorResponse extends DoctorResponseBase {
-  constructor(
-    id: string,
-    username: string,
-    name: string,
-    email: string,
-    dateOfBirth: Date,
-    hourlyRate: number,
-    affiliation: string,
-    educationalBackground: string,
-    speciality: string,
-    requestStatus: DoctorStatus,
-    public availableTimes: [Date],
-    public employmentContract: [string]
-  ) {
-    super(
-      id,
-      username,
-      name,
-      email,
-      dateOfBirth,
-      hourlyRate,
-      affiliation,
-      educationalBackground,
-      speciality,
-      requestStatus
-    )
-  }
+export interface ApproveDoctorResponse extends DoctorResponseBase {
+  availableTimes: [Date]
+  employmentContract: [string]
 }
 
-export class GetDoctorResponse extends DoctorResponseBase {
-  constructor(
-    id: string,
-    username: string,
-    name: string,
-    email: string,
-    dateOfBirth: Date,
-    hourlyRate: number,
-    affiliation: string,
-    educationalBackground: string,
-    speciality: string,
-    requestStatus: DoctorStatus,
-    public contractStatus: ContractStatus,
-    public availableTimes: [Date],
-    public employmentContract: [string]
-  ) {
-    super(
-      id,
-      username,
-      name,
-      email,
-      dateOfBirth,
-      hourlyRate,
-      affiliation,
-      educationalBackground,
-      speciality,
-      requestStatus
-    )
-  }
+export interface GetDoctorResponse extends DoctorResponseBase {
+  contractStatus: ContractStatus
+  availableTimes: [Date]
+  employmentContract: [string]
 }
 
-export class GetApprovedDoctorsResponse {
-  constructor(public doctors: GetApprovedDoctorResponse[]) {}
+export interface GetApprovedDoctorsResponse {
+  doctors: GetApprovedDoctorResponse[]
 }
 
 export type UpdateDoctorRequest = z.infer<typeof UpdateDoctorRequestValidator>
@@ -175,14 +68,16 @@ export type AddAvailableTimeSlotsRequest = z.infer<
   typeof AddAvailableTimeSlotsRequestValidator
 >
 
-export class UpdateDoctorResponse extends DoctorResponseBase {}
+export interface UpdateDoctorResponse extends DoctorResponseBase {}
 
-export class RegisterDoctorRequestResponse extends DoctorResponseBase {}
+export interface RegisterDoctorRequestResponse extends DoctorResponseBase {}
 
-export class AddAvailableTimeSlotsResponse extends GetApprovedDoctorResponse {}
+export interface AddAvailableTimeSlotsResponse extends DoctorResponseBase {
+  availableTimes: [Date]
+}
 
-export class GetWalletMoneyResponse {
-  constructor(public money: number) {}
+export interface GetWalletMoneyResponse {
+  money: number
 }
 
 export type IRegisterDoctorRequest = {

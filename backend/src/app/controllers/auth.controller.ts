@@ -108,19 +108,17 @@ authRouter.post(
       ...req.body,
       documents: req.files as Express.Multer.File[],
     })
-    res.send(
-      new RegisterDoctorRequestResponse(
-        doctor.id,
-        doctor.user.username,
-        doctor.name,
-        doctor.email,
-        doctor.dateOfBirth,
-        doctor.hourlyRate,
-        doctor.affiliation,
-        doctor.educationalBackground,
-        doctor.speciality,
-        doctor.requestStatus as DoctorStatus
-      )
-    )
+    res.send({
+      id: doctor.id,
+      username: doctor.user.username,
+      name: doctor.name,
+      email: doctor.email,
+      dateOfBirth: doctor.dateOfBirth,
+      hourlyRate: doctor.hourlyRate,
+      affiliation: doctor.affiliation,
+      educationalBackground: doctor.educationalBackground,
+      speciality: doctor.speciality,
+      requestStatus: doctor.requestStatus as DoctorStatus,
+    } satisfies RegisterDoctorRequestResponse)
   })
 )
