@@ -43,8 +43,52 @@ import {
 } from 'clinic-common/types/appointment.types'
 import { getApprovedDoctorById } from '../services/doctor.service'
 import { changePassowrd } from '../services/changePassword'
-import { SUCCESS } from '../utils/httpStatusText'
+import { ERROR, SUCCESS } from '../utils/httpStatusText'
 import AppError from '../utils/appError'
+import { sendOTP, updatePassword, verifyOTP } from '../services/forgotPassword'
+
+export const requestOTP = asyncWrapper(async (req, res) => {
+  const { email } = req.body
+
+  if (email) {
+    await sendOTP(email)
+    res.json({ success: SUCCESS, message: 'OTP sent successfully' })
+  }
+})
+
+export const verifyOTPController = asyncWrapper(async (req, res) => {
+  console.log('heyy i entered')
+  const { otp, email } = req.body
+
+  const isOTPValid = await verifyOTP(email, otp)
+
+  if (isOTPValid) {
+    res.json({ success: SUCCESS, message: 'OTP verified successfully' })
+  } else {
+    res.json({ error: ERROR, message: 'not verified' })
+  }
+})
+
+export const updatePasswordController = asyncWrapper(async (req, res) => {
+  const { newPassword, email } = req.body
+
+  if (!email) {
+    res.status(400).json({ error: 'Email not provided' })
+
+    return
+  }
+
+  try {
+    const result = await updatePassword(email, newPassword)
+    res.json({ success: SUCCESS, message: result })
+  } catch (error) {
+    if (error instanceof AppError) {
+      res.status(error.statusCode).json({ error: error.message })
+    } else {
+      res.status(500).json({ error: 'Internal Server Error' })
+    }
+  }
+})
 
 export const changeUserPassword = asyncWrapper(async (req, res) => {
   try {
@@ -100,6 +144,10 @@ patientRouter.post(
   })
 )
 patientRouter.put('/changePassword', changeUserPassword)
+patientRouter.put('/updatePassword', updatePasswordController)
+patientRouter.post('/requestOtp', requestOTP)
+
+patientRouter.post('/verifyOtp', verifyOTPController)
 
 patientRouter.post(
   '/deleteHealthRecord/:id',
