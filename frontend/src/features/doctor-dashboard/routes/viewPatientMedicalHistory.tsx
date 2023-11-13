@@ -31,7 +31,7 @@ function ViewMedicalHistory() {
         component="h1"
         gutterBottom
       >
-        Health Records Files
+        Medical History Files
       </Typography>
 
       {MedicalHistory.map((url, index) => (
