@@ -79,7 +79,7 @@ appointmentsRouter.post(
 
           if (patient.walletMoney - toPayUsingWallet < 0) {
             res.status(403).send('Not enough money in wallet')
-          } else if (!doctor || !doctor.walletMoney) {
+          } else if (!doctor) {
             res.status(404).send('Issues fetching doctor')
           } else {
             patient.walletMoney -= toPayUsingWallet

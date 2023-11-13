@@ -197,8 +197,7 @@ healthPackagesRouter.patch(
     const packageInfo = await getHealthPackageById(healthPackageId)
     const patient = await getPatientByUsername(payerUsername)
 
-    if (!packageInfo || !patient || !patient.walletMoney)
-      throw new NotFoundError()
+    if (!packageInfo || !patient) throw new NotFoundError()
 
     if (patient.walletMoney - packageInfo.pricePerYear < 0)
       throw new APIError('Not enough money in wallet', 400)
