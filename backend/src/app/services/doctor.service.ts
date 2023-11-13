@@ -259,3 +259,16 @@ export async function removeTimeFromDoctorAvailability(
 
   return updatedDoctor
 }
+
+export function getDoctorSessionRateWithMarkup({
+  doctor,
+}: {
+  doctor: Pick<DoctorDocument, 'employmentContract' | 'hourlyRate'>
+}) {
+  // TODO: Update this in MS3
+  const clinicMarkup = Number(
+    doctor.employmentContract[2].split(':')[1].replace('%', '')
+  )
+
+  return doctor.hourlyRate * (1 + clinicMarkup / 100)
+}
