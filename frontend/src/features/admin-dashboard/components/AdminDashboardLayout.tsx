@@ -1,7 +1,7 @@
 import { AuthenticatedRoute } from '@/components/AuthenticatedRoute'
 import { useSidebar } from '@/hooks/sidebar'
 import { UserType } from 'clinic-common/types/user.types'
-import { PersonAdd, Discount } from '@mui/icons-material'
+import { PersonAdd, Discount, VpnKey } from '@mui/icons-material'
 import { Container } from '@mui/material'
 import { useEffect } from 'react'
 import { Outlet } from 'react-router-dom'
@@ -31,6 +31,11 @@ export function AdminDashboardLayout() {
         to: '/admin-dashboard/users',
         text: 'Users',
         icon: <PersonIcon />,
+      },
+      {
+        to: '/admin-dashboard/change-password',
+        text: 'Change Password',
+        icon: <VpnKey />,
       },
     ])
   }, [setSidebarLinks])

@@ -10,6 +10,7 @@ import { ViewMyAvailableTimeSlots } from './ViewMyAvailableTimeSlots'
 import { Wallet } from './Wallet'
 import { EmploymentContract } from './EmploymentContract'
 import AddHealthRecord from './AddHealthRecord'
+import ChangePassword from '@/features/auth/routes/ChangePassword'
 import ViewMedicalHistory from './viewPatientMedicalHistory'
 
 export const doctorDashboardRoutes: RouteObject[] = [
@@ -51,6 +52,10 @@ export const doctorDashboardRoutes: RouteObject[] = [
       {
         path: 'healthRecords/:id',
         element: <AddHealthRecord />,
+      },
+      {
+        path: 'change-password',
+        element: <ChangePassword />,
       },
       {
         path: 'medicalHistory/:id',

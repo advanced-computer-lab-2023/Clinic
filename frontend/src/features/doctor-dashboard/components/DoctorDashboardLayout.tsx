@@ -1,7 +1,7 @@
 import { AuthenticatedRoute } from '@/components/AuthenticatedRoute'
 import { useSidebar } from '@/hooks/sidebar'
 import { UserType } from 'clinic-common/types/user.types'
-import { Person, Wallet } from '@mui/icons-material'
+import { Person, VpnKey, Wallet } from '@mui/icons-material'
 import Container from '@mui/material/Container'
 import { useEffect } from 'react'
 import { Navigate, Outlet } from 'react-router-dom'
@@ -79,6 +79,11 @@ export function DoctorDashboardLayout() {
         to: '/doctor-dashboard/employmentContract',
         text: 'Employment Contract',
         icon: <AssignmentIcon />,
+      },
+      {
+        to: '/doctor-dashboard/change-password',
+        text: 'Change Password',
+        icon: <VpnKey />,
       },
     ])
   }, [

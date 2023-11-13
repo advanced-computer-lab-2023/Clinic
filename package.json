@@ -33,5 +33,9 @@
       "prettier --write -u"
     ],
     "!**/*.{js,ts,jsx,tsx}": "prettier --write -u"
+  },
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "formik": "^2.4.5"
   }
 }
