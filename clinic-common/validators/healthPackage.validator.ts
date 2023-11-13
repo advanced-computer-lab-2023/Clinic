@@ -15,8 +15,3 @@ export const UpdateHealthPackageRequestValidator = zod.object({
   medicineDiscount: zod.number().optional(),
   familyMemberSubscribtionDiscount: zod.number().optional(),
 })
-
-export const GetAllHealthPackagesForPatientRequestValidator = zod.object({
-  patientId: zod.string(),
-  isFamilyMember: zod.boolean(),
-})

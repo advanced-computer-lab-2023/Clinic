@@ -17,13 +17,7 @@ import { AlertsProvider } from './providers/AlertsProvider'
 import { SnackbarProvider } from 'notistack'
 import { ToastContainer } from 'react-toastify'
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      refetchOnWindowFocus: false,
-    },
-  },
-})
+const queryClient = new QueryClient()
 const router = createBrowserRouter(routes)
 
 ReactDOM.createRoot(document.getElementById('root')!).render(

@@ -1,7 +1,8 @@
 import {
   getCancelledHealthPackagesForPatient,
-  getSubscribedHealthPackageForPatient,
-  getAllHealthPackagesForPatient,
+  getCanellationDate,
+  getHealthPackageForPatient,
+  getHealthPackages,
   subscribeCreditToHealthPackage,
   subscribeWalletToHealthPackage,
   unsubscribeToHealthPackage,
@@ -26,43 +27,12 @@ import {
   Typography,
 } from '@mui/material'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import { LoadingButton } from '@mui/lab'
 import { AddModerator } from '@mui/icons-material'
 import { useAlerts } from '@/hooks/alerts'
 import Checkout from '@/components/StripeCheckout'
 import { useAuth } from '@/hooks/auth'
-import { GetAllHealthPackagesForPatientResponse } from 'clinic-common/types/healthPackage.types'
-
-function HealthPackagePrice({
-  healthPackage,
-}: {
-  healthPackage: GetAllHealthPackagesForPatientResponse[0]
-}) {
-  if (!healthPackage) {
-    return null
-  }
-
-  return (
-    <Typography variant="body1">
-      {healthPackage.discountedPricePerYear != healthPackage.pricePerYear ? (
-        <Stack direction="row" spacing={1}>
-          <Typography variant="body1">
-            {healthPackage.discountedPricePerYear}$
-          </Typography>
-          <Typography
-            variant="body1"
-            sx={{ textDecoration: 'line-through', color: 'text.disabled' }}
-          >
-            {healthPackage.pricePerYear}$
-          </Typography>
-        </Stack>
-      ) : (
-        healthPackage.pricePerYear + '$'
-      )}
-    </Typography>
-  )
-}
 
 export function SubscribeToHealthPackages({
   subscriberId,
@@ -85,22 +55,18 @@ export function SubscribeToHealthPackages({
   const { user } = useAuth()
   const queryClient = useQueryClient()
 
+  const query = useQuery({
+    queryKey: ['health-packages'],
+    queryFn: getHealthPackages,
+  })
+
   const id = subscriberId || user!.modelId
   const payerUsername = user!.username
-
-  const query = useQuery({
-    queryKey: ['health-packages', subscriberId],
-    queryFn: () =>
-      getAllHealthPackagesForPatient({
-        patientId: id,
-        isFamilyMember,
-      }),
-  })
 
   const subscribedHealthPackageQuery = useQuery({
     queryKey: ['subscribed-health-packages', isFamilyMember, id],
     queryFn: () =>
-      getSubscribedHealthPackageForPatient({
+      getHealthPackageForPatient({
         patientId: id,
         isFamilyMember,
       }),
@@ -109,13 +75,15 @@ export function SubscribeToHealthPackages({
     queryKey: ['cancelled-health-packages', id, isFamilyMember],
     queryFn: () => getCancelledHealthPackagesForPatient({ id, isFamilyMember }),
   })
+  useEffect(() => {
+    cancelledHealthPackagesQuery.refetch()
+  }, [subscribedHealthPackageQuery.data, cancelledHealthPackagesQuery])
 
   const onSuccess =
     (message: string = 'Subscribed to health package successfully.') =>
     () => {
       query.refetch()
       subscribedHealthPackageQuery.refetch()
-      cancelledHealthPackagesQuery.refetch()
       queryClient.invalidateQueries(['family-members'])
       setSelectedHealthPackageId(null)
       setWalletMethodIdPackage(null)
@@ -161,17 +129,46 @@ export function SubscribeToHealthPackages({
 
   const selectedHealthPackage = useMemo(
     () =>
-      query.data?.find((healthPackage) => {
+      query.data?.healthPackages.find((healthPackage) => {
         return healthPackage.id === selectedHealthPackageId
       }),
     [query, selectedHealthPackageId]
   )
 
-  if (
-    query.isLoading ||
-    subscribedHealthPackageQuery.isFetching ||
-    cancelledHealthPackagesQuery.isFetching
-  ) {
+  const [cancellationDatesMap, setCancellationDatesMap] = useState<
+    Record<string, string>
+  >({})
+
+  useEffect(() => {
+    // Fetch cancellation date for each health package
+    const fetchCancellationDates = async () => {
+      try {
+        const dates = await Promise.all(
+          cancelledHealthPackagesQuery.data?.map(async (healthPackage) => {
+            const date = await getCanellationDate(healthPackage, {
+              id,
+              isFamilyMember,
+            })
+
+            return { id: healthPackage, date }
+          }) ?? []
+        )
+
+        const cancellationDatesMap = Object.fromEntries(
+          dates.map(({ id, date }) => [id, date])
+        )
+
+        // Set the dates in the state
+        setCancellationDatesMap(cancellationDatesMap)
+      } catch (error) {
+        console.error('Error fetching cancellation dates:', error)
+      }
+    }
+
+    fetchCancellationDates()
+  }, [cancelledHealthPackagesQuery.data, id, isFamilyMember]) // Dependency on query.data
+
+  if (query.isLoading || subscribedHealthPackageQuery.isLoading) {
     return <CardPlaceholder />
   }
 
@@ -187,7 +184,7 @@ export function SubscribeToHealthPackages({
             </Alert>
           </Grid>
         )}
-        {query.data?.map((healthPackage) => (
+        {query.data?.healthPackages.map((healthPackage) => (
           <Grid
             item
             xl={4}
@@ -218,38 +215,35 @@ export function SubscribeToHealthPackages({
                   >
                     <Typography variant="h6">{healthPackage.name}</Typography>
 
-                    <>
-                      {subscribedPackage?.id == healthPackage.id && (
+                    {subscribedPackage?.id == healthPackage.id && (
+                      <Chip
+                        variant="filled"
+                        color="success"
+                        label="Subscribed"
+                      />
+                    )}
+                    {cancelledHealthPackagesQuery.data?.includes(
+                      healthPackage.id
+                    ) && (
+                      <>
                         <Chip
-                          variant="filled"
-                          color="success"
-                          label="Subscribed"
+                          label={`Cancelled on ${
+                            cancellationDatesMap[healthPackage.id]
+                          }`}
+                          color="error"
+                          size="small"
                         />
-                      )}
-
-                      {!!cancelledHealthPackagesQuery.data![
-                        healthPackage.id
-                      ] && (
-                        <>
-                          <Chip
-                            label={`Cancelled on ${
-                              cancelledHealthPackagesQuery.data![
-                                healthPackage.id
-                              ]
-                            }`}
-                            color="error"
-                            size="small"
-                          />
-                        </>
-                      )}
-                    </>
+                      </>
+                    )}
                   </Stack>
 
                   <Stack spacing={-1}>
                     <Typography variant="overline" color="text.secondary">
                       Price per year
                     </Typography>
-                    <HealthPackagePrice healthPackage={healthPackage} />
+                    <Typography variant="body1">
+                      {healthPackage.pricePerYear}
+                    </Typography>
                   </Stack>
                   <Stack spacing={-1}>
                     <Typography variant="overline" color="text.secondary">
@@ -292,8 +286,7 @@ export function SubscribeToHealthPackages({
               <CardActions>
                 {subscribedPackage?.id == healthPackage.id &&
                 new Date(subscribedPackage?.renewalDate) > new Date() ? (
-                  <LoadingButton
-                    loading={cancelMutation.isLoading}
+                  <Button
                     variant="contained"
                     fullWidth
                     color="secondary"
@@ -307,7 +300,7 @@ export function SubscribeToHealthPackages({
                     }
                   >
                     Unsubscribe
-                  </LoadingButton>
+                  </Button>
                 ) : (
                   <Button
                     variant="contained"
@@ -353,11 +346,7 @@ export function SubscribeToHealthPackages({
                   <Chip
                     color="warning"
                     size="small"
-                    label={
-                      <HealthPackagePrice
-                        healthPackage={selectedHealthPackage!}
-                      />
-                    }
+                    label={selectedHealthPackage?.pricePerYear + '$'}
                   />{' '}
                   per year for the{' '}
                   <Chip
@@ -379,11 +368,7 @@ export function SubscribeToHealthPackages({
                   <Chip
                     color="warning"
                     size="small"
-                    label={
-                      <HealthPackagePrice
-                        healthPackage={selectedHealthPackage!}
-                      />
-                    }
+                    label={selectedHealthPackage?.pricePerYear + '$'}
                   />{' '}
                   per year for the health package starting from today.
                 </Alert>
