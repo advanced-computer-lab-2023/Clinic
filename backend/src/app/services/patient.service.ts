@@ -81,8 +81,33 @@ export async function deleteMedicalHistory(
   }
 }
 
+export async function deleteHealthRecord(
+  id: string,
+  url: string
+): Promise<void> {
+  const updateResult = await PatientModel.updateOne(
+    { _id: id },
+    { $pull: { healthRecords: url } }
+  ).exec()
+
+  if (updateResult.matchedCount === 0) {
+    throw new NotFoundError() // If no document was found
+  }
+
+  if (updateResult.modifiedCount === 0) {
+    throw new Error('No document was modified') // If the document was found but not modified
+  }
+}
+
 export async function getMyMedicalHistory(id: string): Promise<string[]> {
   const patient = await PatientModel.findOne({ user: id }).exec()
+  if (patient == null) throw new NotFoundError()
+
+  return patient.documents
+}
+
+export async function getMedicalHistoryFiles(id: string): Promise<string[]> {
+  const patient = await PatientModel.findOne({ _id: id }).exec()
   if (patient == null) throw new NotFoundError()
 
   return patient.documents

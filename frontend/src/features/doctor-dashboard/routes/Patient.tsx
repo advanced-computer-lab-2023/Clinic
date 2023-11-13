@@ -179,6 +179,11 @@ export function Patient() {
               Health Records Files
             </Button>
           </Link>
+          <Link to={'../medicalHistory/' + id}>
+            <Button variant="contained" color="primary">
+              Medical History Files
+            </Button>
+          </Link>
         </Stack>
       </CardContent>
     </Card>
