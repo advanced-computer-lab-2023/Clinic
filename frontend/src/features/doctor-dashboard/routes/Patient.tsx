@@ -138,8 +138,12 @@ export function Patient() {
                 {`${prescription.medicine} - ${prescription.date.toString()}`}
               </Typography>
             ))}
+
+            {patient.prescriptions.length == 0 && (
+              <Typography variant="body1">None</Typography>
+            )}
           </Stack>
-          <Stack spacing={5}>
+          {/* <Stack spacing={5}>
             <img
               src={
                 'https://images.sampleforms.com/wp-content/uploads/2016/07/pediatric-medical-history-form.jpg'
@@ -147,7 +151,7 @@ export function Patient() {
               className="Screenshot"
               alt="showing screen capture"
             />
-          </Stack>
+          </Stack> */}
           <Stack spacing={-1}>
             <Typography variant="overline" color="text.secondary">
               Medical Records
@@ -177,6 +181,11 @@ export function Patient() {
           <Link to={'../healthRecords/' + id}>
             <Button variant="contained" color="primary">
               Health Records Files
+            </Button>
+          </Link>
+          <Link to={'../medicalHistory/' + id}>
+            <Button variant="contained" color="primary">
+              Medical History Files
             </Button>
           </Link>
         </Stack>

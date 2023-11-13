@@ -92,19 +92,18 @@ familyMemberRouter.post(
   asyncWrapper<LinkFamilyMemberRequest>(async (req: any, res: any) => {
     let familyMember = null
 
-    if (req.body.email != null) {
+    if (req.body.email) {
       const familyMemberEmail = req.body.email
       familyMember = await findFamilyMemberByEmail(familyMemberEmail)
-    } else if (req.body.mobileNumber != null) {
-      const familyMemberMobileNumber = req.body.mobileNumber
+    } else if (req.body.phonenumber) {
+      const familyMemberMobileNumber = req.body.phonenumber
       familyMember = await findFamilyMemberByMobileNumber(
         familyMemberMobileNumber
       )
+    } else {
+      throw new Error('No email or mobile number provided')
     }
 
-    // else{
-    // TODO: throw error
-    // }
     const calculatedAge =
       familyMember?.dateOfBirth != null
         ? new Date().getFullYear() - familyMember.dateOfBirth!.getFullYear()

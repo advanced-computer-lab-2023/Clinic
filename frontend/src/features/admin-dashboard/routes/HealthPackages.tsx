@@ -1,4 +1,4 @@
-import { deleteHealthPackage, getHealthPackages } from '@/api/healthPackages'
+import { deleteHealthPackage, getAllHealthPackages } from '@/api/healthPackages'
 import { CardPlaceholder } from '@/components/CardPlaceholder'
 import {
   Button,
@@ -32,7 +32,7 @@ export function HealthPackages() {
   const navigate = useNavigate()
   const query = useQuery({
     queryKey: ['health-packages'],
-    queryFn: () => getHealthPackages(),
+    queryFn: () => getAllHealthPackages(),
   })
   // const { addAlert } = useAlerts()
   // const alertScope = useMemo(() => uuidv4(), [])
@@ -108,7 +108,7 @@ export function HealthPackages() {
             Add Health Package
           </Button>
         </Grid>
-        {query.data.healthPackages.map((healthPackage) => {
+        {query.data.map((healthPackage) => {
           return (
             <Grid item xl={4}>
               <Card variant="outlined">

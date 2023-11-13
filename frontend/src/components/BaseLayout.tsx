@@ -14,7 +14,7 @@ import {
   IconButton,
 } from '@mui/material'
 import React from 'react'
-import { Link, Outlet } from 'react-router-dom'
+import { Link, Outlet, useLocation } from 'react-router-dom'
 import { OnlyAuthenticated } from './OnlyAuthenticated'
 import { LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
@@ -28,10 +28,15 @@ interface ListItemLinkProps {
 
 function ListItemLink(props: ListItemLinkProps) {
   const { icon, primary, to } = props
+  const location = useLocation()
 
   return (
     <li>
-      <ListItemButton component={Link} to={to}>
+      <ListItemButton
+        component={Link}
+        to={to}
+        selected={location.pathname === to}
+      >
         {icon ? <ListItemIcon>{icon}</ListItemIcon> : null}
         <ListItemText primary={primary} />
       </ListItemButton>

@@ -1,20 +1,34 @@
 import { api } from '.'
 import {
   AddHealthPackageResponse,
-  GetAllHealthPackagesResponse,
-  GetHealthPackageForPatientRequest,
-  GetHealthPackageForPatientResponse,
+  GetAllHealthPackagesForPatientResponse,
+  GetCancelledHealthPackagesForPatientResponse,
+  GetSubscribedHealthPackageForPatientRequest,
+  GetSubscribedHealthPackageForPatientResponse,
   GetHealthPackageResponse,
   SubscribeToHealthPackageRequest,
   UnsubscribeToHealthPackageRequest,
   UpdateHealthPackageRequest,
   UpdateHealthPackageResponse,
   createHealthPackageRequest,
+  GetAllHealthPackagesForPatientRequest,
+  GetAllHealthPackagesResponse,
 } from 'clinic-common/types/healthPackage.types'
 
-export async function getHealthPackages(): Promise<GetAllHealthPackagesResponse> {
+export async function getAllHealthPackagesForPatient(
+  params: GetAllHealthPackagesForPatientRequest
+): Promise<GetAllHealthPackagesForPatientResponse> {
   return await api
-    .get<GetAllHealthPackagesResponse>(`/health-packages/`)
+    .post<GetAllHealthPackagesForPatientResponse>(
+      `/health-packages/for-patient`,
+      params
+    )
+    .then((res) => res.data)
+}
+
+export async function getAllHealthPackages(): Promise<GetAllHealthPackagesResponse> {
+  return await api
+    .get<GetAllHealthPackagesResponse>(`/health-packages`)
     .then((res) => res.data)
 }
 
@@ -77,12 +91,12 @@ export async function unsubscribeToHealthPackage(
     .then((res) => res.data)
 }
 
-export async function getHealthPackageForPatient(
-  params: GetHealthPackageForPatientRequest
-): Promise<GetHealthPackageForPatientResponse> {
+export async function getSubscribedHealthPackageForPatient(
+  params: GetSubscribedHealthPackageForPatientRequest
+): Promise<GetSubscribedHealthPackageForPatientResponse> {
   return await api
-    .post<GetHealthPackageForPatientResponse>(
-      `/health-packages/for-patient`,
+    .post<GetSubscribedHealthPackageForPatientResponse>(
+      `/health-packages/subscribed`,
       params
     )
     .then((res) => res.data)
@@ -91,9 +105,12 @@ export async function getHealthPackageForPatient(
 export async function getCancelledHealthPackagesForPatient(params: {
   id: string
   isFamilyMember: boolean
-}): Promise<string[]> {
+}): Promise<GetCancelledHealthPackagesForPatientResponse> {
   return await api
-    .post<string[]>(`/health-packages/patient-cancelled`, params)
+    .post<GetCancelledHealthPackagesForPatientResponse>(
+      `/health-packages/patient-cancelled`,
+      params
+    )
     .then((res) => res.data)
 }
 

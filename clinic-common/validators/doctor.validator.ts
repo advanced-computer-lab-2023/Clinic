@@ -12,21 +12,3 @@ export const UpdateDoctorRequestValidator = zod.object({
 export const AddAvailableTimeSlotsRequestValidator = zod.object({
   time: zod.coerce.date(),
 })
-
-export const RegisterDoctorRequestValidator = zod.object({
-  username: zod
-    .string()
-    .min(3)
-    .max(255)
-    .regex(/^[a-zA-Z0-9_]+$/),
-  password: zod.string().min(6).max(255),
-  name: zod.string().min(3).max(255),
-  email: zod.string().email(),
-  mobileNumber: zod.string().min(11).max(11),
-  dateOfBirth: zod.coerce.date(),
-  hourlyRate: zod.number(),
-  affiliation: zod.string().min(1),
-  educationalBackground: zod.string().min(1),
-  speciality: zod.string().min(1),
-  documents: zod.array(zod.string()),
-})
