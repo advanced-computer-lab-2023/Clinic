@@ -11,6 +11,14 @@ export class UsersResponse {
   ) {}
 }
 
+export class AdminResponse {
+  constructor(
+    public username: string,
+    public email: string,
+    public type: string
+  ) {}
+}
+
 export class GetUsersResponse {
   constructor(public user: UsersResponse[]) {}
 }
