@@ -129,8 +129,8 @@ export function ApprovedDoctors() {
                   </Typography>
                   <Typography variant="body1">
                     <DiscountedPrice
-                      originalPrice={doctor.sessionRate}
-                      discountedPrice={doctor.hourlyRateWithMarkup}
+                      discountedPrice={doctor.sessionRate}
+                      originalPrice={doctor.hourlyRateWithMarkup}
                     />
                   </Typography>
                 </Stack>
