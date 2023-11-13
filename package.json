@@ -1,5 +1,6 @@
 {
   "devDependencies": {
+    "@types/nodemailer": "^6.4.14",
     "@typescript-eslint/eslint-plugin": "^6.7.4",
     "@typescript-eslint/parser": "^6.0.0",
     "concurrently": "^8.2.2",
@@ -36,6 +37,7 @@
   },
   "dependencies": {
     "bcrypt": "^5.1.1",
-    "formik": "^2.4.5"
+    "formik": "^2.4.5",
+    "nodemailer": "^6.9.7"
   }
 }
