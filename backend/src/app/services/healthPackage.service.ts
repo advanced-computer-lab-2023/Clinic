@@ -8,6 +8,9 @@ import {
   type UpdateHealthPackageRequest,
   type createHealthPackageRequest,
 } from 'clinic-common/types/healthPackage.types'
+import { DoctorDocument } from '../models/doctor.model'
+import { PatientDocument } from '../models/patient.model'
+import { getDoctorSessionRateWithMarkup } from './doctor.service'
 
 export async function addHealthPackages(
   request: createHealthPackageRequest
@@ -131,4 +134,38 @@ export async function getHealthPackageNameById(
   } catch (err) {
     return 'N/A'
   }
+}
+
+export function getDoctorSessionRateForPatient({
+  doctor,
+  patient,
+}: {
+  doctor: Pick<DoctorDocument, 'hourlyRate' | 'employmentContract'>
+  patient: Pick<PatientDocument, 'healthPackageRenewalDate'> & {
+    healthPackage?: HealthPackageDocument
+  }
+}) {
+  let sessionRate = getDoctorSessionRateWithMarkup({ doctor })
+
+  if (!hasDiscountOnDoctorSession({ patient })) return sessionRate
+
+  const healthPackageDiscount =
+    (patient?.healthPackage?.sessionDiscount ?? 0) / 100
+  sessionRate = sessionRate * (1 - healthPackageDiscount)
+
+  return sessionRate
+}
+
+export function hasDiscountOnDoctorSession({
+  patient,
+}: {
+  patient: Pick<PatientDocument, 'healthPackageRenewalDate'> & {
+    healthPackage?: HealthPackageDocument
+  }
+}) {
+  if (!patient.healthPackage || !patient.healthPackageRenewalDate) return false
+
+  const healthPackageDiscount = patient.healthPackage.sessionDiscount / 100
+
+  return healthPackageDiscount > 0
 }

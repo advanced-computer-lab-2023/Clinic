@@ -29,6 +29,23 @@ function AddHealthRecord() {
     setImageValue({ file: event.currentTarget.files[0] })
   }
 
+  const handleDelete = async (urlToDelete: string) => {
+    try {
+      // Send a POST request to delete the URL
+      await api.post(
+        `http://localhost:3000/patients/deleteHealthRecord/${id}`,
+        { url: urlToDelete }
+      )
+
+      // Remove the deleted URL from the state
+      setDownloadURLs((prevURLs) =>
+        prevURLs.filter((url) => url !== urlToDelete)
+      )
+    } catch (err) {
+      console.error('Error deleting URL:', err)
+    }
+  }
+
   const handleUpload = async () => {
     if (!imageValue.file) {
       alert('Please select a file to upload.')
@@ -72,6 +89,13 @@ function AddHealthRecord() {
           <h2>{'File ' + (index + 1)}</h2>
           <iframe title={'File' + index} src={url} width="80%" height="400px" />
           <br />
+          <Button
+            color="error"
+            variant="outlined"
+            onClick={() => handleDelete(url)}
+          >
+            Delete
+          </Button>
         </div>
       ))}
     </div>

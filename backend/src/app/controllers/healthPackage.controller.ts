@@ -4,12 +4,15 @@ import {
   UpdateHealthPackageResponse,
   type UpdateHealthPackageRequest,
   type createHealthPackageRequest,
-  GetAllHealthPackagesResponse,
+  GetAllHealthPackagesForPatientResponse,
   AddHealthPackageResponse,
   GetHealthPackageResponse,
-  GetHealthPackageForPatientResponse,
-  GetHealthPackageForPatientRequest,
+  GetSubscribedHealthPackageForPatientResponse,
+  GetSubscribedHealthPackageForPatientRequest,
   SubscribeToHealthPackageRequest,
+  GetCancelledHealthPackagesForPatientResponse,
+  GetAllHealthPackagesForPatientRequest,
+  GetAllHealthPackagesResponse,
 } from 'clinic-common/types/healthPackage.types'
 import { asyncWrapper } from '../utils/asyncWrapper'
 import {
@@ -26,6 +29,7 @@ import {
 } from '../services/healthPackage.service'
 import {
   CreateHealthPackageRequestValidator,
+  GetAllHealthPackagesForPatientRequestValidator,
   UpdateHealthPackageRequestValidator,
 } from 'clinic-common/validators/healthPackage.validator'
 import {
@@ -36,7 +40,6 @@ import {
 import { getPatientByUsername } from '../services/patient.service'
 import { APIError, NotFoundError } from '../errors'
 import { GetWalletMoneyResponse } from 'clinic-common/types/patient.types'
-import { Types } from 'mongoose'
 import { FamilyMemberModel } from '../models/familyMember.model'
 import { PatientModel } from '../models/patient.model'
 
@@ -96,17 +99,46 @@ healthPackagesRouter.get(
   asyncWrapper(async (req, res) => {
     const healthPackages = await getAllHealthPackages()
 
-    res.send({
-      healthPackages: healthPackages.map((healthPackage) => ({
-        name: healthPackage.name,
+    res.send(
+      healthPackages.map((healthPackage) => ({
         id: healthPackage.id,
+        name: healthPackage.name,
         pricePerYear: healthPackage.pricePerYear,
         sessionDiscount: healthPackage.sessionDiscount,
         medicineDiscount: healthPackage.medicineDiscount,
         familyMemberSubscribtionDiscount:
           healthPackage.familyMemberSubscribtionDiscount,
-      })),
-    } satisfies GetAllHealthPackagesResponse)
+      })) satisfies GetAllHealthPackagesResponse
+    )
+  })
+)
+
+healthPackagesRouter.post(
+  '/for-patient',
+  validate(GetAllHealthPackagesForPatientRequestValidator),
+  asyncWrapper<GetAllHealthPackagesForPatientRequest>(async (req, res) => {
+    const { patientId, isFamilyMember } = req.body
+
+    const healthPackages = await getAllHealthPackages()
+
+    const discount = await getDiscount({
+      subscriberId: patientId,
+      isFamilyMember,
+    })
+
+    res.send(
+      healthPackages.map((healthPackage) => ({
+        id: healthPackage.id,
+        name: healthPackage.name,
+        pricePerYear: healthPackage.pricePerYear,
+        discountedPricePerYear:
+          healthPackage.pricePerYear - discount * healthPackage.pricePerYear,
+        sessionDiscount: healthPackage.sessionDiscount,
+        medicineDiscount: healthPackage.medicineDiscount,
+        familyMemberSubscribtionDiscount:
+          healthPackage.familyMemberSubscribtionDiscount,
+      })) satisfies GetAllHealthPackagesForPatientResponse
+    )
   })
 )
 
@@ -165,8 +197,7 @@ healthPackagesRouter.patch(
     const packageInfo = await getHealthPackageById(healthPackageId)
     const patient = await getPatientByUsername(payerUsername)
 
-    if (!packageInfo || !patient || !patient.walletMoney)
-      throw new NotFoundError()
+    if (!packageInfo || !patient) throw new NotFoundError()
 
     if (patient.walletMoney - packageInfo.pricePerYear < 0)
       throw new APIError('Not enough money in wallet', 400)
@@ -206,41 +237,45 @@ healthPackagesRouter.patch(
 )
 
 healthPackagesRouter.post(
-  '/for-patient',
-  asyncWrapper<GetHealthPackageForPatientRequest>(async (req, res) => {
-    const { patientId, isFamilyMember } = req.body
-    const patient = isFamilyMember
-      ? await FamilyMemberModel.findById(patientId)
-      : await PatientModel.findById(patientId)
+  '/subscribed',
+  asyncWrapper<GetSubscribedHealthPackageForPatientRequest>(
+    async (req, res) => {
+      const { patientId, isFamilyMember } = req.body
+      const patient = isFamilyMember
+        ? await FamilyMemberModel.findById(patientId)
+        : await PatientModel.findById(patientId)
 
-    if (!patient?.healthPackage || !patient.healthPackageRenewalDate) {
-      res.status(204).send({} satisfies GetHealthPackageForPatientResponse)
-    } else {
-      const healthPackage = await getHealthPackageById(
-        patient.healthPackage.toString()
-      )
-      const current = new Date()
-      const renewal = patient.healthPackageRenewalDate
-      const months =
-        (renewal.getFullYear() - current.getFullYear()) * 12 +
-        renewal.getMonth() -
-        current.getMonth()
+      if (!patient?.healthPackage || !patient.healthPackageRenewalDate) {
+        res
+          .status(204)
+          .send({} satisfies GetSubscribedHealthPackageForPatientResponse)
+      } else {
+        const healthPackage = await getHealthPackageById(
+          patient.healthPackage.toString()
+        )
+        const current = new Date()
+        const renewal = patient.healthPackageRenewalDate
+        const months =
+          (renewal.getFullYear() - current.getFullYear()) * 12 +
+          renewal.getMonth() -
+          current.getMonth()
 
-      res.send({
-        healthPackage: {
-          name: healthPackage.name,
-          id: healthPackage.id,
-          pricePerYear: healthPackage.pricePerYear,
-          sessionDiscount: healthPackage.sessionDiscount,
-          medicineDiscount: healthPackage.medicineDiscount,
-          familyMemberSubscribtionDiscount:
-            healthPackage.familyMemberSubscribtionDiscount,
-          renewalDate: patient.healthPackageRenewalDate.toDateString(),
-          remainingMonths: months,
-        },
-      } satisfies GetHealthPackageForPatientResponse)
+        res.send({
+          healthPackage: {
+            name: healthPackage.name,
+            id: healthPackage.id,
+            pricePerYear: healthPackage.pricePerYear,
+            sessionDiscount: healthPackage.sessionDiscount,
+            medicineDiscount: healthPackage.medicineDiscount,
+            familyMemberSubscribtionDiscount:
+              healthPackage.familyMemberSubscribtionDiscount,
+            renewalDate: patient.healthPackageRenewalDate.toDateString(),
+            remainingMonths: months,
+          },
+        } satisfies GetSubscribedHealthPackageForPatientResponse)
+      }
     }
-  })
+  )
 )
 
 healthPackagesRouter.post(
@@ -255,11 +290,14 @@ healthPackagesRouter.post(
       throw new NotFoundError()
     }
 
-    const cancelled: Types.ObjectId[] = []
+    const cancelled: GetCancelledHealthPackagesForPatientResponse = {}
+
     model.healthPackageHistory.forEach((healthPackage) => {
-      cancelled.push(healthPackage.healthPackage)
+      cancelled[healthPackage.healthPackage.toString()] =
+        healthPackage.date.toDateString()
     })
-    res.send(cancelled)
+
+    res.send(cancelled satisfies GetCancelledHealthPackagesForPatientResponse)
   })
 )
 

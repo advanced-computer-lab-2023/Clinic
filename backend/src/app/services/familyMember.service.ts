@@ -145,6 +145,7 @@ export async function findFamilyMemberByEmail(
 export async function findFamilyMemberByMobileNumber(
   familyMemberMobileNumber: string
 ): Promise<WithUser<PatientDocument>> {
+  console.log(familyMemberMobileNumber)
   const patient = await PatientModel.findOne({
     mobileNumber: familyMemberMobileNumber,
   }).populate<{

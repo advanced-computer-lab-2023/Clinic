@@ -2,6 +2,7 @@ import { type z } from 'zod'
 import {
   type UpdateHealthPackageRequestValidator,
   type CreateHealthPackageRequestValidator,
+  GetAllHealthPackagesForPatientRequestValidator,
 } from '../validators/healthPackage.validator'
 
 export type createHealthPackageRequest = z.infer<
@@ -26,26 +27,34 @@ export interface UpdateHealthPackageResponse
 
 export interface AddHealthPackageResponse extends HealthPackageResponseBase {}
 
-export interface GetAllHealthPackagesResponse {
-  healthPackages: HealthPackageResponseBase[]
-}
+export type GetAllHealthPackagesForPatientRequest = z.infer<
+  typeof GetAllHealthPackagesForPatientRequestValidator
+>
+
+export type GetAllHealthPackagesForPatientResponse = Array<
+  HealthPackageResponseBase & {
+    discountedPricePerYear: number
+  }
+>
+
+export type GetAllHealthPackagesResponse = HealthPackageResponseBase[]
 
 export interface GetHealthPackageResponse extends HealthPackageResponseBase {}
 
-export interface GetHealthPackageForPatientRequest {
+export interface GetSubscribedHealthPackageForPatientRequest {
   patientId: string // patientId or familyMemberId
   isFamilyMember: boolean
 }
 
-export interface GetHealthPackageForPatientResponse {
+export interface GetSubscribedHealthPackageForPatientResponse {
   healthPackage?: HealthPackageResponseBase & {
     renewalDate: string
     remainingMonths: number
   }
 }
 
-export interface GetCancelledHealthPackagesForPatientResponse {
-  healthPackageHistory: [string]
+export type GetCancelledHealthPackagesForPatientResponse = {
+  [id: string]: string // Maps ID of cancelled healthPackage to Date of cancellation
 }
 
 export interface SubscribeToHealthPackageRequest {

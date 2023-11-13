@@ -63,8 +63,51 @@ export async function uploadMedicalHistory(
   }
 }
 
+export async function deleteMedicalHistory(
+  id: string,
+  url: string
+): Promise<void> {
+  const updateResult = await PatientModel.updateOne(
+    { user: id },
+    { $pull: { documents: url } }
+  ).exec()
+
+  if (updateResult.matchedCount === 0) {
+    throw new NotFoundError() // If no document was found
+  }
+
+  if (updateResult.modifiedCount === 0) {
+    throw new Error('No document was modified') // If the document was found but not modified
+  }
+}
+
+export async function deleteHealthRecord(
+  id: string,
+  url: string
+): Promise<void> {
+  const updateResult = await PatientModel.updateOne(
+    { _id: id },
+    { $pull: { healthRecords: url } }
+  ).exec()
+
+  if (updateResult.matchedCount === 0) {
+    throw new NotFoundError() // If no document was found
+  }
+
+  if (updateResult.modifiedCount === 0) {
+    throw new Error('No document was modified') // If the document was found but not modified
+  }
+}
+
 export async function getMyMedicalHistory(id: string): Promise<string[]> {
   const patient = await PatientModel.findOne({ user: id }).exec()
+  if (patient == null) throw new NotFoundError()
+
+  return patient.documents
+}
+
+export async function getMedicalHistoryFiles(id: string): Promise<string[]> {
+  const patient = await PatientModel.findOne({ _id: id }).exec()
   if (patient == null) throw new NotFoundError()
 
   return patient.documents
@@ -187,7 +230,7 @@ export async function subscribeToHealthPackage({
   isFamilyMember?: boolean
   healthPackageId: string
 }): Promise<void> {
-  const model = isFamilyMember
+  let model = isFamilyMember
     ? await FamilyMemberModel.findById(patientId)
     : await PatientModel.findById(patientId)
 
@@ -201,8 +244,9 @@ export async function subscribeToHealthPackage({
     throw new NotFoundError()
   }
 
-  if (model.healthPackage)
-    await unSubscribeToHealthPackage({ id: patientId, isFamilyMember })
+  if (model.healthPackage) {
+    model = await unSubscribeToHealthPackage({ id: patientId, isFamilyMember })
+  }
 
   model.healthPackage = healthPackage.id
 
@@ -224,7 +268,7 @@ export async function subscribeToHealthPackage({
 export async function unSubscribeToHealthPackage(params: {
   id: string
   isFamilyMember: boolean
-}): Promise<void> {
+}) {
   const model = params.isFamilyMember
     ? await FamilyMemberModel.findById(params.id)
     : await PatientModel.findById(params.id)
@@ -255,6 +299,8 @@ export async function unSubscribeToHealthPackage(params: {
     model.healthPackageRenewalDate = undefined
     await model.save()
   }
+
+  return model
 }
 
 export async function getPatientByUsername(
