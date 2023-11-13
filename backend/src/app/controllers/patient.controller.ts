@@ -15,6 +15,8 @@ import {
   getHealthRecordsFiles,
   getPatientHealthRecords,
   deleteMedicalHistory,
+  deleteHealthRecord,
+  getMedicalHistoryFiles,
 } from '../services/patient.service'
 import {
   GetAPatientResponse,
@@ -65,6 +67,27 @@ patientRouter.post(
 )
 
 patientRouter.post(
+  '/deleteHealthRecord/:id',
+  asyncWrapper(async (req, res) => {
+    const id = req.params.id
+    const url = req.body.url
+    console.log(url)
+    const response = await deleteHealthRecord(id, url)
+    res.send(response)
+  })
+)
+
+patientRouter.get(
+  //Health Records Uploads for doctor
+  '/getMedicalHistory/:id',
+  asyncWrapper(async (req, res) => {
+    const medicalHistory = await getMedicalHistoryFiles(req.params.id)
+
+    res.send(medicalHistory)
+  })
+)
+
+patientRouter.post(
   '/deleteMedicalHistory/mine',
   asyncWrapper(async (req, res) => {
     const user: HydratedDocument<UserDocument> | null = await UserModel.findOne(
@@ -78,7 +101,6 @@ patientRouter.post(
     res.send(response)
   })
 )
-
 patientRouter.post(
   '/uploadHealthRecords/:id',
   upload.single('HealthRecord'),
