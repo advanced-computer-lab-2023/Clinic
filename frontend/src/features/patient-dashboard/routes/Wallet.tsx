@@ -27,7 +27,7 @@ export function Wallet() {
     <Card variant="outlined">
       <CardContent>
         <Typography variant="h6" color="text.secondary">
-          {`Wallet Money: ${res.money} EGP`}
+          {`Wallet Money: ${res.money.toFixed(2)} EGP`}
         </Typography>
       </CardContent>
     </Card>
