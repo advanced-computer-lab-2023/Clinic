@@ -11,6 +11,7 @@ import {
 import { DateRange, FilteredList } from '@/components/FilteredList'
 import { useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
+import { DiscountedPrice } from '@/components/DiscountedPrice'
 
 export function ApprovedDoctors() {
   const navigate = useNavigate()
@@ -124,10 +125,13 @@ export function ApprovedDoctors() {
                 </Stack>
                 <Stack spacing={-1}>
                   <Typography variant="overline" color="text.secondary">
-                    Session Rate
+                    Session Rate <small>(Markup + Discount If Any)</small>
                   </Typography>
                   <Typography variant="body1">
-                    {doctor.sessionRate.toFixed(2)} E£
+                    <DiscountedPrice
+                      originalPrice={doctor.sessionRate}
+                      discountedPrice={doctor.hourlyRateWithMarkup}
+                    />
                   </Typography>
                 </Stack>
               </Stack>
