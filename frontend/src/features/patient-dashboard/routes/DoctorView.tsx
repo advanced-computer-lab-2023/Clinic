@@ -367,8 +367,8 @@ export function DoctorView() {
                 </Typography>
                 <Typography variant="body1">
                   <DiscountedPrice
-                    originalPrice={query.data!.sessionRate}
-                    discountedPrice={query.data!.hourlyRateWithMarkup}
+                    discountedPrice={query.data!.sessionRate}
+                    originalPrice={query.data!.hourlyRateWithMarkup}
                   />
                 </Typography>
               </Stack>
