@@ -1,5 +1,4 @@
 import { Router } from 'express'
-
 import { authRouter } from './app/controllers/auth.controller'
 import { doctorsRouter } from './app/controllers/doctor.controller'
 import { debugRouter } from './app/controllers/debug.controller'

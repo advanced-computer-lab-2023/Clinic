@@ -1,4 +1,5 @@
 import { Router } from 'express'
+
 import multer from 'multer'
 import { asyncWrapper } from '../utils/asyncWrapper'
 import {
@@ -69,6 +70,7 @@ export const verifyOTPController = asyncWrapper(async (req, res) => {
   }
 })
 
+// here's a useless comment cuz i need to push again
 export const updatePasswordController = asyncWrapper(async (req, res) => {
   const { newPassword, email } = req.body
 
