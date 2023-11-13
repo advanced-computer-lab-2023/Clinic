@@ -24,6 +24,7 @@ import { getFamilyMembers } from '@/api/familyMembers'
 import { useState } from 'react'
 import { LoadingButton } from '@mui/lab'
 import Checkout from '@/components/StripeCheckout'
+import { DiscountedPrice } from '@/components/DiscountedPrice'
 
 export function DoctorView() {
   // State to manage the modal visibility
@@ -362,10 +363,13 @@ export function DoctorView() {
               </Stack>
               <Stack spacing={-1}>
                 <Typography variant="overline" color="text.secondary">
-                  Session Rate
+                  Session Rate <small>(Markup + Discount If Any)</small>
                 </Typography>
                 <Typography variant="body1">
-                  {query.data?.sessionRate.toFixed(2)}
+                  <DiscountedPrice
+                    discountedPrice={query.data!.sessionRate}
+                    originalPrice={query.data!.hourlyRateWithMarkup}
+                  />
                 </Typography>
               </Stack>
             </Stack>
