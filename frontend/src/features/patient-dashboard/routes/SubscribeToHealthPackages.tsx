@@ -33,6 +33,7 @@ import { useAlerts } from '@/hooks/alerts'
 import Checkout from '@/components/StripeCheckout'
 import { useAuth } from '@/hooks/auth'
 import { GetAllHealthPackagesForPatientResponse } from 'clinic-common/types/healthPackage.types'
+import { DiscountedPrice } from '@/components/DiscountedPrice'
 
 function HealthPackagePrice({
   healthPackage,
@@ -44,23 +45,10 @@ function HealthPackagePrice({
   }
 
   return (
-    <Typography variant="body1">
-      {healthPackage.discountedPricePerYear != healthPackage.pricePerYear ? (
-        <Stack direction="row" spacing={1}>
-          <Typography variant="body1">
-            {healthPackage.discountedPricePerYear}$
-          </Typography>
-          <Typography
-            variant="body1"
-            sx={{ textDecoration: 'line-through', color: 'text.disabled' }}
-          >
-            {healthPackage.pricePerYear}$
-          </Typography>
-        </Stack>
-      ) : (
-        healthPackage.pricePerYear + '$'
-      )}
-    </Typography>
+    <DiscountedPrice
+      originalPrice={healthPackage.pricePerYear}
+      discountedPrice={healthPackage.discountedPricePerYear}
+    />
   )
 }
 
