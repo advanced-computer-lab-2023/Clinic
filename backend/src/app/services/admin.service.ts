@@ -15,7 +15,7 @@ const bcryptSalt = process.env.BCRYPT_SALT ?? '$2b$10$13bXTGGukQXsCf5hokNe2u'
 export async function addAdmin(
   request: AddAdminRequest
 ): Promise<AddAdminResponse> {
-  const { username, password } = request
+  const { username, password, email } = request
 
   if (await isUsernameTaken(request.username)) {
     throw new UsernameAlreadyTakenError()
@@ -32,6 +32,7 @@ export async function addAdmin(
 
   const newAdmin = await AdminModel.create({
     user: newUser.id,
+    email,
   })
   await newAdmin.save()
 
