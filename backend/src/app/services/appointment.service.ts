@@ -17,8 +17,9 @@ export async function getfilteredAppointments(
     query.patientID !== null &&
     query.patientID !== ''
   ) {
+    // Search for appointments where patientID or familyID matches the specified user ID
     return await AppointmentModel.find({
-      patientID: query.patientID,
+      $or: [{ patientID: query.patientID }, { familyID: query.patientID }],
     })
   } else if (
     query.doctorID !== undefined &&
