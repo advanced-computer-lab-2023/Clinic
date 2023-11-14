@@ -292,6 +292,7 @@ async function createDummyAdmin(
 
   const admin = await AdminModel.create({
     user: user.id,
+    email: process.env.ADMIN_EMAIL ?? randomEmail(),
   })
 
   return await admin.populate<{ user: UserDocument }>('user')
