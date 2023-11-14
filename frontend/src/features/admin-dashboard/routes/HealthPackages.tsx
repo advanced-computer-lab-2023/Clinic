@@ -71,7 +71,7 @@ export function HealthPackages() {
       handleClose()
 
       if (
-        message == "Can't Delete!there are patients subscribed to this package"
+        message == "Can't Delete! There are patients subscribed to this package"
       ) {
         toast.error(message)
       }
@@ -90,7 +90,7 @@ export function HealthPackages() {
         <DialogTitle id="responsive-dialog-title">{'Alert'}</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Are you sure,you want to delete this package?
+            Are you sure you want to delete this package?
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -134,14 +134,6 @@ export function HealthPackages() {
                       >
                         <Typography variant="h6" color="text.secondary">
                           {healthPackage.name}
-                        </Typography>
-                      </Stack>
-                      <Stack spacing={-1}>
-                        <Typography variant="overline" color="text.secondary">
-                          Package ID
-                        </Typography>
-                        <Typography variant="body1">
-                          {healthPackage.id}
                         </Typography>
                       </Stack>
 
