@@ -53,14 +53,13 @@ export function Patient() {
       setNotesError(false)
       setShowTextField(false)
       setShowButton(false)
-      console.log(notes)
-      console.log(id)
       await axios
         .patch(`http://localhost:3000/patients/addNote/${id}`, {
           newNote: notes,
         })
         .then(() => {
           toast.success('Note added successfully')
+          query.refetch()
         })
         .catch((err) => {
           console.log(err)
