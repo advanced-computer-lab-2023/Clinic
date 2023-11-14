@@ -71,7 +71,10 @@ healthPackagesRouter.patch(
     const isUpdated = await updateHealthPackage(req.params.id, req.body)
 
     if (!isUpdated) {
-      res.send("Can't update!There are patients subscribed to this package")
+      throw new APIError(
+        "Can't Update! There are patients already subscribed to this package",
+        404
+      )
     }
 
     res.send('Package updated successfuly')
