@@ -45,6 +45,7 @@ export interface AcceptOrRejectContractResponse extends DoctorResponseBase {
   contractStatus: ContractStatus
   availableTimes: [Date]
   employmentContract: [string]
+  documents: [string]
 }
 
 export interface ApproveDoctorResponse extends DoctorResponseBase {
@@ -56,6 +57,7 @@ export interface GetDoctorResponse extends DoctorResponseBase {
   contractStatus: ContractStatus
   availableTimes: [Date]
   employmentContract: [string]
+  documents: [string]
 }
 
 export interface GetApprovedDoctorsResponse {
