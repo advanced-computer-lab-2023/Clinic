@@ -382,7 +382,11 @@ export function SubscribeToHealthPackages({
                 <Chip
                   color="warning"
                   size="small"
-                  label={selectedHealthPackage?.pricePerYear + '$'}
+                  label={
+                    <HealthPackagePrice
+                      healthPackage={selectedHealthPackage!}
+                    />
+                  }
                 />{' '}
                 per year for the{' '}
                 <Chip
