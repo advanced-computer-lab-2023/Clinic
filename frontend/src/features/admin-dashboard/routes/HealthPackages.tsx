@@ -27,6 +27,7 @@ import {
   useState,
 } from 'react'
 import { LoadingButton } from '@mui/lab'
+import { ToastContainer, toast } from 'react-toastify'
 
 export function HealthPackages() {
   const navigate = useNavigate()
@@ -64,8 +65,17 @@ export function HealthPackages() {
   function handleDelelte() {
     // addAlert(new Alert("successMessage", 'success',alertScope))
     setLoading(true)
-    deleteHealthPackage(packageId).then(() => {
+    const q = deleteHealthPackage(packageId)
+    console.log(q)
+    q.then((message) => {
       handleClose()
+
+      if (
+        message == "Can't Delete!there are patients subscribed to this package"
+      ) {
+        toast.error(message)
+      }
+
       query.refetch()
     })
   }
@@ -110,87 +120,90 @@ export function HealthPackages() {
         </Grid>
         {query.data.map((healthPackage) => {
           return (
-            <Grid item xl={4}>
-              <Card variant="outlined">
-                <CardContent>
-                  <Stack spacing={2}>
-                    <Stack
-                      direction="row"
-                      spacing={1}
-                      justifyContent="space-between"
-                      alignItems="center"
-                    >
-                      <Typography variant="h6" color="text.secondary">
-                        {healthPackage.name}
-                      </Typography>
-                    </Stack>
-                    <Stack spacing={-1}>
-                      <Typography variant="overline" color="text.secondary">
-                        Package ID
-                      </Typography>
-                      <Typography variant="body1">
-                        {healthPackage.id}
-                      </Typography>
-                    </Stack>
+            <>
+              <ToastContainer />
+              <Grid item xl={4}>
+                <Card variant="outlined">
+                  <CardContent>
+                    <Stack spacing={2}>
+                      <Stack
+                        direction="row"
+                        spacing={1}
+                        justifyContent="space-between"
+                        alignItems="center"
+                      >
+                        <Typography variant="h6" color="text.secondary">
+                          {healthPackage.name}
+                        </Typography>
+                      </Stack>
+                      <Stack spacing={-1}>
+                        <Typography variant="overline" color="text.secondary">
+                          Package ID
+                        </Typography>
+                        <Typography variant="body1">
+                          {healthPackage.id}
+                        </Typography>
+                      </Stack>
 
-                    <Stack spacing={-1}>
-                      <Typography variant="overline" color="text.secondary">
-                        Price per year
-                      </Typography>
-                      <Typography variant="body1">
-                        {healthPackage.pricePerYear}
-                      </Typography>
+                      <Stack spacing={-1}>
+                        <Typography variant="overline" color="text.secondary">
+                          Price per year
+                        </Typography>
+                        <Typography variant="body1">
+                          {healthPackage.pricePerYear}
+                        </Typography>
+                      </Stack>
+                      <Stack spacing={-1}>
+                        <Typography variant="overline" color="text.secondary">
+                          Session Discount
+                        </Typography>
+                        <Typography variant="body1">
+                          {healthPackage.sessionDiscount}
+                        </Typography>
+                      </Stack>
+                      <Stack spacing={-1}>
+                        <Typography variant="overline" color="text.secondary">
+                          Medicine From Our Pharmacy Discount
+                        </Typography>
+                        <Typography variant="body1">
+                          {healthPackage.medicineDiscount}
+                        </Typography>
+                      </Stack>
+                      <Stack spacing={-1}>
+                        <Typography variant="overline" color="text.secondary">
+                          Family Member Subscription Discount
+                        </Typography>
+                        <Typography variant="body1">
+                          {healthPackage.familyMemberSubscribtionDiscount}
+                        </Typography>
+                      </Stack>
                     </Stack>
-                    <Stack spacing={-1}>
-                      <Typography variant="overline" color="text.secondary">
-                        Session Discount
-                      </Typography>
-                      <Typography variant="body1">
-                        {healthPackage.sessionDiscount}
-                      </Typography>
-                    </Stack>
-                    <Stack spacing={-1}>
-                      <Typography variant="overline" color="text.secondary">
-                        Medicine From Our Pharmacy Discount
-                      </Typography>
-                      <Typography variant="body1">
-                        {healthPackage.medicineDiscount}
-                      </Typography>
-                    </Stack>
-                    <Stack spacing={-1}>
-                      <Typography variant="overline" color="text.secondary">
-                        Family Member Subscription Discount
-                      </Typography>
-                      <Typography variant="body1">
-                        {healthPackage.familyMemberSubscribtionDiscount}
-                      </Typography>
-                    </Stack>
-                  </Stack>
-                </CardContent>
-                <CardActions>
-                  <Button
-                    size="small"
-                    startIcon={<UpgradeIcon />}
-                    onClick={() => {
-                      handleUpdate(healthPackage.id)
-                    }}
-                  >
-                    Update
-                  </Button>
-                  <Button
-                    size="small"
-                    startIcon={<DeleteIcon />}
-                    onClick={() => {
-                      // handleDelte(healthPackage.id)
-                      setPackageId(healthPackage.id)
-                      handleClickOpen()
-                    }}
-                  >
-                    Delete
-                  </Button>
-                </CardActions>
-              </Card>
-            </Grid>
+                  </CardContent>
+                  <CardActions>
+                    <Button
+                      size="small"
+                      startIcon={<UpgradeIcon />}
+                      onClick={() => {
+                        handleUpdate(healthPackage.id)
+                      }}
+                    >
+                      Update
+                    </Button>
+                    <Button
+                      size="small"
+                      startIcon={<DeleteIcon />}
+                      onClick={() => {
+                        // handleDelte(healthPackage.id)
+                        setPackageId(healthPackage.id)
+                        handleClickOpen()
+                      }}
+                    >
+                      Delete
+                    </Button>
+                  </CardActions>
+                </Card>
+              </Grid>
+            </>
           )
         })}
       </Grid>
