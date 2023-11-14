@@ -20,7 +20,7 @@ import { useParams } from 'react-router-dom'
 import { CardPlaceholder } from '@/components/CardPlaceholder'
 import { reserveTimes } from '@/api/appointments'
 import { toast } from 'react-toastify'
-import { getFamilyMembers } from '@/api/familyMembers'
+import { getFamilyMembers, getLinkedFamilyMembers } from '@/api/familyMembers'
 import { useState } from 'react'
 import { LoadingButton } from '@mui/lab'
 import Checkout from '@/components/StripeCheckout'
@@ -55,6 +55,11 @@ export function DoctorView() {
     queryKey: ['family-members'],
     queryFn: getFamilyMembers,
   })
+  const query3 = useQuery({
+    queryKey: ['Linked-family-members'],
+    queryFn: getLinkedFamilyMembers,
+  })
+  console.log(query3)
 
   if (query.isLoading) {
     return <CardPlaceholder />
@@ -110,6 +115,31 @@ export function DoctorView() {
                     onClick={() => {
                       closeModal()
                       setSelectedFamilyMemberId(familyMember.id)
+                      setSelectedFamilyMemberName(familyMember.name)
+                      setSelectedAFamilyMember(true)
+                    }}
+                  >
+                    Reserve for family member
+                  </Button>
+                </CardActions>
+              </Card>
+            ))}
+            {query3.data?.map((familyMember) => (
+              <Card key={familyMember.id} style={{ marginTop: '16px' }}>
+                <CardContent>
+                  <Typography variant="h6">{familyMember.name}</Typography>
+                  <Typography variant="subtitle1">
+                    {familyMember.relation}
+                  </Typography>
+                </CardContent>
+                <CardActions>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    fullWidth
+                    onClick={() => {
+                      closeModal()
+                      setSelectedFamilyMemberId(familyMember.patientId)
                       setSelectedFamilyMemberName(familyMember.name)
                       setSelectedAFamilyMember(true)
                     }}
