@@ -27,9 +27,10 @@ import { validate } from '../middlewares/validation.middleware'
 import { type Gender } from 'clinic-common/types/gender.types'
 import { GetPatientLinkingMeResponse } from 'clinic-common/types/patient.types'
 import { FamilyMemberModel } from '../models/familyMember.model'
-import { PatientModel } from '../models/patient.model'
+import { PatientDocument, PatientModel } from '../models/patient.model'
 import { UserModel } from '../models/user.model'
 import { getHealthPackageNameById } from '../services/healthPackage.service'
+import { WithUser } from '../utils/typeUtils'
 
 export const familyMemberRouter = Router()
 
@@ -90,7 +91,12 @@ familyMemberRouter.post(
   '/link',
   validate(LinkFamilyMemberRequestValidator),
   asyncWrapper<LinkFamilyMemberRequest>(async (req: any, res: any) => {
-    let familyMember = null
+    let familyMember: WithUser<PatientDocument> | null = null
+
+    const user = await UserModel.findOne({ username: req.username })
+    const currentUser = await PatientModel.findOne({
+      user: user?._id,
+    })
 
     if (req.body.email) {
       const familyMemberEmail = req.body.email
@@ -102,6 +108,19 @@ familyMemberRouter.post(
       )
     } else {
       throw new Error('No email or mobile number provided')
+    }
+
+    const familyMemberIDs = currentUser?.familyMembers
+    const familyMembers = await FamilyMemberModel.find({
+      _id: { $in: familyMemberIDs },
+    })
+
+    if (familyMember && familyMember !== null && familyMember._id) {
+      const familyMemberId = familyMember._id
+
+      if (familyMembers.some((fm) => fm.patient?.equals(familyMemberId))) {
+        throw new Error('Already linked')
+      }
     }
 
     const calculatedAge =
@@ -119,8 +138,7 @@ familyMemberRouter.post(
       patient: familyMember?._id,
     })
     await newFamilyMember.save()
-    const user = await UserModel.findOne({ username: req.username })
-    const currentUser = await PatientModel.findOne({ user: user?._id })
+
     if (currentUser == null)
       return res.status(404).json({ error: 'Current user not found' })
     currentUser.familyMembers.push(newFamilyMember._id)
