@@ -328,7 +328,9 @@ doctorsRouter.get(
   '/wallet/:username',
   asyncWrapper(async (req, res) => {
     const doctor = await getDoctorByUsername(req.params.username)
-    if (!doctor || !doctor.walletMoney) throw new NotFoundError()
-    res.send({ money: doctor.walletMoney } satisfies GetWalletMoneyResponse)
+    if (!doctor) throw new NotFoundError()
+    res.send({
+      money: doctor.walletMoney ?? 0,
+    } satisfies GetWalletMoneyResponse)
   })
 )
