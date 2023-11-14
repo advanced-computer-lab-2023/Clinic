@@ -71,6 +71,7 @@ doctorsRouter.get(
         educationalBackground: doctor.educationalBackground,
         speciality: doctor.speciality,
         requestStatus: doctor.requestStatus as DoctorStatus,
+        documents: doctor.documents as [string],
       })),
     } satisfies GetPendingDoctorsResponse)
   })
@@ -144,6 +145,7 @@ doctorsRouter.get(
         availableTimes: doctor.availableTimes as [Date],
         requestStatus: doctor.requestStatus as DoctorStatus,
         hasDiscount: hasDiscountOnDoctorSession({ patient }),
+        documents: doctor.documents as [string],
       })),
     } satisfies GetApprovedDoctorsResponse)
   })
@@ -169,6 +171,7 @@ doctorsRouter.get(
       availableTimes: doctor.availableTimes as [Date],
       contractStatus: doctor.contractStatus as ContractStatus,
       employmentContract: doctor.employmentContract as [string],
+      documents: doctor.documents as [string],
     } satisfies GetDoctorResponse)
   })
 )
@@ -268,6 +271,7 @@ doctorsRouter.patch(
       availableTimes: doctor.availableTimes as [Date],
       contractStatus: doctor.contractStatus as ContractStatus,
       employmentContract: doctor.employmentContract as [string],
+      documents: doctor.documents as [string],
     } satisfies AcceptOrRejectContractResponse)
   })
 )
@@ -291,6 +295,7 @@ doctorsRouter.patch(
       availableTimes: doctor.availableTimes as [Date],
       contractStatus: doctor.contractStatus as ContractStatus,
       employmentContract: doctor.employmentContract as [string],
+      documents: doctor.documents as [string],
     } satisfies AcceptOrRejectContractResponse)
   })
 )
