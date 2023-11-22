@@ -65,6 +65,8 @@ prescriptionsRouter.get(
   allowAuthenticated,
   asyncWrapper(async (req, res) => {
     // Allow only doctors and the patient to get the prescriptions
+    console.log('Ana hena fl controller')
+
     if (
       !(
         (await isDoctorAndApproved(req.username!)) ||
