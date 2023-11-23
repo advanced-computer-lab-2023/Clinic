@@ -102,7 +102,7 @@ function ViewPrescription() {
                 component="h2"
                 sx={{ color: '#333', fontWeight: 'bold', marginBottom: '20px' }}
               >
-                Prescription Date: {prescription.date}
+                Prescription Date: {prescription.date.slice(0, 10)}
               </Typography>
 
               <Typography
