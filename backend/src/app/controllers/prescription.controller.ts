@@ -79,18 +79,7 @@ prescriptionsRouter.get(
 
     const prescriptions = await getPrescriptions(req.params.patientUsername)
 
-    res.send(
-      new GetPrescriptionResponse(
-        prescriptions.map((prescription) => ({
-          id: prescription.id,
-          doctor: prescription.doctor.name,
-          patient: prescription.patient.name,
-          date: prescription.date,
-          isFilled: prescription.isFilled,
-          medicine: prescription.medicine,
-        }))
-      )
-    )
+    res.send(prescriptions)
   })
 )
 

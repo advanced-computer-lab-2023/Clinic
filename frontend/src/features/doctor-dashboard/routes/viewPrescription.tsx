@@ -6,25 +6,29 @@ import {
   TextField,
   Paper,
   Button,
+  CardContent,
+  Card,
 } from '@mui/material'
-import { DesktopDatePicker } from '@mui/x-date-pickers'
 import { useFormik } from 'formik'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
+import React from 'react'
 
 function ViewPrescription() {
   const { username } = useParams()
+  const [prescriptions, setPrescriptions] = useState([])
   const formik = useFormik({
     initialValues: {
-      name: '',
-      dosage: '',
-      frequency: '',
-      duration: '',
+      medicines: [{ name: '', dosage: '', frequency: '', duration: '' }],
       date: null,
     },
     onSubmit: (values) => {
       // Call your addPrescription method here
-      addPrescription(values)
+      const submissionValues = {
+        ...values,
+        date: new Date(),
+      }
+      addPrescription(submissionValues)
       // You can also reset the form if needed
       formik.resetForm()
     },
@@ -34,14 +38,7 @@ function ViewPrescription() {
     try {
       const response = await api.post(`http://localhost:3000/prescriptions`, {
         patient: username,
-        medicine: [
-          {
-            name: values.name,
-            dosage: values.dosage,
-            frequency: values.frequency,
-            duration: values.duration,
-          },
-        ],
+        medicine: values.medicines,
         date: values.date,
       })
       console.log(response)
@@ -50,7 +47,6 @@ function ViewPrescription() {
     }
   }
 
-  const [prescriptions, setPrescriptions] = useState([])
   useEffect(() => {
     const fetchPresciptions = async () => {
       try {
@@ -69,23 +65,80 @@ function ViewPrescription() {
 
   return (
     <>
-      <Container maxWidth="md" className="App">
+      <Container
+        maxWidth="md"
+        sx={{
+          padding: '50px 0',
+          animation: 'fadeIn 1s',
+        }}
+      >
         <Typography
           variant="h3"
-          style={{ marginTop: '50px' }}
-          color="primary"
           component="h1"
           gutterBottom
+          sx={{
+            marginBottom: '40px',
+            textAlign: 'center',
+            color: '#3f51b5',
+          }}
         >
           Prescriptions
         </Typography>
+
+        {prescriptions.map((prescription: any, prescriptionIndex) => (
+          <Card
+            key={`prescription-${prescriptionIndex}`}
+            sx={{
+              marginBottom: 20,
+              animation: 'slideUp 0.5s ease',
+              backgroundColor: '#e3f2fd',
+              borderRadius: '15px',
+            }}
+            elevation={4}
+          >
+            <CardContent>
+              <Typography
+                variant="h5"
+                component="h2"
+                sx={{ color: '#333', fontWeight: 'bold', marginBottom: '20px' }}
+              >
+                Prescription Date: {prescription.date}
+              </Typography>
+
+              <Typography
+                variant="h6"
+                component="h3"
+                sx={{ color: '#444', fontWeight: 'bold', marginBottom: '15px' }}
+              >
+                Medicines:
+              </Typography>
+
+              {prescription.medicine &&
+                prescription.medicine.map(
+                  (medicine: any, medicineIndex: any) => (
+                    <Typography
+                      key={`medicine-${medicineIndex}`}
+                      variant="body1"
+                      component="p"
+                      style={{ margin: '5px 0', color: '#555' }}
+                    >
+                      <strong>Name:</strong> {medicine.name},{' '}
+                      <strong>Dosage:</strong> {medicine.dosage},{' '}
+                      <strong>Frequency:</strong> {medicine.frequency},{' '}
+                      <strong>Duration:</strong> {medicine.duration}
+                    </Typography>
+                  )
+                )}
+            </CardContent>
+          </Card>
+        ))}
       </Container>
 
       <Container component="main" maxWidth="xs">
         <Paper
           elevation={3}
-          style={{
-            padding: 20,
+          sx={{
+            padding: 2,
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
@@ -94,64 +147,66 @@ function ViewPrescription() {
           <Typography component="h1" variant="h5">
             Prescription Form
           </Typography>
-          <form
-            onSubmit={formik.handleSubmit}
-            style={{ width: '100%', marginTop: 20 }}
-          >
+          <form onSubmit={formik.handleSubmit}>
             <Grid container spacing={2}>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  id="name"
-                  name="name"
-                  label="Medicine Name"
-                  variant="outlined"
-                  onChange={formik.handleChange}
-                  value={formik.values.name}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  id="dosage"
-                  name="dosage"
-                  label="Dosage"
-                  variant="outlined"
-                  onChange={formik.handleChange}
-                  value={formik.values.dosage}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  id="frequency"
-                  name="frequency"
-                  label="Frequency"
-                  variant="outlined"
-                  onChange={formik.handleChange}
-                  value={formik.values.frequency}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  id="duration"
-                  name="duration"
-                  label="Duration"
-                  variant="outlined"
-                  onChange={formik.handleChange}
-                  value={formik.values.duration}
-                />
-              </Grid>
-
-              <Grid>
-                <DesktopDatePicker
-                  label="Date"
-                  value={formik.values.date}
-                  onChange={(date) => formik.setFieldValue('date', date)}
-                />
-              </Grid>
+              {formik.values.medicines.map((medicine: any, index) => (
+                <React.Fragment key={index}>
+                  <Grid item xs={12}>
+                    <TextField
+                      fullWidth
+                      name={`medicines[${index}].name`}
+                      label="Medicine Name"
+                      variant="outlined"
+                      onChange={formik.handleChange}
+                      value={medicine.name}
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      fullWidth
+                      name={`medicines[${index}].dosage`}
+                      label="Dosage"
+                      variant="outlined"
+                      onChange={formik.handleChange}
+                      value={medicine.dosage}
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      fullWidth
+                      name={`medicines[${index}].frequency`}
+                      label="Frequency"
+                      variant="outlined"
+                      onChange={formik.handleChange}
+                      value={medicine.frequency}
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      fullWidth
+                      name={`medicines[${index}].duration`}
+                      label="Duration"
+                      variant="outlined"
+                      onChange={formik.handleChange}
+                      value={medicine.duration}
+                    />
+                  </Grid>
+                  {/* Repeat for dosage, frequency, and duration */}
+                </React.Fragment>
+              ))}
             </Grid>
+
+            <Button
+              onClick={() =>
+                formik.setFieldValue('medicines', [
+                  ...formik.values.medicines,
+                  { name: '', dosage: '', frequency: '', duration: '' },
+                ])
+              }
+            >
+              Add Another Medicine
+            </Button>
+
             <Button
               type="submit"
               fullWidth
