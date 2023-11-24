@@ -1,4 +1,4 @@
-import { api } from '@/api'
+import { addHealthRecord, deleteHealthRecord } from '@/api/doctor'
 import { getPatientHealthRecordsFiles } from '@/api/patient'
 //import { getMyMedicalHistory } from '@/api/patient'
 import { Button, TextField } from '@mui/material'
@@ -32,11 +32,7 @@ function AddHealthRecord() {
   const handleDelete = async (urlToDelete: string) => {
     try {
       // Send a POST request to delete the URL
-      await api.post(
-        `http://localhost:3000/patients/deleteHealthRecord/${id}`,
-        { url: urlToDelete }
-      )
-
+      await deleteHealthRecord(id, urlToDelete)
       // Remove the deleted URL from the state
       setDownloadURLs((prevURLs) =>
         prevURLs.filter((url) => url !== urlToDelete)
@@ -57,17 +53,7 @@ function AddHealthRecord() {
     formData.append('HealthRecord', imageValue.file)
 
     try {
-      // Send a POST request with the uploaded file
-      await api.post(
-        `http://localhost:3000/patients/uploadHealthRecords/${id}`,
-        formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data; ${formData.getBoundary()}',
-          },
-        }
-      )
-      // Fetch updated download URLs after the upload is complete
+      await addHealthRecord(id, formData)
       const downloadURLsResponse = await getPatientHealthRecordsFiles(id || '')
       setDownloadURLs(downloadURLsResponse)
     } catch (err) {

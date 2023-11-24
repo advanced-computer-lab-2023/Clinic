@@ -11,11 +11,11 @@ import { DateRange, FilteredList } from '@/components/FilteredList'
 import { getAppointments } from '@/api/appointments'
 import { AppointmentStatus } from 'clinic-common/types/appointment.types'
 import { useState } from 'react'
-import axios from 'axios'
 import { useAuth } from '@/hooks/auth'
 import { UserType } from 'clinic-common/types/user.types'
 import { toast } from 'react-toastify'
 import { useQueryClient } from '@tanstack/react-query'
+import { createFollowup } from '@/api/patient'
 
 export function Appointments() {
   const queryClient = useQueryClient()
@@ -29,13 +29,7 @@ export function Appointments() {
       toast.error('Please select a date')
     } else {
       setFollowUpDateError(false)
-
-      await axios
-        .post(`http://localhost:3000/appointment/createFollowUp`, {
-          doctorID,
-          patientID,
-          date: followUpDate,
-        })
+      await createFollowup(doctorID, patientID, followUpDate)
         .then(() => {
           toast.success('Follow-up scheduled successfully')
           queryClient.refetchQueries(['appointments'])

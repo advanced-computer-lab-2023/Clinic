@@ -1,4 +1,4 @@
-import { api } from '@/api'
+import { getMedicalHistory } from '@/api/doctor'
 import { Typography, Container } from '@mui/material'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
@@ -10,9 +10,7 @@ function ViewMedicalHistory() {
   useEffect(() => {
     const fetchMedicalHistory = async () => {
       try {
-        const response = await api.get(
-          `http://localhost:3000/patients/getMedicalHistory/${id}`
-        )
+        const response = await getMedicalHistory(id)
         setMedicalHistoryFiles(response.data)
       } catch (error) {
         console.error('Error fetching health records:', error)

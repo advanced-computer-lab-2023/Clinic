@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import axios from 'axios'
 import Button from '@mui/material/Button'
 import SendIcon from '@mui/icons-material/Send'
 import { ToastContainer, toast } from 'react-toastify'
@@ -14,6 +13,7 @@ import {
   Container,
   FormControlLabel,
 } from '@mui/material'
+import { sendDoctorRequest } from '@/api/doctor'
 
 export const RequestDoctor = () => {
   const [name, setName] = useState('')
@@ -55,19 +55,13 @@ export const RequestDoctor = () => {
 
     console.log(formData)
 
-    await axios
-      .post('http://localhost:3000/auth/request-doctor', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data; ${formData.getBoundary()}', // Axios sets the correct Content-Type header with the boundary.
-        },
-      })
-      .then(() => {
-        toast.success('Your request has been sent successfully')
-      })
-      .catch((err) => {
-        toast.error(err.response.data.message)
-        console.log(err)
-      })
+    try {
+      await sendDoctorRequest(formData)
+      toast.success('Your request has been sent successfully')
+    } catch (e: any) {
+      console.log(e)
+      toast.error(e.message)
+    }
   }
 
   return (

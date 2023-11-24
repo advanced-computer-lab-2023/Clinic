@@ -98,3 +98,58 @@ export async function getWalletMoney(
       return res.data
     })
 }
+
+export async function sendDoctorRequest(formData: any) {
+  console.log('hi')
+
+  return await api
+    .post('/auth/request-doctor', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data; ${formData.getBoundary()}', // Axios sets the correct Content-Type header with the boundary.
+      },
+    })
+    .then((res) => {
+      return res
+    })
+}
+
+export async function addHealthRecord(id: any, formData: any) {
+  return await api.post(`/patients/uploadHealthRecords/${id}`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data; ${formData.getBoundary()}',
+    },
+  })
+}
+
+export async function deleteHealthRecord(id: any, urlToDelete: any) {
+  return await api.post(
+    `http://localhost:3000/patients/deleteHealthRecord/${id}`,
+    { url: urlToDelete }
+  )
+}
+
+export async function AddNotes(id: any, notes: any) {
+  return await api.patch(`/patients/addNote/${id}`, {
+    newNote: notes,
+  })
+}
+
+export async function getMedicalHistory(id: any) {
+  return await api.get(`/patients/getMedicalHistory/${id}`)
+}
+
+export async function getPrescriptions(username: any) {
+  return await api.get(`/prescriptions/${username}`)
+}
+
+export async function addPrescriptionApi(
+  patient: any,
+  medicine: any,
+  date: any
+) {
+  return await api.post(`/prescriptions`, {
+    patient,
+    medicine,
+    date,
+  })
+}
