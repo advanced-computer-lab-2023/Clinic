@@ -5,9 +5,16 @@ import {
 } from '../models/appointment.model'
 import { AppointmentStatus } from 'clinic-common/types/appointment.types'
 
-import { removeTimeFromDoctorAvailability } from './doctor.service'
+import {
+  addAvailableTimeSlots,
+  removeTimeFromDoctorAvailability,
+} from './doctor.service'
 import { PatientModel } from '../models/patient.model'
 import { NotFoundError } from '../errors'
+import { DoctorModel } from '../models/doctor.model'
+import { UserModel } from '../models/user.model'
+import AppError from '../utils/appError'
+import { ERROR } from '../utils/httpStatusText'
 
 export async function getfilteredAppointments(
   query: any
@@ -98,4 +105,36 @@ export async function createFollowUpAppointment(
   })
 
   return await newAppointment.save()
+}
+
+export async function deleteAppointment(
+  appointmentId: string
+): Promise<AppointmentDocument | null> {
+  // Find the appointment by ID
+  const appointment = await AppointmentModel.findById(appointmentId)
+
+  if (!appointment) {
+    throw new AppError("Couldn't find appointment", 404, ERROR)
+  }
+  //add the date to the availabel times here
+
+  const doctorID = appointment.doctorID
+  const appointmentDate = new Date(appointment.date)
+
+  const doctor = await DoctorModel.findById(doctorID)
+  const doctorUIser = await UserModel.findById(doctor!.user)
+
+  const updatedDoctor = await addAvailableTimeSlots(doctorUIser!.username, {
+    time: appointmentDate,
+  })
+
+  if (!updatedDoctor) {
+    throw new AppError("Couldn't add date to doctor", 500, ERROR)
+  }
+
+  // Delete the appointment from the database
+  const deletedAppointment =
+    await AppointmentModel.findByIdAndDelete(appointmentId)
+
+  return deletedAppointment
 }
