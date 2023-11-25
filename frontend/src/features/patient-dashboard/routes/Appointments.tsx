@@ -184,7 +184,7 @@ export function Appointments() {
                   )}
 
                 {/* New Cancel Appointment Button */}
-                {user && (
+                {user && appointment.status === 'upcoming' && (
                   <Button
                     variant="contained"
                     size="small"
