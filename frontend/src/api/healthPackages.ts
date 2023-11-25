@@ -9,7 +9,6 @@ import {
   SubscribeToHealthPackageRequest,
   UnsubscribeToHealthPackageRequest,
   UpdateHealthPackageRequest,
-  UpdateHealthPackageResponse,
   createHealthPackageRequest,
   GetAllHealthPackagesForPatientRequest,
   GetAllHealthPackagesResponse,
@@ -43,9 +42,9 @@ export async function getHealthPackage(
 export async function updateHealthPackage(
   id: string,
   req: UpdateHealthPackageRequest
-): Promise<UpdateHealthPackageResponse> {
+): Promise<string> {
   return await api
-    .patch<UpdateHealthPackageResponse>(`/health-packages/${id}`, req)
+    .patch<string>(`/health-packages/${id}`, req)
     .then((res) => res.data)
 }
 
@@ -57,8 +56,16 @@ export async function addHealthPackage(
     .then((res) => res.data)
 }
 
-export async function deleteHealthPackage(id: string): Promise<void> {
-  await api.delete(`/health-packages/${id}`).then((res) => res.data)
+export async function deleteHealthPackage(id: string): Promise<string> {
+  return await api
+    .delete<string>(`/health-packages/${id}`)
+    .then((res) => res.data)
+}
+
+export async function isPackageHasSubscribers(id: string): Promise<boolean> {
+  return await api
+    .get<boolean>(`/health-packages/isPackageHasSubscribers/${id}`)
+    .then((res) => res.data)
 }
 
 // export async function subscribeToHealthPackage(id: string): Promise<void> {

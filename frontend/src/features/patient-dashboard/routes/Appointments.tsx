@@ -16,8 +16,10 @@ import { useAuth } from '@/hooks/auth'
 import { UserType } from 'clinic-common/types/user.types'
 import { toast } from 'react-toastify'
 import { useNavigate } from 'react-router-dom'
+import { useQueryClient } from '@tanstack/react-query'
 
 export function Appointments() {
+  const queryClient = useQueryClient()
   const [followUpDate, setFollowUpDate] = useState('')
   const [followUpDateError, setFollowUpDateError] = useState(false)
   const { user } = useAuth()
@@ -27,21 +29,13 @@ export function Appointments() {
   // console.log(user?.type)
   // console.log(user?.type === UserType.Doctor)
 
-  async function handleFollowUpButton(doctorID: string, patientID: string) {
-    //  console.log(followUpDate)
-    //   console.log(typeof(followUpDate))
-    //  console.log(followUpDate+":00")
 
+  async function handleFollowUpButton(doctorID: string, patientID: string) {
     if (followUpDate === '') {
       setFollowUpDateError(true)
       toast.error('Please select a date')
     } else {
       setFollowUpDateError(false)
-
-      // console.log(typeof(doctorID))
-      // console.log(patientID)
-      // console.log(followUpDate)
-      // console.log(followUpDate.toString())
 
       await axios
         .post(`http://localhost:3000/appointment/createFollowUp`, {
@@ -51,6 +45,7 @@ export function Appointments() {
         })
         .then(() => {
           toast.success('Follow-up scheduled successfully')
+          queryClient.refetchQueries(['appointments'])
         })
         .catch((err) => {
           toast.error('Error in scheduling follow-up')

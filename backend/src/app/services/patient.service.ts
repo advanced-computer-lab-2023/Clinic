@@ -391,7 +391,12 @@ export async function getDiscount({
     },
   })
 
-  if (!linkedFamily) {
+  if (
+    !linkedFamily ||
+    !linkedFamily.healthPackage ||
+    !linkedFamily.healthPackageRenewalDate ||
+    linkedFamily.healthPackageRenewalDate < new Date()
+  ) {
     return 0
   }
 
