@@ -1,7 +1,6 @@
 import { Router } from 'express'
 import { validate } from '../middlewares/validation.middleware'
 import {
-  UpdateHealthPackageResponse,
   type UpdateHealthPackageRequest,
   type createHealthPackageRequest,
   GetAllHealthPackagesForPatientResponse,
@@ -69,19 +68,16 @@ healthPackagesRouter.patch(
   asyncWrapper(allowAdmins),
   validate(UpdateHealthPackageRequestValidator),
   asyncWrapper<UpdateHealthPackageRequest>(async (req, res) => {
-    const updatedHealthPackage = await updateHealthPackage(
-      req.params.id,
-      req.body
-    )
-    res.send({
-      name: updatedHealthPackage.name,
-      id: updatedHealthPackage.id,
-      pricePerYear: updatedHealthPackage.pricePerYear,
-      sessionDiscount: updatedHealthPackage.sessionDiscount,
-      medicineDiscount: updatedHealthPackage.medicineDiscount,
-      familyMemberSubscribtionDiscount:
-        updatedHealthPackage.familyMemberSubscribtionDiscount,
-    } satisfies UpdateHealthPackageResponse)
+    const isUpdated = await updateHealthPackage(req.params.id, req.body)
+
+    if (!isUpdated) {
+      throw new APIError(
+        "Can't Update! There are patients already subscribed to this package",
+        404
+      )
+    }
+
+    res.send('Package updated successfuly')
   })
 )
 
@@ -89,10 +85,25 @@ healthPackagesRouter.delete(
   '/:id',
   asyncWrapper(allowAdmins),
   asyncWrapper(async (req, res) => {
-    await removeHealthPackage(req.params.id)
-    res.send('deletedSuccefuly')
+    const canDelete = await removeHealthPackage(req.params.id)
+
+    if (!canDelete) {
+      res.send("Can't Delete!there are patients subscribed to this package")
+    }
+
+    res.send('Package deleted successfuly')
   })
 )
+
+// healthPackagesRouter.get(
+//   '/isPackageHasSubscribers/:id',
+//   asyncWrapper(allowAdmins),
+//   asyncWrapper(async (req, res) => {
+//     const hasSubscribers=await isPackageHasSubscribers(req.params.id)
+
+//     res.send(hasSubscribers)
+//   })
+// )
 
 healthPackagesRouter.get(
   '/',
