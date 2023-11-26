@@ -22,6 +22,8 @@ export function Appointments() {
   const [followUpDate, setFollowUpDate] = useState('')
   const [followUpDateError, setFollowUpDateError] = useState(false)
   const { user } = useAuth()
+  const [rescheduleDate, setRescheduleDate] = useState('')
+  const [rescheduleDateError, setRescheduleDateError] = useState(false)
 
   async function handleFollowUpButton(doctorID: string, patientID: string) {
     if (followUpDate === '') {
@@ -46,6 +48,38 @@ export function Appointments() {
         })
 
       setFollowUpDate('')
+    }
+  }
+
+  async function handleRescheduleButton(
+    doctorID: string,
+    patientID: string,
+    reservedFor: string,
+    familyID: string
+  ) {
+    if (followUpDate === '') {
+      setRescheduleDateError(true)
+      toast.error('Please select a date')
+    } else {
+      setRescheduleDateError(false)
+      await axios
+        .post(`http://localhost:3000/appointment/reschedule`, {
+          doctorID,
+          patientID,
+          date: rescheduleDate,
+          reservedFor,
+          familyID,
+        })
+        .then(() => {
+          toast.success('Appointment rescheduled successfully')
+          queryClient.refetchQueries(['appointments'])
+        })
+        .catch((err) => {
+          toast.error('Error in rescheduling appointment')
+          console.log(err)
+        })
+
+      setRescheduleDate('')
     }
   }
 
@@ -149,6 +183,40 @@ export function Appointments() {
                       }
                     >
                       Schedule Follow-up
+                    </Button>
+                  )}
+                {user?.type === UserType.Patient &&
+                  appointment.status !== 'completed' && (
+                    <TextField
+                      type="datetime-local"
+                      onChange={(e) => {
+                        setRescheduleDate(e.target.value)
+                      }}
+                      inputProps={{ min: currentDate }}
+                      error={rescheduleDateError}
+                      // disabled={
+                      //   !appointment.doctorTimes.includes(
+                      //     inputValue
+                      //   )
+                      // }
+                    />
+                  )}
+
+                {user?.type === UserType.Patient &&
+                  appointment.status !== 'completed' && (
+                    <Button
+                      variant="contained"
+                      size="small"
+                      onClick={() =>
+                        handleRescheduleButton(
+                          appointment.doctorID,
+                          appointment.patientID,
+                          appointment.reservedFor,
+                          appointment.familyID
+                        )
+                      }
+                    >
+                      Reschedule
                     </Button>
                   )}
               </Stack>

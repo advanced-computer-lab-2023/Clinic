@@ -48,7 +48,6 @@ export async function createAndRemoveTime(
   if (reservedFor == 'Me') {
     const patient = await PatientModel.findById(patientID)
     const patientName = patient?.name
-    console.log(patientName)
 
     newAppointment = new AppointmentModel({
       patientID,
@@ -72,8 +71,6 @@ export async function createAndRemoveTime(
   await removeTimeFromDoctorAvailability(doctorID, date)
   // Save the new appointment
   await newAppointment.save()
-
-  console.log(newAppointment)
 
   return newAppointment
 }

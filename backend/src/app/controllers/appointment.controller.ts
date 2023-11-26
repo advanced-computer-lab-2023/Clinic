@@ -46,6 +46,7 @@ appointmentsRouter.get(
           patientID: appointment.patientID.toString(),
           doctorID: appointment.doctorID.toString(),
           doctorName: doctor.name,
+          doctorTimes: doctor.availableTimes.map((date) => date.toISOString()),
           date: appointment.date,
           familyID: appointment.familyID || '',
           reservedFor: appointment.reservedFor || 'Me',
@@ -72,8 +73,6 @@ appointmentsRouter.post(
         const patient = await PatientModel.findOne({ user: user.id })
 
         if (patient) {
-          // Assuming 'doctorID' is known or can be retrieved from the request
-
           const doctorID = req.body.doctorid
           const doctor = await DoctorModel.findOne({ _id: doctorID })
 
@@ -125,6 +124,20 @@ appointmentsRouter.post(
   asyncWrapper(async (req, res) => {
     const appointment = req.body
     const newAppointment = await createFollowUpAppointment(appointment)
+    res.send(newAppointment)
+  })
+)
+
+appointmentsRouter.post(
+  '/reschedule',
+  asyncWrapper(async (req, res) => {
+    const newAppointment = await createAndRemoveTime(
+      req.body.patientID,
+      req.body.doctorID,
+      req.body.date,
+      req.body.familyID,
+      req.body.reservedFor
+    )
     res.send(newAppointment)
   })
 )
