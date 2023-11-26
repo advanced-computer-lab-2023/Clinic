@@ -6,10 +6,15 @@ import {
   Typography,
   Button,
   TextField,
+  Select,
+  MenuItem,
 } from '@mui/material'
 import { DateRange, FilteredList } from '@/components/FilteredList'
 import { getAppointments } from '@/api/appointments'
-import { AppointmentStatus } from 'clinic-common/types/appointment.types'
+import {
+  AppointmentResponseBase,
+  AppointmentStatus,
+} from 'clinic-common/types/appointment.types'
 import { useState } from 'react'
 import axios from 'axios'
 import { useAuth } from '@/hooks/auth'
@@ -51,24 +56,16 @@ export function Appointments() {
     }
   }
 
-  async function handleRescheduleButton(
-    doctorID: string,
-    patientID: string,
-    reservedFor: string,
-    familyID: string
-  ) {
-    if (followUpDate === '') {
+  async function handleRescheduleButton(appointment: AppointmentResponseBase) {
+    if (rescheduleDate === '') {
       setRescheduleDateError(true)
       toast.error('Please select a date')
     } else {
       setRescheduleDateError(false)
       await axios
         .post(`http://localhost:3000/appointment/reschedule`, {
-          doctorID,
-          patientID,
-          date: rescheduleDate,
-          reservedFor,
-          familyID,
+          appointment,
+          rescheduleDate,
         })
         .then(() => {
           toast.success('Appointment rescheduled successfully')
@@ -187,37 +184,32 @@ export function Appointments() {
                   )}
                 {user?.type === UserType.Patient &&
                   appointment.status !== 'completed' && (
-                    <TextField
-                      type="datetime-local"
-                      onChange={(e) => {
-                        setRescheduleDate(e.target.value)
-                      }}
-                      inputProps={{ min: currentDate }}
-                      error={rescheduleDateError}
-                      // disabled={
-                      //   !appointment.doctorTimes.includes(
-                      //     inputValue
-                      //   )
-                      // }
-                    />
-                  )}
+                    <Stack spacing={2}>
+                      <Button
+                        variant="contained"
+                        size="small"
+                        onClick={() => handleRescheduleButton(appointment)}
+                      >
+                        Reschedule Appointment
+                      </Button>
 
-                {user?.type === UserType.Patient &&
-                  appointment.status !== 'completed' && (
-                    <Button
-                      variant="contained"
-                      size="small"
-                      onClick={() =>
-                        handleRescheduleButton(
-                          appointment.doctorID,
-                          appointment.patientID,
-                          appointment.reservedFor,
-                          appointment.familyID
-                        )
-                      }
-                    >
-                      Reschedule
-                    </Button>
+                      {/* Dropdown for selecting available timings */}
+                      <Select
+                        value={rescheduleDate}
+                        onChange={(e) => setRescheduleDate(e.target.value)}
+                        displayEmpty
+                        error={rescheduleDateError}
+                      >
+                        <MenuItem value="" disabled>
+                          Select Time
+                        </MenuItem>
+                        {appointment.doctorTimes.map((time) => (
+                          <MenuItem key={time} value={time}>
+                            {time}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </Stack>
                   )}
               </Stack>
             </CardContent>

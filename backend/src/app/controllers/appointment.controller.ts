@@ -13,7 +13,12 @@ import { PatientModel } from '../models/patient.model'
 import { DoctorModel } from '../models/doctor.model'
 import { type HydratedDocument } from 'mongoose'
 import { type UserDocument, UserModel } from '../models/user.model'
-import { getApprovedDoctorById } from '../services/doctor.service'
+import {
+  changeAvailableTimeSlot,
+  getApprovedDoctorById,
+} from '../services/doctor.service'
+import { AppointmentModel } from '../models/appointment.model'
+import { NotFoundError } from '../errors'
 
 export const appointmentsRouter = Router()
 
@@ -52,7 +57,7 @@ appointmentsRouter.get(
           reservedFor: appointment.reservedFor || 'Me',
           status:
             new Date(appointment.date) > new Date()
-              ? AppointmentStatus.Upcoming
+              ? (appointment.status as AppointmentStatus)
               : AppointmentStatus.Completed,
         }
       })
@@ -131,13 +136,20 @@ appointmentsRouter.post(
 appointmentsRouter.post(
   '/reschedule',
   asyncWrapper(async (req, res) => {
-    const newAppointment = await createAndRemoveTime(
-      req.body.patientID,
-      req.body.doctorID,
-      req.body.date,
-      req.body.familyID,
-      req.body.reservedFor
+    changeAvailableTimeSlot(
+      req.body.appointment.doctorID,
+      req.body.appointment.date,
+      req.body.rescheduleDate
     )
-    res.send(newAppointment)
+    const appointment = await AppointmentModel.findById(req.body.appointment.id)
+
+    if (!appointment) {
+      throw new NotFoundError()
+    }
+
+    appointment.date = req.body.rescheduleDate
+    appointment.status = AppointmentStatus.Rescheduled
+    appointment.save()
+    res.send(appointment)
   })
 )

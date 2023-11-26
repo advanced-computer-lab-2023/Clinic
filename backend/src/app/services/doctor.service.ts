@@ -272,3 +272,20 @@ export function getDoctorSessionRateWithMarkup({
 
   return doctor.hourlyRate * (1 + clinicMarkup / 100)
 }
+
+export async function changeAvailableTimeSlot(
+  doctorID: string,
+  returnedDate: string,
+  newDate: string
+) {
+  const doctor = await DoctorModel.findById(doctorID)
+
+  if (!doctor) throw new NotFoundError()
+
+  doctor.availableTimes = doctor.availableTimes.filter(
+    (date) => date.toISOString() !== new Date(newDate).toISOString()
+  )
+
+  doctor.availableTimes.push(new Date(returnedDate))
+  doctor.save()
+}
