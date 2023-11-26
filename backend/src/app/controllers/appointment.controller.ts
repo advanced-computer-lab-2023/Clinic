@@ -4,6 +4,7 @@ import {
   createAndRemoveTime,
   getfilteredAppointments,
   createFollowUpAppointment,
+  deleteAppointment,
 } from '../services/appointment.service'
 import {
   AppointmentStatus,
@@ -151,5 +152,26 @@ appointmentsRouter.post(
     appointment.status = AppointmentStatus.Rescheduled
     appointment.save()
     res.send(appointment)
+    
+    })
+)
+
+appointmentsRouter.delete(
+  '/delete/:appointmentId',
+  asyncWrapper(async (req, res) => {
+    const appointmentId = req.params.appointmentId
+
+    try {
+      const deletedAppointment = await deleteAppointment(appointmentId)
+
+      if (!deletedAppointment) {
+        res.status(404).send('Error in the DeleteAppointment function')
+      } else {
+        res.status(200).json(deletedAppointment)
+      }
+    } catch (error: any) {
+      res.status(error.status || 500).send(error.message)
+    }
+
   })
 )

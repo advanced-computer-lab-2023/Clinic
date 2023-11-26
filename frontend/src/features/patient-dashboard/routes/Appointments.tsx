@@ -15,11 +15,13 @@ import {
   AppointmentResponseBase,
   AppointmentStatus,
 } from 'clinic-common/types/appointment.types'
+import { cancelAppointment, getAppointments } from '@/api/appointments'
 import { useState } from 'react'
 import axios from 'axios'
 import { useAuth } from '@/hooks/auth'
 import { UserType } from 'clinic-common/types/user.types'
 import { toast } from 'react-toastify'
+import { useNavigate } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
 
 export function Appointments() {
@@ -29,6 +31,7 @@ export function Appointments() {
   const { user } = useAuth()
   const [rescheduleDate, setRescheduleDate] = useState('')
   const [rescheduleDateError, setRescheduleDateError] = useState(false)
+  const navigate = useNavigate()
 
   async function handleFollowUpButton(doctorID: string, patientID: string) {
     if (followUpDate === '') {
@@ -81,6 +84,25 @@ export function Appointments() {
   }
 
   const currentDate = new Date().toISOString().slice(0, 16)
+
+  async function handleCancelAppointment(appointmentId: string) {
+    try {
+      const response = await cancelAppointment(appointmentId)
+
+      if (response) {
+        // Handle success, e.g., update the component state or show a message
+        toast.success('Appointment canceled successfully')
+        navigate('/patient-dashboard/approved-doctors')
+      } else {
+        // Handle the case where the response is falsy (indicating an error)
+        toast.error('Error canceling appointment')
+      }
+    } catch (error: any) {
+      // Handle errors from the API call
+      console.error('Error canceling appointment:', error.message)
+      toast.error('Error canceling appointment')
+    }
+  }
 
   return (
     <FilteredList
@@ -182,6 +204,7 @@ export function Appointments() {
                       Schedule Follow-up
                     </Button>
                   )}
+
                 {user?.type === UserType.Patient &&
                   appointment.status !== 'completed' && (
                     <Stack spacing={2}>
@@ -211,6 +234,23 @@ export function Appointments() {
                       </Select>
                     </Stack>
                   )}
+
+                {/* New Cancel Appointment Button */}
+                {user && appointment.status === 'upcoming' && (
+                  <Button
+                    variant="contained"
+                    size="small"
+                    fullWidth
+                    sx={{
+                      backgroundColor: 'red',
+                      color: 'white',
+                      marginTop: 2,
+                    }}
+                    onClick={() => handleCancelAppointment(appointment.id)}
+                  >
+                    Cancel Appointment
+                  </Button>
+                )}
               </Stack>
             </CardContent>
           </Card>
