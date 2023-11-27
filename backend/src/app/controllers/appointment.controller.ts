@@ -5,6 +5,7 @@ import {
   getfilteredAppointments,
   createFollowUpAppointment,
   deleteAppointment,
+  requestFollowUpAppointment,
 } from '../services/appointment.service'
 import {
   AppointmentStatus,
@@ -127,6 +128,17 @@ appointmentsRouter.post(
     const appointment = req.body
     const newAppointment = await createFollowUpAppointment(appointment)
     res.send(newAppointment)
+  })
+)
+
+appointmentsRouter.post(
+  '/requestFollowUp',
+  asyncWrapper(async (req, res) => {
+    const request = await requestFollowUpAppointment(
+      req.body.appointmentID,
+      req.body.date
+    )
+    res.send(request)
   })
 )
 

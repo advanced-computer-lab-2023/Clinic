@@ -15,6 +15,10 @@ import { DoctorModel } from '../models/doctor.model'
 import { UserModel } from '../models/user.model'
 import AppError from '../utils/appError'
 import { ERROR } from '../utils/httpStatusText'
+import {
+  FollowupRequestDocument,
+  FollowupRequestModel,
+} from '../models/followupRequest.model'
 
 export async function getfilteredAppointments(
   query: any
@@ -105,6 +109,18 @@ export async function createFollowUpAppointment(
   })
 
   return await newAppointment.save()
+}
+
+export async function requestFollowUpAppointment(
+  appointmentID: string,
+  newDate: string
+): Promise<FollowupRequestDocument> {
+  const request = new FollowupRequestModel({
+    appointment: appointmentID,
+    date: newDate,
+  })
+
+  return await request.save()
 }
 
 export async function deleteAppointment(

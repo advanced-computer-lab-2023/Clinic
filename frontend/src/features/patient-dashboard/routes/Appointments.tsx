@@ -25,11 +25,6 @@ export function Appointments() {
   const { user } = useAuth()
   const navigate = useNavigate()
 
-  // console.log(user)
-  // console.log(user?.type)
-  // console.log(user?.type === UserType.Doctor)
-
-
   async function handleFollowUpButton(doctorID: string, patientID: string) {
     if (followUpDate === '') {
       setFollowUpDateError(true)
@@ -49,6 +44,30 @@ export function Appointments() {
         })
         .catch((err) => {
           toast.error('Error in scheduling follow-up')
+          console.log(err)
+        })
+
+      setFollowUpDate('')
+    }
+  }
+
+  async function handleRequestFollowUpButton(appointmentID: string) {
+    if (followUpDate === '') {
+      setFollowUpDateError(true)
+      toast.error('Please select a date')
+    } else {
+      setFollowUpDateError(false)
+
+      await axios
+        .post(`http://localhost:3000/appointment/requestFollowUp`, {
+          appointmentID,
+          date: followUpDate,
+        })
+        .then(() => {
+          toast.success('Follow-up requested successfully')
+        })
+        .catch((err) => {
+          toast.error('Error in requesting follow-up')
           console.log(err)
         })
 
@@ -194,6 +213,27 @@ export function Appointments() {
                     Cancel Appointment
                   </Button>
                 )}
+                {user?.type === UserType.Patient &&
+                  appointment.status === 'completed' && (
+                    <TextField
+                      type="datetime-local"
+                      onChange={(e) => setFollowUpDate(e.target.value)}
+                      inputProps={{ min: currentDate }}
+                      error={followUpDateError}
+                    />
+                  )}
+                {user?.type === UserType.Patient &&
+                  appointment.status === 'completed' && (
+                    <Button
+                      variant="contained"
+                      size="small"
+                      onClick={() =>
+                        handleRequestFollowUpButton(appointment.id)
+                      }
+                    >
+                      Request Follow-up
+                    </Button>
+                  )}
               </Stack>
             </CardContent>
           </Card>
