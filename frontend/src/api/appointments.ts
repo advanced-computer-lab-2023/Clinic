@@ -26,3 +26,12 @@ export async function reserveTimes(
 
   return response
 }
+
+export async function cancelAppointment(appointmentId: string) {
+  const response = await api
+    .delete(`/appointment/delete/${appointmentId}`)
+    .then((res) => res.data)
+    .catch((err) => err)
+
+  return response
+}

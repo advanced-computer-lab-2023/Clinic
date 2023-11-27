@@ -4,6 +4,7 @@ import {
   createAndRemoveTime,
   getfilteredAppointments,
   createFollowUpAppointment,
+  deleteAppointment,
 } from '../services/appointment.service'
 import {
   AppointmentStatus,
@@ -13,7 +14,12 @@ import { PatientModel } from '../models/patient.model'
 import { DoctorModel } from '../models/doctor.model'
 import { type HydratedDocument } from 'mongoose'
 import { type UserDocument, UserModel } from '../models/user.model'
-import { getApprovedDoctorById } from '../services/doctor.service'
+import {
+  changeAvailableTimeSlot,
+  getApprovedDoctorById,
+} from '../services/doctor.service'
+import { AppointmentModel } from '../models/appointment.model'
+import { NotFoundError } from '../errors'
 
 export const appointmentsRouter = Router()
 
@@ -46,12 +52,13 @@ appointmentsRouter.get(
           patientID: appointment.patientID.toString(),
           doctorID: appointment.doctorID.toString(),
           doctorName: doctor.name,
+          doctorTimes: doctor.availableTimes.map((date) => date.toISOString()),
           date: appointment.date,
           familyID: appointment.familyID || '',
           reservedFor: appointment.reservedFor || 'Me',
           status:
             new Date(appointment.date) > new Date()
-              ? AppointmentStatus.Upcoming
+              ? (appointment.status as AppointmentStatus)
               : AppointmentStatus.Completed,
         }
       })
@@ -72,8 +79,6 @@ appointmentsRouter.post(
         const patient = await PatientModel.findOne({ user: user.id })
 
         if (patient) {
-          // Assuming 'doctorID' is known or can be retrieved from the request
-
           const doctorID = req.body.doctorid
           const doctor = await DoctorModel.findOne({ _id: doctorID })
 
@@ -126,5 +131,45 @@ appointmentsRouter.post(
     const appointment = req.body
     const newAppointment = await createFollowUpAppointment(appointment)
     res.send(newAppointment)
+  })
+)
+
+appointmentsRouter.post(
+  '/reschedule',
+  asyncWrapper(async (req, res) => {
+    changeAvailableTimeSlot(
+      req.body.appointment.doctorID,
+      req.body.appointment.date,
+      req.body.rescheduleDate
+    )
+    const appointment = await AppointmentModel.findById(req.body.appointment.id)
+
+    if (!appointment) {
+      throw new NotFoundError()
+    }
+
+    appointment.date = req.body.rescheduleDate
+    appointment.status = AppointmentStatus.Rescheduled
+    appointment.save()
+    res.send(appointment)
+  })
+)
+
+appointmentsRouter.delete(
+  '/delete/:appointmentId',
+  asyncWrapper(async (req, res) => {
+    const appointmentId = req.params.appointmentId
+
+    try {
+      const deletedAppointment = await deleteAppointment(appointmentId)
+
+      if (!deletedAppointment) {
+        res.status(404).send('Error in the DeleteAppointment function')
+      } else {
+        res.status(200).json(deletedAppointment)
+      }
+    } catch (error: any) {
+      res.status(error.status || 500).send(error.message)
+    }
   })
 )
