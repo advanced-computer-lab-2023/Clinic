@@ -129,9 +129,9 @@ export async function deleteAppointment(
     throw new AppError("Couldn't add date to doctor", 500, ERROR)
   }
 
-  // Delete the appointment from the database
-  const deletedAppointment =
-    await AppointmentModel.findByIdAndDelete(appointmentId)
+  //update the status to cancelled
+  appointment.status = AppointmentStatus.Cancelled
+  const deletedAppointment = await appointment.save()
 
   return deletedAppointment
 }
