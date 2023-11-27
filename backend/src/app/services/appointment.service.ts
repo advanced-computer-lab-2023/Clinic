@@ -11,6 +11,7 @@ import {
 } from './doctor.service'
 import { PatientModel } from '../models/patient.model'
 import { NotFoundError } from '../errors'
+import { sendAppointmentNotificationToPatient } from './sendNotificationForAppointment'
 import { DoctorModel } from '../models/doctor.model'
 import { UserModel } from '../models/user.model'
 import AppError from '../utils/appError'
@@ -79,6 +80,8 @@ export async function createAndRemoveTime(
   // Save the new appointment
   await newAppointment.save()
 
+  sendAppointmentNotificationToPatient(newAppointment)
+
   return newAppointment
 }
 
@@ -100,8 +103,10 @@ export async function createFollowUpAppointment(
     status: AppointmentStatus.Upcoming,
     reservedFor: patientName,
   })
+  await newAppointment.save()
+  sendAppointmentNotificationToPatient(newAppointment)
 
-  return await newAppointment.save()
+  return newAppointment
 }
 
 export async function deleteAppointment(

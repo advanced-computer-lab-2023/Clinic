@@ -152,8 +152,7 @@ appointmentsRouter.post(
     appointment.status = AppointmentStatus.Rescheduled
     appointment.save()
     res.send(appointment)
-    
-    })
+  })
 )
 
 appointmentsRouter.delete(
@@ -172,6 +171,5 @@ appointmentsRouter.delete(
     } catch (error: any) {
       res.status(error.status || 500).send(error.message)
     }
-
   })
 )
