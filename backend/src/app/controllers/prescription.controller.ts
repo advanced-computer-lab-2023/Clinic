@@ -65,6 +65,8 @@ prescriptionsRouter.get(
   allowAuthenticated,
   asyncWrapper(async (req, res) => {
     // Allow only doctors and the patient to get the prescriptions
+    console.log('Ana hena fl controller')
+
     if (
       !(
         (await isDoctorAndApproved(req.username!)) ||
@@ -77,18 +79,7 @@ prescriptionsRouter.get(
 
     const prescriptions = await getPrescriptions(req.params.patientUsername)
 
-    res.send(
-      new GetPrescriptionResponse(
-        prescriptions.map((prescription) => ({
-          id: prescription.id,
-          doctor: prescription.doctor.name,
-          patient: prescription.patient.name,
-          date: prescription.date,
-          isFilled: prescription.isFilled,
-          medicine: prescription.medicine,
-        }))
-      )
-    )
+    res.send(prescriptions)
   })
 )
 

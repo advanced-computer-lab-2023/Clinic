@@ -84,7 +84,9 @@ export const FilteredPrescriptions = () => {
                   alignItems="center"
                 >
                   <Typography variant="h6" color="text.secondary">
-                    {prescription.medicine}
+                    {prescription.medicine
+                      .map((medicine) => medicine.name)
+                      .join(', ')}
                   </Typography>
                   <Chip
                     label={prescription.isFilled ? 'Filled' : 'Unfilled'}

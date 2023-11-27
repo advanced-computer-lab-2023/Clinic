@@ -128,20 +128,7 @@ export function Patient() {
               </Typography>
             ))}
           </Stack>
-          <Stack spacing={-1}>
-            <Typography variant="overline" color="text.secondary">
-              Prescriptions
-            </Typography>
-            {patient.prescriptions.map((prescription) => (
-              <Typography variant="body1">
-                {`${prescription.medicine} - ${prescription.date.toString()}`}
-              </Typography>
-            ))}
 
-            {patient.prescriptions.length == 0 && (
-              <Typography variant="body1">None</Typography>
-            )}
-          </Stack>
           {/* <Stack spacing={5}>
             <img
               src={
@@ -180,6 +167,11 @@ export function Patient() {
           <Link to={'../healthRecords/' + id}>
             <Button variant="contained" color="primary">
               Health Records Files
+            </Button>
+          </Link>
+          <Link to={'../Prescriptions/' + patient.username}>
+            <Button variant="contained" color="primary">
+              view Prescriptions
             </Button>
           </Link>
           <Link to={'../medicalHistory/' + id}>
