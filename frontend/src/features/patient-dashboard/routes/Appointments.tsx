@@ -10,7 +10,6 @@ import {
   MenuItem,
 } from '@mui/material'
 import { DateRange, FilteredList } from '@/components/FilteredList'
-import { getAppointments } from '@/api/appointments'
 import {
   AppointmentResponseBase,
   AppointmentStatus,
@@ -206,7 +205,8 @@ export function Appointments() {
                   )}
 
                 {user?.type === UserType.Patient &&
-                  appointment.status !== 'completed' && (
+                  appointment.status !== 'completed' &&
+                  appointment.status !== 'cancelled' && (
                     <Stack spacing={2}>
                       <Button
                         variant="contained"
@@ -234,23 +234,47 @@ export function Appointments() {
                       </Select>
                     </Stack>
                   )}
+                {user?.type === UserType.Doctor &&
+                  appointment.status !== 'completed' &&
+                  appointment.status !== 'cancelled' && (
+                    <Stack spacing={2}>
+                      <TextField
+                        type="datetime-local"
+                        onChange={(e) => setRescheduleDate(e.target.value)}
+                        inputProps={{ min: currentDate }}
+                        error={rescheduleDateError}
+                      />
+
+                      <Button
+                        variant="contained"
+                        size="small"
+                        onClick={() => handleRescheduleButton(appointment)}
+                      >
+                        Reschedule Appointment
+                      </Button>
+
+                      {/* ADD DATE TIME PICKER HERE THAT IS SET TO THE RESCHDULE DATE STATE VARIABLE */}
+                    </Stack>
+                  )}
 
                 {/* New Cancel Appointment Button */}
-                {user && appointment.status === 'upcoming' && (
-                  <Button
-                    variant="contained"
-                    size="small"
-                    fullWidth
-                    sx={{
-                      backgroundColor: 'red',
-                      color: 'white',
-                      marginTop: 2,
-                    }}
-                    onClick={() => handleCancelAppointment(appointment.id)}
-                  >
-                    Cancel Appointment
-                  </Button>
-                )}
+                {user &&
+                  appointment.status !== 'cancelled' &&
+                  appointment.status !== 'completed' && (
+                    <Button
+                      variant="contained"
+                      size="small"
+                      fullWidth
+                      sx={{
+                        backgroundColor: 'red',
+                        color: 'white',
+                        marginTop: 2,
+                      }}
+                      onClick={() => handleCancelAppointment(appointment.id)}
+                    >
+                      Cancel Appointment
+                    </Button>
+                  )}
               </Stack>
             </CardContent>
           </Card>
