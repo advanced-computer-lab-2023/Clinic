@@ -8,6 +8,7 @@ import { AppointmentStatus } from 'clinic-common/types/appointment.types'
 import { removeTimeFromDoctorAvailability } from './doctor.service'
 import { PatientModel } from '../models/patient.model'
 import { NotFoundError } from '../errors'
+import { sendAppointmentNotificationToPatient } from './sendNotificationForAppointment'
 
 export async function getfilteredAppointments(
   query: any
@@ -73,7 +74,10 @@ export async function createAndRemoveTime(
   // Save the new appointment
   await newAppointment.save()
 
-  console.log(newAppointment)
+  console.log('+++++++++++++++++++++++++++++++++++++')
+  sendAppointmentNotificationToPatient(newAppointment)
+
+  console.log('+++++++++++++++++++++++++++++++++++++')
 
   return newAppointment
 }
@@ -96,6 +100,11 @@ export async function createFollowUpAppointment(
     status: AppointmentStatus.Upcoming,
     reservedFor: patientName,
   })
+  await newAppointment.save()
+  sendAppointmentNotificationToPatient(newAppointment.id)
+  console.log('+++++++++++++++++++++++++++++++++++++')
+  console.log(newAppointment._id)
+  console.log('+++++++++++++++++++++++++++++++++++++')
 
-  return await newAppointment.save()
+  return newAppointment
 }
