@@ -80,7 +80,7 @@ export async function createAndRemoveTime(
   // Save the new appointment
   await newAppointment.save()
 
-  sendAppointmentNotificationToPatient(newAppointment)
+  sendAppointmentNotificationToPatient(newAppointment, 'accepted')
 
   return newAppointment
 }
@@ -104,7 +104,7 @@ export async function createFollowUpAppointment(
     reservedFor: patientName,
   })
   await newAppointment.save()
-  sendAppointmentNotificationToPatient(newAppointment)
+  sendAppointmentNotificationToPatient(newAppointment, 'confirmed')
 
   return newAppointment
 }
@@ -137,6 +137,7 @@ export async function deleteAppointment(
   //update the status to cancelled
   appointment.status = AppointmentStatus.Cancelled
   const deletedAppointment = await appointment.save()
+  sendAppointmentNotificationToPatient(deletedAppointment, 'cancelled')
 
   return deletedAppointment
 }
