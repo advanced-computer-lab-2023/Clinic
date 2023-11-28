@@ -5,6 +5,7 @@ import { useAuth } from '@/hooks/auth'
 import { RegisterRequest } from 'clinic-common/types/auth.types'
 import { RegisterRequestValidator } from 'clinic-common/validators/user.validator'
 
+
 export const Register = () => {
   const { refreshUser } = useAuth()
 

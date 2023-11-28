@@ -21,6 +21,7 @@ import { ChatsList } from './chats/ChatsList'
 import { ChatsProvider } from '@/providers/ChatsProvider'
 import { useAuth } from '@/hooks/auth'
 
+
 interface ListItemLinkProps {
   icon?: React.ReactElement
   primary: string
@@ -89,6 +90,15 @@ export function BaseLayout() {
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap component="div">
+            <IconButton
+              color="inherit"
+              aria-label="open drawer"
+              edge="start"
+              onClick={!openDrawer ? handleDrawerOpen : handleDrawerClose}
+              sx={{ mr: 2 }}
+            >
+              <MenuIcon />
+            </IconButton>
             Clinic
           </Typography>
           <Box sx={{ flexGrow: 1 }} />
@@ -98,6 +108,7 @@ export function BaseLayout() {
           </OnlyAuthenticated>
         </Toolbar>
       </AppBar>
+
       <Drawer
         sx={{
           width: drawerWidth,
