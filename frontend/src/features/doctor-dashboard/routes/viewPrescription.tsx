@@ -17,10 +17,10 @@ import React from 'react'
 function ViewPrescription() {
   const { username } = useParams()
   const [prescriptions, setPrescriptions] = useState([])
+  const [editingPrescription, setEditingPrescription] = useState<any>(null)
   const formik = useFormik({
     initialValues: {
       medicines: [{ name: '', dosage: '', frequency: '', duration: '' }],
-      date: null,
     },
     onSubmit: (values) => {
       // Call your addPrescription method here
@@ -28,22 +28,41 @@ function ViewPrescription() {
         ...values,
         date: new Date(),
       }
-      addPrescription(submissionValues)
+      addOrUpdatePrescription(submissionValues)
       // You can also reset the form if needed
       formik.resetForm()
     },
   })
 
-  const addPrescription = async (values: any) => {
+  const handleEdit = (prescription: any) => {
+    console.log(prescription)
+    setEditingPrescription(prescription)
+    console.log('editing pres' + editingPrescription)
+    formik.setValues({
+      medicines: prescription.medicine,
+
+      // Adjust format if needed
+    })
+  }
+
+  const addOrUpdatePrescription = async (values: any) => {
+    const endpoint = editingPrescription
+      ? `http://localhost:3000/prescriptions/edit/${editingPrescription._id}` // Update endpoint
+      : `http://localhost:3000/prescriptions`
+
+    const method = editingPrescription ? 'put' : 'post'
+
     try {
-      const response = await api.post(`http://localhost:3000/prescriptions`, {
+      const response = await api[method](endpoint, {
         patient: username,
         medicine: values.medicines,
         date: values.date,
       })
       console.log(response)
+      setEditingPrescription(null) // Reset editing mode
+      formik.resetForm()
     } catch (error) {
-      console.error('Error fetching presciptions:', error)
+      console.error('Error submitting presciptions:', error)
     }
   }
 
@@ -89,7 +108,7 @@ function ViewPrescription() {
           <Card
             key={`prescription-${prescriptionIndex}`}
             sx={{
-              marginBottom: 20,
+              marginBottom: 5,
               animation: 'slideUp 0.5s ease',
               backgroundColor: '#e3f2fd',
               borderRadius: '15px',
@@ -129,6 +148,15 @@ function ViewPrescription() {
                     </Typography>
                   )
                 )}
+              {!prescription.isFilled && (
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  onClick={() => handleEdit(prescription)}
+                >
+                  Edit
+                </Button>
+              )}
             </CardContent>
           </Card>
         ))}
@@ -214,7 +242,7 @@ function ViewPrescription() {
               color="primary"
               style={{ marginTop: 20 }}
             >
-              Add Prescription
+              {editingPrescription ? 'Update Prescription' : 'Add Prescription'}
             </Button>
           </form>
         </Paper>

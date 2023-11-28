@@ -4,6 +4,7 @@ import { validate } from '../middlewares/validation.middleware'
 
 import {
   createPrescription,
+  editPrescription,
   getPrescriptions,
   getSinglePrescription,
 } from '../services/prescription.service'
@@ -23,6 +24,14 @@ import {
 } from '../middlewares/auth.middleware'
 
 export const prescriptionsRouter = Router()
+
+prescriptionsRouter.put(
+  '/edit/:id',
+  asyncWrapper(async (req, res) => {
+    await editPrescription(req.body, req.params.id)
+    res.status(200).json('Prescription edited Successfully')
+  })
+)
 
 prescriptionsRouter.get(
   // Renamed from '/' to '/mine', because I added another one `/:patientUsername` to get all prescriptions for a patient by username

@@ -19,6 +19,31 @@ type PrescriptionDocumentWithDoctor = Omit<
   patient: PatientDocument
 }
 
+export async function editPrescription(
+  request: CreatePrescriptionRequest,
+  id: string
+): Promise<void> {
+  const prescription = await PrescriptionModel.findOne({
+    _id: id,
+  })
+
+  if (prescription == null) {
+    throw new NotFoundError()
+  }
+
+  await PrescriptionModel.updateOne(
+    {
+      _id: id,
+    },
+    {
+      $set: {
+        date: request.date,
+        medicine: request.medicine,
+      },
+    }
+  )
+}
+
 export async function getPrescriptions(
   userName: string
 ): Promise<PrescriptionDocumentWithDoctor[]> {
