@@ -402,6 +402,7 @@ patientRouter.get(
           patientID: appointment.patientID.toString(),
           doctorID: appointment.doctorID.toString(),
           doctorName: doctor.name,
+          doctorTimes: doctor.availableTimes.map((date) => date.toISOString()),
           date: appointment.date,
           familyID: appointment.familyID || '',
           reservedFor: appointment.reservedFor || 'Me',

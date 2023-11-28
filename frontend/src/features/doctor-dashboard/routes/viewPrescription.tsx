@@ -12,7 +12,9 @@ import { useFormik } from 'formik'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import React from 'react'
+
 import { addPrescriptionApi, getPrescriptions } from '@/api/doctor'
+
 
 function ViewPrescription() {
   const { username } = useParams()
@@ -36,6 +38,7 @@ function ViewPrescription() {
 
   const addPrescription = async (values: any) => {
     try {
+
       const response = await addPrescriptionApi(
         username,
         values.medicines,
@@ -43,6 +46,7 @@ function ViewPrescription() {
       )
       console.log(response)
       await fetchPresciptions()
+
     } catch (error) {
       console.error('Error fetching presciptions:', error)
     }
@@ -61,6 +65,7 @@ function ViewPrescription() {
   useEffect(() => {
     fetchPresciptions()
   }, [username])
+
 
   return (
     <>
