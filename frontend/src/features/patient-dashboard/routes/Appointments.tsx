@@ -14,7 +14,11 @@ import {
   AppointmentResponseBase,
   AppointmentStatus,
 } from 'clinic-common/types/appointment.types'
-import { cancelAppointment, getAppointments } from '@/api/appointments'
+import {
+  cancelAppointment,
+  getAppointments,
+  reschedule,
+} from '@/api/appointments'
 import { useState } from 'react'
 import { useAuth } from '@/hooks/auth'
 import { UserType } from 'clinic-common/types/user.types'
@@ -58,16 +62,12 @@ export function Appointments() {
       toast.error('Please select a date')
     } else {
       setRescheduleDateError(false)
-      await axios
-        .post(`http://localhost:3000/appointment/reschedule`, {
-          appointment,
-          rescheduleDate,
-        })
+      await reschedule(appointment, rescheduleDate)
         .then(() => {
           toast.success('Appointment rescheduled successfully')
           queryClient.refetchQueries(['appointments'])
         })
-        .catch((err) => {
+        .catch((err: any) => {
           toast.error('Error in rescheduling appointment')
           console.log(err)
         })

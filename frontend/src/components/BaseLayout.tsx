@@ -13,12 +13,13 @@ import {
   ListItemText,
   IconButton,
 } from '@mui/material'
-import React from 'react'
+import React, { useState } from 'react'
 import { Link, Outlet, useLocation } from 'react-router-dom'
 import { OnlyAuthenticated } from './OnlyAuthenticated'
 import { LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { NotificationsList } from './Notifications'
+import MenuIcon from '@mui/icons-material/Menu'
 
 interface ListItemLinkProps {
   icon?: React.ReactElement
@@ -59,16 +60,34 @@ interface SidebarLink {
 
 export function BaseLayout() {
   const [sidebarLinks, setSidebarLinks] = React.useState<SidebarLink[]>([])
+  const [openDrawer, setOpenDrawer] = useState(false)
+
+  const handleDrawerOpen = () => {
+    setOpenDrawer(true)
+  }
+
+  const handleDrawerClose = () => {
+    setOpenDrawer(false)
+  }
 
   return (
     <Box sx={{ display: 'flex' }}>
       <CssBaseline />
       <AppBar
         position="fixed"
-        sx={{ width: `calc(100% - ${drawerWidth}px)`, ml: `${drawerWidth}px` }}
+        sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
       >
         <Toolbar>
           <Typography variant="h6" noWrap component="div">
+            <IconButton
+              color="inherit"
+              aria-label="open drawer"
+              edge="start"
+              onClick={!openDrawer ? handleDrawerOpen : handleDrawerClose}
+              sx={{ mr: 2 }}
+            >
+              <MenuIcon />
+            </IconButton>
             Clinic
           </Typography>
           <Box sx={{ flexGrow: 1 }} />
@@ -88,6 +107,7 @@ export function BaseLayout() {
           </OnlyAuthenticated>
         </Toolbar>
       </AppBar>
+
       <Drawer
         sx={{
           width: drawerWidth,
@@ -97,8 +117,10 @@ export function BaseLayout() {
             boxSizing: 'border-box',
           },
         }}
-        variant="permanent"
+        variant="temporary"
         anchor="left"
+        open={openDrawer}
+        onClose={handleDrawerClose}
       >
         <Toolbar />
         <Divider />

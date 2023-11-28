@@ -16,14 +16,20 @@ export function AuthLayout() {
         icon: <Login />,
       },
 
+      // {
+      //   to: '/auth/register',
+      //   text: 'Register',
+      //   icon: <AppRegistrationRounded />,
+      // },
+      // {
+      //   to: '/auth/requestDoctor',
+      //   text: 'Request as a doctor',
+      //   icon: <AppRegistrationRounded />,
+      // },
+
       {
-        to: '/auth/register',
-        text: 'Register',
-        icon: <AppRegistrationRounded />,
-      },
-      {
-        to: '/auth/requestDoctor',
-        text: 'Request as a doctor',
+        to: '/auth/signup',
+        text: 'sign up',
         icon: <AppRegistrationRounded />,
       },
     ])
