@@ -13,8 +13,8 @@ import { useQuery } from '@tanstack/react-query'
 import { Link, useParams } from 'react-router-dom'
 import AddIcon from '@mui/icons-material/Add'
 import { useState } from 'react'
-import axios from 'axios'
 import { toast } from 'react-toastify'
+import { AddNotes } from '@/api/doctor'
 
 export function Patient() {
   const [showTextField, setShowTextField] = useState(false)
@@ -53,10 +53,7 @@ export function Patient() {
       setNotesError(false)
       setShowTextField(false)
       setShowButton(false)
-      await axios
-        .patch(`http://localhost:3000/patients/addNote/${id}`, {
-          newNote: notes,
-        })
+      await AddNotes(id, notes)
         .then(() => {
           toast.success('Note added successfully')
           query.refetch()

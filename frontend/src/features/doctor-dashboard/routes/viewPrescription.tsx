@@ -1,4 +1,3 @@
-import { api } from '@/api'
 import {
   Typography,
   Container,
@@ -13,6 +12,9 @@ import { useFormik } from 'formik'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import React from 'react'
+
+import { addPrescriptionApi, getPrescriptions } from '@/api/doctor'
+
 
 function ViewPrescription() {
   const { username } = useParams()
@@ -36,32 +38,34 @@ function ViewPrescription() {
 
   const addPrescription = async (values: any) => {
     try {
-      const response = await api.post(`http://localhost:3000/prescriptions`, {
-        patient: username,
-        medicine: values.medicines,
-        date: values.date,
-      })
+
+      const response = await addPrescriptionApi(
+        username,
+        values.medicines,
+        values.date
+      )
       console.log(response)
+      await fetchPresciptions()
+
+    } catch (error) {
+      console.error('Error fetching presciptions:', error)
+    }
+  }
+
+  const fetchPresciptions = async () => {
+    try {
+      const response = await getPrescriptions(username)
+      setPrescriptions(response.data)
+      console.log(prescriptions)
     } catch (error) {
       console.error('Error fetching presciptions:', error)
     }
   }
 
   useEffect(() => {
-    const fetchPresciptions = async () => {
-      try {
-        const response = await api.get(
-          `http://localhost:3000/prescriptions/${username}`
-        )
-        setPrescriptions(response.data)
-        console.log(prescriptions)
-      } catch (error) {
-        console.error('Error fetching presciptions:', error)
-      }
-    }
-
     fetchPresciptions()
-  }, [username, prescriptions])
+  }, [username])
+
 
   return (
     <>
