@@ -92,7 +92,6 @@ export async function createAndRemoveTime(
 export async function createFollowUpAppointment(
   appointment: AppointmentDocument
 ): Promise<AppointmentDocument> {
-  console.log(appointment.patientID)
   const patient = await PatientModel.findById(appointment.patientID)
 
   if (patient == null) {

@@ -2,6 +2,7 @@ import { Router } from 'express'
 
 import {
   acceptEmploymentContract,
+  acceptFollowupRequest,
   addAvailableTimeSlots,
   approveDoctor,
   getAllDoctors,
@@ -363,6 +364,15 @@ doctorsRouter.get(
     const response = new GetFollowupRequestsResponse(followupRequestResponses)
 
     res.send(response)
+  })
+)
+
+doctorsRouter.patch(
+  '/acceptFollowupRequest/:id',
+  asyncWrapper(allowApprovedDoctors),
+  asyncWrapper(async (req, res) => {
+    await acceptFollowupRequest(req.params.id)
+    res.send()
   })
 )
 
