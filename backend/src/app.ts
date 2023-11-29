@@ -16,7 +16,7 @@ const port = process.env.PORT ?? 3000
 const MongoURL =
   process.env.MONGO_URI ??
   process.env.URL ?? // Keeping this for backwards compatibility
-  'mongodb+srv://admin:admin@cluster0.ugek6la.mongodb.net/'
+  'mongodb+srv://darinmfadel:Darin2002@cluster0.ghfjumf.mongodb.net/project1?retryWrites=true&w=majority'
 
 export const server = createServer(app)
 
