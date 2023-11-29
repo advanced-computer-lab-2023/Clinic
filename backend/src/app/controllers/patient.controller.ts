@@ -255,7 +255,7 @@ patientRouter.get(
           dateOfBirth: patient.dateOfBirth.toDateString(),
           gender: patient.gender as Gender,
           emergencyContact: {
-            name: patient.emergencyContact?.name ?? '',
+            name: patient.emergencyContact?.fullName ?? '',
             mobileNumber: patient.emergencyContact?.mobileNumber ?? '',
           },
           familyMembers: patient.familyMembers.map((familyMember) =>
@@ -297,7 +297,7 @@ patientRouter.get(
           dateOfBirth: patient.dateOfBirth,
           gender: patient.gender as Gender,
           emergencyContact: {
-            name: patient.emergencyContact?.name ?? '',
+            name: patient.emergencyContact?.fullName ?? '',
             mobileNumber: patient.emergencyContact?.mobileNumber ?? '',
           },
           notes: patient.notes,
@@ -329,7 +329,7 @@ patientRouter.post(
           dateOfBirth: patient.dateOfBirth,
           gender: patient.gender as Gender,
           emergencyContact: {
-            name: patient.emergencyContact?.name ?? '',
+            name: patient.emergencyContact?.fullName ?? '',
             mobileNumber: patient.emergencyContact?.mobileNumber ?? '',
           },
           notes: patient.notes,
@@ -427,7 +427,7 @@ patientRouter.get(
         patient.dateOfBirth,
         patient.gender as Gender,
         {
-          name: patient.emergencyContact?.name ?? '',
+          name: patient.emergencyContact?.fullName ?? '',
           mobileNumber: patient.emergencyContact?.mobileNumber ?? '',
         },
         patient.documents,

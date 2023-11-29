@@ -28,16 +28,21 @@ export const Register = () => {
           selectedValues: [
             { label: 'Male', value: 'male' },
             { label: 'Female', value: 'female' },
+            { label: 'Other', value: 'other' },
           ],
         },
         {
           label: 'Emergency Contact Name',
-          property: 'emergencyContact.name',
+          property: 'emergencyContact.fullName',
         },
         {
           label: 'Emergency Contact Mobile Number',
           property: 'emergencyContact.mobileNumber',
           customError: 'Mobile number must be 10 digits.',
+        },
+        {
+          label: 'Emergency Contact Relationship',
+          property: 'emergencyContact.relation',
         },
       ]}
       validator={RegisterRequestValidator}
