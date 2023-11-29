@@ -7,6 +7,7 @@ import {
   getAllDoctors,
   getApprovedDoctorById,
   getDoctorByUsername,
+  getDoctorFollowupRequests,
   getDoctorSessionRateWithMarkup,
   getPendingDoctorRequests,
   rejectDoctor,
@@ -51,6 +52,11 @@ import {
   getDoctorSessionRateForPatient,
   hasDiscountOnDoctorSession,
 } from '../services/healthPackage.service'
+import {
+  FollowupRequestResponseBase,
+  GetFollowupRequestsResponse,
+} from 'clinic-common/types/appointment.types'
+import { AppointmentModel } from '../models/appointment.model'
 
 export const doctorsRouter = Router()
 
@@ -148,31 +154,6 @@ doctorsRouter.get(
         documents: doctor.documents as [string],
       })),
     } satisfies GetApprovedDoctorsResponse)
-  })
-)
-
-doctorsRouter.get(
-  '/:username',
-  allowAuthenticated,
-  asyncWrapper(async (req, res) => {
-    const doctor = await getDoctorByUsername(req.params.username)
-
-    res.send({
-      id: doctor.id,
-      username: doctor.user.username,
-      name: doctor.name,
-      email: doctor.email,
-      dateOfBirth: doctor.dateOfBirth,
-      hourlyRate: doctor.hourlyRate,
-      affiliation: doctor.affiliation,
-      speciality: doctor.speciality,
-      educationalBackground: doctor.educationalBackground,
-      requestStatus: doctor.requestStatus as DoctorStatus,
-      availableTimes: doctor.availableTimes as [Date],
-      contractStatus: doctor.contractStatus as ContractStatus,
-      employmentContract: doctor.employmentContract as [string],
-      documents: doctor.documents as [string],
-    } satisfies GetDoctorResponse)
   })
 )
 
@@ -332,5 +313,79 @@ doctorsRouter.get(
     res.send({
       money: doctor.walletMoney ?? 0,
     } satisfies GetWalletMoneyResponse)
+  })
+)
+doctorsRouter.get(
+  '/followupRequests',
+  asyncWrapper(async (req, res) => {
+    if (!req.username) {
+      throw new NotFoundError()
+    }
+
+    const followupRequests = await getDoctorFollowupRequests(req.username)
+    const fetchAppointments = followupRequests.map(async (request) => {
+      const appointment = await AppointmentModel.findById(request.appointment)
+
+      if (!appointment) {
+        throw new NotFoundError()
+      }
+
+      return { request, appointment }
+    })
+
+    const resolvedFetchAppointments = await Promise.all(fetchAppointments)
+
+    const followupRequestResponsesPromises = resolvedFetchAppointments.map(
+      async ({ request, appointment }) => {
+        const patient = await PatientModel.findById(appointment.patientID)
+
+        if (!patient) {
+          throw new NotFoundError()
+        }
+
+        return new FollowupRequestResponseBase(
+          appointment.id.toString(),
+          appointment.patientID.toString(),
+          patient.name,
+          appointment.date,
+          request.date,
+          appointment.familyID,
+          appointment.reservedFor
+        )
+      }
+    )
+
+    const followupRequestResponses = await Promise.all(
+      followupRequestResponsesPromises
+    )
+
+    const response = new GetFollowupRequestsResponse(followupRequestResponses)
+
+    res.send(response)
+  })
+)
+
+doctorsRouter.get(
+  '/:username',
+  allowAuthenticated,
+  asyncWrapper(async (req, res) => {
+    const doctor = await getDoctorByUsername(req.params.username)
+
+    res.send({
+      id: doctor.id,
+      username: doctor.user.username,
+      name: doctor.name,
+      email: doctor.email,
+      dateOfBirth: doctor.dateOfBirth,
+      hourlyRate: doctor.hourlyRate,
+      affiliation: doctor.affiliation,
+      speciality: doctor.speciality,
+      educationalBackground: doctor.educationalBackground,
+      requestStatus: doctor.requestStatus as DoctorStatus,
+      availableTimes: doctor.availableTimes as [Date],
+      contractStatus: doctor.contractStatus as ContractStatus,
+      employmentContract: doctor.employmentContract as [string],
+      documents: doctor.documents as [string],
+    } satisfies GetDoctorResponse)
   })
 )

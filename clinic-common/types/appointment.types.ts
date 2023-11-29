@@ -36,3 +36,25 @@ export class AppointmentResponseBase {
 export class GetFilteredAppointmentsResponse {
   constructor(public appointments: AppointmentResponseBase[]) {}
 }
+
+export enum followupRequestStatus {
+  pending = 'pending',
+  accepted = 'accepted',
+  rejected = 'rejected',
+}
+
+export class FollowupRequestResponseBase {
+  constructor(
+    public id: string,
+    public patientID: string,
+    public patientName: string,
+    public appointmentDate: string,
+    public followupDate: string,
+    public familyID: string,
+    public reservedFor: string
+  ) {}
+}
+
+export class GetFollowupRequestsResponse {
+  constructor(public requests: FollowupRequestResponseBase[]) {}
+}

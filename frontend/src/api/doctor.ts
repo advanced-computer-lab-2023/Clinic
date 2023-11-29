@@ -10,6 +10,7 @@ import {
   UpdateDoctorRequest,
   UpdateDoctorResponse,
 } from 'clinic-common/types/doctor.types'
+import { GetFollowupRequestsResponse } from 'clinic-common/types/appointment.types'
 import { api } from '.'
 
 export async function updateDoctor(
@@ -97,4 +98,10 @@ export async function getWalletMoney(
 
       return res.data
     })
+}
+
+export async function getFollowupRequests(): Promise<GetFollowupRequestsResponse> {
+  return await api
+    .get<GetFollowupRequestsResponse>('/doctors/followupRequests')
+    .then((res) => res.data)
 }

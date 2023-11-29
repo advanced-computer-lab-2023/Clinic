@@ -15,6 +15,7 @@ import { getDoctor } from '@/api/doctor'
 import { ContractStatus, DoctorStatus } from 'clinic-common/types/doctor.types'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import AssignmentIcon from '@mui/icons-material/Assignment'
+import AddAlarmIcon from '@mui/icons-material/AddAlarm'
 
 export function DoctorDashboardLayout() {
   const { setSidebarLinks } = useSidebar()
@@ -84,6 +85,11 @@ export function DoctorDashboardLayout() {
         to: '/doctor-dashboard/change-password',
         text: 'Change Password',
         icon: <VpnKey />,
+      },
+      {
+        to: '/doctor-dashboard/followup-requests',
+        text: 'Follow-up Requests',
+        icon: <AddAlarmIcon />,
       },
     ])
   }, [
