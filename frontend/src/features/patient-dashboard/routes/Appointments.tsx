@@ -22,6 +22,7 @@ import { toast } from 'react-toastify'
 import { useNavigate } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
 import { createFollowup } from '@/api/patient'
+import axios from 'axios'
 
 export function Appointments() {
   const queryClient = useQueryClient()
@@ -67,7 +68,7 @@ export function Appointments() {
           toast.success('Appointment rescheduled successfully')
           queryClient.refetchQueries(['appointments'])
         })
-        .catch((err) => {
+        .catch((err: any) => {
           toast.error('Error in rescheduling appointment')
           console.log(err)
         })
