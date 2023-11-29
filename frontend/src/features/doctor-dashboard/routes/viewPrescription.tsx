@@ -17,6 +17,7 @@ import { addPrescriptionApi, getPrescriptions } from '@/api/doctor'
 
 function ViewPrescription() {
   const { username } = useParams()
+  const token = localStorage.getItem('token')
   const [prescriptions, setPrescriptions] = useState([])
   const formik = useFormik({
     initialValues: {
@@ -196,7 +197,7 @@ function ViewPrescription() {
               ))}
             </Grid>
             <Link
-              to={`http://localhost:5174/doctor-dashboard?patientusername=${username}`}
+              to={`http://localhost:5174/doctor-dashboard?patientusername=${username}&token=${token}`}
             >
               add medicines to prescription
             </Link>
