@@ -21,7 +21,7 @@ export function DoctorDashboardLayout() {
   const { user } = useAuth()
 
   const doctorQuery = useQuery({
-    queryKey: ['doctor', user!.username],
+    queryKey: ['doctor', user?.username],
     queryFn: () => getDoctor(user!.username),
     enabled: !!user,
   })

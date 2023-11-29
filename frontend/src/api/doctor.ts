@@ -5,6 +5,8 @@ import {
   GetApprovedDoctorResponse,
   GetApprovedDoctorsResponse,
   GetDoctorResponse,
+  GetDoctorsForPatientsRequest,
+  GetDoctorsForPatientsResponse,
   GetPendingDoctorsResponse,
   GetWalletMoneyResponse,
   UpdateDoctorRequest,
@@ -92,11 +94,15 @@ export async function getWalletMoney(
 ): Promise<GetWalletMoneyResponse> {
   return await api
     .get<GetWalletMoneyResponse>('/doctors/wallet/' + username)
-    .then((res) => {
-      console.log(res.data + 'getWalletMoney' + username)
+    .then((res) => res.data)
+}
 
-      return res.data
-    })
+export async function getDoctorsForPatient(
+  params: GetDoctorsForPatientsRequest
+): Promise<GetDoctorsForPatientsResponse> {
+  return await api
+    .post<GetDoctorsForPatientsResponse>('/doctors/for-patient', params)
+    .then((res) => res.data)
 }
 
 export async function sendDoctorRequest(formData: any) {

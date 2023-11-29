@@ -1,4 +1,4 @@
-import { Checkbox, FormControlLabel, TextField } from '@mui/material'
+import { Checkbox, FormControlLabel, Stack, TextField } from '@mui/material'
 import { useQuery } from '@tanstack/react-query'
 import { CardPlaceholder } from '@/components/CardPlaceholder'
 import { filterPatients, viewPatients } from '@/api/patient'
@@ -6,6 +6,8 @@ import { useState } from 'react'
 import { Box, Button } from '@mui/material'
 import { DataGrid, GridColDef } from '@mui/x-data-grid'
 import { useNavigate } from 'react-router-dom'
+import { GetMyPatientsResponse } from 'clinic-common/types/patient.types'
+import { ChatButton } from '@/components/chats/ChatButton'
 
 export function ViewPatients() {
   const query = useQuery(['view-patients'], viewPatients)
@@ -18,11 +20,16 @@ export function ViewPatients() {
     return <CardPlaceholder />
   }
 
-  const columns: GridColDef[] = [
+  const columns: GridColDef<GetMyPatientsResponse['patients'][0]>[] = [
     {
       field: 'name',
       headerName: 'Name',
       flex: 1,
+    },
+    {
+      field: 'username',
+      headerName: 'Username',
+      flex: 2,
     },
     {
       field: 'email',
@@ -42,9 +49,9 @@ export function ViewPatients() {
     {
       field: 'action',
       headerName: 'Action',
-      flex: 1,
+      flex: 3,
       renderCell: (params) => (
-        <strong>
+        <Stack spacing={1} direction="row">
           <Button
             variant="contained"
             color="primary"
@@ -56,7 +63,8 @@ export function ViewPatients() {
           >
             View Patient
           </Button>
-        </strong>
+          <ChatButton otherUsername={params.row.username} />
+        </Stack>
       ),
     },
   ]
@@ -72,7 +80,7 @@ export function ViewPatients() {
       }}
       height="auto"
     >
-      <div
+      <Box
         style={{
           display: 'flex',
           justifyContent: 'space-around',
@@ -90,56 +98,33 @@ export function ViewPatients() {
         <FormControlLabel
           control={
             <Checkbox
-              defaultChecked
               onChange={(e) => setUpcomingAppointments(e.target.checked)}
               checked={upcomingAppointments}
             />
           }
           label="Only upcoming appointments"
         />
-      </div>
+      </Box>
 
       {upcomingAppointments ? (
         <DataGrid
           autoHeight
           rows={
-            queryUpComing.data
-              ?.filter((user) => {
-                return user.name.includes(searchKey)
-              })
-              .map((user) => {
-                return {
-                  id: user.id,
-                  name: user.name,
-                  email: user.email,
-                  mobileNumber: user.mobileNumber,
-                  dateOfBirth: user.dateOfBirth,
-                }
-              }) || []
+            queryUpComing.data?.filter((user) => {
+              return user.name.includes(searchKey)
+            }) || []
           }
           columns={columns}
-          style={{ display: 'flex', width: '100%' }}
         />
       ) : (
         <DataGrid
           autoHeight
           rows={
-            query.data
-              ?.filter((user: { name: string | string[] }) => {
-                return user.name.includes(searchKey)
-              })
-              .map((user) => {
-                return {
-                  id: user.id,
-                  name: user.name,
-                  email: user.email,
-                  mobileNumber: user.mobileNumber,
-                  dateOfBirth: user.dateOfBirth,
-                }
-              }) || []
+            query.data?.filter((user: { name: string | string[] }) => {
+              return user.name.includes(searchKey)
+            }) || []
           }
           columns={columns}
-          style={{ display: 'flex', width: '100%' }}
         />
       )}
     </Box>

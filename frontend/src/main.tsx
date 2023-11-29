@@ -1,4 +1,3 @@
-import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { RouterProvider, createBrowserRouter } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
@@ -27,7 +26,8 @@ const queryClient = new QueryClient({
 const router = createBrowserRouter(routes)
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
+  // <React.StrictMode>
+  <>
     <AuthProvider>
       <QueryClientProvider client={queryClient}>
         <SnackbarProvider
@@ -44,5 +44,6 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       </QueryClientProvider>
     </AuthProvider>
     <ToastContainer />
-  </React.StrictMode>
+  </>
+  // </React.StrictMode>
 )
