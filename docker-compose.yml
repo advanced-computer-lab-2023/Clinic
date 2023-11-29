@@ -6,10 +6,15 @@ services:
     volumes:
       - ./:/app
       - /app/node_modules
+      - /app/frontend/node_modules
     working_dir: /app
     depends_on:
       - backend
-    entrypoint: sh -c "npm install && npm run dev -w frontend"
+    entrypoint: sh -c "
+      npm config set fetch-retry-mintimeout 200000 &&
+      npm config set fetch-retry-maxtimeout 1200000 &&
+      npm install --no-audit --verbose &&
+      npm run dev -w frontend"
 
   backend:
     image: node:18-alpine
@@ -18,10 +23,15 @@ services:
     volumes:
       - ./:/app
       - /app/node_modules
+      - /app/frontend/node_modules
     environment:
       - MONGO_URI=mongodb://root:example@database:27017
     working_dir: /app
-    entrypoint: sh -c "npm install && npm run dev -w backend"
+    entrypoint: sh -c "
+      npm config set fetch-retry-mintimeout 200000 &&
+      npm config set fetch-retry-maxtimeout 1200000 &&
+      npm install --no-audit --verbose &&
+      npm run dev -w backend"
     depends_on:
       - database
 

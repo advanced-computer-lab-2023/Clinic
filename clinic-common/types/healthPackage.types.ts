@@ -2,6 +2,7 @@ import { type z } from 'zod'
 import {
   type UpdateHealthPackageRequestValidator,
   type CreateHealthPackageRequestValidator,
+  GetAllHealthPackagesForPatientRequestValidator,
 } from '../validators/healthPackage.validator'
 
 export type createHealthPackageRequest = z.infer<
@@ -12,29 +13,66 @@ export type UpdateHealthPackageRequest = z.infer<
   typeof UpdateHealthPackageRequestValidator
 >
 
-export class HealthPackageResponseBase {
-  constructor(
-    public name: string,
-    public id: string,
-    public pricePerYear: number,
-    public sessionDiscount: number,
-    public medicineDiscount: number,
-    public familyMemberSubscribtionDiscount: number
-  ) {}
+export interface HealthPackageResponseBase {
+  name: string
+  id: string
+  pricePerYear: number
+  sessionDiscount: number
+  medicineDiscount: number
+  familyMemberSubscribtionDiscount: number
 }
 
-export class UpdateHealthPackageResponse extends HealthPackageResponseBase {}
+export interface UpdateHealthPackageResponse
+  extends HealthPackageResponseBase {}
 
-export class AddHealthPackageResponse extends HealthPackageResponseBase {}
+export interface AddHealthPackageResponse extends HealthPackageResponseBase {}
 
-export class GetAllHealthPackagesResponse {
-  constructor(
-    public healthPackages: Array<
-      HealthPackageResponseBase & {
-        isSubscribed: boolean
-      }
-    >
-  ) {}
+export type GetAllHealthPackagesForPatientRequest = z.infer<
+  typeof GetAllHealthPackagesForPatientRequestValidator
+>
+
+export type GetAllHealthPackagesForPatientResponse = Array<
+  HealthPackageResponseBase & {
+    discountedPricePerYear: number
+  }
+>
+
+export type GetAllHealthPackagesResponse = HealthPackageResponseBase[]
+
+export interface GetHealthPackageResponse extends HealthPackageResponseBase {}
+
+export interface GetSubscribedHealthPackageForPatientRequest {
+  patientId: string // patientId or familyMemberId
+  isFamilyMember: boolean
 }
 
-export class GetHealthPackageResponse extends HealthPackageResponseBase {}
+export interface GetSubscribedHealthPackageForPatientResponse {
+  healthPackage?: HealthPackageResponseBase & {
+    renewalDate: string
+    remainingMonths: number
+  }
+}
+
+export type GetCancelledHealthPackagesForPatientResponse = {
+  [id: string]: string // Maps ID of cancelled healthPackage to Date of cancellation
+}
+
+export interface SubscribeToHealthPackageRequest {
+  // patientId or familyMemberId for the person that should be subscribed to the health package
+  subscriberId: string
+
+  /**
+   * The person that is paying for the subscription
+   */
+  payerUsername: string
+
+  // Indicates whether the subscribee is a the id for FamilyMember or Patient
+  isFamilyMember: boolean
+  healthPackageId: string
+}
+
+export interface UnsubscribeToHealthPackageRequest {
+  subscriberId: string
+  payerUsername: string
+  isFamilyMember: boolean
+}

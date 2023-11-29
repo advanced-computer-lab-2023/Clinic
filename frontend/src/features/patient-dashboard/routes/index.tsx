@@ -12,6 +12,8 @@ import { SubscribeToHealthPackages } from './SubscribeToHealthPackages'
 import { Wallet } from './Wallet'
 import HealthRecords from './HealthRecords'
 import FileViewer from './ViewFiles'
+import ChangePassword from '@/features/auth/routes/ChangePassword'
+import { MyDoctors } from './MyDoctors'
 
 export const patientDashboardRoutes: RouteObject[] = [
   {
@@ -20,6 +22,10 @@ export const patientDashboardRoutes: RouteObject[] = [
       {
         path: '',
         element: <PatientDashboardHome />,
+      },
+      {
+        path: 'change-password',
+        element: <ChangePassword />,
       },
       {
         path: 'family-members',
@@ -65,6 +71,10 @@ export const patientDashboardRoutes: RouteObject[] = [
       {
         path: 'MyMedicalHistory',
         element: <FileViewer />,
+      },
+      {
+        path: 'my-doctors',
+        element: <MyDoctors />,
       },
     ],
   },

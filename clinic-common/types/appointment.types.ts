@@ -17,6 +17,8 @@ export class AppointmentResponseBase {
     public id: string,
     public patientID: string,
     public doctorID: string,
+    public doctorName: string,
+    public doctorTimes: string[],
     public date: string,
     public familyID: string,
     public reservedFor: string

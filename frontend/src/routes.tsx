@@ -6,6 +6,7 @@ import { adminDashboardRoutes } from './features/admin-dashboard/routes'
 import { patientDashboardRoutes } from './features/patient-dashboard/routes'
 import { BaseLayout } from './components/BaseLayout'
 import { RedirectToDashboard } from './components/RedirectToDashboard'
+import ForgotPassword from './features/auth/routes/ForgotPassword'
 
 export const routes: RouteObject[] = [
   {
@@ -34,6 +35,10 @@ export const routes: RouteObject[] = [
       {
         path: '/auth',
         children: authRoutes,
+      },
+      {
+        path: 'forgot-password',
+        element: <ForgotPassword />,
       },
     ],
   },

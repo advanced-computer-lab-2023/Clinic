@@ -8,6 +8,7 @@ import { UpdateHealthPackage } from './UpdateHealthPackage'
 import { AddAdmin } from '@/features/admin-dashboard/routes/AddAdmin'
 import { Users } from './Users'
 import { PendingDoctorDetails } from './PendingDoctorDetails'
+import ChangePassword from '@/features/auth/routes/ChangePassword'
 
 export const adminDashboardRoutes: RouteObject[] = [
   {
@@ -16,6 +17,10 @@ export const adminDashboardRoutes: RouteObject[] = [
       {
         path: '',
         element: <AdminDashboardHome />,
+      },
+      {
+        path: 'change-password',
+        element: <ChangePassword />,
       },
 
       {

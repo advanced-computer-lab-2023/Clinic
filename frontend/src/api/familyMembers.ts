@@ -1,6 +1,7 @@
 import {
   GetFamilyMemberResponse,
   GetFamilyMembersResponse,
+  GetLinkedFamilyMembersResponse,
   LinkFamilyMemberRequest,
   LinkFamilyMemberResponse,
 } from 'clinic-common/types/familyMember.types'
@@ -43,5 +44,11 @@ export async function linkFamilyMember(
 ): Promise<LinkFamilyMemberResponse> {
   return await api
     .post<LinkFamilyMemberResponse>(`/family-members/link`, req)
+    .then((res) => res.data)
+}
+
+export async function getLinkedFamilyMembers(): Promise<GetLinkedFamilyMembersResponse> {
+  return await api
+    .get<GetLinkedFamilyMembersResponse>(`/family-members/mine/linked`)
     .then((res) => res.data)
 }

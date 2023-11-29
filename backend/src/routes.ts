@@ -1,5 +1,4 @@
 import { Router } from 'express'
-
 import { authRouter } from './app/controllers/auth.controller'
 import { doctorsRouter } from './app/controllers/doctor.controller'
 import { debugRouter } from './app/controllers/debug.controller'
@@ -13,6 +12,7 @@ import { adminRouter } from './app/controllers/admin.controller'
 import { asyncWrapper } from './app/utils/asyncWrapper'
 import { healthPackagesRouter } from './app/controllers/healthPackage.controller'
 import { notificationRouter } from './app/controllers/notification.controller'
+import { chatsRouter } from './app/controllers/chats.controller'
 
 export const router = Router()
 
@@ -27,5 +27,7 @@ router.use('/health-packages', healthPackagesRouter)
 router.use('/patients', patientRouter)
 router.use('/appointment', appointmentsRouter)
 router.use('/admins', asyncWrapper(allowAdmins), adminRouter)
+
+router.use(chatsRouter)
 
 router.use(notificationRouter)

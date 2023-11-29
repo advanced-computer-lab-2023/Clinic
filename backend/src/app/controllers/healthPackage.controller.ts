@@ -1,12 +1,17 @@
 import { Router } from 'express'
 import { validate } from '../middlewares/validation.middleware'
 import {
-  UpdateHealthPackageResponse,
   type UpdateHealthPackageRequest,
   type createHealthPackageRequest,
-  GetAllHealthPackagesResponse,
+  GetAllHealthPackagesForPatientResponse,
   AddHealthPackageResponse,
   GetHealthPackageResponse,
+  GetSubscribedHealthPackageForPatientResponse,
+  GetSubscribedHealthPackageForPatientRequest,
+  SubscribeToHealthPackageRequest,
+  GetCancelledHealthPackagesForPatientResponse,
+  GetAllHealthPackagesForPatientRequest,
+  GetAllHealthPackagesResponse,
 } from 'clinic-common/types/healthPackage.types'
 import { asyncWrapper } from '../utils/asyncWrapper'
 import {
@@ -23,15 +28,19 @@ import {
 } from '../services/healthPackage.service'
 import {
   CreateHealthPackageRequestValidator,
+  GetAllHealthPackagesForPatientRequestValidator,
   UpdateHealthPackageRequestValidator,
 } from 'clinic-common/validators/healthPackage.validator'
 import {
+  getDiscount,
   subscribeToHealthPackage,
   unSubscribeToHealthPackage,
 } from '../services/patient.service'
 import { getPatientByUsername } from '../services/patient.service'
 import { APIError, NotFoundError } from '../errors'
 import { GetWalletMoneyResponse } from 'clinic-common/types/patient.types'
+import { FamilyMemberModel } from '../models/familyMember.model'
+import { PatientModel } from '../models/patient.model'
 
 export const healthPackagesRouter = Router()
 
@@ -40,17 +49,17 @@ healthPackagesRouter.post(
   asyncWrapper(allowAdmins),
   validate(CreateHealthPackageRequestValidator),
   asyncWrapper<createHealthPackageRequest>(async (req, res) => {
-    const HealthPackage = await addHealthPackages(req.body)
-    res.send(
-      new AddHealthPackageResponse(
-        HealthPackage.name,
-        HealthPackage.id,
-        HealthPackage.pricePerYear,
-        HealthPackage.sessionDiscount,
-        HealthPackage.medicineDiscount,
-        HealthPackage.familyMemberSubscribtionDiscount
-      )
-    )
+    const healthPackage = await addHealthPackages(req.body)
+
+    res.send({
+      name: healthPackage.name,
+      id: healthPackage.id,
+      pricePerYear: healthPackage.pricePerYear,
+      sessionDiscount: healthPackage.sessionDiscount,
+      medicineDiscount: healthPackage.medicineDiscount,
+      familyMemberSubscribtionDiscount:
+        healthPackage.familyMemberSubscribtionDiscount,
+    } satisfies AddHealthPackageResponse)
   })
 )
 
@@ -59,20 +68,16 @@ healthPackagesRouter.patch(
   asyncWrapper(allowAdmins),
   validate(UpdateHealthPackageRequestValidator),
   asyncWrapper<UpdateHealthPackageRequest>(async (req, res) => {
-    const updatedHealthPackage = await updateHealthPackage(
-      req.params.id,
-      req.body
-    )
-    res.send(
-      new UpdateHealthPackageResponse(
-        updatedHealthPackage.name,
-        updatedHealthPackage.id,
-        updatedHealthPackage.pricePerYear,
-        updatedHealthPackage.sessionDiscount,
-        updatedHealthPackage.medicineDiscount,
-        updatedHealthPackage.familyMemberSubscribtionDiscount
+    const isUpdated = await updateHealthPackage(req.params.id, req.body)
+
+    if (!isUpdated) {
+      throw new APIError(
+        "Can't Update! There are patients already subscribed to this package",
+        404
       )
-    )
+    }
+
+    res.send('Package updated successfuly')
   })
 )
 
@@ -80,30 +85,70 @@ healthPackagesRouter.delete(
   '/:id',
   asyncWrapper(allowAdmins),
   asyncWrapper(async (req, res) => {
-    await removeHealthPackage(req.params.id)
-    res.send('deletedSuccefuly')
+    const canDelete = await removeHealthPackage(req.params.id)
+
+    if (!canDelete) {
+      res.send("Can't Delete!there are patients subscribed to this package")
+    }
+
+    res.send('Package deleted successfuly')
   })
 )
+
+// healthPackagesRouter.get(
+//   '/isPackageHasSubscribers/:id',
+//   asyncWrapper(allowAdmins),
+//   asyncWrapper(async (req, res) => {
+//     const hasSubscribers=await isPackageHasSubscribers(req.params.id)
+
+//     res.send(hasSubscribers)
+//   })
+// )
 
 healthPackagesRouter.get(
   '/',
   asyncWrapper(async (req, res) => {
     const healthPackages = await getAllHealthPackages()
-    const patient = await getPatientByUsername(req.username!)
 
     res.send(
-      new GetAllHealthPackagesResponse(
-        healthPackages.map((healthPackage) => ({
-          name: healthPackage.name,
-          id: healthPackage.id,
-          pricePerYear: healthPackage.pricePerYear,
-          sessionDiscount: healthPackage.sessionDiscount,
-          medicineDiscount: healthPackage.medicineDiscount,
-          familyMemberSubscribtionDiscount:
-            healthPackage.familyMemberSubscribtionDiscount,
-          isSubscribed: patient?.healthPackage?.toString() === healthPackage.id,
-        }))
-      )
+      healthPackages.map((healthPackage) => ({
+        id: healthPackage.id,
+        name: healthPackage.name,
+        pricePerYear: healthPackage.pricePerYear,
+        sessionDiscount: healthPackage.sessionDiscount,
+        medicineDiscount: healthPackage.medicineDiscount,
+        familyMemberSubscribtionDiscount:
+          healthPackage.familyMemberSubscribtionDiscount,
+      })) satisfies GetAllHealthPackagesResponse
+    )
+  })
+)
+
+healthPackagesRouter.post(
+  '/for-patient',
+  validate(GetAllHealthPackagesForPatientRequestValidator),
+  asyncWrapper<GetAllHealthPackagesForPatientRequest>(async (req, res) => {
+    const { patientId, isFamilyMember } = req.body
+
+    const healthPackages = await getAllHealthPackages()
+
+    const discount = await getDiscount({
+      subscriberId: patientId,
+      isFamilyMember,
+    })
+
+    res.send(
+      healthPackages.map((healthPackage) => ({
+        id: healthPackage.id,
+        name: healthPackage.name,
+        pricePerYear: healthPackage.pricePerYear,
+        discountedPricePerYear:
+          healthPackage.pricePerYear - discount * healthPackage.pricePerYear,
+        sessionDiscount: healthPackage.sessionDiscount,
+        medicineDiscount: healthPackage.medicineDiscount,
+        familyMemberSubscribtionDiscount:
+          healthPackage.familyMemberSubscribtionDiscount,
+      })) satisfies GetAllHealthPackagesForPatientResponse
     )
   })
 )
@@ -113,74 +158,174 @@ healthPackagesRouter.get(
   asyncWrapper(async (req, res) => {
     const healthPackage = await getHealthPackageById(req.params.id)
 
-    res.send(
-      new GetHealthPackageResponse(
-        healthPackage.name,
-        healthPackage.id,
-        healthPackage.pricePerYear,
-        healthPackage.sessionDiscount,
-        healthPackage.medicineDiscount,
-        healthPackage.familyMemberSubscribtionDiscount
-      )
-    )
+    res.send({
+      name: healthPackage.name,
+      id: healthPackage.id,
+      pricePerYear: healthPackage.pricePerYear,
+      sessionDiscount: healthPackage.sessionDiscount,
+      medicineDiscount: healthPackage.medicineDiscount,
+      familyMemberSubscribtionDiscount:
+        healthPackage.familyMemberSubscribtionDiscount,
+    } satisfies GetHealthPackageResponse)
   })
 )
 
+// healthPackagesRouter.post(
+//   '/:id/subscribe',
+//   [allowAuthenticated, asyncWrapper(allowPatients)],
+//   asyncWrapper(async (req, res) => {
+//     const patientId = getPatientIdFromUsername(req.username!)
+
+//     await subscribeToHealthPackage({
+//       patientId,
+//       healthPackageId: req.params.id,
+//     })
+
+//     res.status(200).send()
+//   })
+// )
+
 healthPackagesRouter.post(
-  '/:id/subscribe',
+  '/unsubscribe',
   [allowAuthenticated, asyncWrapper(allowPatients)],
   asyncWrapper(async (req, res) => {
-    await subscribeToHealthPackage({
-      patientUsername: req.username!,
-      healthPackageId: req.params.id,
-    })
+    const { subscriberId, isFamilyMember } = req.body
 
-    res.status(200).send()
-  })
-)
-
-healthPackagesRouter.post(
-  '/:id/unsubscribe',
-  [allowAuthenticated, asyncWrapper(allowPatients)],
-  asyncWrapper(async (req, res) => {
     await unSubscribeToHealthPackage({
-      patientUsername: req.username!,
-      healthPackageId: req.params.id,
+      id: subscriberId,
+      isFamilyMember,
     })
     res.status(200).send()
   })
 )
 
 healthPackagesRouter.patch(
-  '/wallet/subscriptions/:packageId',
-  asyncWrapper(async (req, res) => {
-    const packageId = req.params.packageId
-    const userName = req.username
-    const packageInfo = await getHealthPackageById(packageId)
-    const patient = await getPatientByUsername(userName!)
-    if (!patient || !patient.walletMoney) throw new NotFoundError()
+  '/wallet/subscriptions',
+  asyncWrapper<SubscribeToHealthPackageRequest>(async (req, res) => {
+    const { healthPackageId, subscriberId, isFamilyMember, payerUsername } =
+      req.body
+
+    const packageInfo = await getHealthPackageById(healthPackageId)
+    const patient = await getPatientByUsername(payerUsername)
+
+    if (!packageInfo || !patient) throw new NotFoundError()
+
     if (patient.walletMoney - packageInfo.pricePerYear < 0)
       throw new APIError('Not enough money in wallet', 400)
-    patient.walletMoney -= packageInfo.pricePerYear
-    await patient.save()
-    await subscribeToHealthPackage({
-      patientUsername: req.username!,
-      healthPackageId: packageId,
+
+    const discount = await getDiscount({
+      subscriberId,
+      isFamilyMember,
     })
+
+    patient.walletMoney -=
+      packageInfo.pricePerYear - packageInfo.pricePerYear * discount
+    await patient.save()
+
+    await subscribeToHealthPackage({
+      patientId: subscriberId,
+      healthPackageId,
+      isFamilyMember,
+    })
+
     res.send(new GetWalletMoneyResponse(patient.walletMoney))
   })
 )
 
 healthPackagesRouter.patch(
-  '/credit-card/subscriptions/:packageId',
-  asyncWrapper(async (req, res) => {
-    const packageId = req.params.packageId
-    const patient = await getPatientByUsername(req.username!)
-    if (!patient) throw new NotFoundError()
+  '/credit-card/subscriptions',
+  asyncWrapper<SubscribeToHealthPackageRequest>(async (req, res) => {
+    const { healthPackageId, subscriberId, isFamilyMember } = req.body
+
     await subscribeToHealthPackage({
-      patientUsername: req.username!,
-      healthPackageId: packageId,
+      patientId: subscriberId,
+      healthPackageId,
+      isFamilyMember,
     })
-    res.send(new GetWalletMoneyResponse(patient.walletMoney))
+
+    res.status(200).send()
+  })
+)
+
+healthPackagesRouter.post(
+  '/subscribed',
+  asyncWrapper<GetSubscribedHealthPackageForPatientRequest>(
+    async (req, res) => {
+      const { patientId, isFamilyMember } = req.body
+      const patient = isFamilyMember
+        ? await FamilyMemberModel.findById(patientId)
+        : await PatientModel.findById(patientId)
+
+      if (!patient?.healthPackage || !patient.healthPackageRenewalDate) {
+        res
+          .status(204)
+          .send({} satisfies GetSubscribedHealthPackageForPatientResponse)
+      } else {
+        const healthPackage = await getHealthPackageById(
+          patient.healthPackage.toString()
+        )
+        const current = new Date()
+        const renewal = patient.healthPackageRenewalDate
+        const months =
+          (renewal.getFullYear() - current.getFullYear()) * 12 +
+          renewal.getMonth() -
+          current.getMonth()
+
+        res.send({
+          healthPackage: {
+            name: healthPackage.name,
+            id: healthPackage.id,
+            pricePerYear: healthPackage.pricePerYear,
+            sessionDiscount: healthPackage.sessionDiscount,
+            medicineDiscount: healthPackage.medicineDiscount,
+            familyMemberSubscribtionDiscount:
+              healthPackage.familyMemberSubscribtionDiscount,
+            renewalDate: patient.healthPackageRenewalDate.toDateString(),
+            remainingMonths: months,
+          },
+        } satisfies GetSubscribedHealthPackageForPatientResponse)
+      }
+    }
+  )
+)
+
+healthPackagesRouter.post(
+  '/patient-cancelled',
+  asyncWrapper(async (req, res) => {
+    const { id, isFamilyMember } = req.body
+    const model = isFamilyMember
+      ? await FamilyMemberModel.findById(id)
+      : await PatientModel.findById(id)
+
+    if (!model) {
+      throw new NotFoundError()
+    }
+
+    const cancelled: GetCancelledHealthPackagesForPatientResponse = {}
+
+    model.healthPackageHistory.forEach((healthPackage) => {
+      cancelled[healthPackage.healthPackage.toString()] =
+        healthPackage.date.toDateString()
+    })
+
+    res.send(cancelled satisfies GetCancelledHealthPackagesForPatientResponse)
+  })
+)
+
+healthPackagesRouter.post(
+  '/cancellation-date/:healthPackageId',
+  asyncWrapper(async (req, res) => {
+    const { id, isFamilyMember } = req.body
+    const model = isFamilyMember
+      ? await FamilyMemberModel.findById(id)
+      : await PatientModel.findById(id)
+    if (!model) throw new NotFoundError()
+    model.healthPackageHistory.forEach((healthPackage) => {
+      if (
+        healthPackage.healthPackage.toString() === req.params.healthPackageId
+      ) {
+        res.send(healthPackage.date.toDateString())
+      }
+    })
   })
 )

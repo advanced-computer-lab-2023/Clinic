@@ -11,7 +11,7 @@ import {
 } from '@mui/material'
 import NotificationsIcon from '@mui/icons-material/Notifications'
 import { useMutation, useQuery } from '@tanstack/react-query'
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Clear } from '@mui/icons-material'
 
 export function NotificationsList() {
@@ -46,6 +46,14 @@ export function NotificationsList() {
   const handleClose = () => {
     setAnchorEl(null)
   }
+
+  useEffect(() => {
+    const refetchInterval = setInterval(() => {
+      query.refetch()
+    }, 5000)
+
+    return () => clearInterval(refetchInterval)
+  }, [])
 
   return (
     <>

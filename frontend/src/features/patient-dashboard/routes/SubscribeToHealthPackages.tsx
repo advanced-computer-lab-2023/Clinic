@@ -1,7 +1,8 @@
 import {
-  getHealthPackages,
+  getCancelledHealthPackagesForPatient,
+  getSubscribedHealthPackageForPatient,
+  getAllHealthPackagesForPatient,
   subscribeCreditToHealthPackage,
-  subscribeToHealthPackage,
   subscribeWalletToHealthPackage,
   unsubscribeToHealthPackage,
 } from '@/api/healthPackages'
@@ -30,8 +31,34 @@ import { LoadingButton } from '@mui/lab'
 import { AddModerator } from '@mui/icons-material'
 import { useAlerts } from '@/hooks/alerts'
 import Checkout from '@/components/StripeCheckout'
+import { useAuth } from '@/hooks/auth'
+import { GetAllHealthPackagesForPatientResponse } from 'clinic-common/types/healthPackage.types'
+import { DiscountedPrice } from '@/components/DiscountedPrice'
 
-export function SubscribeToHealthPackages() {
+function HealthPackagePrice({
+  healthPackage,
+}: {
+  healthPackage: GetAllHealthPackagesForPatientResponse[0]
+}) {
+  if (!healthPackage) {
+    return null
+  }
+
+  return (
+    <DiscountedPrice
+      originalPrice={healthPackage.pricePerYear}
+      discountedPrice={healthPackage.discountedPricePerYear}
+    />
+  )
+}
+
+export function SubscribeToHealthPackages({
+  subscriberId,
+  isFamilyMember = false,
+}: {
+  subscriberId?: string
+  isFamilyMember?: boolean
+}) {
   const [selectedHealthPackageId, setSelectedHealthPackageId] = useState<
     null | string
   >()
@@ -41,62 +68,71 @@ export function SubscribeToHealthPackages() {
   const [creditMethodIdPackage, setCreditMethodIdPackage] = useState<
     null | string
   >()
-  const queryClient = useQueryClient()
+
   const alerts = useAlerts()
+  const { user } = useAuth()
+  const queryClient = useQueryClient()
+
+  const id = subscriberId || user!.modelId
+  const payerUsername = user!.username
+
   const query = useQuery({
-    queryKey: ['health-packages'],
-    queryFn: getHealthPackages,
-  })
-  const mutation = useMutation({
-    mutationFn: subscribeToHealthPackage,
-    onSuccess: () => {
-      queryClient.invalidateQueries(['health-packages'])
-      setSelectedHealthPackageId(null)
-      alerts.addAlert({
-        severity: 'success',
-        message: 'Subscribed to health package successfully.',
-      })
-    },
+    queryKey: ['health-packages', subscriberId],
+    queryFn: () =>
+      getAllHealthPackagesForPatient({
+        patientId: id,
+        isFamilyMember,
+      }),
   })
 
-  const cancelMutation = useMutation({
-    mutationFn: unsubscribeToHealthPackage,
-    onSuccess: () => {
-      queryClient.invalidateQueries(['health-packages'])
+  const subscribedHealthPackageQuery = useQuery({
+    queryKey: ['subscribed-health-packages', isFamilyMember, id],
+    queryFn: () =>
+      getSubscribedHealthPackageForPatient({
+        patientId: id,
+        isFamilyMember,
+      }),
+  })
+  const cancelledHealthPackagesQuery = useQuery({
+    queryKey: ['cancelled-health-packages', id, isFamilyMember],
+    queryFn: () => getCancelledHealthPackagesForPatient({ id, isFamilyMember }),
+  })
+
+  const onSuccess =
+    (message: string = 'Subscribed to health package successfully.') =>
+    () => {
+      query.refetch()
+      subscribedHealthPackageQuery.refetch()
+      cancelledHealthPackagesQuery.refetch()
+      queryClient.invalidateQueries(['family-members'])
       setSelectedHealthPackageId(null)
-      alerts.addAlert({
-        severity: 'success',
-        message: 'Unsubscribed from health package successfully.',
-      })
-    },
-  })
-  const subscribeWalletMutation = useMutation({
-    mutationFn: subscribeWalletToHealthPackage,
-    onSuccess: () => {
-      queryClient.invalidateQueries(['health-packages'])
       setWalletMethodIdPackage(null)
-      alerts.addAlert({
-        severity: 'success',
-        message: 'Subscribed to health package successfully.',
-      })
-    },
-    onError: (e: Error) => {
-      alerts.addAlert({
-        message: e.message ?? 'Failed! Try again',
-        severity: 'error',
-      })
-    },
-  })
-  const subscribeCreditMutation = useMutation({
-    mutationFn: subscribeCreditToHealthPackage,
-    onSuccess: () => {
-      queryClient.invalidateQueries(['health-packages'])
       setCreditMethodIdPackage(null)
       alerts.addAlert({
         severity: 'success',
-        message: 'Subscribed to health package successfully.',
+        message,
+      })
+    }
+
+  const cancelMutation = useMutation({
+    mutationFn: unsubscribeToHealthPackage,
+    onSuccess: onSuccess('Unsubscribed from health package successfully.'),
+  })
+
+  const subscribeWalletMutation = useMutation({
+    mutationFn: subscribeWalletToHealthPackage,
+    onSuccess: onSuccess(),
+    onError: (e: Error) => {
+      alerts.addAlert({
+        message: e.message ?? 'Failed! Try again',
+        severity: 'error',
       })
     },
+  })
+
+  const subscribeCreditMutation = useMutation({
+    mutationFn: subscribeCreditToHealthPackage,
+    onSuccess: onSuccess(),
     onError: (e: Error) => {
       alerts.addAlert({
         severity: 'error',
@@ -105,31 +141,25 @@ export function SubscribeToHealthPackages() {
     },
   })
 
-  const isSubscribed = useMemo(() => {
-    return (
-      query.data?.healthPackages.some((healthPackage) => {
-        return healthPackage.isSubscribed
-      }) || false
-    )
-  }, [query])
+  const subscribedPackage = subscribedHealthPackageQuery.data?.healthPackage
 
-  // const subscribedHealthPackage = useMemo(
-  //   () =>
-  //     query.data?.healthPackages.find((healthPackage) => {
-  //       return healthPackage.isSubscribed
-  //     }),
-  //   [query]
-  // )
+  const isSubscribed = useMemo(() => {
+    return !!subscribedPackage
+  }, [subscribedPackage])
 
   const selectedHealthPackage = useMemo(
     () =>
-      query.data?.healthPackages.find((healthPackage) => {
+      query.data?.find((healthPackage) => {
         return healthPackage.id === selectedHealthPackageId
       }),
     [query, selectedHealthPackageId]
   )
 
-  if (query.isLoading) {
+  if (
+    query.isLoading ||
+    subscribedHealthPackageQuery.isFetching ||
+    cancelledHealthPackagesQuery.isFetching
+  ) {
     return <CardPlaceholder />
   }
 
@@ -145,23 +175,25 @@ export function SubscribeToHealthPackages() {
             </Alert>
           </Grid>
         )}
-        {query.data?.healthPackages.map((healthPackage) => (
+        {query.data?.map((healthPackage) => (
           <Grid
             item
             xl={4}
             key={healthPackage.id}
-            zIndex={healthPackage.isSubscribed ? 1 : 0}
+            zIndex={subscribedPackage?.id == healthPackage.id ? 1 : 0}
           >
             <Card
               variant="outlined"
               style={{
-                transform: healthPackage.isSubscribed
-                  ? 'scale(1.027)'
-                  : 'scale(1)',
+                transform:
+                  subscribedPackage?.id == healthPackage.id
+                    ? 'scale(1.027)'
+                    : 'scale(1)',
                 transition: 'all 0.2s',
-                boxShadow: healthPackage.isSubscribed
-                  ? '0 2px 10px rgba(199, 127, 255, 0.91)'
-                  : '',
+                boxShadow:
+                  subscribedPackage?.id == healthPackage.id
+                    ? '0 2px 10px rgba(199, 127, 255, 0.91)'
+                    : '',
               }}
             >
               <CardContent>
@@ -174,22 +206,38 @@ export function SubscribeToHealthPackages() {
                   >
                     <Typography variant="h6">{healthPackage.name}</Typography>
 
-                    {healthPackage.isSubscribed && (
-                      <Chip
-                        variant="filled"
-                        color="success"
-                        label="Subscribed"
-                      />
-                    )}
+                    <>
+                      {subscribedPackage?.id == healthPackage.id && (
+                        <Chip
+                          variant="filled"
+                          color="success"
+                          label="Subscribed"
+                        />
+                      )}
+
+                      {!!cancelledHealthPackagesQuery.data![
+                        healthPackage.id
+                      ] && (
+                        <>
+                          <Chip
+                            label={`Cancelled on ${
+                              cancelledHealthPackagesQuery.data![
+                                healthPackage.id
+                              ]
+                            }`}
+                            color="error"
+                            size="small"
+                          />
+                        </>
+                      )}
+                    </>
                   </Stack>
 
                   <Stack spacing={-1}>
                     <Typography variant="overline" color="text.secondary">
                       Price per year
                     </Typography>
-                    <Typography variant="body1">
-                      {healthPackage.pricePerYear}
-                    </Typography>
+                    <HealthPackagePrice healthPackage={healthPackage} />
                   </Stack>
                   <Stack spacing={-1}>
                     <Typography variant="overline" color="text.secondary">
@@ -215,19 +263,39 @@ export function SubscribeToHealthPackages() {
                       {healthPackage.familyMemberSubscribtionDiscount}%
                     </Typography>
                   </Stack>
+                  {subscribedPackage?.id == healthPackage.id && (
+                    <Stack spacing={-1}>
+                      <Typography variant="overline" color="text.secondary">
+                        Renewal Date
+                      </Typography>
+                      <Typography variant="body1">
+                        {new Date(
+                          subscribedPackage?.renewalDate
+                        ).toLocaleDateString()}
+                      </Typography>
+                    </Stack>
+                  )}
                 </Stack>
               </CardContent>
               <CardActions>
-                {healthPackage.isSubscribed ? (
-                  <Button
+                {subscribedPackage?.id == healthPackage.id &&
+                new Date(subscribedPackage?.renewalDate) > new Date() ? (
+                  <LoadingButton
+                    loading={cancelMutation.isLoading}
                     variant="contained"
                     fullWidth
-                    color="secondary" // Set the color as desired
-                    startIcon={<AddModerator />} // Replace with the icon you prefer
-                    onClick={() => cancelMutation.mutateAsync(healthPackage.id)}
+                    color="secondary"
+                    startIcon={<AddModerator />} // Replace with cancel icon
+                    onClick={() =>
+                      cancelMutation.mutateAsync({
+                        subscriberId: id,
+                        payerUsername,
+                        isFamilyMember,
+                      })
+                    }
                   >
                     Unsubscribe
-                  </Button>
+                  </LoadingButton>
                 ) : (
                   <Button
                     variant="contained"
@@ -236,9 +304,15 @@ export function SubscribeToHealthPackages() {
                     onClick={() => {
                       setSelectedHealthPackageId(healthPackage.id)
                     }}
-                    disabled={healthPackage.isSubscribed}
+                    color={
+                      subscribedPackage?.id == healthPackage.id
+                        ? 'success'
+                        : 'primary'
+                    }
                   >
-                    {healthPackage.isSubscribed ? 'Subscribed' : 'Subscribe'}
+                    {subscribedPackage?.id == healthPackage.id
+                      ? 'Renew'
+                      : 'Subscribe'}
                   </Button>
                 )}
               </CardActions>
@@ -254,35 +328,65 @@ export function SubscribeToHealthPackages() {
         <DialogContent>
           <DialogContentText>
             {isSubscribed ? (
-              <Alert severity="error">
-                You are already subscribed to a health package. If you subscribe
-                to another health package, your current health package will be
-                cancelled.{' '}
-                <u>
-                  The remaining {12 - new Date().getMonth()} months will not be
-                  refunded
-                </u>
-                , and you will start paying{' '}
-                <Chip
-                  color="warning"
-                  size="small"
-                  label={selectedHealthPackage?.pricePerYear + '$'}
-                />{' '}
-                per year for the{' '}
-                <Chip
-                  color="info"
-                  size="small"
-                  label={selectedHealthPackage?.name}
-                />{' '}
-                health package starting from today.
-              </Alert>
+              new Date(subscribedPackage!.renewalDate) > new Date() ? (
+                <Alert severity="error">
+                  You are already subscribed to a health package. If you
+                  subscribe to another health package, your current health
+                  package will be cancelled.{' '}
+                  <u>
+                    The remaining {subscribedPackage?.remainingMonths} months
+                    will not be refunded
+                  </u>
+                  , and you will start paying{' '}
+                  <Chip
+                    color="warning"
+                    size="small"
+                    label={
+                      <HealthPackagePrice
+                        healthPackage={selectedHealthPackage!}
+                      />
+                    }
+                  />{' '}
+                  per year for the{' '}
+                  <Chip
+                    color="info"
+                    size="small"
+                    label={selectedHealthPackage?.name}
+                  />{' '}
+                  health package starting from today.
+                </Alert>
+              ) : (
+                <Alert severity="info">
+                  You are going to renew your subscription to{' '}
+                  <Chip
+                    color="info"
+                    size="small"
+                    label={selectedHealthPackage?.name}
+                  />{' '}
+                  . You will be charged{' '}
+                  <Chip
+                    color="warning"
+                    size="small"
+                    label={
+                      <HealthPackagePrice
+                        healthPackage={selectedHealthPackage!}
+                      />
+                    }
+                  />{' '}
+                  per year for the health package starting from today.
+                </Alert>
+              )
             ) : (
               <Alert severity="info">
                 You will be charged{' '}
                 <Chip
                   color="warning"
                   size="small"
-                  label={selectedHealthPackage?.pricePerYear + '$'}
+                  label={
+                    <HealthPackagePrice
+                      healthPackage={selectedHealthPackage!}
+                    />
+                  }
                 />{' '}
                 per year for the{' '}
                 <Chip
@@ -306,7 +410,6 @@ export function SubscribeToHealthPackages() {
               setWalletMethodIdPackage(selectedHealthPackageId!)
               setSelectedHealthPackageId(null)
             }}
-            loading={mutation.isLoading}
           >
             Subscribe
           </LoadingButton>
@@ -340,7 +443,12 @@ export function SubscribeToHealthPackages() {
               <LoadingButton
                 variant="contained"
                 onClick={() => {
-                  subscribeWalletMutation.mutateAsync(walletMethodIdPackage!)
+                  subscribeWalletMutation.mutateAsync({
+                    healthPackageId: walletMethodIdPackage!,
+                    isFamilyMember,
+                    payerUsername,
+                    subscriberId: id,
+                  })
                 }}
                 loading={subscribeWalletMutation.isLoading}
               >
@@ -383,7 +491,12 @@ export function SubscribeToHealthPackages() {
           <Checkout
             handleSubmit={() => {
               console.log('handleSubmit')
-              subscribeCreditMutation.mutateAsync(creditMethodIdPackage!)
+              subscribeCreditMutation.mutateAsync({
+                healthPackageId: creditMethodIdPackage!,
+                isFamilyMember,
+                payerUsername,
+                subscriberId: id,
+              })
             }}
           />
         </DialogContent>

@@ -1,19 +1,23 @@
 import { Router } from 'express'
 
 import {
+  acceptEmploymentContract,
   addAvailableTimeSlots,
   approveDoctor,
   getAllDoctors,
   getApprovedDoctorById,
   getDoctorByUsername,
+  getDoctorSessionRateWithMarkup,
   getPendingDoctorRequests,
   rejectDoctor,
+  rejectEmploymentContract,
   updateDoctorByUsername,
 } from '../services/doctor.service'
 import { asyncWrapper } from '../utils/asyncWrapper'
 import {
   allowAdmins,
   allowApprovedDoctors,
+  allowApprovedandAcceptsDoctors,
   allowAuthenticated,
 } from '../middlewares/auth.middleware'
 import {
@@ -26,6 +30,10 @@ import {
   type UpdateDoctorRequest,
   AddAvailableTimeSlotsResponse,
   GetWalletMoneyResponse,
+  ApproveDoctorResponse,
+  ContractStatus,
+  AcceptOrRejectContractResponse,
+  GetDoctorsForPatientsResponse,
 } from 'clinic-common/types/doctor.types'
 import { isAdmin } from '../services/auth.service'
 import { NotAuthenticatedError } from '../errors/auth.errors'
@@ -35,11 +43,18 @@ import {
   AddAvailableTimeSlotsRequestValidator,
   UpdateDoctorRequestValidator,
 } from 'clinic-common/validators/doctor.validator'
-import { type UserDocument, UserModel } from '../models/user.model'
+import { type UserDocument, UserModel, IUser } from '../models/user.model'
 import { PatientModel } from '../models/patient.model'
 import { type HydratedDocument } from 'mongoose'
 
 import { type HealthPackageDocument } from '../models/healthPackage.model'
+import {
+  getDoctorSessionRateForPatient,
+  hasDiscountOnDoctorSession,
+} from '../services/healthPackage.service'
+import { GetDoctorsForPatientsRequest } from 'clinic-common/types/doctor.types'
+import { DoctorModel } from '../models/doctor.model'
+import { AppointmentModel } from '../models/appointment.model'
 
 export const doctorsRouter = Router()
 
@@ -48,22 +63,21 @@ doctorsRouter.get(
   asyncWrapper(allowAdmins),
   asyncWrapper(async (req, res) => {
     const pendingDoctorRequests = await getPendingDoctorRequests()
-    res.send(
-      new GetPendingDoctorsResponse(
-        pendingDoctorRequests.map((doctor) => ({
-          id: doctor.id,
-          username: doctor.user.username,
-          name: doctor.name,
-          email: doctor.email,
-          dateOfBirth: doctor.dateOfBirth,
-          hourlyRate: doctor.hourlyRate,
-          affiliation: doctor.affiliation,
-          educationalBackground: doctor.educationalBackground,
-          speciality: doctor.speciality,
-          requestStatus: doctor.requestStatus as DoctorStatus,
-        }))
-      )
-    )
+    res.send({
+      doctors: pendingDoctorRequests.map((doctor) => ({
+        id: doctor.id,
+        username: doctor.user.username,
+        name: doctor.name,
+        email: doctor.email,
+        dateOfBirth: doctor.dateOfBirth,
+        hourlyRate: doctor.hourlyRate,
+        affiliation: doctor.affiliation,
+        educationalBackground: doctor.educationalBackground,
+        speciality: doctor.speciality,
+        requestStatus: doctor.requestStatus as DoctorStatus,
+        documents: doctor.documents as [string],
+      })),
+    } satisfies GetPendingDoctorsResponse)
   })
 )
 
@@ -90,20 +104,18 @@ doctorsRouter.patch(
       req.body
     )
 
-    res.send(
-      new UpdateDoctorResponse(
-        updatedDoctor.id,
-        updatedDoctor.user.username,
-        updatedDoctor.name,
-        updatedDoctor.email,
-        updatedDoctor.dateOfBirth,
-        updatedDoctor.hourlyRate,
-        updatedDoctor.affiliation,
-        updatedDoctor.educationalBackground,
-        updatedDoctor.speciality,
-        updatedDoctor.requestStatus as DoctorStatus
-      )
-    )
+    res.send({
+      id: updatedDoctor.id,
+      username: updatedDoctor.user.username,
+      name: updatedDoctor.name,
+      email: updatedDoctor.email,
+      dateOfBirth: updatedDoctor.dateOfBirth,
+      hourlyRate: updatedDoctor.hourlyRate,
+      affiliation: updatedDoctor.affiliation,
+      educationalBackground: updatedDoctor.educationalBackground,
+      speciality: updatedDoctor.speciality,
+      requestStatus: updatedDoctor.requestStatus as DoctorStatus,
+    } satisfies UpdateDoctorResponse)
   })
 )
 
@@ -121,28 +133,25 @@ doctorsRouter.get(
     if (patient == null) throw new NotAuthenticatedError()
     const doctors = await getAllDoctors()
 
-    const discount = patient.healthPackage?.sessionDiscount ?? 0
-    res.send(
-      new GetApprovedDoctorsResponse(
-        doctors.map((doctor) => ({
-          id: doctor.id,
-          username: doctor.user.username,
-          name: doctor.name,
-          email: doctor.email,
-          dateOfBirth: doctor.dateOfBirth,
-          hourlyRate: doctor.hourlyRate,
-          affiliation: doctor.affiliation,
-          speciality: doctor.speciality,
-          educationalBackground: doctor.educationalBackground,
-          sessionRate:
-            doctor.hourlyRate * 1.1 - (discount * doctor.hourlyRate) / 100,
-          // TODO: retrieve available times from the Appointments. Since we aren't required to make appointments for this sprint, I will
-          // assume available times is a field in the doctors schema for now.
-          availableTimes: doctor.availableTimes as [Date],
-          requestStatus: doctor.requestStatus as DoctorStatus,
-        }))
-      )
-    )
+    res.send({
+      doctors: doctors.map((doctor) => ({
+        id: doctor.id,
+        username: doctor.user.username,
+        name: doctor.name,
+        email: doctor.email,
+        dateOfBirth: doctor.dateOfBirth,
+        hourlyRate: doctor.hourlyRate,
+        hourlyRateWithMarkup: getDoctorSessionRateWithMarkup({ doctor }),
+        affiliation: doctor.affiliation,
+        speciality: doctor.speciality,
+        educationalBackground: doctor.educationalBackground,
+        sessionRate: getDoctorSessionRateForPatient({ doctor, patient }),
+        availableTimes: doctor.availableTimes as [Date],
+        requestStatus: doctor.requestStatus as DoctorStatus,
+        hasDiscount: hasDiscountOnDoctorSession({ patient }),
+        documents: doctor.documents as [string],
+      })),
+    } satisfies GetApprovedDoctorsResponse)
   })
 )
 
@@ -152,21 +161,22 @@ doctorsRouter.get(
   asyncWrapper(async (req, res) => {
     const doctor = await getDoctorByUsername(req.params.username)
 
-    res.send(
-      new GetDoctorResponse(
-        doctor.id,
-        doctor.user.username,
-        doctor.name,
-        doctor.email,
-        doctor.dateOfBirth,
-        doctor.hourlyRate,
-        doctor.affiliation,
-        doctor.educationalBackground,
-        doctor.speciality,
-        doctor.requestStatus as DoctorStatus,
-        doctor.availableTimes as [Date]
-      )
-    )
+    res.send({
+      id: doctor.id,
+      username: doctor.user.username,
+      name: doctor.name,
+      email: doctor.email,
+      dateOfBirth: doctor.dateOfBirth,
+      hourlyRate: doctor.hourlyRate,
+      affiliation: doctor.affiliation,
+      speciality: doctor.speciality,
+      educationalBackground: doctor.educationalBackground,
+      requestStatus: doctor.requestStatus as DoctorStatus,
+      availableTimes: doctor.availableTimes as [Date],
+      contractStatus: doctor.contractStatus as ContractStatus,
+      employmentContract: doctor.employmentContract as [string],
+      documents: doctor.documents as [string],
+    } satisfies GetDoctorResponse)
   })
 )
 
@@ -186,24 +196,22 @@ doctorsRouter.get(
 
     if (patient == null) throw new NotAuthenticatedError()
 
-    const discount = patient.healthPackage?.sessionDiscount ?? 0
-
-    res.send(
-      new GetApprovedDoctorResponse(
-        doctor.id,
-        doctor.user.username,
-        doctor.name,
-        doctor.email,
-        doctor.dateOfBirth,
-        doctor.hourlyRate,
-        doctor.affiliation,
-        doctor.educationalBackground,
-        doctor.speciality,
-        doctor.requestStatus as DoctorStatus,
-        doctor.availableTimes as [Date],
-        doctor.hourlyRate * 1.1 - (discount * doctor.hourlyRate) / 100
-      )
-    )
+    res.send({
+      id: doctor.id,
+      username: doctor.user.username,
+      name: doctor.name,
+      email: doctor.email,
+      dateOfBirth: doctor.dateOfBirth,
+      hourlyRate: doctor.hourlyRate,
+      affiliation: doctor.affiliation,
+      educationalBackground: doctor.educationalBackground,
+      speciality: doctor.speciality,
+      requestStatus: doctor.requestStatus as DoctorStatus,
+      availableTimes: doctor.availableTimes as [Date],
+      sessionRate: getDoctorSessionRateForPatient({ doctor, patient }),
+      hourlyRateWithMarkup: getDoctorSessionRateWithMarkup({ doctor }),
+      hasDiscount: hasDiscountOnDoctorSession({ patient }),
+    } satisfies GetApprovedDoctorResponse)
   })
 )
 
@@ -212,20 +220,18 @@ doctorsRouter.patch(
   asyncWrapper(allowAdmins),
   asyncWrapper(async (req, res) => {
     const doctor = await rejectDoctor(req.params.id)
-    res.send(
-      new UpdateDoctorResponse(
-        doctor.id,
-        doctor.user.username,
-        doctor.name,
-        doctor.email,
-        doctor.dateOfBirth,
-        doctor.hourlyRate,
-        doctor.affiliation,
-        doctor.educationalBackground,
-        doctor.speciality,
-        doctor.requestStatus as DoctorStatus
-      )
-    )
+    res.send({
+      id: doctor.id,
+      username: doctor.user.username,
+      name: doctor.name,
+      email: doctor.email,
+      dateOfBirth: doctor.dateOfBirth,
+      hourlyRate: doctor.hourlyRate,
+      affiliation: doctor.affiliation,
+      educationalBackground: doctor.educationalBackground,
+      speciality: doctor.speciality,
+      requestStatus: doctor.requestStatus as DoctorStatus,
+    } satisfies UpdateDoctorResponse)
   })
 )
 doctorsRouter.patch(
@@ -233,44 +239,91 @@ doctorsRouter.patch(
   asyncWrapper(allowAdmins),
   asyncWrapper(async (req, res) => {
     const doctor = await approveDoctor(req.params.id)
-    res.send(
-      new UpdateDoctorResponse(
-        doctor.id,
-        doctor.user.username,
-        doctor.name,
-        doctor.email,
-        doctor.dateOfBirth,
-        doctor.hourlyRate,
-        doctor.affiliation,
-        doctor.educationalBackground,
-        doctor.speciality,
-        doctor.requestStatus as DoctorStatus
-      )
-    )
+    res.send({
+      id: doctor.id,
+      username: doctor.user.username,
+      name: doctor.name,
+      email: doctor.email,
+      dateOfBirth: doctor.dateOfBirth,
+      hourlyRate: doctor.hourlyRate,
+      affiliation: doctor.affiliation,
+      educationalBackground: doctor.educationalBackground,
+      speciality: doctor.speciality,
+      requestStatus: doctor.requestStatus as DoctorStatus,
+      availableTimes: doctor.availableTimes as [Date],
+      employmentContract: doctor.employmentContract as [string],
+    } satisfies ApproveDoctorResponse)
   })
 )
+//reject employment contract
+doctorsRouter.patch(
+  '/rejectEmploymentContract',
+  asyncWrapper(allowApprovedDoctors),
+  asyncWrapper(async (req, res) => {
+    const doctor = await rejectEmploymentContract(req.username!)
+    res.send({
+      id: doctor.id,
+      username: doctor.user.username,
+      name: doctor.name,
+      email: doctor.email,
+      dateOfBirth: doctor.dateOfBirth,
+      hourlyRate: doctor.hourlyRate,
+      affiliation: doctor.affiliation,
+      speciality: doctor.speciality,
+      educationalBackground: doctor.educationalBackground,
+      requestStatus: doctor.requestStatus as DoctorStatus,
+      availableTimes: doctor.availableTimes as [Date],
+      contractStatus: doctor.contractStatus as ContractStatus,
+      employmentContract: doctor.employmentContract as [string],
+      documents: doctor.documents as [string],
+    } satisfies AcceptOrRejectContractResponse)
+  })
+)
+//accept employment contract
+doctorsRouter.patch(
+  '/acceptEmploymentContract',
+  asyncWrapper(allowApprovedDoctors),
+  asyncWrapper(async (req, res) => {
+    const doctor = await acceptEmploymentContract(req.username!)
+    res.send({
+      id: doctor.id,
+      username: doctor.user.username,
+      name: doctor.name,
+      email: doctor.email,
+      dateOfBirth: doctor.dateOfBirth,
+      hourlyRate: doctor.hourlyRate,
+      affiliation: doctor.affiliation,
+      speciality: doctor.speciality,
+      educationalBackground: doctor.educationalBackground,
+      requestStatus: doctor.requestStatus as DoctorStatus,
+      availableTimes: doctor.availableTimes as [Date],
+      contractStatus: doctor.contractStatus as ContractStatus,
+      employmentContract: doctor.employmentContract as [string],
+      documents: doctor.documents as [string],
+    } satisfies AcceptOrRejectContractResponse)
+  })
+)
+
 doctorsRouter.patch(
   '/addAvailableTimeSlots',
   validate(AddAvailableTimeSlotsRequestValidator),
-  asyncWrapper(allowApprovedDoctors),
+  asyncWrapper(allowApprovedandAcceptsDoctors),
   asyncWrapper(async (req, res) => {
     const doctor = await addAvailableTimeSlots(req.username!, req.body)
-    res.send(
-      new AddAvailableTimeSlotsResponse(
-        doctor.id,
-        doctor.user.username,
-        doctor.name,
-        doctor.email,
-        doctor.dateOfBirth,
-        doctor.hourlyRate,
-        doctor.affiliation,
-        doctor.educationalBackground,
-        doctor.speciality,
-        doctor.requestStatus as DoctorStatus,
-        doctor.availableTimes as [Date],
-        doctor.hourlyRate
-      )
-    )
+
+    res.send({
+      id: doctor.id,
+      username: doctor.user.username,
+      name: doctor.name,
+      email: doctor.email,
+      dateOfBirth: doctor.dateOfBirth,
+      hourlyRate: doctor.hourlyRate,
+      affiliation: doctor.affiliation,
+      speciality: doctor.speciality,
+      educationalBackground: doctor.educationalBackground,
+      availableTimes: doctor.availableTimes as [Date],
+      requestStatus: doctor.requestStatus as DoctorStatus,
+    } satisfies AddAvailableTimeSlotsResponse)
   })
 )
 
@@ -279,7 +332,44 @@ doctorsRouter.get(
   '/wallet/:username',
   asyncWrapper(async (req, res) => {
     const doctor = await getDoctorByUsername(req.params.username)
-    if (!doctor || !doctor.walletMoney) throw new NotFoundError()
-    res.send(new GetWalletMoneyResponse(doctor.walletMoney))
+    if (!doctor) throw new NotFoundError()
+    res.send({
+      money: doctor.walletMoney ?? 0,
+    } satisfies GetWalletMoneyResponse)
+  })
+)
+
+doctorsRouter.post(
+  '/for-patient',
+  asyncWrapper<GetDoctorsForPatientsRequest>(async (req, res) => {
+    const user = await UserModel.findOne({ username: req.body.patientUsername })
+
+    if (!user) throw new NotFoundError()
+
+    const patient = await PatientModel.findOne({
+      user: user.id,
+    })
+
+    if (!patient) throw new NotFoundError()
+
+    const appointments = await AppointmentModel.find({
+      patientID: patient.id,
+    })
+
+    const doctorIds = Array.from(
+      new Set(appointments.map((appointment) => appointment.doctorID))
+    )
+
+    const doctors = await DoctorModel.find({
+      _id: { $in: doctorIds },
+    }).populate<{ user: IUser }>('user')
+
+    res.send(
+      doctors.map((d) => ({
+        id: d.id,
+        username: d.user.username,
+        name: d.name,
+      })) satisfies GetDoctorsForPatientsResponse
+    )
   })
 )

@@ -8,6 +8,10 @@ import {
   type UpdateHealthPackageRequest,
   type createHealthPackageRequest,
 } from 'clinic-common/types/healthPackage.types'
+import { DoctorDocument } from '../models/doctor.model'
+import { PatientDocument, PatientModel } from '../models/patient.model'
+import { getDoctorSessionRateWithMarkup } from './doctor.service'
+import { FamilyMemberModel } from '../models/familyMember.model'
 
 export async function addHealthPackages(
   request: createHealthPackageRequest
@@ -26,8 +30,23 @@ export async function addHealthPackages(
 export async function updateHealthPackage(
   packageId: string,
   request: UpdateHealthPackageRequest
-): Promise<HydratedDocument<HealthPackageDocument>> {
+): Promise<boolean> {
   if (packageId == null) throw new NotFoundError()
+
+  const patient = await PatientModel.findOne({ healthPackage: packageId })
+
+  if (patient) {
+    return false
+  }
+
+  const familyMember = await FamilyMemberModel.findOne({
+    healthPackage: packageId,
+  })
+
+  if (familyMember) {
+    return false
+  }
+
   const updatedHealthPackage = await HealthPackageModel.findByIdAndUpdate(
     { _id: packageId },
     request,
@@ -40,10 +59,24 @@ export async function updateHealthPackage(
     throw new NotFoundError()
   }
 
-  return updatedHealthPackage
+  return true
 }
 
-export async function removeHealthPackage(packageId: string): Promise<void> {
+export async function removeHealthPackage(packageId: string): Promise<boolean> {
+  const patient = await PatientModel.findOne({ healthPackage: packageId })
+
+  if (patient) {
+    return false
+  }
+
+  const familyMember = await FamilyMemberModel.findOne({
+    healthPackage: packageId,
+  })
+
+  if (familyMember) {
+    return false
+  }
+
   const healthPackage = await HealthPackageModel.findByIdAndDelete({
     _id: packageId,
   })
@@ -51,7 +84,26 @@ export async function removeHealthPackage(packageId: string): Promise<void> {
   if (healthPackage == null) {
     throw new NotFoundError()
   }
+
+  return true
 }
+
+// export async function isPackageHasSubscribers(packageId: string): Promise<boolean> {
+//   console.log("Reached")
+//   const patient =await PatientModel.findOne({healthPackage:packageId})
+
+//   if(patient){
+//     return true
+//   }
+
+//   const familyMember=await FamilyMemberModel.findOne({healthPackage:packageId})
+
+//   if(familyMember){
+//     return true
+//   }
+
+//   return false
+// }
 
 export async function getAllHealthPackages(): Promise<
   Array<HydratedDocument<HealthPackageDocument>>
@@ -131,4 +183,38 @@ export async function getHealthPackageNameById(
   } catch (err) {
     return 'N/A'
   }
+}
+
+export function getDoctorSessionRateForPatient({
+  doctor,
+  patient,
+}: {
+  doctor: Pick<DoctorDocument, 'hourlyRate' | 'employmentContract'>
+  patient: Pick<PatientDocument, 'healthPackageRenewalDate'> & {
+    healthPackage?: HealthPackageDocument
+  }
+}) {
+  let sessionRate = getDoctorSessionRateWithMarkup({ doctor })
+
+  if (!hasDiscountOnDoctorSession({ patient })) return sessionRate
+
+  const healthPackageDiscount =
+    (patient?.healthPackage?.sessionDiscount ?? 0) / 100
+  sessionRate = sessionRate * (1 - healthPackageDiscount)
+
+  return sessionRate
+}
+
+export function hasDiscountOnDoctorSession({
+  patient,
+}: {
+  patient: Pick<PatientDocument, 'healthPackageRenewalDate'> & {
+    healthPackage?: HealthPackageDocument
+  }
+}) {
+  if (!patient.healthPackage || !patient.healthPackageRenewalDate) return false
+
+  const healthPackageDiscount = patient.healthPackage.sessionDiscount / 100
+
+  return healthPackageDiscount > 0
 }

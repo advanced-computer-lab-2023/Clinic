@@ -1,7 +1,7 @@
 import { AuthenticatedRoute } from '@/components/AuthenticatedRoute'
 import { useSidebar } from '@/hooks/sidebar'
 import { UserType } from 'clinic-common/types/user.types'
-import { Person, Wallet } from '@mui/icons-material'
+import { Person, VpnKey, Wallet } from '@mui/icons-material'
 import Container from '@mui/material/Container'
 import { useEffect } from 'react'
 import { Navigate, Outlet } from 'react-router-dom'
@@ -12,15 +12,16 @@ import { useQuery } from '@tanstack/react-query'
 import { CardPlaceholder } from '@/components/CardPlaceholder'
 import { Typography } from '@mui/material'
 import { getDoctor } from '@/api/doctor'
-import { DoctorStatus } from 'clinic-common/types/doctor.types'
+import { ContractStatus, DoctorStatus } from 'clinic-common/types/doctor.types'
 import VisibilityIcon from '@mui/icons-material/Visibility'
+import AssignmentIcon from '@mui/icons-material/Assignment'
 
 export function DoctorDashboardLayout() {
   const { setSidebarLinks } = useSidebar()
   const { user } = useAuth()
 
   const doctorQuery = useQuery({
-    queryKey: ['doctor', user!.username],
+    queryKey: ['doctor', user?.username],
     queryFn: () => getDoctor(user!.username),
     enabled: !!user,
   })
@@ -32,6 +33,18 @@ export function DoctorDashboardLayout() {
 
     if (doctorQuery.data?.requestStatus != DoctorStatus.Approved) {
       setSidebarLinks([])
+
+      return
+    }
+
+    if (doctorQuery.data?.contractStatus != ContractStatus.Accepted) {
+      setSidebarLinks([
+        {
+          to: '/doctor-dashboard/employmentContract',
+          text: 'Employment Contract',
+          icon: <AssignmentIcon />,
+        },
+      ])
 
       return
     }
@@ -62,8 +75,23 @@ export function DoctorDashboardLayout() {
         text: 'Wallet',
         icon: <Wallet />,
       },
+      {
+        to: '/doctor-dashboard/employmentContract',
+        text: 'Employment Contract',
+        icon: <AssignmentIcon />,
+      },
+      {
+        to: '/doctor-dashboard/change-password',
+        text: 'Change Password',
+        icon: <VpnKey />,
+      },
     ])
-  }, [setSidebarLinks, user, doctorQuery.data?.requestStatus])
+  }, [
+    setSidebarLinks,
+    user,
+    doctorQuery.data?.requestStatus,
+    doctorQuery.data?.contractStatus,
+  ])
 
   if (!user) {
     return <Navigate to="/" />

@@ -16,6 +16,7 @@ import { type HydratedDocument, type ObjectId } from 'mongoose'
 import { getStorage, ref, uploadBytes } from 'firebase/storage'
 import { getDownloadURL } from 'firebase/storage'
 import FireBase from '../../../../firebase.config'
+import { FamilyMemberModel } from '../models/familyMember.model'
 type PatientDocumentWithUser = WithUser<PatientDocument>
 const storage = getStorage(FireBase)
 const storageRef = ref(storage, 'petients/medicalHistory')
@@ -62,8 +63,51 @@ export async function uploadMedicalHistory(
   }
 }
 
+export async function deleteMedicalHistory(
+  id: string,
+  url: string
+): Promise<void> {
+  const updateResult = await PatientModel.updateOne(
+    { user: id },
+    { $pull: { documents: url } }
+  ).exec()
+
+  if (updateResult.matchedCount === 0) {
+    throw new NotFoundError() // If no document was found
+  }
+
+  if (updateResult.modifiedCount === 0) {
+    throw new Error('No document was modified') // If the document was found but not modified
+  }
+}
+
+export async function deleteHealthRecord(
+  id: string,
+  url: string
+): Promise<void> {
+  const updateResult = await PatientModel.updateOne(
+    { _id: id },
+    { $pull: { healthRecords: url } }
+  ).exec()
+
+  if (updateResult.matchedCount === 0) {
+    throw new NotFoundError() // If no document was found
+  }
+
+  if (updateResult.modifiedCount === 0) {
+    throw new Error('No document was modified') // If the document was found but not modified
+  }
+}
+
 export async function getMyMedicalHistory(id: string): Promise<string[]> {
   const patient = await PatientModel.findOne({ user: id }).exec()
+  if (patient == null) throw new NotFoundError()
+
+  return patient.documents
+}
+
+export async function getMedicalHistoryFiles(id: string): Promise<string[]> {
+  const patient = await PatientModel.findOne({ _id: id }).exec()
   if (patient == null) throw new NotFoundError()
 
   return patient.documents
@@ -124,7 +168,7 @@ export async function filterPatientByAppointment(
 // Define the function to get all patients of a doctor
 export async function getMyPatients(
   doctorId: ObjectId
-): Promise<Array<HydratedDocument<PatientDocument>>> {
+): Promise<Array<WithUser<PatientDocument>>> {
   // Find all appointments with the given doctorId
   const appointments = await AppointmentModel.find({ doctorID: doctorId })
   // Create a map of unique patient IDs to their corresponding patient documents
@@ -151,7 +195,13 @@ export async function getMyPatients(
   ) as Array<HydratedDocument<PatientDocument>>
 
   // Return the list of patients
-  return filteredPatients
+  return Promise.all(
+    filteredPatients.map((p) =>
+      p.populate<{
+        user: HydratedDocument<UserDocument>
+      }>('user')
+    )
+  )
 }
 
 export async function addNoteToPatient(
@@ -177,50 +227,86 @@ export async function getPatientNotes(username: string) {
   return patient?.notes
 }
 
-export async function subscribeToHealthPackage(params: {
-  patientUsername: string
+export async function subscribeToHealthPackage({
+  patientId,
+  isFamilyMember = false,
+  healthPackageId,
+}: {
+  patientId: string
+  isFamilyMember?: boolean
   healthPackageId: string
 }): Promise<void> {
-  const patient = await getPatientByUsername(params.patientUsername)
+  let model = isFamilyMember
+    ? await FamilyMemberModel.findById(patientId)
+    : await PatientModel.findById(patientId)
 
-  if (!patient) {
+  if (!model) {
     throw new NotFoundError()
   }
 
-  const healthPackage = await HealthPackageModel.findById(
-    params.healthPackageId
-  )
+  const healthPackage = await HealthPackageModel.findById(healthPackageId)
 
   if (!healthPackage) {
     throw new NotFoundError()
   }
 
-  patient.healthPackage = healthPackage.id
+  if (model.healthPackage) {
+    model = await unSubscribeToHealthPackage({ id: patientId, isFamilyMember })
+  }
 
-  await patient.save() //removed console.log
+  model.healthPackage = healthPackage.id
+
+  // Set renewal date to 1 year from now
+  const renewalDate = new Date()
+  renewalDate.setFullYear(renewalDate.getFullYear() + 1)
+  model.healthPackageRenewalDate = renewalDate
+  const historyIndex = model.healthPackageHistory.findIndex(
+    (entry) => entry.healthPackage.toString() === healthPackage.id
+  )
+
+  if (historyIndex !== -1) {
+    model.healthPackageHistory.splice(historyIndex, 1)
+  }
+
+  await model.save()
 }
 
 export async function unSubscribeToHealthPackage(params: {
-  patientUsername: string
-  healthPackageId: string
-}): Promise<void> {
-  const patient = await getPatientByUsername(params.patientUsername)
+  id: string
+  isFamilyMember: boolean
+}) {
+  const model = params.isFamilyMember
+    ? await FamilyMemberModel.findById(params.id)
+    : await PatientModel.findById(params.id)
 
-  if (!patient) {
+  if (!model) {
     throw new NotFoundError()
   }
 
-  const healthPackage = await HealthPackageModel.findById(
-    params.healthPackageId
-  )
+  if (model && model.healthPackage) {
+    // Check if there is existing history with the same healthPackage
+    const existingItemIndex = model.healthPackageHistory.findIndex(
+      (item) =>
+        item.healthPackage.toString() === model.healthPackage?.toString()
+    )
 
-  if (!healthPackage) {
-    throw new NotFoundError()
+    if (existingItemIndex !== -1) {
+      // Update the date attribute of the existing item
+      model.healthPackageHistory[existingItemIndex].date = new Date()
+    } else {
+      // If no existing item, push a new item
+      model.healthPackageHistory.push({
+        healthPackage: model.healthPackage,
+        date: new Date(),
+      })
+    }
+
+    model.healthPackage = undefined
+    model.healthPackageRenewalDate = undefined
+    await model.save()
   }
 
-  patient.healthPackage = undefined
-
-  await patient.save()
+  return model
 }
 
 export async function getPatientByUsername(
@@ -270,4 +356,63 @@ export async function getPatientHealthRecords(
   const patient = await PatientModel.findOne({ user: user?._id })
 
   return patient?.healthRecords || []
+}
+
+export async function getPatientIdFromUsername(username: string) {
+  const user = await UserModel.findOne({ username })
+
+  if (!user) {
+    throw new NotFoundError()
+  }
+
+  const patient = await PatientModel.findOne({ user: user.id })
+
+  if (!patient) {
+    throw new NotFoundError()
+  }
+
+  return patient.id
+}
+
+export async function getDiscount({
+  subscriberId,
+  isFamilyMember,
+}: {
+  subscriberId: string
+  isFamilyMember?: boolean
+}) {
+  let familyMemberId = subscriberId
+
+  if (!isFamilyMember) {
+    const patient = await PatientModel.findById(subscriberId)
+    const familyMember = await FamilyMemberModel.findOne({
+      patient: patient?.id,
+    })
+    familyMemberId = familyMember?.id
+  }
+
+  const linkedFamily = await PatientModel.findOne({
+    familyMembers: {
+      $in: [familyMemberId],
+    },
+  })
+
+  if (
+    !linkedFamily ||
+    !linkedFamily.healthPackage ||
+    !linkedFamily.healthPackageRenewalDate ||
+    linkedFamily.healthPackageRenewalDate < new Date()
+  ) {
+    return 0
+  }
+
+  const healthPackage = await HealthPackageModel.findById(
+    linkedFamily.healthPackage
+  )
+
+  if (!healthPackage) {
+    return 0
+  }
+
+  return healthPackage.familyMemberSubscribtionDiscount / 100
 }

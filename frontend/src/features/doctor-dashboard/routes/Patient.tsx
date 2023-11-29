@@ -13,7 +13,8 @@ import { useQuery } from '@tanstack/react-query'
 import { Link, useParams } from 'react-router-dom'
 import AddIcon from '@mui/icons-material/Add'
 import { useState } from 'react'
-import axios from 'axios'
+import { toast } from 'react-toastify'
+import { AddNotes } from '@/api/doctor'
 
 export function Patient() {
   const [showTextField, setShowTextField] = useState(false)
@@ -47,19 +48,15 @@ export function Patient() {
   async function submit() {
     if (notes === '') {
       setNotesError(true)
-      alert('Please enter a health record ')
+      toast.error('Please enter a health record')
     } else {
       setNotesError(false)
       setShowTextField(false)
       setShowButton(false)
-      console.log(notes)
-      console.log(id)
-      await axios
-        .patch(`http://localhost:3000/patients/addNote/${id}`, {
-          newNote: notes,
-        })
+      await AddNotes(id, notes)
         .then(() => {
-          alert('Note added successfully')
+          toast.success('Note added successfully')
+          query.refetch()
         })
         .catch((err) => {
           console.log(err)
@@ -128,17 +125,8 @@ export function Patient() {
               </Typography>
             ))}
           </Stack>
-          <Stack spacing={-1}>
-            <Typography variant="overline" color="text.secondary">
-              Prescriptions
-            </Typography>
-            {patient.prescriptions.map((prescription) => (
-              <Typography variant="body1">
-                {`${prescription.medicine} - ${prescription.date.toString()}`}
-              </Typography>
-            ))}
-          </Stack>
-          <Stack spacing={5}>
+
+          {/* <Stack spacing={5}>
             <img
               src={
                 'https://images.sampleforms.com/wp-content/uploads/2016/07/pediatric-medical-history-form.jpg'
@@ -146,7 +134,7 @@ export function Patient() {
               className="Screenshot"
               alt="showing screen capture"
             />
-          </Stack>
+          </Stack> */}
           <Stack spacing={-1}>
             <Typography variant="overline" color="text.secondary">
               Medical Records
@@ -173,11 +161,19 @@ export function Patient() {
               ADD
             </Button>
           )}
-          <Link
-            to={'http://localhost:5173/doctor-dashboard/healthRecords/' + id}
-          >
+          <Link to={'../healthRecords/' + id}>
             <Button variant="contained" color="primary">
               Health Records Files
+            </Button>
+          </Link>
+          <Link to={'../Prescriptions/' + patient.username}>
+            <Button variant="contained" color="primary">
+              view Prescriptions
+            </Button>
+          </Link>
+          <Link to={'../medicalHistory/' + id}>
+            <Button variant="contained" color="primary">
+              Medical History Files
             </Button>
           </Link>
         </Stack>

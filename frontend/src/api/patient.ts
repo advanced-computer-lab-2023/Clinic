@@ -70,7 +70,33 @@ export async function getPatientHealthRecordsFiles(id: string) {
 }
 
 export async function getMyHealthRecordsFiles() {
-  return await api.get(`/patients//viewHealthRecordsFiles`).then((res) => {
+  return await api.get(`/patients/viewHealthRecordsFiles`).then((res) => {
     return res.data
+  })
+}
+
+export async function createFollowup(
+  doctorID: any,
+  patientID: any,
+  followUpDate: any
+) {
+  return await api.post(`/appointment/createFollowUp`, {
+    doctorID,
+    patientID,
+    date: followUpDate,
+  })
+}
+
+export async function deleteMedicalHistory(urlToDelete: any) {
+  return await api.post('/patients/deleteMedicalHistory/mine', {
+    url: urlToDelete,
+  })
+}
+
+export async function addMedicalHistory(formData: any) {
+  return await api.post('/patients/uploadMedicalHistory/mine', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data; ${formData.getBoundary()}',
+    },
   })
 }

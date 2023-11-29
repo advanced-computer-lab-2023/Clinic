@@ -1,4 +1,4 @@
-import { AccountCircle, Logout } from '@mui/icons-material'
+import { Logout as LogoutIcon, Menu as MenuIcon } from '@mui/icons-material'
 import {
   Box,
   CssBaseline,
@@ -13,12 +13,13 @@ import {
   ListItemText,
   IconButton,
 } from '@mui/material'
-import React from 'react'
-import { Link, Outlet } from 'react-router-dom'
+import React, { useState } from 'react'
+import { Link, Outlet, useLocation } from 'react-router-dom'
 import { OnlyAuthenticated } from './OnlyAuthenticated'
-import { LocalizationProvider } from '@mui/x-date-pickers'
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { NotificationsList } from './Notifications'
+import { ChatsList } from './chats/ChatsList'
+import { ChatsProvider } from '@/providers/ChatsProvider'
+import { useAuth } from '@/hooks/auth'
 
 interface ListItemLinkProps {
   icon?: React.ReactElement
@@ -28,10 +29,15 @@ interface ListItemLinkProps {
 
 function ListItemLink(props: ListItemLinkProps) {
   const { icon, primary, to } = props
+  const location = useLocation()
 
   return (
     <li>
-      <ListItemButton component={Link} to={to}>
+      <ListItemButton
+        component={Link}
+        to={to}
+        selected={location.pathname === to}
+      >
         {icon ? <ListItemIcon>{icon}</ListItemIcon> : null}
         <ListItemText primary={primary} />
       </ListItemButton>
@@ -53,33 +59,42 @@ interface SidebarLink {
 }
 
 export function BaseLayout() {
-  const [sidebarLinks, setSidebarLinks] = React.useState<SidebarLink[]>([])
+  const [sidebarLinks, setSidebarLinks] = useState<SidebarLink[]>([])
+  const [openDrawer, setOpenDrawer] = useState(false)
+  const { user } = useAuth()
 
-  return (
+  const handleDrawerOpen = () => {
+    setOpenDrawer(true)
+  }
+
+  const handleDrawerClose = () => {
+    setOpenDrawer(false)
+  }
+
+  const layout = (
     <Box sx={{ display: 'flex' }}>
       <CssBaseline />
       <AppBar
         position="fixed"
-        sx={{ width: `calc(100% - ${drawerWidth}px)`, ml: `${drawerWidth}px` }}
+        sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
       >
         <Toolbar>
+          <IconButton
+            color="inherit"
+            aria-label="open drawer"
+            edge="start"
+            onClick={!openDrawer ? handleDrawerOpen : handleDrawerClose}
+            sx={{ mr: 2 }}
+          >
+            <MenuIcon />
+          </IconButton>
           <Typography variant="h6" noWrap component="div">
             Clinic
           </Typography>
           <Box sx={{ flexGrow: 1 }} />
           <OnlyAuthenticated>
             <NotificationsList />
-            <IconButton
-              size="large"
-              edge="end"
-              aria-label="account of current user"
-              // aria-controls={menuId}
-              aria-haspopup="true"
-              // onClick={handleProfileMenuOpen}
-              color="inherit"
-            >
-              <AccountCircle />
-            </IconButton>
+            <ChatsList />
           </OnlyAuthenticated>
         </Toolbar>
       </AppBar>
@@ -92,8 +107,10 @@ export function BaseLayout() {
             boxSizing: 'border-box',
           },
         }}
-        variant="permanent"
+        variant="temporary"
         anchor="left"
+        open={openDrawer}
+        onClose={handleDrawerClose}
       >
         <Toolbar />
         <Divider />
@@ -111,7 +128,7 @@ export function BaseLayout() {
             <ListItemLink
               to="/auth/logout"
               primary="Logout"
-              icon={<Logout />}
+              icon={<LogoutIcon />}
             />
           </OnlyAuthenticated>
         </List>
@@ -121,14 +138,18 @@ export function BaseLayout() {
         sx={{ flexGrow: 1, bgcolor: 'background.default', p: 3 }}
       >
         <Toolbar />
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <Outlet
-            context={
-              { setSidebarLinks, sidebarLinks } satisfies OutletContextType
-            }
-          />
-        </LocalizationProvider>
+        <Outlet
+          context={
+            { setSidebarLinks, sidebarLinks } satisfies OutletContextType
+          }
+        />
       </Box>
     </Box>
   )
+
+  if (user) {
+    return <ChatsProvider>{layout}</ChatsProvider>
+  } else {
+    return layout
+  }
 }

@@ -8,7 +8,11 @@ import { Patient } from '@/features/doctor-dashboard/routes/Patient'
 import { ViewMyAvailableTimeSlots } from './ViewMyAvailableTimeSlots'
 
 import { Wallet } from './Wallet'
+import { EmploymentContract } from './EmploymentContract'
 import AddHealthRecord from './AddHealthRecord'
+import ChangePassword from '@/features/auth/routes/ChangePassword'
+import ViewMedicalHistory from './viewPatientMedicalHistory'
+import ViewPrescription from './viewPrescription'
 
 export const doctorDashboardRoutes: RouteObject[] = [
   {
@@ -43,8 +47,24 @@ export const doctorDashboardRoutes: RouteObject[] = [
         element: <Wallet />,
       },
       {
+        path: 'employmentContract',
+        element: <EmploymentContract />,
+      },
+      {
         path: 'healthRecords/:id',
         element: <AddHealthRecord />,
+      },
+      {
+        path: 'change-password',
+        element: <ChangePassword />,
+      },
+      {
+        path: 'medicalHistory/:id',
+        element: <ViewMedicalHistory />,
+      },
+      {
+        path: 'Prescriptions/:username',
+        element: <ViewPrescription />,
       },
     ],
   },

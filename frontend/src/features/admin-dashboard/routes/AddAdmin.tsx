@@ -7,6 +7,8 @@ export function AddAdmin() {
     <ApiForm
       fields={[
         { label: 'Username', property: 'username' },
+        { label: 'Email', property: 'email' },
+
         { label: 'Password', property: 'password' },
       ]}
       validator={AddAdminValidator}

@@ -25,11 +25,17 @@ import {
   GetUserByUsernameResponse,
   type UserType,
 } from 'clinic-common/types/user.types'
-import { RegisterDoctorRequestValidator } from 'clinic-common/validators/doctor.validator'
+
 import {
   type DoctorStatus,
   RegisterDoctorRequestResponse,
 } from 'clinic-common/types/doctor.types'
+import { getModelIdForUsername } from '../services/auth.service'
+import multer from 'multer'
+
+const storage = multer.memoryStorage() // You can choose a different storage method
+
+const upload = multer({ storage })
 
 export const authRouter = Router()
 
@@ -60,9 +66,13 @@ authRouter.get(
   allowAuthenticated,
   asyncWrapper(async (req, res) => {
     const user = await getUserByUsername(req.username as string)
-    res.send(
-      new GetCurrentUserResponse(user.id, user.username, user.type as UserType)
-    )
+
+    res.send({
+      id: user.id,
+      username: user.username,
+      type: user.type as UserType,
+      modelId: await getModelIdForUsername(user.username),
+    } satisfies GetCurrentUserResponse)
   })
 )
 
@@ -80,35 +90,35 @@ authRouter.get(
 
     const user = await getUserByUsername(req.params.username)
 
-    res.send(
-      new GetUserByUsernameResponse(
-        user.id,
-        user.username,
-        user.type as UserType
-      )
-    )
+    res.send({
+      id: user.id,
+      username: user.username,
+      type: user.type as UserType,
+      modelId: await getModelIdForUsername(user.username),
+    } satisfies GetUserByUsernameResponse)
   })
 )
 
 // Submit a Request to Register as a Doctor
 authRouter.post(
   '/request-doctor',
-  validate(RegisterDoctorRequestValidator),
+  upload.array('documents', 50),
   asyncWrapper(async (req, res) => {
-    const doctor = await submitDoctorRequest(req.body)
-    res.send(
-      new RegisterDoctorRequestResponse(
-        doctor.id,
-        doctor.user.username,
-        doctor.name,
-        doctor.email,
-        doctor.dateOfBirth,
-        doctor.hourlyRate,
-        doctor.affiliation,
-        doctor.educationalBackground,
-        doctor.speciality,
-        doctor.requestStatus as DoctorStatus
-      )
-    )
+    const doctor = await submitDoctorRequest({
+      ...req.body,
+      documents: req.files as Express.Multer.File[],
+    })
+    res.send({
+      id: doctor.id,
+      username: doctor.user.username,
+      name: doctor.name,
+      email: doctor.email,
+      dateOfBirth: doctor.dateOfBirth,
+      hourlyRate: doctor.hourlyRate,
+      affiliation: doctor.affiliation,
+      educationalBackground: doctor.educationalBackground,
+      speciality: doctor.speciality,
+      requestStatus: doctor.requestStatus as DoctorStatus,
+    } satisfies RegisterDoctorRequestResponse)
   })
 )

@@ -1,4 +1,4 @@
-import mongoose from 'mongoose'
+import mongoose, { HydratedDocument, InferSchemaType } from 'mongoose'
 import { UserType } from 'clinic-common/types/user.types'
 
 const Schema = mongoose.Schema
@@ -25,5 +25,7 @@ const userSchema = new Schema(
 )
 
 export type UserDocument = mongoose.InferSchemaType<typeof userSchema>
+
+export type IUser = HydratedDocument<InferSchemaType<typeof userSchema>>
 
 export const UserModel = mongoose.model('User', userSchema)

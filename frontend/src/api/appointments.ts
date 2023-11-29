@@ -13,14 +13,25 @@ export async function reserveTimes(
   doctorid: string,
   date: Date | null,
   familyID: string,
-  reservedFor: string
+  reservedFor: string,
+  toPayUsingWallet: number
 ) {
   const response = await api.post('/appointment/makeappointment', {
     doctorid,
     date,
     familyID,
     reservedFor,
+    toPayUsingWallet,
   })
+
+  return response
+}
+
+export async function cancelAppointment(appointmentId: string) {
+  const response = await api
+    .delete(`/appointment/delete/${appointmentId}`)
+    .then((res) => res.data)
+    .catch((err) => err)
 
   return response
 }

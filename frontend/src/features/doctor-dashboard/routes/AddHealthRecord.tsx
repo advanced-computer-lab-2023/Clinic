@@ -1,4 +1,4 @@
-import { api } from '@/api'
+import { addHealthRecord, deleteHealthRecord } from '@/api/doctor'
 import { getPatientHealthRecordsFiles } from '@/api/patient'
 //import { getMyMedicalHistory } from '@/api/patient'
 import { Button, TextField } from '@mui/material'
@@ -29,6 +29,19 @@ function AddHealthRecord() {
     setImageValue({ file: event.currentTarget.files[0] })
   }
 
+  const handleDelete = async (urlToDelete: string) => {
+    try {
+      // Send a POST request to delete the URL
+      await deleteHealthRecord(id, urlToDelete)
+      // Remove the deleted URL from the state
+      setDownloadURLs((prevURLs) =>
+        prevURLs.filter((url) => url !== urlToDelete)
+      )
+    } catch (err) {
+      console.error('Error deleting URL:', err)
+    }
+  }
+
   const handleUpload = async () => {
     if (!imageValue.file) {
       alert('Please select a file to upload.')
@@ -40,17 +53,7 @@ function AddHealthRecord() {
     formData.append('HealthRecord', imageValue.file)
 
     try {
-      // Send a POST request with the uploaded file
-      await api.post(
-        `http://localhost:3000/patients/uploadHealthRecords/${id}`,
-        formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data; ${formData.getBoundary()}',
-          },
-        }
-      )
-      // Fetch updated download URLs after the upload is complete
+      await addHealthRecord(id, formData)
       const downloadURLsResponse = await getPatientHealthRecordsFiles(id || '')
       setDownloadURLs(downloadURLsResponse)
     } catch (err) {
@@ -72,6 +75,13 @@ function AddHealthRecord() {
           <h2>{'File ' + (index + 1)}</h2>
           <iframe title={'File' + index} src={url} width="80%" height="400px" />
           <br />
+          <Button
+            color="error"
+            variant="outlined"
+            onClick={() => handleDelete(url)}
+          >
+            Delete
+          </Button>
         </div>
       ))}
     </div>
