@@ -1,7 +1,7 @@
 import {
-  acceptDoctorRequest,
+  acceptFollowupRequest,
   getFollowupRequests,
-  rejectDoctorRequest,
+  rejectFollowupRequest,
 } from '@/api/doctor'
 import { CardPlaceholder } from '@/components/CardPlaceholder'
 import { Box, Button, ButtonGroup } from '@mui/material'
@@ -21,24 +21,24 @@ export function FollowupRequests() {
     return <CardPlaceholder />
   }
 
-  function handleApprove(id: string) {
-    const promise = acceptDoctorRequest(id).then(() => {
+  function handleAccept(id: string) {
+    const promise = acceptFollowupRequest(id).then(() => {
       query.refetch()
     })
     toast.promise(promise, {
       pending: 'Loading',
-      success: 'Doctor Request Approved Successfully!',
+      success: 'Follow-up Request Accepted Successfully!',
       error: 'error',
     })
   }
 
   function handleReject(id: string) {
-    const promise = rejectDoctorRequest(id).then(() => {
+    const promise = rejectFollowupRequest(id).then(() => {
       query.refetch()
     })
     toast.promise(promise, {
       pending: 'Loading',
-      success: 'Doctor Request Rejected Successfully!',
+      success: 'Follow-up Request Rejected Successfully!',
       error: 'error',
     })
   }
@@ -74,10 +74,10 @@ export function FollowupRequests() {
             size="small"
             color="success"
             onClick={() => {
-              handleApprove(column.row.id)
+              handleAccept(column.row.id)
             }}
           >
-            Approve
+            Accept
           </Button>
           <Button
             variant="contained"

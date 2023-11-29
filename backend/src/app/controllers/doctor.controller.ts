@@ -12,6 +12,7 @@ import {
   getPendingDoctorRequests,
   rejectDoctor,
   rejectEmploymentContract,
+  rejectFollowupRequest,
   updateDoctorByUsername,
 } from '../services/doctor.service'
 import { asyncWrapper } from '../utils/asyncWrapper'
@@ -344,7 +345,7 @@ doctorsRouter.get(
         }
 
         return new FollowupRequestResponseBase(
-          appointment.id.toString(),
+          request.id,
           appointment.patientID.toString(),
           patient.name,
           appointment.date,
@@ -362,6 +363,15 @@ doctorsRouter.get(
     const response = new GetFollowupRequestsResponse(followupRequestResponses)
 
     res.send(response)
+  })
+)
+
+doctorsRouter.patch(
+  '/rejectFollowupRequest/:id',
+  asyncWrapper(allowApprovedDoctors),
+  asyncWrapper(async (req, res) => {
+    await rejectFollowupRequest(req.params.id)
+    res.send()
   })
 )
 

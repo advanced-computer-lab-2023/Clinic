@@ -12,6 +12,7 @@ import {
   FollowupRequestModel,
 } from '../models/followupRequest.model'
 import { AppointmentModel } from '../models/appointment.model'
+import { HydratedDocument } from 'mongoose'
 
 /**
  * TODO: Replace DoctorDocumentWithUser with WithUser<DoctorDocument>,
@@ -280,7 +281,7 @@ export function getDoctorSessionRateWithMarkup({
 
 export async function getDoctorFollowupRequests(
   username: string
-): Promise<FollowupRequestDocument[]> {
+): Promise<HydratedDocument<FollowupRequestDocument>[]> {
   const doctor = await getDoctorByUsername(username)
   if (!doctor) throw new NotFoundError()
 

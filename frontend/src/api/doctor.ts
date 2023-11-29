@@ -105,3 +105,17 @@ export async function getFollowupRequests(): Promise<GetFollowupRequestsResponse
     .get<GetFollowupRequestsResponse>('/doctors/followupRequests')
     .then((res) => res.data)
 }
+
+export async function acceptFollowupRequest(
+  id: string
+): Promise<UpdateDoctorResponse> {
+  return await api
+    .patch<UpdateDoctorResponse>(`/doctors/acceptDoctorRequest/${id}`)
+    .then((res) => res.data)
+}
+
+export async function rejectFollowupRequest(id: string): Promise<void> {
+  await api
+    .patch<void>(`/doctors/rejectFollowupRequest/${id}`)
+    .then((res) => res.data)
+}
