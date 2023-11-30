@@ -168,7 +168,7 @@ export async function filterPatientByAppointment(
 // Define the function to get all patients of a doctor
 export async function getMyPatients(
   doctorId: ObjectId
-): Promise<Array<HydratedDocument<PatientDocument>>> {
+): Promise<Array<WithUser<PatientDocument>>> {
   // Find all appointments with the given doctorId
   const appointments = await AppointmentModel.find({ doctorID: doctorId })
   // Create a map of unique patient IDs to their corresponding patient documents
@@ -195,7 +195,13 @@ export async function getMyPatients(
   ) as Array<HydratedDocument<PatientDocument>>
 
   // Return the list of patients
-  return filteredPatients
+  return Promise.all(
+    filteredPatients.map((p) =>
+      p.populate<{
+        user: HydratedDocument<UserDocument>
+      }>('user')
+    )
+  )
 }
 
 export async function addNoteToPatient(

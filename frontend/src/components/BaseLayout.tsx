@@ -1,4 +1,4 @@
-import { AccountCircle, Logout } from '@mui/icons-material'
+import { Logout as LogoutIcon, Menu as MenuIcon } from '@mui/icons-material'
 import {
   Box,
   CssBaseline,
@@ -16,10 +16,13 @@ import {
 import React, { useState } from 'react'
 import { Link, Outlet, useLocation } from 'react-router-dom'
 import { OnlyAuthenticated } from './OnlyAuthenticated'
-import { LocalizationProvider } from '@mui/x-date-pickers'
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { NotificationsList } from './Notifications'
+
 import MenuIcon from '@mui/icons-material/Menu'
+import { ChatsList } from './chats/ChatsList'
+import { ChatsProvider } from '@/providers/ChatsProvider'
+import { useAuth } from '@/hooks/auth'
+
 
 interface ListItemLinkProps {
   icon?: React.ReactElement
@@ -59,8 +62,10 @@ interface SidebarLink {
 }
 
 export function BaseLayout() {
-  const [sidebarLinks, setSidebarLinks] = React.useState<SidebarLink[]>([])
+
+  const [sidebarLinks, setSidebarLinks] = useState<SidebarLink[]>([])
   const [openDrawer, setOpenDrawer] = useState(false)
+  const { user } = useAuth()
 
   const handleDrawerOpen = () => {
     setOpenDrawer(true)
@@ -70,7 +75,7 @@ export function BaseLayout() {
     setOpenDrawer(false)
   }
 
-  return (
+  const layout = (
     <Box sx={{ display: 'flex' }}>
       <CssBaseline />
       <AppBar
@@ -78,6 +83,15 @@ export function BaseLayout() {
         sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
       >
         <Toolbar>
+          <IconButton
+            color="inherit"
+            aria-label="open drawer"
+            edge="start"
+            onClick={!openDrawer ? handleDrawerOpen : handleDrawerClose}
+            sx={{ mr: 2 }}
+          >
+            <MenuIcon />
+          </IconButton>
           <Typography variant="h6" noWrap component="div">
             <IconButton
               color="inherit"
@@ -93,17 +107,7 @@ export function BaseLayout() {
           <Box sx={{ flexGrow: 1 }} />
           <OnlyAuthenticated>
             <NotificationsList />
-            <IconButton
-              size="large"
-              edge="end"
-              aria-label="account of current user"
-              // aria-controls={menuId}
-              aria-haspopup="true"
-              // onClick={handleProfileMenuOpen}
-              color="inherit"
-            >
-              <AccountCircle />
-            </IconButton>
+            <ChatsList />
           </OnlyAuthenticated>
         </Toolbar>
       </AppBar>
@@ -138,7 +142,7 @@ export function BaseLayout() {
             <ListItemLink
               to="/auth/logout"
               primary="Logout"
-              icon={<Logout />}
+              icon={<LogoutIcon />}
             />
           </OnlyAuthenticated>
         </List>
@@ -148,14 +152,18 @@ export function BaseLayout() {
         sx={{ flexGrow: 1, bgcolor: 'background.default', p: 3 }}
       >
         <Toolbar />
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <Outlet
-            context={
-              { setSidebarLinks, sidebarLinks } satisfies OutletContextType
-            }
-          />
-        </LocalizationProvider>
+        <Outlet
+          context={
+            { setSidebarLinks, sidebarLinks } satisfies OutletContextType
+          }
+        />
       </Box>
     </Box>
   )
+
+  if (user) {
+    return <ChatsProvider>{layout}</ChatsProvider>
+  } else {
+    return layout
+  }
 }

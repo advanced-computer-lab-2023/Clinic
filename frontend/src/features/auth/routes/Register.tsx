@@ -56,5 +56,6 @@ export const Register = () => {
         buttonText="Register"
       />
     </>
+
   )
 }

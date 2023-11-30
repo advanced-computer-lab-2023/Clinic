@@ -64,6 +64,11 @@ export function PatientDashboardLayout() {
         text: 'Change Password',
         icon: <VpnKey />,
       },
+      {
+        to: '/patient-dashboard/my-doctors',
+        text: 'My Doctors',
+        icon: <Healing />,
+      },
     ])
   }, [setSidebarLinks])
 

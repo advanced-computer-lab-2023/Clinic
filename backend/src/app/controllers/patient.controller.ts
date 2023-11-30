@@ -245,25 +245,24 @@ patientRouter.get(
     const doctor = await DoctorModel.findOne({ user: user.id })
     if (doctor == null) throw new NotAuthenticatedError()
     const patients = await getMyPatients(doctor.id)
-    res.send(
-      new GetMyPatientsResponse(
-        patients.map((patient) => ({
-          id: patient.id,
-          name: patient.name,
-          email: patient.email,
-          mobileNumber: patient.mobileNumber,
-          dateOfBirth: patient.dateOfBirth.toDateString(),
-          gender: patient.gender as Gender,
-          emergencyContact: {
-            name: patient.emergencyContact?.name ?? '',
-            mobileNumber: patient.emergencyContact?.mobileNumber ?? '',
-          },
-          familyMembers: patient.familyMembers.map((familyMember) =>
-            familyMember.toString()
-          ),
-        }))
-      )
-    )
+    res.send({
+      patients: patients.map((patient) => ({
+        id: patient.id,
+        name: patient.name,
+        username: patient.user.username,
+        email: patient.email,
+        mobileNumber: patient.mobileNumber,
+        dateOfBirth: patient.dateOfBirth.toDateString(),
+        gender: patient.gender as Gender,
+        emergencyContact: {
+          name: patient.emergencyContact?.fullName ?? '',
+          mobileNumber: patient.emergencyContact?.mobileNumber ?? '',
+        },
+        familyMembers: patient.familyMembers.map((familyMember) =>
+          familyMember.toString()
+        ),
+      })),
+    } satisfies GetMyPatientsResponse)
   })
 )
 
@@ -297,7 +296,7 @@ patientRouter.get(
           dateOfBirth: patient.dateOfBirth,
           gender: patient.gender as Gender,
           emergencyContact: {
-            name: patient.emergencyContact?.name ?? '',
+            name: patient.emergencyContact?.fullName ?? '',
             mobileNumber: patient.emergencyContact?.mobileNumber ?? '',
           },
           notes: patient.notes,
@@ -329,7 +328,7 @@ patientRouter.post(
           dateOfBirth: patient.dateOfBirth,
           gender: patient.gender as Gender,
           emergencyContact: {
-            name: patient.emergencyContact?.name ?? '',
+            name: patient.emergencyContact?.fullName ?? '',
             mobileNumber: patient.emergencyContact?.mobileNumber ?? '',
           },
           notes: patient.notes,
@@ -427,7 +426,7 @@ patientRouter.get(
         patient.dateOfBirth,
         patient.gender as Gender,
         {
-          name: patient.emergencyContact?.name ?? '',
+          name: patient.emergencyContact?.fullName ?? '',
           mobileNumber: patient.emergencyContact?.mobileNumber ?? '',
         },
         patient.documents,
