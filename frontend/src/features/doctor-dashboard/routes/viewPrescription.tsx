@@ -90,7 +90,7 @@ function ViewPrescription() {
           <Card
             key={`prescription-${prescriptionIndex}`}
             sx={{
-              marginBottom: 20,
+              marginBottom: 5,
               animation: 'slideUp 0.5s ease',
               backgroundColor: '#e3f2fd',
               borderRadius: '15px',
@@ -126,7 +126,6 @@ function ViewPrescription() {
                       <strong>Name:</strong> {medicine.name},{' '}
                       <strong>Dosage:</strong> {medicine.dosage},{' '}
                       <strong>Frequency:</strong> {medicine.frequency},{' '}
-                      <strong>Duration:</strong> {medicine.duration}
                     </Typography>
                   )
                 )}
@@ -199,7 +198,7 @@ function ViewPrescription() {
             <Link
               to={`http://localhost:5174/doctor-dashboard?patientusername=${username}&token=${token}`}
             >
-              add medicines to prescription
+              Add Another Prescription
             </Link>
             <Button
               onClick={() =>
