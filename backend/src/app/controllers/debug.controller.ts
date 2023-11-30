@@ -22,7 +22,8 @@ import {
 } from '../models/prescription.model'
 import { Relation } from 'clinic-common/types/familyMember.types'
 import { Gender } from 'clinic-common/types/gender.types'
-import mongoose, { type HydratedDocument } from 'mongoose'
+// import mongoose, { type HydratedDocument } from 'mongoose'
+import { type HydratedDocument } from 'mongoose'
 import { createDefaultHealthPackages } from '../services/healthPackage.service'
 import { AppointmentStatus } from 'clinic-common/types/appointment.types'
 import {
@@ -434,7 +435,7 @@ debugRouter.post(
 debugRouter.post(
   '/seed',
   asyncWrapper(async (req, res) => {
-    await mongoose.connection.db.dropDatabase()
+    // await mongoose.connection.db.dropDatabase()
 
     await createDefaultHealthPackages()
 

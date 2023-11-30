@@ -10,14 +10,14 @@ import {
 } from '@mui/material'
 import { useFormik } from 'formik'
 import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import React from 'react'
 
 import { addPrescriptionApi, getPrescriptions } from '@/api/doctor'
 
-
 function ViewPrescription() {
   const { username } = useParams()
+  const token = localStorage.getItem('token')
   const [prescriptions, setPrescriptions] = useState([])
   const formik = useFormik({
     initialValues: {
@@ -38,7 +38,6 @@ function ViewPrescription() {
 
   const addPrescription = async (values: any) => {
     try {
-
       const response = await addPrescriptionApi(
         username,
         values.medicines,
@@ -46,7 +45,6 @@ function ViewPrescription() {
       )
       console.log(response)
       await fetchPresciptions()
-
     } catch (error) {
       console.error('Error fetching presciptions:', error)
     }
@@ -65,7 +63,6 @@ function ViewPrescription() {
   useEffect(() => {
     fetchPresciptions()
   }, [username])
-
 
   return (
     <>
@@ -199,7 +196,11 @@ function ViewPrescription() {
                 </React.Fragment>
               ))}
             </Grid>
-
+            <Link
+              to={`http://localhost:5174/doctor-dashboard?patientusername=${username}&token=${token}`}
+            >
+              add medicines to prescription
+            </Link>
             <Button
               onClick={() =>
                 formik.setFieldValue('medicines', [
