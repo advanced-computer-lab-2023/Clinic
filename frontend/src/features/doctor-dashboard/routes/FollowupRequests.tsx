@@ -45,7 +45,7 @@ export function FollowupRequests() {
 
   const columns: GridColDef<GetFollowupRequestsResponse['requests'][0]>[] = [
     {
-      field: 'patientName',
+      field: 'reservedFor',
       headerName: 'Patient Name',
       width: 100,
     },
