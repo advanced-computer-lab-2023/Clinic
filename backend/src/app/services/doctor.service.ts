@@ -13,6 +13,7 @@ import {
 } from '../models/followupRequest.model'
 import { AppointmentModel } from '../models/appointment.model'
 import { HydratedDocument } from 'mongoose'
+import { AppointmentStatus } from 'clinic-common/types/appointment.types'
 
 /**
  * TODO: Replace DoctorDocumentWithUser with WithUser<DoctorDocument>,
@@ -309,7 +310,18 @@ export async function rejectFollowupRequest(id: string): Promise<void> {
 export async function acceptFollowupRequest(id: string): Promise<void> {
   const request = await FollowupRequestModel.findById(id)
   if (!request) throw new NotFoundError()
+  const appointment = await AppointmentModel.findById(request.appointment)
+  if (!appointment) throw new NotFoundError()
 
+  const newAppointment = new AppointmentModel({
+    patientID: appointment.patientID,
+    doctorID: appointment.doctorID,
+    date: request.date,
+    status: AppointmentStatus.Upcoming,
+    familyID: appointment.familyID,
+    reservedFor: appointment.reservedFor,
+  })
+  await newAppointment.save()
   request.status = 'accepted'
   await request.save()
 }
