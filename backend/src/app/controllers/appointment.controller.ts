@@ -20,6 +20,7 @@ import {
 } from '../services/doctor.service'
 import { AppointmentModel } from '../models/appointment.model'
 import { NotFoundError } from '../errors'
+import { sendAppointmentNotificationToPatient } from '../services/sendNotificationForAppointment'
 
 export const appointmentsRouter = Router()
 
@@ -151,6 +152,8 @@ appointmentsRouter.post(
     appointment.date = req.body.rescheduleDate
     appointment.status = AppointmentStatus.Rescheduled
     appointment.save()
+    sendAppointmentNotificationToPatient(appointment, 'rescheduled')
+
     res.send(appointment)
   })
 )

@@ -19,14 +19,30 @@ const transporter = nodemailer.createTransport({
 export async function sendNotificationPerMail(
   emailAddress: string,
   doctorName: string,
-  time: any
+  time: any,
+  status: string
 ) {
-  const mailOptions = {
-    from: 'el7a2niii@gmail.com',
-    to: emailAddress,
-    subject: 'Appointment Confirmation',
-    text: `Hello!
-    We are pleased to inform you that your appointment request has been accepted, and we have scheduled your appointment with Dr. ${doctorName} at time ${time}. The address of the clinic is 5th Settlement.
+  let mailOptions
+
+  if (status === 'cancelled') {
+    mailOptions = {
+      from: 'el7a2niii@gmail.com',
+      to: emailAddress,
+      subject: 'Appointment Cancellation',
+      text: `Hello!
+      This is an automated mail to inform you that your appointment request  with Dr. ${doctorName} at time ${time} has been cancelled. 
+     
+      Best regards,
+      El7a2ni team
+        `,
+    }
+  } else {
+    mailOptions = {
+      from: 'el7a2niii@gmail.com',
+      to: emailAddress,
+      subject: 'Appointment Update',
+      text: `Hello!
+    This is an automated mail to inform you that your appointment request has been ${status}, and it's set with Dr. ${doctorName} at time ${time}. The address of the clinic is 5th Settlement.
 
     If you have any questions or need to reschedule, please do this using your account on the clinic's website.
     
@@ -35,6 +51,7 @@ export async function sendNotificationPerMail(
     Best regards,
     El7a2ni team
       `,
+    }
   }
 
   try {
@@ -48,20 +65,22 @@ export async function sendNotificationPerMail(
 export async function sendNotificationOnTheSystem(
   username: string,
   doctorName: string,
-  time: any
+  time: any,
+  status: string
 ) {
   console.log('hi i am posting notifications now')
 
   const notification = {
-    description: `Appointment with Dr. ${doctorName} at time ${time} is Approved`,
-    title: 'Appointment Confirmation',
+    description: `Appointment with Dr. ${doctorName} at time ${time} is ${status}`,
+    title: 'Appointment Update',
   }
 
   addUserNotification({ username, notification })
 }
 
 export async function sendAppointmentNotificationToPatient(
-  appointment: AppointmentDocument
+  appointment: AppointmentDocument,
+  status: string
 ) {
   const patient = await PatientModel.findById(appointment?.patientID)
   const patientUser = await UserModel.findById(patient?.user).lean()
@@ -73,7 +92,8 @@ export async function sendAppointmentNotificationToPatient(
     sendNotificationOnTheSystem(
       patientUsername,
       doctor?.name,
-      appointment?.date
+      appointment?.date,
+      status
     )
   }
 
@@ -81,7 +101,8 @@ export async function sendAppointmentNotificationToPatient(
     await sendNotificationPerMail(
       patient.email,
       doctor?.name,
-      appointment?.date
+      appointment?.date,
+      status
     )
   else console.log("one of them isn't found idk which")
 }
