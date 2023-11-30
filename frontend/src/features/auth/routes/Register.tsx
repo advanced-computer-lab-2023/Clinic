@@ -6,7 +6,6 @@ import { RegisterRequest } from 'clinic-common/types/auth.types'
 import { RegisterRequestValidator } from 'clinic-common/validators/user.validator'
 import { Box, Container, Typography } from '@mui/material'
 
-
 export const Register = () => {
   const { refreshUser } = useAuth()
 
@@ -42,7 +41,11 @@ export const Register = () => {
           },
           {
             label: 'Emergency Contact Name',
-            property: 'emergencyContact.name',
+            property: 'emergencyContact.fullName',
+          },
+          {
+            label: 'Emergency Contact Relationship',
+            property: 'emergencyContact.relation',
           },
           {
             label: 'Emergency Contact Mobile Number',
@@ -57,6 +60,5 @@ export const Register = () => {
         buttonText="Register"
       />
     </>
-
   )
 }
