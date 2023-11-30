@@ -18,11 +18,9 @@ import { Link, Outlet, useLocation } from 'react-router-dom'
 import { OnlyAuthenticated } from './OnlyAuthenticated'
 import { NotificationsList } from './Notifications'
 
-import MenuIcon from '@mui/icons-material/Menu'
 import { ChatsList } from './chats/ChatsList'
 import { ChatsProvider } from '@/providers/ChatsProvider'
 import { useAuth } from '@/hooks/auth'
-
 
 interface ListItemLinkProps {
   icon?: React.ReactElement
@@ -62,7 +60,6 @@ interface SidebarLink {
 }
 
 export function BaseLayout() {
-
   const [sidebarLinks, setSidebarLinks] = useState<SidebarLink[]>([])
   const [openDrawer, setOpenDrawer] = useState(false)
   const { user } = useAuth()
@@ -93,15 +90,6 @@ export function BaseLayout() {
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap component="div">
-            <IconButton
-              color="inherit"
-              aria-label="open drawer"
-              edge="start"
-              onClick={!openDrawer ? handleDrawerOpen : handleDrawerClose}
-              sx={{ mr: 2 }}
-            >
-              <MenuIcon />
-            </IconButton>
             Clinic
           </Typography>
           <Box sx={{ flexGrow: 1 }} />
