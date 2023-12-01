@@ -14,9 +14,11 @@ import { useParams } from 'react-router-dom'
 import html2canvas from 'html2canvas'
 import jsPDF from 'jspdf'
 import { useRef } from 'react'
+import { addPrescriptionTocart } from '@/api/pharmacy'
 
 export function PrescriptionView() {
   const { id } = useParams()
+  const token = localStorage.getItem('token')
   const pdfRef = useRef(null)
 
   const query = useQuery({
@@ -109,6 +111,20 @@ export function PrescriptionView() {
       >
         download
       </Button>
+      {!prescription.isFilled && (
+        <Button
+          onClick={() => {
+            console.log('hii')
+            addPrescriptionTocart(id, token)
+          }}
+        >
+          CHECKOUT
+          {/* <Link to={`http://localhost:5174/patient-dashboard/prescriptionCheckout?PrescriptionId=${id}&token=${token}`}
+            >
+            CHECKOUT
+            </Link> */}
+        </Button>
+      )}
     </Card>
   )
 }
