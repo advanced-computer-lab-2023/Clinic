@@ -35,8 +35,8 @@ export const Register = () => {
             property: 'gender',
             type: 'select',
             selectedValues: [
-              { label: 'Male', value: 'male' },
-              { label: 'Female', value: 'female' },
+              { label: 'Male', value: 'Male' },
+              { label: 'Female', value: 'Female' },
             ],
           },
           {
