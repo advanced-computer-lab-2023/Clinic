@@ -25,7 +25,7 @@ import { UserType } from 'clinic-common/types/user.types'
 import { toast } from 'react-toastify'
 import { useNavigate } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
-import { createFollowup } from '@/api/patient'
+import { createFollowup, requestFollowup } from '@/api/patient'
 
 export function Appointments() {
   const queryClient = useQueryClient()
@@ -75,6 +75,7 @@ export function Appointments() {
       setRescheduleDate('')
     }
   }
+
   async function handleRequestFollowUpButton(appointmentID: string) {
     if (followUpDate === '') {
       setFollowUpDateError(true)
@@ -82,11 +83,7 @@ export function Appointments() {
     } else {
       setFollowUpDateError(false)
 
-      await axios
-        .post(`http://localhost:3000/appointment/requestFollowUp`, {
-          appointmentID,
-          date: followUpDate,
-        })
+      await requestFollowup(appointmentID, followUpDate)
         .then(() => {
           toast.success('Follow-up requested successfully')
         })
@@ -290,8 +287,8 @@ export function Appointments() {
                       onClick={() => handleCancelAppointment(appointment.id)}
                     >
                       Cancel Appointment
-                      </Button>
-                )}
+                    </Button>
+                  )}
                 {user && appointment.status === 'upcoming' && (
                   <Button
                     variant="contained"

@@ -100,3 +100,13 @@ export async function addMedicalHistory(formData: any) {
     },
   })
 }
+
+export async function requestFollowup(
+  appointmentID: string,
+  followUpDate: string
+) {
+  return await api.post(`/appointment/requestFollowUp`, {
+    appointmentID,
+    date: followUpDate,
+  })
+}

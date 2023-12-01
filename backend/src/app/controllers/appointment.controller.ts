@@ -158,7 +158,7 @@ appointmentsRouter.post(
     res.send(appointment)
   })
 )
- appointmentRouter.post(
+appointmentsRouter.post(
   '/requestFollowUp',
   asyncWrapper(async (req, res) => {
     const request = await requestFollowUpAppointment(
