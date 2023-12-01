@@ -2,15 +2,18 @@ import { Router } from 'express'
 
 import {
   acceptEmploymentContract,
+  acceptFollowupRequest,
   addAvailableTimeSlots,
   approveDoctor,
   getAllDoctors,
   getApprovedDoctorById,
   getDoctorByUsername,
+  getDoctorFollowupRequests,
   getDoctorSessionRateWithMarkup,
   getPendingDoctorRequests,
   rejectDoctor,
   rejectEmploymentContract,
+  rejectFollowupRequest,
   updateDoctorByUsername,
 } from '../services/doctor.service'
 import { asyncWrapper } from '../utils/asyncWrapper'
@@ -54,6 +57,10 @@ import {
 } from '../services/healthPackage.service'
 import { GetDoctorsForPatientsRequest } from 'clinic-common/types/doctor.types'
 import { DoctorModel } from '../models/doctor.model'
+import {
+  FollowupRequestResponseBase,
+  GetFollowupRequestsResponse,
+} from 'clinic-common/types/appointment.types'
 import { AppointmentModel } from '../models/appointment.model'
 
 export const doctorsRouter = Router()
@@ -152,31 +159,6 @@ doctorsRouter.get(
         documents: doctor.documents as [string],
       })),
     } satisfies GetApprovedDoctorsResponse)
-  })
-)
-
-doctorsRouter.get(
-  '/:username',
-  allowAuthenticated,
-  asyncWrapper(async (req, res) => {
-    const doctor = await getDoctorByUsername(req.params.username)
-
-    res.send({
-      id: doctor.id,
-      username: doctor.user.username,
-      name: doctor.name,
-      email: doctor.email,
-      dateOfBirth: doctor.dateOfBirth,
-      hourlyRate: doctor.hourlyRate,
-      affiliation: doctor.affiliation,
-      speciality: doctor.speciality,
-      educationalBackground: doctor.educationalBackground,
-      requestStatus: doctor.requestStatus as DoctorStatus,
-      availableTimes: doctor.availableTimes as [Date],
-      contractStatus: doctor.contractStatus as ContractStatus,
-      employmentContract: doctor.employmentContract as [string],
-      documents: doctor.documents as [string],
-    } satisfies GetDoctorResponse)
   })
 )
 
@@ -371,5 +353,97 @@ doctorsRouter.post(
         name: d.name,
       })) satisfies GetDoctorsForPatientsResponse
     )
+  })
+ )
+doctorsRouter.get(
+  '/followupRequests',
+  asyncWrapper(async (req, res) => {
+    if (!req.username) {
+      throw new NotFoundError()
+    }
+
+    const followupRequests = await getDoctorFollowupRequests(req.username)
+    const fetchAppointments = followupRequests.map(async (request) => {
+      const appointment = await AppointmentModel.findById(request.appointment)
+
+      if (!appointment) {
+        throw new NotFoundError()
+      }
+
+      return { request, appointment }
+    })
+
+    const resolvedFetchAppointments = await Promise.all(fetchAppointments)
+
+    const followupRequestResponsesPromises = resolvedFetchAppointments.map(
+      async ({ request, appointment }) => {
+        const patient = await PatientModel.findById(appointment.patientID)
+
+        if (!patient) {
+          throw new NotFoundError()
+        }
+
+        return new FollowupRequestResponseBase(
+          request.id,
+          appointment.patientID.toString(),
+          patient.name,
+          appointment.date,
+          request.date,
+          appointment.familyID,
+          appointment.reservedFor
+        )
+      }
+    )
+
+    const followupRequestResponses = await Promise.all(
+      followupRequestResponsesPromises
+    )
+
+    const response = new GetFollowupRequestsResponse(followupRequestResponses)
+
+    res.send(response)
+  })
+)
+
+doctorsRouter.patch(
+  '/acceptFollowupRequest/:id',
+  asyncWrapper(allowApprovedDoctors),
+  asyncWrapper(async (req, res) => {
+    await acceptFollowupRequest(req.params.id)
+    res.send()
+  })
+)
+
+doctorsRouter.patch(
+  '/rejectFollowupRequest/:id',
+  asyncWrapper(allowApprovedDoctors),
+  asyncWrapper(async (req, res) => {
+    await rejectFollowupRequest(req.params.id)
+    res.send()
+  })
+)
+
+doctorsRouter.get(
+  '/:username',
+  allowAuthenticated,
+  asyncWrapper(async (req, res) => {
+    const doctor = await getDoctorByUsername(req.params.username)
+
+    res.send({
+      id: doctor.id,
+      username: doctor.user.username,
+      name: doctor.name,
+      email: doctor.email,
+      dateOfBirth: doctor.dateOfBirth,
+      hourlyRate: doctor.hourlyRate,
+      affiliation: doctor.affiliation,
+      speciality: doctor.speciality,
+      educationalBackground: doctor.educationalBackground,
+      requestStatus: doctor.requestStatus as DoctorStatus,
+      availableTimes: doctor.availableTimes as [Date],
+      contractStatus: doctor.contractStatus as ContractStatus,
+      employmentContract: doctor.employmentContract as [string],
+      documents: doctor.documents as [string],
+    } satisfies GetDoctorResponse)
   })
 )

@@ -25,7 +25,7 @@ import { UserType } from 'clinic-common/types/user.types'
 import { toast } from 'react-toastify'
 import { useNavigate } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
-import { createFollowup } from '@/api/patient'
+import { createFollowup, requestFollowup } from '@/api/patient'
 
 export function Appointments() {
   const queryClient = useQueryClient()
@@ -73,6 +73,26 @@ export function Appointments() {
         })
 
       setRescheduleDate('')
+    }
+  }
+
+  async function handleRequestFollowUpButton(appointmentID: string) {
+    if (followUpDate === '') {
+      setFollowUpDateError(true)
+      toast.error('Please select a date')
+    } else {
+      setFollowUpDateError(false)
+
+      await requestFollowup(appointmentID, followUpDate)
+        .then(() => {
+          toast.success('Follow-up requested successfully')
+        })
+        .catch((err) => {
+          toast.error('Error in requesting follow-up')
+          console.log(err)
+        })
+
+      setFollowUpDate('')
     }
   }
 
@@ -252,21 +272,40 @@ export function Appointments() {
                   )}
 
                 {/* New Cancel Appointment Button */}
-                {user &&
-                  appointment.status !== 'cancelled' &&
-                  appointment.status !== 'completed' && (
+                {user && appointment.status === 'upcoming' && (
+                  <Button
+                    variant="contained"
+                    size="small"
+                    fullWidth
+                    sx={{
+                      backgroundColor: 'red',
+                      color: 'white',
+                      marginTop: 2,
+                    }}
+                    onClick={() => handleCancelAppointment(appointment.id)}
+                  >
+                    Cancel Appointment
+                  </Button>
+                )}
+                {user?.type === UserType.Patient &&
+                  appointment.status === 'completed' && (
+                    <TextField
+                      type="datetime-local"
+                      onChange={(e) => setFollowUpDate(e.target.value)}
+                      inputProps={{ min: currentDate }}
+                      error={followUpDateError}
+                    />
+                  )}
+                {user?.type === UserType.Patient &&
+                  appointment.status === 'completed' && (
                     <Button
                       variant="contained"
                       size="small"
-                      fullWidth
-                      sx={{
-                        backgroundColor: 'red',
-                        color: 'white',
-                        marginTop: 2,
-                      }}
-                      onClick={() => handleCancelAppointment(appointment.id)}
+                      onClick={() =>
+                        handleRequestFollowUpButton(appointment.id)
+                      }
                     >
-                      Cancel Appointment
+                      Request Follow-up
                     </Button>
                   )}
               </Stack>
