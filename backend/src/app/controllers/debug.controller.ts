@@ -23,7 +23,7 @@ import {
 import { Relation } from 'clinic-common/types/familyMember.types'
 import { Gender } from 'clinic-common/types/gender.types'
 // import mongoose, { type HydratedDocument } from 'mongoose'
-import { type HydratedDocument } from 'mongoose'
+import mongoose, { type HydratedDocument } from 'mongoose'
 import { createDefaultHealthPackages } from '../services/healthPackage.service'
 import { AppointmentStatus } from 'clinic-common/types/appointment.types'
 import {
@@ -31,8 +31,7 @@ import {
   AppointmentModel,
 } from '../models/appointment.model'
 import { HealthPackageModel } from '../models/healthPackage.model'
-
-const bcryptSalt = process.env.BCRYPT_SALT ?? '$2b$10$13bXTGGukQXsCf5hokNe2u'
+import { bcryptSalt } from '../services/auth.service'
 
 // Generate a random long number to be used in usernames to avoid duplicated usernames
 function randomLongId(): string {
@@ -138,7 +137,14 @@ async function createDummyPrescription(
     patient: patientId,
     doctor: doctorId,
     date: faker.date.past(),
-    medicine: faker.word.noun() + ' ' + faker.word.noun(),
+    medicine: [
+      {
+        name: faker.word.noun() + ' ' + faker.word.noun(),
+        dosage: faker.number.int({ min: 10, max: 20 }).toString(),
+        frequency: faker.number.int({ min: 1, max: 3 }),
+        duration: faker.helpers.arrayElement(['1 week', '2 weeks', '1 month']),
+      },
+    ],
     isFilled: faker.datatype.boolean(),
   })
 }
@@ -233,10 +239,16 @@ async function createDummyPatient({
     email: randomEmail(),
     dateOfBirth: faker.date.past(),
     mobileNumber: faker.phone.number(),
-    gender: 'female',
+    gender: faker.helpers.enumValue(Gender),
     emergencyContact: {
-      name: faker.person.fullName(),
+      fullName: faker.person.fullName(),
       mobileNumber: faker.phone.number(),
+      relation: faker.helpers.arrayElement([
+        'Son',
+        'Daughter',
+        'Wife',
+        'Husband',
+      ]),
     },
     healthPackage,
     healthPackageRenewalDate: healthPackage ? faker.date.anytime() : undefined,
@@ -347,7 +359,7 @@ debugRouter.post(
       email: user.username + '@gmail.com',
       mobileNumber: '01001111111',
       dateOfBirth: new Date(),
-      gender: 'female',
+      gender: Gender.Female,
       emergencyContact: {
         name: 'Emergency1',
         mobileNumber: '0100111111',
@@ -428,42 +440,62 @@ debugRouter.post(
   })
 )
 
-/**
- * Creates random data for the database, for testing purposes.
- * Will be used for the evaluation.
- */
+async function seed({
+  dropDatabase = false,
+}: {
+  dropDatabase?: boolean
+} = {}) {
+  if (dropDatabase) {
+    await mongoose.connection.db.dropDatabase()
+  }
+
+  await createDefaultHealthPackages()
+
+  const admin = await createDummyAdmin('admin')
+  const patient = await createDummyPatient({
+    username: 'patient',
+    withFamilyMembers: true,
+    withNotifications: true,
+    withPrescriptions: true,
+    withAppointments: true,
+  })
+  const doctor = await createDummyDoctor({
+    username: 'doctor',
+    status: DoctorStatus.Approved,
+    withAppointments: true,
+  })
+
+  for (let i = 0; i < 3; i++) {
+    await createDummyDoctor({
+      username: randomUsername('pending_doctor'),
+      status: DoctorStatus.Pending,
+    })
+  }
+
+  const pharmacySeed = await fetch('http://localhost:4000/api/debug/seed', {
+    method: 'POST',
+  })
+
+  const pharmacySeedResponse = await pharmacySeed.json()
+
+  return {
+    admin,
+    patient,
+    doctor,
+    pharmacySeedResponse,
+  }
+}
+
 debugRouter.post(
   '/seed',
   asyncWrapper(async (req, res) => {
-    // await mongoose.connection.db.dropDatabase()
+    res.send(await seed())
+  })
+)
 
-    await createDefaultHealthPackages()
-
-    const admin = await createDummyAdmin('admin')
-    const patient = await createDummyPatient({
-      username: 'patient',
-      withFamilyMembers: true,
-      withNotifications: true,
-      withPrescriptions: true,
-      withAppointments: true,
-    })
-    const doctor = await createDummyDoctor({
-      username: 'doctor',
-      status: DoctorStatus.Approved,
-      withAppointments: true,
-    })
-
-    for (let i = 0; i < 3; i++) {
-      await createDummyDoctor({
-        username: randomUsername('pending_doctor'),
-        status: DoctorStatus.Pending,
-      })
-    }
-
-    res.send({
-      admin,
-      patient,
-      doctor,
-    })
+debugRouter.post(
+  '/drop-and-seed',
+  asyncWrapper(async (req, res) => {
+    res.send(await seed({ dropDatabase: true }))
   })
 )
