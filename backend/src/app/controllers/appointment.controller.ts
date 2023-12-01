@@ -15,7 +15,13 @@ import { PatientModel } from '../models/patient.model'
 import { DoctorModel } from '../models/doctor.model'
 import { type HydratedDocument } from 'mongoose'
 import { type UserDocument, UserModel } from '../models/user.model'
-import { getApprovedDoctorById } from '../services/doctor.service'
+import {
+  changeAvailableTimeSlot,
+  getApprovedDoctorById,
+} from '../services/doctor.service'
+import { AppointmentModel } from '../models/appointment.model'
+import { NotFoundError } from '../errors'
+import { sendAppointmentNotificationToPatient } from '../services/sendNotificationForAppointment'
 
 export const appointmentsRouter = Router()
 
@@ -48,12 +54,13 @@ appointmentsRouter.get(
           patientID: appointment.patientID.toString(),
           doctorID: appointment.doctorID.toString(),
           doctorName: doctor.name,
+          doctorTimes: doctor.availableTimes.map((date) => date.toISOString()),
           date: appointment.date,
           familyID: appointment.familyID || '',
           reservedFor: appointment.reservedFor || 'Me',
           status:
             new Date(appointment.date) > new Date()
-              ? AppointmentStatus.Upcoming
+              ? (appointment.status as AppointmentStatus)
               : AppointmentStatus.Completed,
         }
       })
@@ -74,8 +81,6 @@ appointmentsRouter.post(
         const patient = await PatientModel.findOne({ user: user.id })
 
         if (patient) {
-          // Assuming 'doctorID' is known or can be retrieved from the request
-
           const doctorID = req.body.doctorid
           const doctor = await DoctorModel.findOne({ _id: doctorID })
 
@@ -132,6 +137,28 @@ appointmentsRouter.post(
 )
 
 appointmentsRouter.post(
+  '/reschedule',
+  asyncWrapper(async (req, res) => {
+    changeAvailableTimeSlot(
+      req.body.appointment.doctorID,
+      req.body.appointment.date,
+      req.body.rescheduleDate
+    )
+    const appointment = await AppointmentModel.findById(req.body.appointment.id)
+
+    if (!appointment) {
+      throw new NotFoundError()
+    }
+
+    appointment.date = req.body.rescheduleDate
+    appointment.status = AppointmentStatus.Rescheduled
+    appointment.save()
+    sendAppointmentNotificationToPatient(appointment, 'rescheduled')
+
+    res.send(appointment)
+  })
+)
+ appointmentRouter.post(
   '/requestFollowUp',
   asyncWrapper(async (req, res) => {
     const request = await requestFollowUpAppointment(

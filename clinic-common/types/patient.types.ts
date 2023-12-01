@@ -36,24 +36,23 @@ export class GetPatientResponse {
   constructor(public patients: PatientResponseBase[]) {}
 }
 
-export class MyPatientsResponseBase {
-  constructor(
-    public id: string,
-    public name: string,
-    public email: string,
-    public mobileNumber: string,
-    public dateOfBirth: string,
-    public gender: Gender,
-    public emergencyContact: {
-      name: string
-      mobileNumber: string
-    },
-    public familyMembers: string[]
-  ) {}
+export interface MyPatientsResponseBase {
+  id: string
+  name: string
+  username: string
+  email: string
+  mobileNumber: string
+  dateOfBirth: string
+  gender: Gender
+  emergencyContact: {
+    name: string
+    mobileNumber: string
+  }
+  familyMembers: string[]
 }
 
-export class GetMyPatientsResponse {
-  constructor(public patients: MyPatientsResponseBase[]) {}
+export interface GetMyPatientsResponse {
+  patients: MyPatientsResponseBase[]
 }
 
 export class APatientResponseBase {

@@ -64,8 +64,9 @@ export async function registerPatient(
     gender,
     mobileNumber,
     emergencyContact: {
-      name: emergencyContactName,
+      fullName: emergencyContactName,
       mobileNumber: emergencyMobileNumber,
+      relation: emergencyContactRelation,
     },
   } = request
 
@@ -89,8 +90,9 @@ export async function registerPatient(
     gender,
     mobileNumber,
     emergencyContact: {
-      name: emergencyContactName,
+      fullName: emergencyContactName,
       mobileNumber: emergencyMobileNumber,
+      relation: emergencyContactRelation,
     },
   })
   await newPatient.save()

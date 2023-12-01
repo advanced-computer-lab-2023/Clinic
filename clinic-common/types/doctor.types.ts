@@ -105,3 +105,13 @@ type MulterFile = {
   buffer: Buffer
   size: number
 }
+
+export interface GetDoctorsForPatientsRequest {
+  patientUsername: string
+}
+
+export type GetDoctorsForPatientsResponse = Array<{
+  id: string
+  username: string
+  name: string
+}>

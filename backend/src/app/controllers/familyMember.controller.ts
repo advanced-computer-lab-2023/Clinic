@@ -223,7 +223,7 @@ familyMemberRouter.get(
         dateOfBirth: patient.dateOfBirth,
         gender: patient.gender as Gender,
         emergencyContact: {
-          name: patient.emergencyContact?.name ?? '',
+          name: patient.emergencyContact?.fullName ?? '',
           mobileNumber: patient.emergencyContact?.mobileNumber ?? '',
         },
         notes: patient.notes,

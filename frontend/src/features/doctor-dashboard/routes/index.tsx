@@ -12,6 +12,7 @@ import { EmploymentContract } from './EmploymentContract'
 import AddHealthRecord from './AddHealthRecord'
 import ChangePassword from '@/features/auth/routes/ChangePassword'
 import ViewMedicalHistory from './viewPatientMedicalHistory'
+import ViewPrescription from './viewPrescription'
 import { FollowupRequests } from './FollowupRequests'
 
 export const doctorDashboardRoutes: RouteObject[] = [
@@ -61,6 +62,10 @@ export const doctorDashboardRoutes: RouteObject[] = [
       {
         path: 'medicalHistory/:id',
         element: <ViewMedicalHistory />,
+      },
+      {
+        path: 'Prescriptions/:username',
+        element: <ViewPrescription />,
       },
       {
         path: 'followup-requests',

@@ -35,3 +35,10 @@ export async function cancelAppointment(appointmentId: string) {
 
   return response
 }
+
+export async function reschedule(appointment: any, rescheduleDate: any) {
+  return await api.post(`/appointment/reschedule`, {
+    appointment,
+    rescheduleDate,
+  })
+}

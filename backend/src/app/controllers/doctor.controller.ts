@@ -36,6 +36,7 @@ import {
   ApproveDoctorResponse,
   ContractStatus,
   AcceptOrRejectContractResponse,
+  GetDoctorsForPatientsResponse,
 } from 'clinic-common/types/doctor.types'
 import { isAdmin } from '../services/auth.service'
 import { NotAuthenticatedError } from '../errors/auth.errors'
@@ -45,7 +46,7 @@ import {
   AddAvailableTimeSlotsRequestValidator,
   UpdateDoctorRequestValidator,
 } from 'clinic-common/validators/doctor.validator'
-import { type UserDocument, UserModel } from '../models/user.model'
+import { type UserDocument, UserModel, IUser } from '../models/user.model'
 import { PatientModel } from '../models/patient.model'
 import { type HydratedDocument } from 'mongoose'
 
@@ -54,6 +55,8 @@ import {
   getDoctorSessionRateForPatient,
   hasDiscountOnDoctorSession,
 } from '../services/healthPackage.service'
+import { GetDoctorsForPatientsRequest } from 'clinic-common/types/doctor.types'
+import { DoctorModel } from '../models/doctor.model'
 import {
   FollowupRequestResponseBase,
   GetFollowupRequestsResponse,
@@ -317,6 +320,41 @@ doctorsRouter.get(
     } satisfies GetWalletMoneyResponse)
   })
 )
+
+doctorsRouter.post(
+  '/for-patient',
+  asyncWrapper<GetDoctorsForPatientsRequest>(async (req, res) => {
+    const user = await UserModel.findOne({ username: req.body.patientUsername })
+
+    if (!user) throw new NotFoundError()
+
+    const patient = await PatientModel.findOne({
+      user: user.id,
+    })
+
+    if (!patient) throw new NotFoundError()
+
+    const appointments = await AppointmentModel.find({
+      patientID: patient.id,
+    })
+
+    const doctorIds = Array.from(
+      new Set(appointments.map((appointment) => appointment.doctorID))
+    )
+
+    const doctors = await DoctorModel.find({
+      _id: { $in: doctorIds },
+    }).populate<{ user: IUser }>('user')
+
+    res.send(
+      doctors.map((d) => ({
+        id: d.id,
+        username: d.user.username,
+        name: d.name,
+      })) satisfies GetDoctorsForPatientsResponse
+    )
+  })
+ )
 doctorsRouter.get(
   '/followupRequests',
   asyncWrapper(async (req, res) => {

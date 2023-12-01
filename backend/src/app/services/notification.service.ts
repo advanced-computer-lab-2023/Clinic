@@ -23,10 +23,12 @@ export async function addUserNotification({
   notification: UserDocument['notifications'][0]
 }) {
   const user = await UserModel.findOne({ username })
-
+  console.log('i entered here')
   if (!user) throw new NotFoundError()
 
   user.notifications.push(notification)
+  user.save()
+  console.log(user.notifications)
 }
 
 export async function removeUserNotification({

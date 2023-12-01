@@ -1,5 +1,8 @@
-import { api } from '@/api'
-import { getMyMedicalHistory } from '@/api/patient'
+import {
+  addMedicalHistory,
+  deleteMedicalHistory,
+  getMyMedicalHistory,
+} from '@/api/patient'
 import { Button, TextField } from '@mui/material'
 import { useEffect, useState } from 'react'
 
@@ -26,11 +29,7 @@ function FileViewer() {
   const handleDelete = async (urlToDelete: string) => {
     try {
       // Send a POST request to delete the URL
-      await api.post(
-        'http://localhost:3000/patients/deleteMedicalHistory/mine',
-        { url: urlToDelete }
-      )
-
+      await deleteMedicalHistory(urlToDelete)
       // Remove the deleted URL from the state
       setDownloadURLs((prevURLs) =>
         prevURLs.filter((url) => url !== urlToDelete)
@@ -56,15 +55,7 @@ function FileViewer() {
 
     try {
       // Send a POST request with the uploaded file
-      await api.post(
-        'http://localhost:3000/patients/uploadMedicalHistory/mine',
-        formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data; ${formData.getBoundary()}', // Axios sets the correct Content-Type header with the boundary.
-          },
-        }
-      )
+      await addMedicalHistory(formData)
       // Fetch updated download URLs after the upload is complete
       const downloadURLsResponse = await getMyMedicalHistory()
 

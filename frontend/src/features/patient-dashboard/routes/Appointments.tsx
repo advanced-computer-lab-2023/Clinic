@@ -6,23 +6,34 @@ import {
   Typography,
   Button,
   TextField,
+  Select,
+  MenuItem,
 } from '@mui/material'
 import { DateRange, FilteredList } from '@/components/FilteredList'
-import { cancelAppointment, getAppointments } from '@/api/appointments'
-import { AppointmentStatus } from 'clinic-common/types/appointment.types'
+import {
+  AppointmentResponseBase,
+  AppointmentStatus,
+} from 'clinic-common/types/appointment.types'
+import {
+  cancelAppointment,
+  getAppointments,
+  reschedule,
+} from '@/api/appointments'
 import { useState } from 'react'
-import axios from 'axios'
 import { useAuth } from '@/hooks/auth'
 import { UserType } from 'clinic-common/types/user.types'
 import { toast } from 'react-toastify'
 import { useNavigate } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
+import { createFollowup } from '@/api/patient'
 
 export function Appointments() {
   const queryClient = useQueryClient()
   const [followUpDate, setFollowUpDate] = useState('')
   const [followUpDateError, setFollowUpDateError] = useState(false)
   const { user } = useAuth()
+  const [rescheduleDate, setRescheduleDate] = useState('')
+  const [rescheduleDateError, setRescheduleDateError] = useState(false)
   const navigate = useNavigate()
 
   async function handleFollowUpButton(doctorID: string, patientID: string) {
@@ -31,13 +42,7 @@ export function Appointments() {
       toast.error('Please select a date')
     } else {
       setFollowUpDateError(false)
-
-      await axios
-        .post(`http://localhost:3000/appointment/createFollowUp`, {
-          doctorID,
-          patientID,
-          date: followUpDate,
-        })
+      await createFollowup(doctorID, patientID, followUpDate)
         .then(() => {
           toast.success('Follow-up scheduled successfully')
           queryClient.refetchQueries(['appointments'])
@@ -51,6 +56,25 @@ export function Appointments() {
     }
   }
 
+  async function handleRescheduleButton(appointment: AppointmentResponseBase) {
+    if (rescheduleDate === '') {
+      setRescheduleDateError(true)
+      toast.error('Please select a date')
+    } else {
+      setRescheduleDateError(false)
+      await reschedule(appointment, rescheduleDate)
+        .then(() => {
+          toast.success('Appointment rescheduled successfully')
+          queryClient.refetchQueries(['appointments'])
+        })
+        .catch((err: any) => {
+          toast.error('Error in rescheduling appointment')
+          console.log(err)
+        })
+
+      setRescheduleDate('')
+    }
+  }
   async function handleRequestFollowUpButton(appointmentID: string) {
     if (followUpDate === '') {
       setFollowUpDateError(true)
@@ -197,7 +221,77 @@ export function Appointments() {
                     </Button>
                   )}
 
+                {user?.type === UserType.Patient &&
+                  appointment.status !== 'completed' &&
+                  appointment.status !== 'cancelled' && (
+                    <Stack spacing={2}>
+                      <Button
+                        variant="contained"
+                        size="small"
+                        onClick={() => handleRescheduleButton(appointment)}
+                      >
+                        Reschedule Appointment
+                      </Button>
+
+                      {/* Dropdown for selecting available timings */}
+                      <Select
+                        value={rescheduleDate}
+                        onChange={(e) => setRescheduleDate(e.target.value)}
+                        displayEmpty
+                        error={rescheduleDateError}
+                      >
+                        <MenuItem value="" disabled>
+                          Select Time
+                        </MenuItem>
+                        {appointment.doctorTimes.map((time) => (
+                          <MenuItem key={time} value={time}>
+                            {time}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </Stack>
+                  )}
+                {user?.type === UserType.Doctor &&
+                  appointment.status !== 'completed' &&
+                  appointment.status !== 'cancelled' && (
+                    <Stack spacing={2}>
+                      <TextField
+                        type="datetime-local"
+                        onChange={(e) => setRescheduleDate(e.target.value)}
+                        inputProps={{ min: currentDate }}
+                        error={rescheduleDateError}
+                      />
+
+                      <Button
+                        variant="contained"
+                        size="small"
+                        onClick={() => handleRescheduleButton(appointment)}
+                      >
+                        Reschedule Appointment
+                      </Button>
+
+                      {/* ADD DATE TIME PICKER HERE THAT IS SET TO THE RESCHDULE DATE STATE VARIABLE */}
+                    </Stack>
+                  )}
+
                 {/* New Cancel Appointment Button */}
+                {user &&
+                  appointment.status !== 'cancelled' &&
+                  appointment.status !== 'completed' && (
+                    <Button
+                      variant="contained"
+                      size="small"
+                      fullWidth
+                      sx={{
+                        backgroundColor: 'red',
+                        color: 'white',
+                        marginTop: 2,
+                      }}
+                      onClick={() => handleCancelAppointment(appointment.id)}
+                    >
+                      Cancel Appointment
+                      </Button>
+                )}
                 {user && appointment.status === 'upcoming' && (
                   <Button
                     variant="contained"
