@@ -272,23 +272,6 @@ export function Appointments() {
                   )}
 
                 {/* New Cancel Appointment Button */}
-                {user &&
-                  appointment.status !== 'cancelled' &&
-                  appointment.status !== 'completed' && (
-                    <Button
-                      variant="contained"
-                      size="small"
-                      fullWidth
-                      sx={{
-                        backgroundColor: 'red',
-                        color: 'white',
-                        marginTop: 2,
-                      }}
-                      onClick={() => handleCancelAppointment(appointment.id)}
-                    >
-                      Cancel Appointment
-                    </Button>
-                  )}
                 {user && appointment.status === 'upcoming' && (
                   <Button
                     variant="contained"
