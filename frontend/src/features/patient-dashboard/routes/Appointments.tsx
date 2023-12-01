@@ -75,6 +75,29 @@ export function Appointments() {
       setRescheduleDate('')
     }
   }
+  async function handleRequestFollowUpButton(appointmentID: string) {
+    if (followUpDate === '') {
+      setFollowUpDateError(true)
+      toast.error('Please select a date')
+    } else {
+      setFollowUpDateError(false)
+
+      await axios
+        .post(`http://localhost:3000/appointment/requestFollowUp`, {
+          appointmentID,
+          date: followUpDate,
+        })
+        .then(() => {
+          toast.success('Follow-up requested successfully')
+        })
+        .catch((err) => {
+          toast.error('Error in requesting follow-up')
+          console.log(err)
+        })
+
+      setFollowUpDate('')
+    }
+  }
 
   const currentDate = new Date().toISOString().slice(0, 16)
 
@@ -267,6 +290,42 @@ export function Appointments() {
                       onClick={() => handleCancelAppointment(appointment.id)}
                     >
                       Cancel Appointment
+                      </Button>
+                )}
+                {user && appointment.status === 'upcoming' && (
+                  <Button
+                    variant="contained"
+                    size="small"
+                    fullWidth
+                    sx={{
+                      backgroundColor: 'red',
+                      color: 'white',
+                      marginTop: 2,
+                    }}
+                    onClick={() => handleCancelAppointment(appointment.id)}
+                  >
+                    Cancel Appointment
+                  </Button>
+                )}
+                {user?.type === UserType.Patient &&
+                  appointment.status === 'completed' && (
+                    <TextField
+                      type="datetime-local"
+                      onChange={(e) => setFollowUpDate(e.target.value)}
+                      inputProps={{ min: currentDate }}
+                      error={followUpDateError}
+                    />
+                  )}
+                {user?.type === UserType.Patient &&
+                  appointment.status === 'completed' && (
+                    <Button
+                      variant="contained"
+                      size="small"
+                      onClick={() =>
+                        handleRequestFollowUpButton(appointment.id)
+                      }
+                    >
+                      Request Follow-up
                     </Button>
                   )}
               </Stack>
