@@ -130,7 +130,7 @@ doctorsRouter.get(
     const patient = await PatientModel.findOne({ user: user.id })
       .populate<{ healthPackage: HealthPackageDocument }>('healthPackage')
       .exec()
-    if (patient == null) throw new NotAuthenticatedError()
+    // if (patient == null) throw new NotAuthenticatedError()
     const doctors = await getAllDoctors()
 
     res.send({
@@ -145,10 +145,12 @@ doctorsRouter.get(
         affiliation: doctor.affiliation,
         speciality: doctor.speciality,
         educationalBackground: doctor.educationalBackground,
-        sessionRate: getDoctorSessionRateForPatient({ doctor, patient }),
+        sessionRate: patient
+          ? getDoctorSessionRateForPatient({ doctor, patient })
+          : doctor.hourlyRate,
         availableTimes: doctor.availableTimes as [Date],
         requestStatus: doctor.requestStatus as DoctorStatus,
-        hasDiscount: hasDiscountOnDoctorSession({ patient }),
+        hasDiscount: patient ? hasDiscountOnDoctorSession({ patient }) : false,
         documents: doctor.documents as [string],
       })),
     } satisfies GetApprovedDoctorsResponse)
