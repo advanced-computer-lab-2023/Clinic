@@ -6,6 +6,7 @@ import {
   Card,
   CardContent,
   Chip,
+  Paper,
   Stack,
   Typography,
 } from '@mui/material'
@@ -13,18 +14,32 @@ import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'react-router-dom'
 import html2canvas from 'html2canvas'
 import jsPDF from 'jspdf'
-import { useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { addPrescriptionTocart } from '@/api/pharmacy'
+import { toast } from 'react-toastify'
 
 export function PrescriptionView() {
   const { id } = useParams()
   const token = localStorage.getItem('token')
   const pdfRef = useRef(null)
-
+  const [buttonVisible, setButtonVisible] = useState(true)
+  const [filled, setfilled] = useState(false)
   const query = useQuery({
     queryKey: [`PrescriptionView/${id}`],
     queryFn: () => getSinglePrescription(id!),
   })
+
+  useEffect(() => {
+    if (query.isLoading) {
+      return // Don't proceed if still loading
+    }
+
+    const prescription = query.data
+
+    if (prescription) {
+      setfilled(prescription.isFilled || false)
+    }
+  }, [query.isLoading, query.data])
 
   if (query.isLoading) {
     return <CardPlaceholder />
@@ -60,6 +75,41 @@ export function PrescriptionView() {
     })
   }
 
+  function HandleCheckout(): void {
+    setButtonVisible(false)
+    setfilled(true)
+    addPrescriptionTocart(id, token)
+    toast.success(
+      <Paper>
+        <h4>Prescription is added to your cart successfully!</h4>
+        <div style={{ marginTop: '8px' }}>
+          <Button
+            variant="outlined"
+            fullWidth
+            color="primary"
+            style={{ marginBottom: '10px' }}
+            onClick={() =>
+              (window.location.href = `http://localhost:5174/patient-dashboard?token=${token}`)
+            }
+          >
+            Continue Shopping
+          </Button>
+          <Button
+            variant="outlined"
+            color="error"
+            fullWidth
+            onClick={() => toast.dismiss()}
+          >
+            Close
+          </Button>
+        </div>
+      </Paper>,
+      {
+        position: toast.POSITION.TOP_RIGHT,
+      }
+    )
+  }
+
   return (
     <Card variant="outlined">
       <CardContent ref={pdfRef}>
@@ -76,8 +126,8 @@ export function PrescriptionView() {
                 .join(', ')}
             </Typography>
             <Chip
-              label={prescription.isFilled ? 'Filled' : 'Unfilled'}
-              color={prescription.isFilled ? 'success' : 'warning'}
+              label={filled ? 'Filled' : 'Unfilled'}
+              color={filled ? 'success' : 'warning'}
               variant="outlined"
             />
           </Stack>
@@ -111,18 +161,13 @@ export function PrescriptionView() {
       >
         download
       </Button>
-      {!prescription.isFilled && (
+      {!prescription.isFilled && buttonVisible && (
         <Button
           onClick={() => {
-            console.log('hii')
-            addPrescriptionTocart(id, token)
+            HandleCheckout()
           }}
         >
-          CHECKOUT
-          {/* <Link to={`http://localhost:5174/patient-dashboard/prescriptionCheckout?PrescriptionId=${id}&token=${token}`}
-            >
-            CHECKOUT
-            </Link> */}
+          checkout
         </Button>
       )}
     </Card>

@@ -18,19 +18,19 @@ export function LinkFamilyMember({ onSuccess }: { onSuccess: () => void }) {
           selectedValues: [
             {
               label: 'Wife',
-              value: 'wife',
+              value: 'Wife',
             },
             {
               label: 'Husband',
-              value: 'husband',
+              value: 'Husband',
             },
             {
               label: 'Son',
-              value: 'son',
+              value: 'Son',
             },
             {
               label: 'Daughter',
-              value: 'daughter',
+              value: 'Daughter',
             },
           ],
         },
