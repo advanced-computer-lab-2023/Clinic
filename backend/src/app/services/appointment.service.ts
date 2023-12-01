@@ -16,10 +16,7 @@ import { DoctorModel } from '../models/doctor.model'
 import { UserModel } from '../models/user.model'
 import AppError from '../utils/appError'
 import { ERROR } from '../utils/httpStatusText'
-import {
-  FollowupRequestDocument,
-  FollowupRequestModel,
-} from '../models/followupRequest.model'
+import { FollowupRequestModel } from '../models/followupRequest.model'
 
 export async function getfilteredAppointments(
   query: any
@@ -84,6 +81,7 @@ export async function createAndRemoveTime(
   // Save the new appointment
   await newAppointment.save()
   sendAppointmentNotificationToPatient(newAppointment, 'accepted')
+
   return newAppointment
 }
 
@@ -110,16 +108,32 @@ export async function createFollowUpAppointment(
   return newAppointment
 }
 
+export async function checkForExistingFollowUp(appointmentID: string) {
+  const existingRequest = await FollowupRequestModel.findOne({
+    appointment: appointmentID,
+    status: { $ne: 'rejected' },
+  })
+
+  return !!existingRequest
+}
+
 export async function requestFollowUpAppointment(
   appointmentID: string,
   newDate: string
-): Promise<FollowupRequestDocument> {
-  const request = new FollowupRequestModel({
-    appointment: appointmentID,
-    date: newDate,
-  })
+) {
+  const hasExistingFollowUp = await checkForExistingFollowUp(appointmentID)
 
-  return await request.save()
+  if (!hasExistingFollowUp) {
+    const request = new FollowupRequestModel({
+      appointment: appointmentID,
+      date: newDate,
+    })
+    console.log(request)
+
+    return await request.save()
+  } else {
+    throw new Error('A follow-up request already exists for this appointment.')
+  }
 }
 
 export async function deleteAppointment(
