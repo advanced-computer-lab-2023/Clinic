@@ -100,7 +100,9 @@ appointmentsRouter.post(
               doctorID,
               date,
               familyID,
-              reservedFor
+              reservedFor,
+              toPayUsingWallet,
+              doctor.hourlyRate
             )
 
             if (appointment) {

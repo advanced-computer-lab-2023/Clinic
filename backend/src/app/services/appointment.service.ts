@@ -51,7 +51,9 @@ export async function createAndRemoveTime(
   doctorID: string,
   date: Date,
   familyID: string,
-  reservedFor: string
+  reservedFor: string,
+  paidByPatient: number,
+  paidToDoctor: number
 ): Promise<AppointmentDocument | null> {
   // Create a new appointment
   const newDate = new Date(date).toISOString()
@@ -68,6 +70,8 @@ export async function createAndRemoveTime(
       familyID,
       reservedFor: patientName,
       status: AppointmentStatus.Upcoming,
+      paidByPatient,
+      paidToDoctor,
     })
   } else {
     newAppointment = new AppointmentModel({
@@ -77,6 +81,8 @@ export async function createAndRemoveTime(
       familyID,
       reservedFor,
       status: AppointmentStatus.Upcoming,
+      paidByPatient,
+      paidToDoctor,
     })
   }
 
@@ -84,6 +90,7 @@ export async function createAndRemoveTime(
   // Save the new appointment
   await newAppointment.save()
   sendAppointmentNotificationToPatient(newAppointment, 'accepted')
+
   return newAppointment
 }
 
@@ -131,7 +138,7 @@ export async function deleteAppointment(
   if (!appointment) {
     throw new AppError("Couldn't find appointment", 404, ERROR)
   }
-  //add the date to the availabel times here
+  //add the date to the available times here
 
   const doctorID = appointment.doctorID
   const appointmentDate = new Date(appointment.date)

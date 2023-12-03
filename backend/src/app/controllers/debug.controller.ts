@@ -193,6 +193,8 @@ async function createDummyAppointment(
     status: faker.helpers.enumValue(AppointmentStatus),
     familyID: forFamilyMember ? chosenFamilyMember?.id : undefined,
     reservedFor: forFamilyMember ? chosenFamilyMember?.name : patient?.name,
+    paidByPatient: faker.number.int({ min: 100, max: 3000 }),
+    paidToDoctor: faker.number.int({ min: 100, max: 3000 }),
   })
 }
 
