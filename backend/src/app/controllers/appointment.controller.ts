@@ -72,7 +72,8 @@ appointmentsRouter.get(
 appointmentsRouter.post(
   '/makeappointment',
   asyncWrapper(async (req, res) => {
-    const { date, familyID, reservedFor, toPayUsingWallet } = req.body // Assuming the date is sent in the request body intype DaTe
+    const { date, familyID, reservedFor, toPayUsingWallet, sessionPrice } =
+      req.body // Assuming the date is sent in the request body intype DaTe
 
     const user = await UserModel.findOne({ username: req.username })
 
@@ -101,7 +102,7 @@ appointmentsRouter.post(
               date,
               familyID,
               reservedFor,
-              toPayUsingWallet,
+              sessionPrice,
               doctor.hourlyRate
             )
 
