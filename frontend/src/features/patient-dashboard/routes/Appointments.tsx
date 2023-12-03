@@ -19,13 +19,17 @@ import {
   getAppointments,
   reschedule,
 } from '@/api/appointments'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useAuth } from '@/hooks/auth'
 import { UserType } from 'clinic-common/types/user.types'
 import { toast } from 'react-toastify'
 import { useNavigate } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
-import { createFollowup, requestFollowup } from '@/api/patient'
+import {
+  checkForFollowUp,
+  createFollowup,
+  requestFollowup,
+} from '@/api/patient'
 
 export function Appointments() {
   const queryClient = useQueryClient()
@@ -34,7 +38,42 @@ export function Appointments() {
   const { user } = useAuth()
   const [rescheduleDate, setRescheduleDate] = useState('')
   const [rescheduleDateError, setRescheduleDateError] = useState(false)
+
   const navigate = useNavigate()
+  interface FollowUpStatusMap {
+    [appointmentId: string]: boolean
+  }
+  const [followUpStatus, setFollowUpStatus] = useState<FollowUpStatusMap>({})
+
+  useEffect(() => {
+    const fetchAppointmentsAndUpdateStatus = async () => {
+      try {
+        const appointments = await getAppointments() // Replace with actual API call
+
+        const followUpChecks = appointments.map(async (appointment) => {
+          const followUpExists = await checkForFollowUp(appointment.id) // Replace with actual API call
+
+          return { id: appointment.id, exists: followUpExists.exists }
+        })
+
+        const results = await Promise.all(followUpChecks)
+        const followUpStatusMap = results.reduce<FollowUpStatusMap>(
+          (acc, curr) => {
+            acc[curr.id] = curr.exists
+
+            return acc
+          },
+          {}
+        )
+
+        setFollowUpStatus(followUpStatusMap)
+      } catch (error) {
+        console.error('Error fetching appointments:', error)
+      }
+    }
+
+    fetchAppointmentsAndUpdateStatus()
+  }, [])
 
   async function handleFollowUpButton(doctorID: string, patientID: string) {
     if (followUpDate === '') {
@@ -86,9 +125,24 @@ export function Appointments() {
       await requestFollowup(appointmentID, followUpDate)
         .then(() => {
           toast.success('Follow-up requested successfully')
+
+          // Update the followUpStatus state for this specific appointment
+          setFollowUpStatus((prevStatus) => ({
+            ...prevStatus,
+            [appointmentID]: true,
+          }))
         })
         .catch((err) => {
-          toast.error('Error in requesting follow-up')
+          if (
+            err.message.includes(
+              'A follow-up request already exists for this appointment'
+            )
+          ) {
+            toast.error('A follow-up request is already submitted')
+          } else {
+            toast.error('Error in requesting follow-up')
+          }
+
           console.log(err)
         })
 
@@ -296,17 +350,26 @@ export function Appointments() {
                       error={followUpDateError}
                     />
                   )}
+
                 {user?.type === UserType.Patient &&
                   appointment.status === 'completed' && (
-                    <Button
-                      variant="contained"
-                      size="small"
-                      onClick={() =>
-                        handleRequestFollowUpButton(appointment.id)
-                      }
-                    >
-                      Request Follow-up
-                    </Button>
+                    <>
+                      <Button
+                        variant="contained"
+                        size="small"
+                        onClick={() =>
+                          handleRequestFollowUpButton(appointment.id)
+                        }
+                        disabled={followUpStatus[appointment.id] ?? false}
+                      >
+                        Request Follow-up
+                      </Button>
+                      {followUpStatus[appointment.id] && (
+                        <Typography variant="caption" color="error">
+                          A follow-up request already submitted.
+                        </Typography>
+                      )}
+                    </>
                   )}
               </Stack>
             </CardContent>
