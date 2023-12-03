@@ -4,8 +4,10 @@ import { validate } from '../middlewares/validation.middleware'
 
 import {
   createPrescription,
+  editPrescription,
   getPrescriptions,
   getSinglePrescription,
+  getSinglePrescriptionForDoctor,
 } from '../services/prescription.service'
 import { NotAuthorizedError } from '../errors/auth.errors'
 import { isDoctorAndApproved, isPatient } from '../services/auth.service'
@@ -23,6 +25,26 @@ import {
 } from '../middlewares/auth.middleware'
 
 export const prescriptionsRouter = Router()
+
+prescriptionsRouter.get(
+  '/single/:id',
+  asyncWrapper(allowApprovedDoctors),
+
+  asyncWrapper(async (req, res) => {
+    console.log('Ana hena fl prescription controller')
+    const prescription = await getSinglePrescriptionForDoctor(req.params.id)
+
+    res.send(prescription)
+  })
+)
+
+prescriptionsRouter.put(
+  '/edit/:id',
+  asyncWrapper(async (req, res) => {
+    await editPrescription(req.body, req.params.id)
+    res.status(200).json('Prescription edited Successfully')
+  })
+)
 
 prescriptionsRouter.get(
   // Renamed from '/' to '/mine', because I added another one `/:patientUsername` to get all prescriptions for a patient by username
