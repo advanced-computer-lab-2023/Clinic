@@ -110,3 +110,17 @@ export async function requestFollowup(
     date: followUpDate,
   })
 }
+
+export async function checkForFollowUp(appointmentID: string) {
+  try {
+    const response = await api.get(
+      `/appointment/checkFollowUp/${appointmentID}`
+    )
+
+    return response.data
+  } catch (error) {
+    console.error('Error checking follow-up', error)
+
+    return { exists: false }
+  }
+}

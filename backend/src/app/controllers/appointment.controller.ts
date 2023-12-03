@@ -6,6 +6,7 @@ import {
   createFollowUpAppointment,
   deleteAppointment,
   requestFollowUpAppointment,
+  checkForExistingFollowUp,
 } from '../services/appointment.service'
 import {
   AppointmentStatus,
@@ -22,6 +23,7 @@ import {
 import { AppointmentModel } from '../models/appointment.model'
 import { NotFoundError } from '../errors'
 import { sendAppointmentNotificationToPatient } from '../services/sendNotificationForAppointment'
+import AppError from '../utils/appError'
 
 export const appointmentsRouter = Router()
 
@@ -133,6 +135,25 @@ appointmentsRouter.post(
     const appointment = req.body
     const newAppointment = await createFollowUpAppointment(appointment)
     res.send(newAppointment)
+  })
+)
+appointmentsRouter.get(
+  '/checkFollowUp/:appointmentID',
+  asyncWrapper(async (req, res) => {
+    const { appointmentID } = req.params
+
+    try {
+      const hasFollowUp = await checkForExistingFollowUp(appointmentID)
+      res.json({ exists: hasFollowUp })
+    } catch (error) {
+      if (error instanceof AppError) {
+        res
+          .status(error.statusCode)
+          .json({ exists: true, message: error.message })
+      } else {
+        res.status(500).json({ message: 'Internal server error' })
+      }
+    }
   })
 )
 
