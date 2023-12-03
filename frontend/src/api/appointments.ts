@@ -27,9 +27,14 @@ export async function reserveTimes(
   return response
 }
 
-export async function cancelAppointment(appointmentId: string) {
+export async function cancelAppointment(
+  appointmentId: string,
+  cancelledByDoctor: boolean
+) {
   const response = await api
-    .delete(`/appointment/delete/${appointmentId}`)
+    .post(`/appointment/delete/${appointmentId}`, {
+      cancelledByDoctor,
+    })
     .then((res) => res.data)
     .catch((err) => err)
 

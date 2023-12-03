@@ -100,7 +100,10 @@ export function Appointments() {
 
   async function handleCancelAppointment(appointmentId: string) {
     try {
-      const response = await cancelAppointment(appointmentId)
+      const response = await cancelAppointment(
+        appointmentId,
+        user?.type === UserType.Doctor ? false : true
+      )
 
       if (response) {
         // Handle success, e.g., update the component state or show a message

@@ -130,7 +130,8 @@ export async function requestFollowUpAppointment(
 }
 
 export async function deleteAppointment(
-  appointmentId: string
+  appointmentId: string,
+  cancelledByDoctor: boolean
 ): Promise<AppointmentDocument | null> {
   // Find the appointment by ID
   const appointment = await AppointmentModel.findById(appointmentId)
@@ -145,6 +146,29 @@ export async function deleteAppointment(
 
   const doctor = await DoctorModel.findById(doctorID)
   const doctorUIser = await UserModel.findById(doctor!.user)
+  const patient = await PatientModel.findById(appointment.patientID)
+
+  if (!doctor || !doctorUIser || !patient) {
+    throw new AppError(
+      "Couldn't find appointment's doctor or patient",
+      404,
+      ERROR
+    )
+  }
+
+  const timeTillAppointment = Math.abs(
+    new Date().getTime() - appointmentDate.getTime()
+  )
+  const hoursTillAppointment = Math.ceil(timeTillAppointment / (1000 * 60 * 60))
+
+  // refund the money to the patient and from doctor if apptmt is cancelled 24 hours before
+  // or if cancelled by doctor
+  if (hoursTillAppointment >= 24 || cancelledByDoctor) {
+    doctor.walletMoney -= appointment.paidToDoctor
+    patient.walletMoney -= appointment.paidByPatient
+    await doctor.save()
+    await patient.save()
+  }
 
   const updatedDoctor = await addAvailableTimeSlots(doctorUIser!.username, {
     time: appointmentDate,

@@ -92,7 +92,7 @@ appointmentsRouter.post(
             patient.walletMoney -= toPayUsingWallet
             await patient.save()
 
-            doctor.walletMoney! += doctor.hourlyRate
+            doctor.walletMoney += doctor.hourlyRate
             await doctor.save()
 
             const appointment = await createAndRemoveTime(
@@ -111,7 +111,7 @@ appointmentsRouter.post(
               patient.walletMoney += toPayUsingWallet //reverting the wallet money
               await patient.save()
 
-              doctor.walletMoney! -= doctor.hourlyRate
+              doctor.walletMoney -= doctor.hourlyRate
               await doctor.save()
 
               res.status(500).send('Appointment creation failed')
@@ -171,13 +171,17 @@ appointmentsRouter.post(
   })
 )
 
-appointmentsRouter.delete(
+appointmentsRouter.post(
   '/delete/:appointmentId',
   asyncWrapper(async (req, res) => {
     const appointmentId = req.params.appointmentId
+    const cancelledByDoctor = req.body.data.cancelledByDoctor
 
     try {
-      const deletedAppointment = await deleteAppointment(appointmentId)
+      const deletedAppointment = await deleteAppointment(
+        appointmentId,
+        cancelledByDoctor
+      )
 
       if (!deletedAppointment) {
         res.status(404).send('Error in the DeleteAppointment function')
