@@ -165,7 +165,7 @@ export async function deleteAppointment(
   // or if cancelled by doctor
   if (hoursTillAppointment >= 24 || cancelledByDoctor) {
     doctor.walletMoney -= appointment.paidToDoctor
-    patient.walletMoney -= appointment.paidByPatient
+    patient.walletMoney += appointment.paidByPatient
     await doctor.save()
     await patient.save()
   }

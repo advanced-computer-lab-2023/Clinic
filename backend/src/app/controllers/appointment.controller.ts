@@ -175,7 +175,7 @@ appointmentsRouter.post(
   '/delete/:appointmentId',
   asyncWrapper(async (req, res) => {
     const appointmentId = req.params.appointmentId
-    const cancelledByDoctor = req.body.data.cancelledByDoctor
+    const cancelledByDoctor = req.body.cancelledByDoctor
 
     try {
       const deletedAppointment = await deleteAppointment(
