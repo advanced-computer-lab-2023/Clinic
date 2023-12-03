@@ -22,6 +22,8 @@ export const Login = () => {
         buttonText="Login"
       />
       <Link to={'/forgot-password'}>forgot your password?</Link>
+      <br />
+      <Link to={'../signup'}>SIGN UP</Link>
     </>
   )
 }

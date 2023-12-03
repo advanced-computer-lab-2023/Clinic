@@ -1,9 +1,10 @@
 import { RouteObject } from 'react-router-dom'
 import { Login } from './Login'
-import { Register } from './Register'
+// import { Register } from './Register'
 import { AuthLayout } from '../components/AuthLayout'
 import { Logout } from './Logout'
-import { RequestDoctor } from '@/features/auth/routes/RequestDoctor'
+// import { RequestDoctor } from '@/features/auth/routes/RequestDoctor'
+import Signup from './signup'
 
 export const authRoutes: RouteObject[] = [
   {
@@ -13,13 +14,13 @@ export const authRoutes: RouteObject[] = [
         path: 'login',
         element: <Login />,
       },
+      // {
+      //   path: 'register',
+      //   element: <Register />,
+      // },
       {
-        path: 'register',
-        element: <Register />,
-      },
-      {
-        path: 'requestDoctor',
-        element: <RequestDoctor />,
+        path: 'signup',
+        element: <Signup />,
       },
     ],
   },

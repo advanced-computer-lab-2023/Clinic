@@ -4,15 +4,13 @@ const Schema = mongoose.Schema
 export const MedicineItemSchema = new Schema<medicineItem>({
   name: String,
   dosage: String,
-  frequency: Number,
-  duration: String,
+  quantity: Number,
 })
 
 export type medicineItem = {
   name: string
   dosage: string
-  frequency: number
-  duration: string
+  quantity: number
 }
 
 const prescriptionSchema = new Schema(

@@ -12,6 +12,7 @@ import {
   UpdateDoctorRequest,
   UpdateDoctorResponse,
 } from 'clinic-common/types/doctor.types'
+import { GetFollowupRequestsResponse } from 'clinic-common/types/appointment.types'
 import { api } from '.'
 
 export async function updateDoctor(
@@ -158,4 +159,22 @@ export async function addPrescriptionApi(
     medicine,
     date,
   })
+}
+
+export async function getFollowupRequests(): Promise<GetFollowupRequestsResponse> {
+  return await api
+    .get<GetFollowupRequestsResponse>('/doctors/followupRequests')
+    .then((res) => res.data)
+}
+
+export async function acceptFollowupRequest(id: string): Promise<void> {
+  await api
+    .patch<void>(`/doctors/acceptFollowupRequest/${id}`)
+    .then((res) => res.data)
+}
+
+export async function rejectFollowupRequest(id: string): Promise<void> {
+  await api
+    .patch<void>(`/doctors/rejectFollowupRequest/${id}`)
+    .then((res) => res.data)
 }

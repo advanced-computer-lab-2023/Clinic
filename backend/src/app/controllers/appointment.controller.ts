@@ -5,6 +5,7 @@ import {
   getfilteredAppointments,
   createFollowUpAppointment,
   deleteAppointment,
+  requestFollowUpAppointment,
 } from '../services/appointment.service'
 import {
   AppointmentStatus,
@@ -20,6 +21,7 @@ import {
 } from '../services/doctor.service'
 import { AppointmentModel } from '../models/appointment.model'
 import { NotFoundError } from '../errors'
+import { sendAppointmentNotificationToPatient } from '../services/sendNotificationForAppointment'
 
 export const appointmentsRouter = Router()
 
@@ -151,7 +153,19 @@ appointmentsRouter.post(
     appointment.date = req.body.rescheduleDate
     appointment.status = AppointmentStatus.Rescheduled
     appointment.save()
+    sendAppointmentNotificationToPatient(appointment, 'rescheduled')
+
     res.send(appointment)
+  })
+)
+appointmentsRouter.post(
+  '/requestFollowUp',
+  asyncWrapper(async (req, res) => {
+    const request = await requestFollowUpAppointment(
+      req.body.appointmentID,
+      req.body.date
+    )
+    res.send(request)
   })
 )
 

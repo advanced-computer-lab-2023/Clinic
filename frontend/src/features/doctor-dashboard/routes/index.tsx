@@ -13,6 +13,7 @@ import AddHealthRecord from './AddHealthRecord'
 import ChangePassword from '@/features/auth/routes/ChangePassword'
 import ViewMedicalHistory from './viewPatientMedicalHistory'
 import ViewPrescription from './viewPrescription'
+import { FollowupRequests } from './FollowupRequests'
 
 export const doctorDashboardRoutes: RouteObject[] = [
   {
@@ -65,6 +66,10 @@ export const doctorDashboardRoutes: RouteObject[] = [
       {
         path: 'Prescriptions/:username',
         element: <ViewPrescription />,
+      },
+      {
+        path: 'followup-requests',
+        element: <FollowupRequests />,
       },
     ],
   },

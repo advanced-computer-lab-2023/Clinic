@@ -54,6 +54,7 @@ prescriptionsRouter.post(
     validate(CreatePrescriptionRequestValidator),
   ],
   asyncWrapper<CreatePrescriptionRequest>(async (req, res) => {
+    console.log('pppres')
     await createPrescription(req.body, req.username!)
     res.status(200).json('Prescription added Successfully')
   })

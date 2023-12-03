@@ -7,10 +7,10 @@ import { Gender } from './gender.types'
 import { PatientResponseBase } from './patient.types'
 
 export enum Relation {
-  Wife = 'wife',
-  Husband = 'husband',
-  Son = 'son',
-  Daughter = 'daughter',
+  Wife = 'Wife',
+  Husband = 'Husband',
+  Son = 'Son',
+  Daughter = 'Daughter',
 }
 
 export interface FamilyMemberResponseBase {
