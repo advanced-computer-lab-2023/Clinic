@@ -57,7 +57,10 @@ function randomFutureDates(): string[] {
   const futureDates = []
 
   for (let i = 0; i < 5; i++) {
-    futureDates.push(faker.date.future().toString())
+    // create a date one hour from now
+    const date = new Date()
+    date.setHours(date.getHours() + 1)
+    futureDates.push(date.toString())
   }
 
   return futureDates

@@ -180,7 +180,8 @@ export function DoctorView() {
                       date,
                       selectedFamilyMemberName!,
                       selectedFamilyMemberId!,
-                      sessionRate!
+                      sessionRate!, //amount to pay using wallet
+                      sessionRate! // general session rate
                     )
                       .then(() => {
                         setLoading(false)
@@ -244,7 +245,8 @@ export function DoctorView() {
                   date,
                   selectedFamilyMemberName!,
                   selectedFamilyMemberId!,
-                  0
+                  0, //amount to pay using wallet
+                  sessionRate! // general session rate
                 )
                   .then(() => {
                     setCreditMethod(false)
@@ -265,7 +267,8 @@ export function DoctorView() {
     selectedTime: Date | null,
     familyName: string,
     selectedFamilyMember: string,
-    payUsingWallet: number
+    payUsingWallet: number,
+    sessionPrice: number
   ) => {
     try {
       let response = null
@@ -280,7 +283,8 @@ export function DoctorView() {
             selectedTime,
             selectedFamilyMember,
             familyName,
-            payUsingWallet
+            payUsingWallet,
+            sessionPrice
           )
         }
         // Check if id is defined
@@ -290,7 +294,8 @@ export function DoctorView() {
             selectedTime,
             '',
             'Me',
-            payUsingWallet
+            payUsingWallet,
+            sessionPrice
           )
         }
 
@@ -324,7 +329,7 @@ export function DoctorView() {
     } catch (error) {
       // Handle errors
 
-      toast.error(`Error reserving appointment ${error}`, {
+      toast.error(`Error reserving appointment.`, {
         position: 'top-right',
         autoClose: 5000,
         hideProgressBar: false,
