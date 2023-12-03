@@ -1,7 +1,7 @@
 import { LoadingButton } from '@mui/lab'
 import { Dialog } from '@mui/material'
 import { useState } from 'react'
-import { VideoCall } from '../video-call/VideoCall'
+import { Video } from '.'
 import VideocamIcon from '@mui/icons-material/Videocam'
 
 const VideoCallButton = ({ otherUsername }: { otherUsername: string }) => {
@@ -41,7 +41,7 @@ const VideoCallButton = ({ otherUsername }: { otherUsername: string }) => {
         onClose={() => setIsOpen(false)}
         maxWidth="lg"
       >
-        {videoMeetId && <VideoCall meetId={videoMeetId} />}
+        {videoMeetId && <Video />}
       </Dialog>
     </>
   )
