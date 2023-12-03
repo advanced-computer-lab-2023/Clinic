@@ -32,11 +32,11 @@ export function AddFamilyMember({ onSuccess }: { onSuccess: () => void }) {
                   // TODO: use enum
                   {
                     label: 'Male',
-                    value: 'male',
+                    value: 'Male',
                   },
                   {
                     label: 'Female',
-                    value: 'female',
+                    value: 'Female',
                   },
                 ],
               },
@@ -47,19 +47,19 @@ export function AddFamilyMember({ onSuccess }: { onSuccess: () => void }) {
                   // TODO: use enum
                   {
                     label: 'Wife',
-                    value: 'wife',
+                    value: 'Wife',
                   },
                   {
                     label: 'Husband',
-                    value: 'husband',
+                    value: 'Husband',
                   },
                   {
                     label: 'Son',
-                    value: 'son',
+                    value: 'Son',
                   },
                   {
                     label: 'Daughter',
-                    value: 'daughter',
+                    value: 'Daughter',
                   },
                 ],
               },

@@ -9,5 +9,7 @@ export default defineConfig({
   // Without this line, the app will not work in the browser when using docker-compose
   server: {
     host: true,
+
+    port: 5173, // specify the port you want to use
   },
 })

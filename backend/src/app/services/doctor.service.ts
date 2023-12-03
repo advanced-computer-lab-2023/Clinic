@@ -7,6 +7,13 @@ import {
 } from 'clinic-common/types/doctor.types'
 import { APIError, NotFoundError } from '../errors'
 import { type WithUser } from '../utils/typeUtils'
+import {
+  FollowupRequestDocument,
+  FollowupRequestModel,
+} from '../models/followupRequest.model'
+import { AppointmentModel } from '../models/appointment.model'
+import { HydratedDocument } from 'mongoose'
+import { AppointmentStatus } from 'clinic-common/types/appointment.types'
 
 /**
  * TODO: Replace DoctorDocumentWithUser with WithUser<DoctorDocument>,
@@ -273,6 +280,7 @@ export function getDoctorSessionRateWithMarkup({
   return doctor.hourlyRate * (1 + clinicMarkup / 100)
 }
 
+
 export async function changeAvailableTimeSlot(
   doctorID: string,
   returnedDate: string,
@@ -288,4 +296,50 @@ export async function changeAvailableTimeSlot(
 
   doctor.availableTimes.push(new Date(returnedDate))
   doctor.save()
+}
+
+export async function getDoctorFollowupRequests(
+  username: string
+): Promise<HydratedDocument<FollowupRequestDocument>[]> {
+  const doctor = await getDoctorByUsername(username)
+  if (!doctor) throw new NotFoundError()
+
+  const followupRequests = await FollowupRequestModel.find({
+    appointment: {
+      $in: await AppointmentModel.find({ doctorID: doctor.id }).distinct('_id'),
+    },
+  })
+
+  const followupRequestsFiltered = followupRequests.filter(
+    (status) => status.status === 'pending'
+  )
+
+  return followupRequestsFiltered
+}
+
+export async function rejectFollowupRequest(id: string): Promise<void> {
+  const request = await FollowupRequestModel.findById(id)
+  if (!request) throw new NotFoundError()
+
+  request.status = 'rejected'
+  await request.save()
+}
+
+export async function acceptFollowupRequest(id: string): Promise<void> {
+  const request = await FollowupRequestModel.findById(id)
+  if (!request) throw new NotFoundError()
+  const appointment = await AppointmentModel.findById(request.appointment)
+  if (!appointment) throw new NotFoundError()
+
+  const newAppointment = new AppointmentModel({
+    patientID: appointment.patientID,
+    doctorID: appointment.doctorID,
+    date: request.date,
+    status: AppointmentStatus.Upcoming,
+    familyID: appointment.familyID,
+    reservedFor: appointment.reservedFor,
+  })
+  await newAppointment.save()
+  request.status = 'accepted'
+  await request.save()
 }
