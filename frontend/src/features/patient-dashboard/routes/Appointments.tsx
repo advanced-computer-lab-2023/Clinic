@@ -154,11 +154,14 @@ export function Appointments() {
 
   async function handleCancelAppointment(appointmentId: string) {
     try {
-      const response = await cancelAppointment(appointmentId)
+      const response = await cancelAppointment(
+        appointmentId,
+        user?.type === UserType.Doctor ? true : false
+      )
 
       if (response) {
         // Handle success, e.g., update the component state or show a message
-        toast.success('Appointment canceled successfully')
+        toast.success('Appointment cancelled successfully')
         navigate('/patient-dashboard/approved-doctors')
       } else {
         // Handle the case where the response is falsy (indicating an error)

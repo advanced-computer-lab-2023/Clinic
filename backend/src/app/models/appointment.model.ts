@@ -15,6 +15,8 @@ const appointmentSchema = new Schema(
     },
     familyID: { type: String, default: '' },
     reservedFor: { type: String, required: true },
+    paidByPatient: { type: Number, required: true },
+    paidToDoctor: { type: Number, required: true },
   },
   { timestamps: true }
 )

@@ -34,7 +34,7 @@ const patientSchema = new Schema(
         country: { type: String, required: true },
       },
     ],
-    walletMoney: { type: Number, default: 0 },
+    walletMoney: { type: Number, required: true, default: 0 },
     familyMembers: [{ type: Schema.Types.ObjectId, ref: 'FamilyMember' }],
     documents: [{ type: String }],
     healthPackage: { type: Schema.Types.ObjectId, ref: 'HealthPackage' },

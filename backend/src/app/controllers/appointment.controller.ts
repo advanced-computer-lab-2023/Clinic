@@ -74,7 +74,8 @@ appointmentsRouter.get(
 appointmentsRouter.post(
   '/makeappointment',
   asyncWrapper(async (req, res) => {
-    const { date, familyID, reservedFor, toPayUsingWallet } = req.body // Assuming the date is sent in the request body intype DaTe
+    const { date, familyID, reservedFor, toPayUsingWallet, sessionPrice } =
+      req.body // Assuming the date is sent in the request body intype DaTe
 
     const user = await UserModel.findOne({ username: req.username })
 
@@ -94,7 +95,7 @@ appointmentsRouter.post(
             patient.walletMoney -= toPayUsingWallet
             await patient.save()
 
-            doctor.walletMoney! += doctor.hourlyRate
+            doctor.walletMoney += doctor.hourlyRate
             await doctor.save()
 
             const appointment = await createAndRemoveTime(
@@ -102,7 +103,9 @@ appointmentsRouter.post(
               doctorID,
               date,
               familyID,
-              reservedFor
+              reservedFor,
+              sessionPrice,
+              doctor.hourlyRate
             )
 
             if (appointment) {
@@ -111,7 +114,7 @@ appointmentsRouter.post(
               patient.walletMoney += toPayUsingWallet //reverting the wallet money
               await patient.save()
 
-              doctor.walletMoney! -= doctor.hourlyRate
+              doctor.walletMoney -= doctor.hourlyRate
               await doctor.save()
 
               res.status(500).send('Appointment creation failed')
@@ -190,13 +193,17 @@ appointmentsRouter.post(
   })
 )
 
-appointmentsRouter.delete(
+appointmentsRouter.post(
   '/delete/:appointmentId',
   asyncWrapper(async (req, res) => {
     const appointmentId = req.params.appointmentId
+    const cancelledByDoctor = req.body.cancelledByDoctor
 
     try {
-      const deletedAppointment = await deleteAppointment(appointmentId)
+      const deletedAppointment = await deleteAppointment(
+        appointmentId,
+        cancelledByDoctor
+      )
 
       if (!deletedAppointment) {
         res.status(404).send('Error in the DeleteAppointment function')
