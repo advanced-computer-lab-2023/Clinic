@@ -45,6 +45,7 @@ export function ViewMyAvailableTimeSlots() {
 
     if (
       currentDate.getMonth() !== fromTime.getMonth() ||
+
       currentDate.getFullYear() !== fromTime.getFullYear()
     )
       toast.error('You should enter dates within this month and year')
@@ -96,10 +97,16 @@ export function ViewMyAvailableTimeSlots() {
                 Your Available Time Slots in this month
               </Typography>
             </Stack>
-            <Stack spacing={1}>
-              {query.data?.availableTimes.map((time) => (
-                <Typography variant="body1">{time.toString()}</Typography>
-              ))}
+            <Stack spacing={-1}>
+              {query.data?.availableTimes
+                .map((data) => new Date(data))
+                .filter((data) => data.getTime() > Date.now())
+                .sort((a, b) => a.getTime() - b.getTime())
+                .map((data, i) => (
+                  <Typography variant="body1" key={i}>
+                    {new Date(data).toLocaleString()}
+                  </Typography>
+                ))}
             </Stack>
           </Stack>
         </CardContent>
