@@ -115,6 +115,7 @@ export function ApprovedDoctors() {
                   <Stack spacing={-1}>
                     {doctor.availableTimes
                       .map((data) => new Date(data))
+                      .filter((data) => data.getTime() > Date.now())
                       .sort((a, b) => a.getTime() - b.getTime())
                       .map((data, i) => (
                         <Typography variant="body1" key={i}>

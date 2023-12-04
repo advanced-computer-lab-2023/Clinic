@@ -61,7 +61,7 @@ export function ViewMyAvailableTimeSlots() {
           i++
         ) {
           const startDateTime = new Date(
-            fromTime.getTime() + (i + 2) * 1000 * 60 * 60
+            fromTime.getTime() + i * 1000 * 60 * 60
           )
           timeSlots.push(startDateTime)
         }
@@ -91,10 +91,16 @@ export function ViewMyAvailableTimeSlots() {
                 Your Available Time Slots in this month
               </Typography>
             </Stack>
-            <Stack spacing={1}>
-              {query.data?.availableTimes.map((time) => (
-                <Typography variant="body1">{time.toString()}</Typography>
-              ))}
+            <Stack spacing={-1}>
+              {query.data?.availableTimes
+                .map((data) => new Date(data))
+                .filter((data) => data.getTime() > Date.now())
+                .sort((a, b) => a.getTime() - b.getTime())
+                .map((data, i) => (
+                  <Typography variant="body1" key={i}>
+                    {new Date(data).toLocaleString()}
+                  </Typography>
+                ))}
             </Stack>
           </Stack>
         </CardContent>
