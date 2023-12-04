@@ -230,31 +230,33 @@ export function DoctorView() {
           <DialogTitle>
             {' '}
             {
-              /* create a loading spinner */
-              loading ? <LoadingButton loading={true}></LoadingButton> : null
+              /* create a spinner */
+              loading ? (
+                <div className="spinner-border text-primary" role="status">
+                  <span className="visually-hidden">Loading...</span>
+                </div>
+              ) : null
             }
-            {!loading ? (
-              <Checkout
-                handleSubmit={() => {
-                  console.log('handleSubmit')
-                  setLoading(true)
-                  reserveTime(
-                    date,
-                    selectedFamilyMemberName!,
-                    selectedFamilyMemberId!,
-                    0, //amount to pay using wallet
-                    sessionRate! // general session rate
-                  )
-                    .then(() => {
-                      setCreditMethod(false)
-                      setLoading(false)
-                    })
-                    .catch(() => {
-                      setLoading(false)
-                    })
-                }}
-              />
-            ) : null}
+            <Checkout
+              handleSubmit={() => {
+                console.log('handleSubmit')
+                setLoading(true)
+                reserveTime(
+                  date,
+                  selectedFamilyMemberName!,
+                  selectedFamilyMemberId!,
+                  0, //amount to pay using wallet
+                  sessionRate! // general session rate
+                )
+                  .then(() => {
+                    setCreditMethod(false)
+                    setLoading(false)
+                  })
+                  .catch(() => {
+                    setLoading(false)
+                  })
+              }}
+            />
           </DialogTitle>
         </Dialog>
       </>
