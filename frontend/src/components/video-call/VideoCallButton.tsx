@@ -1,50 +1,114 @@
-import { LoadingButton } from '@mui/lab'
-import { Dialog } from '@mui/material'
-import { useState } from 'react'
-import { Video } from '.'
-import VideocamIcon from '@mui/icons-material/Videocam'
+// import { Dialog } from '@mui/material'
+import { useState, useContext, useRef, useEffect } from 'react'
+import { Button, Modal } from 'antd'
+import { VideoContext } from '@/providers/VideoCallProvider'
+import DuoIcon from '@mui/icons-material/Duo'
+import RingingSound from '../../components/video-call/assests/phone-ringing-101221.mp3' //"../../assests/teams.mp3";
+import PhoneDisabledIcon from '@mui/icons-material/PhoneDisabled'
+import { ButtonBase } from '@mui/material'
+import PhoneCall from '../../components/video-call/assests/phone-calling.gif'
 
-const VideoCallButton = ({ otherUsername }: { otherUsername: string }) => {
-  const [videoMeetId, setVideoMeetId] = useState<string | null>(otherUsername)
-  const [isOpen, setIsOpen] = useState(false)
+export function VideoCallButton({ otherUsername }: { otherUsername: string }) {
+  const [isCalling, setIsCalling] = useState(false)
+  const [openModal, setOpenModal] = useState(false)
+  const Audio = useRef<any>()
+  const { callUser, setOtherUser, leaveCall1, callAccepted, callEnded } =
+    useContext(VideoContext)
+  useEffect(() => {
+    if (openModal) {
+      Audio?.current?.play()
+    } else Audio?.current?.pause()
+
+    callUser(otherUsername)
+    setOtherUser(otherUsername)
+  }, [openModal, otherUsername, callUser])
+
+  useEffect(() => {
+    console.log('callAccepted', callAccepted)
+    console.log('callEnded', callEnded)
+    console.log('openModal', openModal)
+    if (isCalling && !(callAccepted && !callEnded)) setOpenModal(true)
+    else setOpenModal(false)
+  }, [callAccepted, callEnded, isCalling])
+
+  const endCall = () => {
+    setIsCalling(false)
+    leaveCall1()
+
+    // window.location.reload()
+  }
 
   return (
     <>
-      <LoadingButton
-        variant="contained"
-        color="primary"
-        size="small"
+      <Button
         style={{
-          marginLeft: 10,
-
-          backgroundColor: '#fff',
-          // borderRadius: "50%",
+          padding: '0px',
+          width: '50px',
+          height: '30px',
+          justifyContent: 'center',
+          alignItems: 'center',
+          display: 'flex',
         }}
+        size="small"
+        color="primary"
         onClick={() => {
-          setIsOpen(true)
-          setVideoMeetId('123')
+          setIsCalling(true)
         }}
       >
-        <VideocamIcon
-          style={{
-            color: 'green',
-            fontSize: '1.5rem',
-            // marginLeft: "10px",
-            // marginRight: "10px",
-          }}
-        />
-      </LoadingButton>
-
-      <Dialog
-        fullWidth
-        open={isOpen}
-        onClose={() => setIsOpen(false)}
-        maxWidth="lg"
+        <DuoIcon />
+      </Button>
+      <Modal
+        title="Calling"
+        footer={null}
+        open={openModal}
+        // onOk={() => showModal(false)}
+        onCancel={endCall}
+        style={{
+          height: '100px',
+          width: '100px',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
       >
-        {videoMeetId && <Video />}
-      </Dialog>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            gap: '1rem',
+            width: '100%',
+            height: '100%',
+            flexDirection: 'column',
+          }}
+        >
+          <audio src={RingingSound} loop ref={Audio} />
+
+          <img
+            //resize
+            style={{
+              width: '300px',
+              height: '300px',
+              objectFit: 'cover',
+              justifySelf: 'center',
+            }}
+            src={PhoneCall}
+          />
+        </div>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'flex-end',
+          }}
+        >
+          <ButtonBase onClick={endCall}>
+            <PhoneDisabledIcon
+              style={{
+                color: 'red',
+              }}
+            />
+          </ButtonBase>
+        </div>
+      </Modal>
     </>
   )
 }
-
-export { VideoCallButton }

@@ -1,4 +1,9 @@
-import { JwtPayload, verifyJWTToken } from './app/services/auth.service'
+import {
+  JwtPayload,
+  getSocketIdForUser,
+  updateSocketIdForUser,
+  verifyJWTToken,
+} from './app/services/auth.service'
 import { Server } from 'http'
 import { Server as SocketIOServer } from 'socket.io'
 
@@ -35,9 +40,80 @@ export function initializeSocket(expressServer: Server) {
   // later to send messages to specific users.
   socketIOServer.on('connection', async (socket) => {
     console.log('Socket.io client connected')
-    console.log('User: ' + socket.data.username)
+    // console.log('User: ' + socket.data.username)
 
     socket.join(socket.data.username)
+    console.log('Socket.io client connected')
+    console.log('socket.id    ', socket.id)
+    updateSocketIdForUser(socket.data.username, socket.id)
+
+    socket.emit('me', socket.id)
+
+    socket.on(
+      'callUser',
+      ({
+        userToCall,
+        signalData,
+        name,
+      }: {
+        userToCall: string
+        signalData: any
+        name: string
+      }) => {
+        console.log('callUser', userToCall)
+        getSocketIdForUser(userToCall).then((id) => {
+          console.log('id', id)
+          if (id)
+            socketIOServer.to(id).emit('callUser', {
+              signal: signalData,
+              from: socket.id,
+              name,
+            })
+        })
+      }
+    )
+
+    socket.on(
+      'updateMyMedia',
+      ({
+        type,
+        currentMediaStatus,
+      }: {
+        type: any
+        currentMediaStatus: any
+      }) => {
+        console.log('updateMyMedia')
+        socket.broadcast.emit('updateUserMedia', { type, currentMediaStatus })
+      }
+    )
+
+    socket.on<any>(
+      'msgUser',
+      ({
+        name,
+        to,
+        msg,
+        sender,
+      }: {
+        name: string
+        to: string
+        msg: string
+        sender: string
+      }) => {
+        socketIOServer.to(to).emit('msgRcv', { name, msg, sender })
+      }
+    )
+
+    socket.on<any>('answerCall', (data: any) => {
+      socket.broadcast.emit('updateUserMedia', {
+        type: data.type,
+        currentMediaStatus: data.myMediaStatus,
+      })
+      socketIOServer.to(data.to).emit('callAccepted', data)
+    })
+    socket.on<any>('endCall', ({ id }: { id: string }) => {
+      socketIOServer.to(id).emit('endCall')
+    })
   })
 
   return socketIOServer

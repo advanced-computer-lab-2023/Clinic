@@ -20,6 +20,7 @@ const userSchema = new Schema(
         description: { type: String },
       },
     ],
+    socketId: { type: String, required: false },
   },
   { timestamps: true }
 )
