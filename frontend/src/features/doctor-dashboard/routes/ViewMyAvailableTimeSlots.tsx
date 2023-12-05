@@ -45,33 +45,39 @@ export function ViewMyAvailableTimeSlots() {
 
     if (
       currentDate.getMonth() !== fromTime.getMonth() ||
-      currentDate.getMonth() !== fromTime.getMonth()
-    ) {
-      toast.error('You should enter dates within this month')
-    } else {
-      if (fromTime.getDate() !== toTime.getDate()) {
-        toast.error('The from date and To date must be on the same day')
-      } else {
-        for (
-          let i = 0;
-          i <
-          Math.floor(
-            (toTime.getTime() - fromTime.getTime()) / (1000 * 60 * 60)
-          );
-          i++
-        ) {
-          const startDateTime = new Date(
-            fromTime.getTime() + (i + 2) * 1000 * 60 * 60
-          )
-          timeSlots.push(startDateTime)
-        }
 
-        timeSlots.forEach((time) => {
-          addAvailableTimeSlots({ time }).then(() => {
-            query.refetch()
-          })
-        })
+      currentDate.getFullYear() !== fromTime.getFullYear()
+    )
+      toast.error('You should enter dates within this month and year')
+    else if (fromTime.getDate() !== toTime.getDate())
+      toast.error('The from date and To date must be on the same day')
+    else if (
+      fromTime.getHours() > toTime.getHours() ||
+      (fromTime.getHours() == toTime.getHours() &&
+        fromTime.getMinutes() >= toTime.getMinutes())
+    )
+      toast.error('The from time must be before the to time')
+    else if (fromTime.getTime() <= currentDate.getTime())
+      toast.error('You can only add future dates')
+    else {
+      for (
+        let i = 0;
+        i <
+        Math.floor((toTime.getTime() - fromTime.getTime()) / (1000 * 60 * 60));
+        i++
+      ) {
+        const startDateTime = new Date(
+          fromTime.getTime() + (i + 2) * 1000 * 60 * 60
+        )
+        timeSlots.push(startDateTime)
       }
+
+      timeSlots.forEach((time) => {
+        addAvailableTimeSlots({ time })
+      })
+
+      query.refetch()
+      toast.success('Time slot(s) added successfully')
     }
   }
 
@@ -91,10 +97,16 @@ export function ViewMyAvailableTimeSlots() {
                 Your Available Time Slots in this month
               </Typography>
             </Stack>
-            <Stack spacing={1}>
-              {query.data?.availableTimes.map((time) => (
-                <Typography variant="body1">{time.toString()}</Typography>
-              ))}
+            <Stack spacing={-1}>
+              {query.data?.availableTimes
+                .map((data) => new Date(data))
+                .filter((data) => data.getTime() > Date.now())
+                .sort((a, b) => a.getTime() - b.getTime())
+                .map((data, i) => (
+                  <Typography variant="body1" key={i}>
+                    {new Date(data).toLocaleString()}
+                  </Typography>
+                ))}
             </Stack>
           </Stack>
         </CardContent>
