@@ -1,9 +1,8 @@
-// import { Dialog } from '@mui/material'
 import { useState, useContext, useRef, useEffect } from 'react'
 import { Button, Modal } from 'antd'
 import { VideoContext } from '@/providers/VideoCallProvider'
 import DuoIcon from '@mui/icons-material/Duo'
-import RingingSound from '../../components/video-call/assests/phone-ringing-101221.mp3' //"../../assests/teams.mp3";
+import RingingSound from '../../components/video-call/assests/phone-ringing-101221.mp3'
 import PhoneDisabledIcon from '@mui/icons-material/PhoneDisabled'
 import { ButtonBase } from '@mui/material'
 import PhoneCall from '../../components/video-call/assests/phone-calling.gif'
@@ -31,8 +30,6 @@ export function VideoCallButton({ otherUsername }: { otherUsername: string }) {
   const endCall = () => {
     setIsCalling(false)
     leaveCall1()
-
-    // window.location.reload()
   }
 
   return (
@@ -60,7 +57,6 @@ export function VideoCallButton({ otherUsername }: { otherUsername: string }) {
         title="Calling"
         footer={null}
         open={openModal}
-        // onOk={() => showModal(false)}
         onCancel={endCall}
         style={{
           height: '100px',

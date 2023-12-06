@@ -1,10 +1,8 @@
 import React, { useState, useEffect, useRef, ReactNode } from 'react'
-// import { io } from 'socket.io-client'
 import Peer from 'simple-peer'
 import { message } from 'antd'
 import Ringing from '@/components/video-call/Ringing'
 import VideoCallScreen from '@/components/video-call/VideoCallScreen'
-// import { useAuth } from '@/hooks/auth'
 import { socket } from '@/api/socket'
 interface VideoContextType {
   call: any
@@ -69,38 +67,20 @@ const VideoCallProvider: React.FC<VideoCallProviderProps> = ({ children }) => {
   const userVideo = useRef<any>()
   const connectionRef = useRef<any>()
   const screenTrackRef = useRef<any>()
-  // const { /user } = useAuth()
-
-  // useEffect(() => {
-  //   socket.auth = {
-  //     token: localStorage.getItem('token'),
-  //   }
-
-  //   socket.connect()
-
-  //   return () => {
-  //     socket.disconnect()
-  //   }
-  // }, [user])
 
   useEffect(() => {
     if (!navigator.mediaDevices)
       return alert('Your browser does not support media devices.')
-
     navigator.mediaDevices
       .getUserMedia({ video: true, audio: true })
       .then((currentStream) => {
         setStream(currentStream)
-
-        // console.log('heeeerrreeee currentStreem=', currentStream)
         myVideo.current.srcObject = currentStream
       })
       .catch((error) => {
         console.log('heeeerrreee currentStreem=  error  ', error)
       })
-  }, [navigator.mediaDevices, callAccepted])
 
-  useEffect(() => {
     if (localStorage.getItem('name')) {
       setName(localStorage.getItem('name'))
     }
@@ -140,24 +120,7 @@ const VideoCallProvider: React.FC<VideoCallProviderProps> = ({ children }) => {
         setMsgRcv({})
       }, 2000)
     })
-  }, [])
-
-  useEffect(() => {
-    console.log('call', call)
-  }, [call])
-  useEffect(() => {
-    console.log('callAccepted', callAccepted)
   }, [callAccepted])
-  useEffect(() => {
-    console.log('callEnded', callEnded)
-  }, [callEnded])
-  useEffect(() => {
-    console.log('socket.id', socket.id)
-  }, [])
-
-  useEffect(() => {
-    console.log('call.isReceivingCall', call.isReceivingCall)
-  }, [call])
 
   const answerCall = () => {
     setCallAccepted(true)
@@ -178,7 +141,9 @@ const VideoCallProvider: React.FC<VideoCallProviderProps> = ({ children }) => {
 
     peer.on('stream', (currentStream) => {
       console.log('here current stream of the other user  ' + currentStream)
-      userVideo.current.srcObject = currentStream
+      setTimeout(() => {
+        userVideo.current.srcObject = currentStream
+      }, 1000)
     })
 
     console.log('the signal to send is = ', call.signal)
@@ -245,7 +210,7 @@ const VideoCallProvider: React.FC<VideoCallProviderProps> = ({ children }) => {
         type: 'mic',
         currentMediaStatus: !currentStatus,
       })
-      if (stream) stream.getAudioTracks()[0].enabled = !currentStatus
+      stream.getAudioTracks()[0].enabled = !currentStatus
 
       return !currentStatus
     })
@@ -297,32 +262,27 @@ const VideoCallProvider: React.FC<VideoCallProviderProps> = ({ children }) => {
           console.log('No stream for sharing ', error)
         })
     } else {
-      screenTrackRef.current?.onended()
+      screenTrackRef.current.onended()
     }
   }
 
-  //full screen
   const fullScreen = (e: any) => {
     const elem = e.target
 
     if (elem.requestFullscreen) {
       elem.requestFullscreen()
     } else if (elem.mozRequestFullScreen) {
-      /* Firefox */
       elem.mozRequestFullScreen()
     } else if (elem.webkitRequestFullscreen) {
-      /* Chrome, Safari & Opera */
       elem.webkitRequestFullscreen()
     } else if (elem.msRequestFullscreen) {
-      /* IE/Edge */
       elem.msRequestFullscreen()
     }
   }
 
   const leaveCall = () => {
     setCallEnded(true)
-
-    if (connectionRef && connectionRef.current) connectionRef.current.destroy()
+    connectionRef.current.destroy()
     socket.emit('endCall', { id: otherUser })
     window.location.reload()
   }
@@ -341,12 +301,6 @@ const VideoCallProvider: React.FC<VideoCallProviderProps> = ({ children }) => {
     }
     setChat([...chat, msg])
   }
-
-  useEffect(() => {
-    console.log('videos')
-    // console.log(myVideo.current?.srcObject)
-    console.log(userVideo)
-  }, [myVideo, userVideo])
 
   return (
     <VideoContext.Provider

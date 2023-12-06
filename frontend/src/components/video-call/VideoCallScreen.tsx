@@ -1,41 +1,33 @@
 import { useContext, useEffect, useState, useRef } from 'react'
 import { VideoContext } from '../../providers/VideoCallProvider'
 import '../../components/video-call/styles/Video.css' //"../Video.css";
-import { Modal, Avatar, Input, Button } from 'antd'
+import { Modal, Input } from 'antd'
 import VideoIcon from '../../components/video-call/assests/video.svg'
 import VideoOff from '../../components/video-call/assests/video-off.svg'
 import Msg_Illus from '../../components/video-call/assests/msg_illus.svg'
 import Msg from '../../components/video-call/assests/msg.svg'
-import ScreenShare from '../../components/video-call/assests/share_screen.svg'
-import { UserOutlined } from '@ant-design/icons'
-import { Dialog } from '@mui/material'
-import Hang from '../../components/video-call/assests/hang.svg'
-import '../../components/video-call/styles/Options.module.css'
+import VideocamOffIcon from '@mui/icons-material/VideocamOff'
+import '../../components/video-call/styles/Video.css'
 import { socket } from '@/api/socket'
+import PhoneMissedIcon from '@mui/icons-material/PhoneMissed'
 
 const { Search } = Input
 
 const VideoCallScreen = () => {
   const {
-    call,
     callAccepted,
     myVideo,
     userVideo,
-    name,
     callEnded,
     leaveCall,
     sendMsg: sendMsgFunc,
     chat,
     setChat,
-    userName,
     myVdoStatus,
     fullScreen,
-    handleScreenSharing,
     userVdoStatus,
     updateVideo,
-    myMicStatus,
     userMicStatus,
-    updateMic,
   } = useContext(VideoContext)
 
   const [isScreenVisible, setIsScreenVisible] = useState(false)
@@ -61,29 +53,46 @@ const VideoCallScreen = () => {
     setSendMsg('')
   }
 
-  // useEffect(() => {
-  //   if (msgRcv?.value && !isModalVisible) {
-  //     notification.open({
-  //       message: '',
-  //       description: `${msgRcv.sender}: ${msgRcv.value}`,
-  //       icon: <MessageOutlined style={{ color: '#108ee9' }} />,
-  //     })
-  //   }
-  // }, [msgRcv])
-
   useEffect(() => {
     if (callAccepted) {
       setIsScreenVisible(true)
     }
   }, [callAccepted, callEnded, userVideo])
 
+  const modalStyles = {
+    body: {
+      boxShadow: 'inset 0 0 5px #999',
+      borderRadius: 5,
+      backgroundColor: '#000000',
+    },
+    mask: {
+      backgroundColor: '#000000',
+    },
+    header: {
+      backgroundColor: '#000000',
+    },
+    footer: {
+      backgroundColor: '#000000',
+    },
+    content: {
+      backgroundColor: '#000000',
+    },
+  }
+
   return (
     <>
-      <Dialog
-        title="Basic Modal"
+      <Modal
+        title={null}
         open={isScreenVisible}
-        onClose={() => setIsScreenVisible(false)}
-        maxWidth="xl"
+        onCancel={leaveCall}
+        width={700}
+        style={{
+          backgroundColor: '#000000',
+        }}
+        styles={modalStyles}
+        footer={null}
+        getContainer={false}
+        closeIcon={false}
       >
         <div
           style={{
@@ -92,60 +101,20 @@ const VideoCallScreen = () => {
             alignItems: 'center',
             width: '100%',
             height: '100%',
-            gap: '5rem',
-            padding: '1rem',
+            backgroundColor: '#000000',
           }}
         >
           <div
-            style={{ textAlign: 'center' }}
-            className="card"
-            id={callAccepted && !callEnded ? 'video1' : 'video3'}
+            style={{
+              width: '80%',
+              position: 'absolute',
+              bottom: '50px',
+              borderRadius: '20px',
+              flexDirection: 'row',
+              zIndex: 1,
+            }}
           >
-            <div style={{ height: '2rem' }}>
-              <h3>{myVdoStatus && name}</h3>
-            </div>
-            <div className="video-avatar-container">
-              <video
-                playsInline
-                muted
-                onClick={fullScreen}
-                ref={myVideo}
-                autoPlay
-                className="video-active"
-                style={{
-                  opacity: `${myVdoStatus ? '1' : '0'}`,
-                }}
-              />
-
-              <Avatar
-                style={{
-                  backgroundColor: '#116',
-                  position: 'absolute',
-                  opacity: `${myVdoStatus ? '-1' : '2'}`,
-                }}
-                size={98}
-                icon={!name && <UserOutlined />}
-              >
-                {name}
-              </Avatar>
-            </div>
-
             <div className="iconsDiv">
-              <div
-                className="icons"
-                onClick={() => {
-                  updateMic()
-                }}
-                tabIndex={0}
-              >
-                <i
-                  className={`fa fa-microphone${myMicStatus ? '' : '-slash'}`}
-                  style={{ transform: 'scaleX(-1)' }}
-                  aria-label={`${myMicStatus ? 'mic on' : 'mic off'}`}
-                  aria-hidden="true"
-                ></i>
-              </div>
-
               {callAccepted && !callEnded && (
                 <div
                   className="icons"
@@ -196,15 +165,6 @@ const VideoCallScreen = () => {
                   onSearch={onSearch}
                 />
               </Modal>
-              {callAccepted && !callEnded && (
-                <div
-                  className="icons"
-                  onClick={() => handleScreenSharing()}
-                  tabIndex={0}
-                >
-                  <img src={ScreenShare} alt="share screen" />
-                </div>
-              )}
 
               <div className="icons" onClick={() => updateVideo()} tabIndex={0}>
                 {myVdoStatus ? (
@@ -213,70 +173,116 @@ const VideoCallScreen = () => {
                   <img src={VideoOff} alt="video off icon" />
                 )}
               </div>
+              <div
+                className="icons"
+                onClick={(e) => {
+                  //shop propagation
+                  e.stopPropagation()
+                  leaveCall()
+                  console.log('hang up')
+                }}
+                tabIndex={0}
+                style={{
+                  color: 'red',
+                  //rgb(255, 255, 255)
+                  backgroundColor: '#FD5735',
+                  paddingLeft: '10px',
+                  paddingRight: '10px',
+                }}
+              >
+                <PhoneMissedIcon style={{ color: '#fff' }} />
+              </div>
             </div>
           </div>
 
           {callAccepted && !callEnded && userVideo && (
-            <div className="card2" style={{ textAlign: 'center' }} id="video2">
-              <div style={{ height: '2rem' }}>
-                <h3>{userVdoStatus && (call.name || userName)}</h3>
-              </div>
-
-              <div className="video-avatar-container">
-                <video
-                  playsInline
-                  ref={userVideo}
-                  onClick={fullScreen}
-                  autoPlay
-                  className="video-active"
+            <div
+              // className="card2"
+              style={{
+                textAlign: 'center',
+                width: '100%',
+                height: '100%',
+                display: 'flex',
+                justifyContent: 'center',
+                flexDirection: 'row',
+              }}
+              id="video2"
+            >
+              <video
+                playsInline
+                ref={userVideo}
+                onClick={fullScreen}
+                autoPlay
+                className="video-active"
+                style={{
+                  opacity: `${userVdoStatus ? '1' : '0'}`,
+                  width: '100%',
+                  height: '100%',
+                  borderRadius: '20px',
+                  backgroundColor: '#000000',
+                  border: '2px solid #fff',
+                  // maxHeight: '100%',
+                }}
+              />
+              <div
+                style={{
+                  width: '100%',
+                  height: '500px',
+                  borderRadius: '20px',
+                  backgroundColor: '#fff',
+                  border: '2px solid #fff',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  opacity: `${userVdoStatus ? '0' : '1'}`,
+                  position: 'absolute',
+                  justifyItems: 'center',
+                }}
+              >
+                <VideocamOffIcon
                   style={{
-                    opacity: `${userVdoStatus ? '1' : '0'}`,
+                    color: 'grey',
+                    fontSize: '5rem',
                   }}
                 />
-
-                <Avatar
-                  style={{
-                    backgroundColor: '#116',
-                    position: 'absolute',
-                    opacity: `${userVdoStatus ? '-1' : '2'}`,
-                  }}
-                  size={98}
-                  icon={!(userName || call.name) && <UserOutlined />}
-                >
-                  {userName || call.name}
-                </Avatar>
-                {!userMicStatus && (
-                  <i
-                    style={{
-                      position: 'absolute',
-                      top: '0',
-                      left: '0',
-                      padding: '0.3rem',
-                      backgroundColor: '#fefefebf',
-                    }}
-                    className="fad fa-volume-mute fa-2x"
-                    aria-hidden="true"
-                    aria-label="microphone muted"
-                  ></i>
-                )}
               </div>
+
+              <video
+                playsInline
+                muted
+                onClick={fullScreen}
+                ref={myVideo}
+                autoPlay
+                className="video-active"
+                style={{
+                  opacity: `${myVdoStatus ? '1' : '0'}`,
+                  width: '20%',
+                  height: '20%',
+                  position: 'absolute',
+                  right: '40px',
+                  top: '40px',
+                  borderRadius: '20%',
+                  border: '2px solid #fff',
+                }}
+              />
+              {!userMicStatus && (
+                <i
+                  style={{
+                    position: 'absolute',
+                    top: '0',
+                    left: '0',
+                    padding: '0.3rem',
+                    backgroundColor: '#fefefebf',
+                  }}
+                  className="fad fa-volume-mute fa-2x"
+                  aria-hidden="true"
+                  aria-label="microphone muted"
+                ></i>
+              )}
             </div>
           )}
         </div>
-        <Button
-          // variant={"contained" }
-          onClick={leaveCall}
-          style={{
-            alignSelf: 'center',
-            margin: '1rem',
-          }}
-          className={'hang'}
-          tabIndex={0}
-        >
-          <img src={Hang} alt="hang up" style={{ height: '15px' }} />
-          &nbsp; Hang up
-        </Button>
-      </Dialog>
+      </Modal>
     </>
   )
 }

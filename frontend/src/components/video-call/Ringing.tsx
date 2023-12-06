@@ -4,8 +4,10 @@ import { Modal } from 'antd'
 import { Button } from 'antd'
 import Phone from '../video-call/assests/phone.gif'
 import Teams from '../video-call/assests/teams.mp3' //"../../assests/teams.mp3";
-import '../../components/video-call/styles/Options.module.css'
+import * as classes from '../../components/video-call/styles/Options.module.css'
 import { PhoneOutlined } from '@ant-design/icons'
+
+const styles = classes as any
 
 const Ringing = () => {
   const [isModalVisible, setIsModalVisible] = useState(false)
@@ -55,15 +57,15 @@ const Ringing = () => {
                 <img
                   src={Phone}
                   alt="phone ringing"
-                  className={'phone'}
+                  className={styles.phone}
                   style={{ display: 'inline-block' }}
                 />
               </h1>
             </div>
-            <div className={'btnDiv'}>
+            <div className={styles.btnDiv}>
               <Button
                 // variant="contained"
-                className={'answer'}
+                className={styles.answer}
                 color="#29bb89"
                 icon={<PhoneOutlined />}
                 onClick={() => {
@@ -76,7 +78,7 @@ const Ringing = () => {
               </Button>
               <Button
                 // variant="contained"
-                className={'decline'}
+                className={styles.decline}
                 icon={<PhoneOutlined />}
                 onClick={() => {
                   setIsModalVisible(false)
