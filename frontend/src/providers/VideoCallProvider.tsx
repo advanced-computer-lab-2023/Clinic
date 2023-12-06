@@ -44,7 +44,7 @@ export const VideoContext = React.createContext<VideoContextType>(
   {} as VideoContextType
 )
 
-const SERVER_URL = 'http://localhost:3000/'
+const SERVER_URL = 'http://192.168.8.102:3000/'
 
 export const socket = io(SERVER_URL)
 

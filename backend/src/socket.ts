@@ -45,7 +45,7 @@ export function initializeSocket(expressServer: Server) {
     socket.join(socket.data.username)
     console.log('Socket.io client connected')
     console.log('socket.id    ', socket.id)
-    updateSocketIdForUser(socket.data.username, socket.id)
+    if (socket.id) updateSocketIdForUser(socket.data.username, socket.id)
 
     socket.emit('me', socket.id)
 

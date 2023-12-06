@@ -19,9 +19,9 @@ export function VideoCallButton({ otherUsername }: { otherUsername: string }) {
       Audio?.current?.play()
     } else Audio?.current?.pause()
 
-    callUser(otherUsername)
+    console.log('the other username is = ' + otherUsername)
     setOtherUser(otherUsername)
-  }, [openModal, otherUsername, callUser])
+  }, [otherUsername])
 
   useEffect(() => {
     console.log('callAccepted', callAccepted)
@@ -53,6 +53,7 @@ export function VideoCallButton({ otherUsername }: { otherUsername: string }) {
         color="primary"
         onClick={() => {
           setIsCalling(true)
+          callUser(otherUsername)
         }}
       >
         <DuoIcon />
