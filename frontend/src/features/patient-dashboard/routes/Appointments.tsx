@@ -269,8 +269,7 @@ export function Appointments() {
                   )}
 
                 {user?.type === UserType.Patient &&
-                  appointment.status !== 'completed' &&
-                  appointment.status !== 'cancelled' && (
+                  appointment.status === 'upcoming' && (
                     <Stack spacing={2}>
                       <Button
                         variant="contained"
@@ -322,29 +321,27 @@ export function Appointments() {
                   )}
 
                 {/* New Cancel Appointment Button */}
-                {user &&
-                  (appointment.status === 'upcoming' ||
-                    appointment.status === 'rescheduled') && (
-                    <LoadingButton
-                      variant="contained"
-                      size="small"
-                      fullWidth
-                      sx={{
-                        backgroundColor: 'red',
-                        color: 'white',
-                        marginTop: 2,
-                      }}
-                      onClick={() => {
-                        setIsLoading(appointment.id)
-                        handleCancelAppointment(appointment.id).finally(() =>
-                          setIsLoading(null)
-                        )
-                      }}
-                      loading={isLoading == appointment.id}
-                    >
-                      Cancel Appointment
-                    </LoadingButton>
-                  )}
+                {user && appointment.status === 'upcoming' && (
+                  <LoadingButton
+                    variant="contained"
+                    size="small"
+                    fullWidth
+                    sx={{
+                      backgroundColor: 'red',
+                      color: 'white',
+                      marginTop: 2,
+                    }}
+                    onClick={() => {
+                      setIsLoading(appointment.id)
+                      handleCancelAppointment(appointment.id).finally(() =>
+                        setIsLoading(null)
+                      )
+                    }}
+                    loading={isLoading == appointment.id}
+                  >
+                    Cancel Appointment
+                  </LoadingButton>
+                )}
 
                 {user &&
                   appointment.status === 'upcoming' &&
