@@ -51,6 +51,7 @@ export function VideoCallButton({ otherUsername }: { otherUsername: string }) {
         onClick={() => {
           setIsCalling(true)
           callUser(otherUsername)
+          console.log('the other username is = ' + otherUsername)
         }}
       >
         <DuoIcon />
