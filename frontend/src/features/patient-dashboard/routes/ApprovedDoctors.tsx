@@ -12,6 +12,7 @@ import { DateRange, FilteredList } from '@/components/FilteredList'
 import { useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { DiscountedPrice } from '@/components/DiscountedPrice'
+import { VideoCallButton } from '@/components/video-call/VideoCallButton'
 
 export function ApprovedDoctors() {
   const navigate = useNavigate()
@@ -97,9 +98,20 @@ export function ApprovedDoctors() {
             <CardContent>
               <Stack spacing={2}>
                 <Stack spacing={-1}>
-                  <Typography variant="overline" color="text.secondary">
-                    Doctor Name
-                  </Typography>
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      flexDirection: 'row',
+                    }}
+                  >
+                    <Typography variant="overline" color="text.secondary">
+                      Doctor Name
+                    </Typography>
+                    <VideoCallButton otherUsername={doctor.username} />
+                  </div>
+
                   <Typography variant="body1">{doctor.name}</Typography>
                 </Stack>
                 <Stack spacing={-1}>

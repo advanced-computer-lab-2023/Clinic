@@ -1,0 +1,89 @@
+.options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  column-gap: 2rem;
+  margin: 2rem auto;
+  width: 90%;
+  max-width: 600px;
+  background: #fefefe;
+  padding: 0.5rem 1rem;
+  border-top: 5px solid dodgerblue;
+  border-radius: 0.25rem;
+}
+
+@media (max-width: 600px) {
+  .options {
+    display: flex;
+    flex-direction: column;
+    max-width: 480px;
+  }
+}
+.options > * {
+  width: 100%;
+}
+.options .btn {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+  transition: none;
+}
+.options .btn:hover {
+  opacity: 0.9;
+}
+.options .btn:focus {
+  outline: 2px solid #000;
+}
+.inputgroup {
+  font-family: Gilroy-light;
+  font-weight: bold;
+  letter-spacing: 0.09rem;
+}
+
+.inputgroup {
+  width: 100%;
+  max-width: 360px;
+}
+
+.btnDiv {
+  display: flex;
+  margin-top: 1rem;
+  flex-direction: row;
+  justify-content: space-around;
+}
+
+.phone {
+  height: 4rem;
+}
+
+.btnDiv .answer {
+  background-color: #29bb89;
+  color: #1e6f5c;
+  font-weight: bold;
+}
+
+.btnDiv .decline {
+  background-color: rgb(250, 30, 14, 0.75);
+  color: #8c0000;
+  font-weight: bold;
+}
+.hang {
+  background-color: rgb(250, 30, 14, 0.75) !important;
+  color: #8c0000 !important;
+  font-weight: bold;
+  margin-top: 0.5rem;
+}
+
+.share_options {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-top: 0.5rem;
+}
+.share_social {
+  display: flex;
+  /* margin-top: 1rem; */
+}
+
+.share_icon {
+  display: flex;
+  margin-left: 0.4rem;
+}

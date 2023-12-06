@@ -33,7 +33,6 @@ mongoose
   .connect(MongoURL)
   .then(() => {
     console.log('Database connected')
-
     server.listen(port, () => {
       console.log(`Server running at http://localhost:${port}`)
     })

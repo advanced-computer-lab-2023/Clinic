@@ -45,5 +45,4 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     </AuthProvider>
     <ToastContainer />
   </>
-  // </React.StrictMode>
 )

@@ -280,7 +280,6 @@ export function getDoctorSessionRateWithMarkup({
   return doctor.hourlyRate * (1 + clinicMarkup / 100)
 }
 
-
 export async function changeAvailableTimeSlot(
   doctorID: string,
   returnedDate: string,

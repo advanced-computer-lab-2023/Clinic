@@ -21,6 +21,7 @@ import { NotificationsList } from './Notifications'
 import { ChatsList } from './chats/ChatsList'
 import { ChatsProvider } from '@/providers/ChatsProvider'
 import { useAuth } from '@/hooks/auth'
+import { VideoCallProvider } from '@/providers/VideoCallProvider'
 
 interface ListItemLinkProps {
   icon?: React.ReactElement
@@ -150,7 +151,11 @@ export function BaseLayout() {
   )
 
   if (user) {
-    return <ChatsProvider>{layout}</ChatsProvider>
+    return (
+      <VideoCallProvider>
+        <ChatsProvider>{layout}</ChatsProvider>
+      </VideoCallProvider>
+    )
   } else {
     return layout
   }
