@@ -8,6 +8,7 @@ import { DataGrid, GridColDef } from '@mui/x-data-grid'
 import { useNavigate } from 'react-router-dom'
 import { GetMyPatientsResponse } from 'clinic-common/types/patient.types'
 import { ChatButton } from '@/components/chats/ChatButton'
+import { VideoCallButton } from '@/components/video-call/VideoCallButton'
 
 export function ViewPatients() {
   const query = useQuery(['view-patients'], viewPatients)
@@ -64,6 +65,7 @@ export function ViewPatients() {
             View Patient
           </Button>
           <ChatButton otherUsername={params.row.username} />
+          <VideoCallButton otherUsername={params.row.username} />
         </Stack>
       ),
     },

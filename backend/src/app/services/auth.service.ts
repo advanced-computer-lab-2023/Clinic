@@ -319,3 +319,26 @@ export async function getModelIdForUsername(username: string): Promise<string> {
       throw new Error('Invalid user type')
   }
 }
+
+export async function updateSocketIdForUser(
+  username: string,
+  socketId: string
+): Promise<void> {
+  const user = await getUserByUsername(username)
+  user.socketId = socketId
+  console.log(
+    'user socket id updated usrname:',
+    username,
+    ' socketId=',
+    socketId
+  )
+  await user.save()
+}
+
+export async function getSocketIdForUser(
+  username: string
+): Promise<string | undefined> {
+  const user = await getUserByUsername(username)
+
+  return user.socketId
+}

@@ -6,6 +6,14 @@ import tsconfigPaths from 'vite-tsconfig-paths'
 export default defineConfig({
   plugins: [react(), tsconfigPaths()],
 
+  resolve: {
+    alias: {
+      'socket.io-client': 'socket.io-client/dist/socket.io.js',
+    },
+  },
+  define: {
+    global: 'window',
+  },
   // Without this line, the app will not work in the browser when using docker-compose
   server: {
     host: true,
