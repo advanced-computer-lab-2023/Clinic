@@ -61,9 +61,10 @@ appointmentsRouter.get(
           familyID: appointment.familyID || '',
           reservedFor: appointment.reservedFor || 'Me',
           status:
-            new Date(appointment.date) > new Date()
-              ? (appointment.status as AppointmentStatus)
-              : AppointmentStatus.Completed,
+            new Date(appointment.date) < new Date() &&
+            appointment.status === AppointmentStatus.Upcoming
+              ? AppointmentStatus.Completed
+              : (appointment.status as AppointmentStatus),
         }
       })
     )
@@ -174,12 +175,23 @@ appointmentsRouter.post(
       throw new NotFoundError()
     }
 
-    appointment.date = req.body.rescheduleDate
+    //appointment.date = req.body.rescheduleDate
     appointment.status = AppointmentStatus.Rescheduled
     appointment.save()
+    const newAppointment = new AppointmentModel({
+      patientID: appointment.patientID,
+      doctorID: appointment.doctorID,
+      date: req.body.rescheduleDate,
+      familyID: appointment.familyID,
+      reservedFor: appointment.reservedFor,
+      status: AppointmentStatus.Upcoming,
+      paidByPatient: appointment.paidByPatient,
+      paidToDoctor: appointment.paidToDoctor,
+    })
+    await newAppointment.save()
     sendAppointmentNotificationToPatient(appointment, 'rescheduled')
 
-    res.send(appointment)
+    res.send(newAppointment)
   })
 )
 appointmentsRouter.post(

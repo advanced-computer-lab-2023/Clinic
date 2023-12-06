@@ -269,8 +269,7 @@ export function Appointments() {
                   )}
 
                 {user?.type === UserType.Patient &&
-                  appointment.status !== 'completed' &&
-                  appointment.status !== 'cancelled' && (
+                  appointment.status === 'upcoming' && (
                     <Stack spacing={2}>
                       <Button
                         variant="contained"
