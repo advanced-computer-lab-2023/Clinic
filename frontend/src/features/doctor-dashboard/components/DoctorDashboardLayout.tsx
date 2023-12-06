@@ -58,7 +58,7 @@ export function DoctorDashboardLayout() {
       },
       {
         to: '/doctor-dashboard/appointments',
-        text: 'Appoitments',
+        text: 'Appointments',
         icon: <AccessTimeIcon />,
       },
       {

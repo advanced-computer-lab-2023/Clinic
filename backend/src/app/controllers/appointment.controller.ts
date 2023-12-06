@@ -6,6 +6,7 @@ import {
   createFollowUpAppointment,
   deleteAppointment,
   requestFollowUpAppointment,
+  checkForExistingFollowUp,
 } from '../services/appointment.service'
 import {
   AppointmentStatus,
@@ -22,6 +23,7 @@ import {
 import { AppointmentModel } from '../models/appointment.model'
 import { NotFoundError } from '../errors'
 import { sendAppointmentNotificationToPatient } from '../services/sendNotificationForAppointment'
+import AppError from '../utils/appError'
 
 export const appointmentsRouter = Router()
 
@@ -59,9 +61,10 @@ appointmentsRouter.get(
           familyID: appointment.familyID || '',
           reservedFor: appointment.reservedFor || 'Me',
           status:
-            new Date(appointment.date) > new Date()
-              ? (appointment.status as AppointmentStatus)
-              : AppointmentStatus.Completed,
+            new Date(appointment.date) < new Date() &&
+            appointment.status === AppointmentStatus.Upcoming
+              ? AppointmentStatus.Completed
+              : (appointment.status as AppointmentStatus),
         }
       })
     )
@@ -72,7 +75,8 @@ appointmentsRouter.get(
 appointmentsRouter.post(
   '/makeappointment',
   asyncWrapper(async (req, res) => {
-    const { date, familyID, reservedFor, toPayUsingWallet } = req.body // Assuming the date is sent in the request body intype DaTe
+    const { date, familyID, reservedFor, toPayUsingWallet, sessionPrice } =
+      req.body // Assuming the date is sent in the request body intype DaTe
 
     const user = await UserModel.findOne({ username: req.username })
 
@@ -92,7 +96,7 @@ appointmentsRouter.post(
             patient.walletMoney -= toPayUsingWallet
             await patient.save()
 
-            doctor.walletMoney! += doctor.hourlyRate
+            doctor.walletMoney += doctor.hourlyRate
             await doctor.save()
 
             const appointment = await createAndRemoveTime(
@@ -100,7 +104,9 @@ appointmentsRouter.post(
               doctorID,
               date,
               familyID,
-              reservedFor
+              reservedFor,
+              sessionPrice,
+              doctor.hourlyRate
             )
 
             if (appointment) {
@@ -109,7 +115,7 @@ appointmentsRouter.post(
               patient.walletMoney += toPayUsingWallet //reverting the wallet money
               await patient.save()
 
-              doctor.walletMoney! -= doctor.hourlyRate
+              doctor.walletMoney -= doctor.hourlyRate
               await doctor.save()
 
               res.status(500).send('Appointment creation failed')
@@ -135,6 +141,25 @@ appointmentsRouter.post(
     res.send(newAppointment)
   })
 )
+appointmentsRouter.get(
+  '/checkFollowUp/:appointmentID',
+  asyncWrapper(async (req, res) => {
+    const { appointmentID } = req.params
+
+    try {
+      const hasFollowUp = await checkForExistingFollowUp(appointmentID)
+      res.json({ exists: hasFollowUp })
+    } catch (error) {
+      if (error instanceof AppError) {
+        res
+          .status(error.statusCode)
+          .json({ exists: true, message: error.message })
+      } else {
+        res.status(500).json({ message: 'Internal server error' })
+      }
+    }
+  })
+)
 
 appointmentsRouter.post(
   '/reschedule',
@@ -150,12 +175,23 @@ appointmentsRouter.post(
       throw new NotFoundError()
     }
 
-    appointment.date = req.body.rescheduleDate
+    //appointment.date = req.body.rescheduleDate
     appointment.status = AppointmentStatus.Rescheduled
     appointment.save()
+    const newAppointment = new AppointmentModel({
+      patientID: appointment.patientID,
+      doctorID: appointment.doctorID,
+      date: req.body.rescheduleDate,
+      familyID: appointment.familyID,
+      reservedFor: appointment.reservedFor,
+      status: AppointmentStatus.Upcoming,
+      paidByPatient: appointment.paidByPatient,
+      paidToDoctor: appointment.paidToDoctor,
+    })
+    await newAppointment.save()
     sendAppointmentNotificationToPatient(appointment, 'rescheduled')
 
-    res.send(appointment)
+    res.send(newAppointment)
   })
 )
 appointmentsRouter.post(
@@ -169,13 +205,17 @@ appointmentsRouter.post(
   })
 )
 
-appointmentsRouter.delete(
+appointmentsRouter.post(
   '/delete/:appointmentId',
   asyncWrapper(async (req, res) => {
     const appointmentId = req.params.appointmentId
+    const cancelledByDoctor = req.body.cancelledByDoctor
 
     try {
-      const deletedAppointment = await deleteAppointment(appointmentId)
+      const deletedAppointment = await deleteAppointment(
+        appointmentId,
+        cancelledByDoctor
+      )
 
       if (!deletedAppointment) {
         res.status(404).send('Error in the DeleteAppointment function')

@@ -27,7 +27,7 @@ const doctorSchema = new Schema(
       default: ContractStatus.Pending,
     },
     availableTimes: { type: [Date], required: true, default: [] },
-    walletMoney: { type: Number, required: false, default: 0 },
+    walletMoney: { type: Number, required: true, default: 0 },
     employmentContract: { type: [String], required: true, default: [] },
   },
 

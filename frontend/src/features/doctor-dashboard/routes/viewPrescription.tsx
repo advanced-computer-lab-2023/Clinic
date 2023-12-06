@@ -1,54 +1,14 @@
-import {
-  Typography,
-  Container,
-  Grid,
-  TextField,
-  Paper,
-  Button,
-  CardContent,
-  Card,
-} from '@mui/material'
-import { useFormik } from 'formik'
-import { useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
-import React from 'react'
+import { Typography, Container, Button, CardContent, Card } from '@mui/material'
 
-import { addPrescriptionApi, getPrescriptions } from '@/api/doctor'
+import { useEffect, useState } from 'react'
+import { useParams } from 'react-router-dom'
+
+import { getPrescriptions } from '@/api/doctor'
 
 function ViewPrescription() {
   const { username } = useParams()
   const token = localStorage.getItem('token')
   const [prescriptions, setPrescriptions] = useState([])
-  const formik = useFormik({
-    initialValues: {
-      medicines: [{ name: '', dosage: '', frequency: '', duration: '' }],
-      date: null,
-    },
-    onSubmit: (values) => {
-      // Call your addPrescription method here
-      const submissionValues = {
-        ...values,
-        date: new Date(),
-      }
-      addPrescription(submissionValues)
-      // You can also reset the form if needed
-      formik.resetForm()
-    },
-  })
-
-  const addPrescription = async (values: any) => {
-    try {
-      const response = await addPrescriptionApi(
-        username,
-        values.medicines,
-        values.date
-      )
-      console.log(response)
-      await fetchPresciptions()
-    } catch (error) {
-      console.error('Error fetching presciptions:', error)
-    }
-  }
 
   const fetchPresciptions = async () => {
     try {
@@ -125,103 +85,47 @@ function ViewPrescription() {
                     >
                       <strong>Name:</strong> {medicine.name},{' '}
                       <strong>Dosage:</strong> {medicine.dosage},{' '}
-                      <strong>Frequency:</strong> {medicine.frequency},{' '}
+                      <strong>Quantity:</strong> {medicine.quantity},{' '}
                     </Typography>
                   )
                 )}
+
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                color="primary"
+                style={{ marginTop: 20 }}
+                onClick={() =>
+                  (window.location.href = `http://localhost:5174/doctor-dashboard?PrescriptionId=${prescription._id}&token=${token}`)
+                }
+              >
+                Edit Prescription
+              </Button>
             </CardContent>
           </Card>
         ))}
       </Container>
 
       <Container component="main" maxWidth="xs">
-        <Paper
-          elevation={3}
-          sx={{
-            padding: 2,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-          }}
-        >
-          <Typography component="h1" variant="h5">
-            Prescription Form
-          </Typography>
-          <form onSubmit={formik.handleSubmit}>
-            <Grid container spacing={2}>
-              {formik.values.medicines.map((medicine: any, index) => (
-                <React.Fragment key={index}>
-                  <Grid item xs={12}>
-                    <TextField
-                      fullWidth
-                      name={`medicines[${index}].name`}
-                      label="Medicine Name"
-                      variant="outlined"
-                      onChange={formik.handleChange}
-                      value={medicine.name}
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <TextField
-                      fullWidth
-                      name={`medicines[${index}].dosage`}
-                      label="Dosage"
-                      variant="outlined"
-                      onChange={formik.handleChange}
-                      value={medicine.dosage}
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <TextField
-                      fullWidth
-                      name={`medicines[${index}].frequency`}
-                      label="Frequency"
-                      variant="outlined"
-                      onChange={formik.handleChange}
-                      value={medicine.frequency}
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <TextField
-                      fullWidth
-                      name={`medicines[${index}].duration`}
-                      label="Duration"
-                      variant="outlined"
-                      onChange={formik.handleChange}
-                      value={medicine.duration}
-                    />
-                  </Grid>
-                  {/* Repeat for dosage, frequency, and duration */}
-                </React.Fragment>
-              ))}
-            </Grid>
-            <Link
+        {/* <Link
               to={`http://localhost:5174/doctor-dashboard?patientusername=${username}&token=${token}`}
             >
               Add Another Prescription
-            </Link>
-            <Button
-              onClick={() =>
-                formik.setFieldValue('medicines', [
-                  ...formik.values.medicines,
-                  { name: '', dosage: '', frequency: '', duration: '' },
-                ])
-              }
-            >
-              Add Another Medicine
-            </Button>
+            </Link> */}
 
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              color="primary"
-              style={{ marginTop: 20 }}
-            >
-              Add Prescription
-            </Button>
-          </form>
-        </Paper>
+        <Button
+          type="submit"
+          fullWidth
+          variant="contained"
+          color="primary"
+          style={{ marginTop: 20 }}
+          onClick={() =>
+            (window.location.href = `http://localhost:5174/doctor-dashboard?patientusername=${username}&token=${token}`)
+          }
+        >
+          Add Prescription
+        </Button>
       </Container>
     </>
   )

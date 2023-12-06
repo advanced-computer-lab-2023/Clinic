@@ -9,6 +9,7 @@ import {
   Select,
   MenuItem,
 } from '@mui/material'
+import { LoadingButton } from '@mui/lab'
 import { DateRange, FilteredList } from '@/components/FilteredList'
 import {
   AppointmentResponseBase,
@@ -19,13 +20,16 @@ import {
   getAppointments,
   reschedule,
 } from '@/api/appointments'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useAuth } from '@/hooks/auth'
 import { UserType } from 'clinic-common/types/user.types'
 import { toast } from 'react-toastify'
-import { useNavigate } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
-import { createFollowup, requestFollowup } from '@/api/patient'
+import {
+  checkForFollowUp,
+  createFollowup,
+  requestFollowup,
+} from '@/api/patient'
 
 export function Appointments() {
   const queryClient = useQueryClient()
@@ -34,7 +38,42 @@ export function Appointments() {
   const { user } = useAuth()
   const [rescheduleDate, setRescheduleDate] = useState('')
   const [rescheduleDateError, setRescheduleDateError] = useState(false)
-  const navigate = useNavigate()
+
+  interface FollowUpStatusMap {
+    [appointmentId: string]: boolean
+  }
+  const [followUpStatus, setFollowUpStatus] = useState<FollowUpStatusMap>({})
+  const [isLoading, setIsLoading] = useState<string | null>(null)
+
+  useEffect(() => {
+    const fetchAppointmentsAndUpdateStatus = async () => {
+      try {
+        const appointments = await getAppointments() // Replace with actual API call
+
+        const followUpChecks = appointments.map(async (appointment) => {
+          const followUpExists = await checkForFollowUp(appointment.id) // Replace with actual API call
+
+          return { id: appointment.id, exists: followUpExists.exists }
+        })
+
+        const results = await Promise.all(followUpChecks)
+        const followUpStatusMap = results.reduce<FollowUpStatusMap>(
+          (acc, curr) => {
+            acc[curr.id] = curr.exists
+
+            return acc
+          },
+          {}
+        )
+
+        setFollowUpStatus(followUpStatusMap)
+      } catch (error) {
+        console.error('Error fetching appointments:', error)
+      }
+    }
+
+    fetchAppointmentsAndUpdateStatus()
+  }, [])
 
   async function handleFollowUpButton(doctorID: string, patientID: string) {
     if (followUpDate === '') {
@@ -86,9 +125,24 @@ export function Appointments() {
       await requestFollowup(appointmentID, followUpDate)
         .then(() => {
           toast.success('Follow-up requested successfully')
+
+          // Update the followUpStatus state for this specific appointment
+          setFollowUpStatus((prevStatus) => ({
+            ...prevStatus,
+            [appointmentID]: true,
+          }))
         })
         .catch((err) => {
-          toast.error('Error in requesting follow-up')
+          if (
+            err.message.includes(
+              'A follow-up request already exists for this appointment'
+            )
+          ) {
+            toast.error('A follow-up request is already submitted')
+          } else {
+            toast.error('Error in requesting follow-up')
+          }
+
           console.log(err)
         })
 
@@ -99,22 +153,18 @@ export function Appointments() {
   const currentDate = new Date().toISOString().slice(0, 16)
 
   async function handleCancelAppointment(appointmentId: string) {
-    try {
-      const response = await cancelAppointment(appointmentId)
-
-      if (response) {
-        // Handle success, e.g., update the component state or show a message
-        toast.success('Appointment canceled successfully')
-        navigate('/patient-dashboard/approved-doctors')
-      } else {
-        // Handle the case where the response is falsy (indicating an error)
-        toast.error('Error canceling appointment')
-      }
-    } catch (error: any) {
-      // Handle errors from the API call
-      console.error('Error canceling appointment:', error.message)
-      toast.error('Error canceling appointment')
-    }
+    await cancelAppointment(
+      appointmentId,
+      user?.type === UserType.Doctor ? true : false
+    )
+      .then(() => {
+        queryClient.refetchQueries(['appointments'])
+        toast.success('Appointment cancelled successfully')
+      })
+      .catch((err: any) => {
+        toast.error('Error in canceling appointment')
+        console.log(err)
+      })
   }
 
   return (
@@ -219,8 +269,7 @@ export function Appointments() {
                   )}
 
                 {user?.type === UserType.Patient &&
-                  appointment.status !== 'completed' &&
-                  appointment.status !== 'cancelled' && (
+                  appointment.status === 'upcoming' && (
                     <Stack spacing={2}>
                       <Button
                         variant="contained"
@@ -273,7 +322,7 @@ export function Appointments() {
 
                 {/* New Cancel Appointment Button */}
                 {user && appointment.status === 'upcoming' && (
-                  <Button
+                  <LoadingButton
                     variant="contained"
                     size="small"
                     fullWidth
@@ -282,11 +331,26 @@ export function Appointments() {
                       color: 'white',
                       marginTop: 2,
                     }}
-                    onClick={() => handleCancelAppointment(appointment.id)}
+                    onClick={() => {
+                      setIsLoading(appointment.id)
+                      handleCancelAppointment(appointment.id).finally(() =>
+                        setIsLoading(null)
+                      )
+                    }}
+                    loading={isLoading == appointment.id}
                   >
                     Cancel Appointment
-                  </Button>
+                  </LoadingButton>
                 )}
+
+                {user &&
+                  appointment.status === 'upcoming' &&
+                  user.type === UserType.Patient && (
+                    <Typography variant="caption" color="warning">
+                      Appointments cancelled less than 24 hours before their
+                      date do not receive a refund.
+                    </Typography>
+                  )}
                 {user?.type === UserType.Patient &&
                   appointment.status === 'completed' && (
                     <TextField
@@ -296,17 +360,26 @@ export function Appointments() {
                       error={followUpDateError}
                     />
                   )}
+
                 {user?.type === UserType.Patient &&
                   appointment.status === 'completed' && (
-                    <Button
-                      variant="contained"
-                      size="small"
-                      onClick={() =>
-                        handleRequestFollowUpButton(appointment.id)
-                      }
-                    >
-                      Request Follow-up
-                    </Button>
+                    <>
+                      <Button
+                        variant="contained"
+                        size="small"
+                        onClick={() =>
+                          handleRequestFollowUpButton(appointment.id)
+                        }
+                        disabled={followUpStatus[appointment.id] ?? false}
+                      >
+                        Request Follow-up
+                      </Button>
+                      {followUpStatus[appointment.id] && (
+                        <Typography variant="caption" color="error">
+                          A follow-up request already submitted.
+                        </Typography>
+                      )}
+                    </>
                   )}
               </Stack>
             </CardContent>

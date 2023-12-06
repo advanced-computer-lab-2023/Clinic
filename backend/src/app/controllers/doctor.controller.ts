@@ -316,7 +316,7 @@ doctorsRouter.get(
     const doctor = await getDoctorByUsername(req.params.username)
     if (!doctor) throw new NotFoundError()
     res.send({
-      money: doctor.walletMoney ?? 0,
+      money: doctor.walletMoney,
     } satisfies GetWalletMoneyResponse)
   })
 )
