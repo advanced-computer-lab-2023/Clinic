@@ -44,9 +44,13 @@
     "formik": "^2.4.5",
     "install": "^0.13.0",
     "nodemailer": "^6.9.7",
+
+    "react-router-dom": "^6.20.1",
+
     "react-copy-to-clipboard": "^5.1.0",
-    "react-router-dom": "^6.18.0",
+   
     "react-share": "^5.0.3",
     "web-vitals": "^3.5.0"
+
   }
 }
