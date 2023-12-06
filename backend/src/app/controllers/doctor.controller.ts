@@ -444,6 +444,7 @@ doctorsRouter.get(
       contractStatus: doctor.contractStatus as ContractStatus,
       employmentContract: doctor.employmentContract as [string],
       documents: doctor.documents as [string],
+      wallet: doctor.walletMoney,
     } satisfies GetDoctorResponse)
   })
 )

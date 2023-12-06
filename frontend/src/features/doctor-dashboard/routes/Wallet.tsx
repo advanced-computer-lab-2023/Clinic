@@ -5,6 +5,7 @@ import { useQuery } from '@tanstack/react-query'
 
 import { useAuth } from '@/hooks/auth'
 import { getWalletMoney } from '@/api/doctor'
+import { useEffect } from 'react'
 
 export function Wallet() {
   const { user } = useAuth()
@@ -12,6 +13,10 @@ export function Wallet() {
     queryKey: ['get-wallet-money'],
     queryFn: () => getWalletMoney(user!.username),
   })
+
+  useEffect(() => {
+    console.log(query?.data?.money)
+  }, [query.data])
 
   if (query.isLoading) {
     return <CardPlaceholder />

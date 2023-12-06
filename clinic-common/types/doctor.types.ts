@@ -58,6 +58,7 @@ export interface GetDoctorResponse extends DoctorResponseBase {
   availableTimes: [Date]
   employmentContract: [string]
   documents: [string]
+  wallet: number
 }
 
 export interface GetApprovedDoctorsResponse {
