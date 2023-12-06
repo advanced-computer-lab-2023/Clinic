@@ -24,9 +24,6 @@ export function VideoCallButton({ otherUsername }: { otherUsername: string }) {
   }, [otherUsername])
 
   useEffect(() => {
-    console.log('callAccepted', callAccepted)
-    console.log('callEnded', callEnded)
-    console.log('openModal', openModal)
     if (isCalling && !(callAccepted && !callEnded)) setOpenModal(true)
     else setOpenModal(false)
   }, [callAccepted, callEnded, isCalling])

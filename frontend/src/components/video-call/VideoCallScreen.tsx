@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState, useRef } from 'react'
-import { VideoContext, socket } from '../../providers/VideoCallProvider'
+import { VideoContext } from '../../providers/VideoCallProvider'
 import '../../components/video-call/styles/Video.css' //"../Video.css";
 import { Modal, Avatar, Input, Button } from 'antd'
 import VideoIcon from '../../components/video-call/assests/video.svg'
@@ -11,6 +11,8 @@ import { UserOutlined } from '@ant-design/icons'
 import { Dialog } from '@mui/material'
 import Hang from '../../components/video-call/assests/hang.svg'
 import '../../components/video-call/styles/Options.module.css'
+import { socket } from '@/api/socket'
+
 const { Search } = Input
 
 const VideoCallScreen = () => {
@@ -19,7 +21,6 @@ const VideoCallScreen = () => {
     callAccepted,
     myVideo,
     userVideo,
-    stream,
     name,
     callEnded,
     leaveCall,
@@ -60,15 +61,15 @@ const VideoCallScreen = () => {
     setSendMsg('')
   }
 
-  //   useEffect(() => {
-  //     if (msgRcv?.value && !isModalVisible) {
-  //       notification.open({
-  //         message: '',
-  //         description: `${msgRcv.sender}: ${msgRcv.value}`,
-  //         icon: <MessageOutlined style={{ color: '#108ee9' }} />,
-  //       })
-  //     }
-  //   }, [msgRcv])
+  // useEffect(() => {
+  //   if (msgRcv?.value && !isModalVisible) {
+  //     notification.open({
+  //       message: '',
+  //       description: `${msgRcv.sender}: ${msgRcv.value}`,
+  //       icon: <MessageOutlined style={{ color: '#108ee9' }} />,
+  //     })
+  //   }
+  // }, [msgRcv])
 
   useEffect(() => {
     if (callAccepted) {
@@ -83,11 +84,6 @@ const VideoCallScreen = () => {
         open={isScreenVisible}
         onClose={() => setIsScreenVisible(false)}
         maxWidth="xl"
-        // onCancel={() => setIsScreenVisible(false)}
-        // footer={null}
-        // style={{
-        //     width: '100%',
-        // }}
       >
         <div
           style={{
@@ -100,139 +96,125 @@ const VideoCallScreen = () => {
             padding: '1rem',
           }}
         >
-          {stream ? (
-            <div
-              style={{ textAlign: 'center' }}
-              className="card"
-              id={callAccepted && !callEnded ? 'video1' : 'video3'}
-            >
-              <div style={{ height: '2rem' }}>
-                <h3>{myVdoStatus && name}</h3>
-              </div>
-              <div className="video-avatar-container">
-                <video
-                  playsInline
-                  muted
-                  onClick={fullScreen}
-                  ref={myVideo}
-                  autoPlay
-                  className="video-active"
-                  style={{
-                    opacity: `${myVdoStatus ? '1' : '0'}`,
-                  }}
-                />
+          <div
+            style={{ textAlign: 'center' }}
+            className="card"
+            id={callAccepted && !callEnded ? 'video1' : 'video3'}
+          >
+            <div style={{ height: '2rem' }}>
+              <h3>{myVdoStatus && name}</h3>
+            </div>
+            <div className="video-avatar-container">
+              <video
+                playsInline
+                muted
+                onClick={fullScreen}
+                ref={myVideo}
+                autoPlay
+                className="video-active"
+                style={{
+                  opacity: `${myVdoStatus ? '1' : '0'}`,
+                }}
+              />
 
-                <Avatar
-                  style={{
-                    backgroundColor: '#116',
-                    position: 'absolute',
-                    opacity: `${myVdoStatus ? '-1' : '2'}`,
-                  }}
-                  size={98}
-                  icon={!name && <UserOutlined />}
-                >
-                  {name}
-                </Avatar>
+              <Avatar
+                style={{
+                  backgroundColor: '#116',
+                  position: 'absolute',
+                  opacity: `${myVdoStatus ? '-1' : '2'}`,
+                }}
+                size={98}
+                icon={!name && <UserOutlined />}
+              >
+                {name}
+              </Avatar>
+            </div>
+
+            <div className="iconsDiv">
+              <div
+                className="icons"
+                onClick={() => {
+                  updateMic()
+                }}
+                tabIndex={0}
+              >
+                <i
+                  className={`fa fa-microphone${myMicStatus ? '' : '-slash'}`}
+                  style={{ transform: 'scaleX(-1)' }}
+                  aria-label={`${myMicStatus ? 'mic on' : 'mic off'}`}
+                  aria-hidden="true"
+                ></i>
               </div>
 
-              <div className="iconsDiv">
+              {callAccepted && !callEnded && (
                 <div
                   className="icons"
                   onClick={() => {
-                    updateMic()
+                    setIsModalVisible(!isModalVisible)
                   }}
                   tabIndex={0}
                 >
-                  <i
-                    className={`fa fa-microphone${myMicStatus ? '' : '-slash'}`}
-                    style={{ transform: 'scaleX(-1)' }}
-                    aria-label={`${myMicStatus ? 'mic on' : 'mic off'}`}
-                    aria-hidden="true"
-                  ></i>
+                  <img src={Msg} alt="chat icon" />
                 </div>
-
-                {callAccepted && !callEnded && (
-                  <div
-                    className="icons"
-                    onClick={() => {
-                      setIsModalVisible(!isModalVisible)
-                    }}
-                    tabIndex={0}
-                  >
-                    <img src={Msg} alt="chat icon" />
+              )}
+              <Modal
+                title="Chat"
+                footer={null}
+                visible={isModalVisible}
+                onOk={() => showModal(false)}
+                onCancel={() => showModal(false)}
+                style={{ maxHeight: '100px' }}
+              >
+                {chat.length ? (
+                  <div className="msg_flex">
+                    {chat.map((msg) => (
+                      <div
+                        className={msg.type === 'sent' ? 'msg_sent' : 'msg_rcv'}
+                      >
+                        {msg.msg}
+                      </div>
+                    ))}
+                    <div ref={dummy} id="no_border"></div>
+                  </div>
+                ) : (
+                  <div className="chat_img_div">
+                    <img
+                      src={Msg_Illus}
+                      alt="msg_illus"
+                      className="img_illus"
+                    />
                   </div>
                 )}
-                <Modal
-                  title="Chat"
-                  footer={null}
-                  visible={isModalVisible}
-                  onOk={() => showModal(false)}
-                  onCancel={() => showModal(false)}
-                  style={{ maxHeight: '100px' }}
-                >
-                  {chat.length ? (
-                    <div className="msg_flex">
-                      {chat.map((msg) => (
-                        <div
-                          className={
-                            msg.type === 'sent' ? 'msg_sent' : 'msg_rcv'
-                          }
-                        >
-                          {msg.msg}
-                        </div>
-                      ))}
-                      <div ref={dummy} id="no_border"></div>
-                    </div>
-                  ) : (
-                    <div className="chat_img_div">
-                      <img
-                        src={Msg_Illus}
-                        alt="msg_illus"
-                        className="img_illus"
-                      />
-                    </div>
-                  )}
-                  <Search
-                    placeholder="your message"
-                    allowClear
-                    className="input_msg"
-                    enterButton="Send 🚀"
-                    onChange={(e) => setSendMsg(e.target.value)}
-                    value={sendMsg}
-                    size="large"
-                    onSearch={onSearch}
-                  />
-                </Modal>
-                {callAccepted && !callEnded && (
-                  <div
-                    className="icons"
-                    onClick={() => handleScreenSharing()}
-                    tabIndex={0}
-                  >
-                    <img src={ScreenShare} alt="share screen" />
-                  </div>
-                )}
-
+                <Search
+                  placeholder="your message"
+                  allowClear
+                  className="input_msg"
+                  enterButton="Send 🚀"
+                  onChange={(e) => setSendMsg(e.target.value)}
+                  value={sendMsg}
+                  size="large"
+                  onSearch={onSearch}
+                />
+              </Modal>
+              {callAccepted && !callEnded && (
                 <div
                   className="icons"
-                  onClick={() => updateVideo()}
+                  onClick={() => handleScreenSharing()}
                   tabIndex={0}
                 >
-                  {myVdoStatus ? (
-                    <img src={VideoIcon} alt="video on icon" />
-                  ) : (
-                    <img src={VideoOff} alt="video off icon" />
-                  )}
+                  <img src={ScreenShare} alt="share screen" />
                 </div>
+              )}
+
+              <div className="icons" onClick={() => updateVideo()} tabIndex={0}>
+                {myVdoStatus ? (
+                  <img src={VideoIcon} alt="video on icon" />
+                ) : (
+                  <img src={VideoOff} alt="video off icon" />
+                )}
               </div>
             </div>
-          ) : (
-            <div className="bouncing-loader">
-              <div></div>
-              <div></div>
-              <div></div>
-            </div>
-          )}
+          </div>
 
           {callAccepted && !callEnded && userVideo && (
             <div className="card2" style={{ textAlign: 'center' }} id="video2">

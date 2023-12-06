@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef, ReactNode } from 'react'
-import { io } from 'socket.io-client'
+// import { io } from 'socket.io-client'
 import Peer from 'simple-peer'
 import { message } from 'antd'
 import Ringing from '@/components/video-call/Ringing'
 import VideoCallScreen from '@/components/video-call/VideoCallScreen'
-import { useAuth } from '@/hooks/auth'
-
+// import { useAuth } from '@/hooks/auth'
+import { socket } from '@/api/socket'
 interface VideoContextType {
   call: any
   callAccepted: boolean
@@ -44,10 +44,6 @@ export const VideoContext = React.createContext<VideoContextType>(
   {} as VideoContextType
 )
 
-const SERVER_URL = 'http://192.168.8.102:3000/'
-
-export const socket = io(SERVER_URL)
-
 interface VideoCallProviderProps {
   children: ReactNode
 }
@@ -73,33 +69,38 @@ const VideoCallProvider: React.FC<VideoCallProviderProps> = ({ children }) => {
   const userVideo = useRef<any>()
   const connectionRef = useRef<any>()
   const screenTrackRef = useRef<any>()
-  const { user } = useAuth()
+  // const { /user } = useAuth()
+
+  // useEffect(() => {
+  //   socket.auth = {
+  //     token: localStorage.getItem('token'),
+  //   }
+
+  //   socket.connect()
+
+  //   return () => {
+  //     socket.disconnect()
+  //   }
+  // }, [user])
 
   useEffect(() => {
-    socket.auth = {
-      token: localStorage.getItem('token'),
-    }
+    if (!navigator.mediaDevices)
+      return alert('Your browser does not support media devices.')
 
-    socket.connect()
-
-    return () => {
-      socket.disconnect()
-    }
-  }, [user])
-
-  useEffect(() => {
     navigator.mediaDevices
       .getUserMedia({ video: true, audio: true })
       .then((currentStream) => {
         setStream(currentStream)
 
-        console.log('heeeerrreeee currentStreem=', currentStream)
+        // console.log('heeeerrreeee currentStreem=', currentStream)
         myVideo.current.srcObject = currentStream
       })
       .catch((error) => {
         console.log('heeeerrreee currentStreem=  error  ', error)
       })
+  }, [navigator.mediaDevices, callAccepted])
 
+  useEffect(() => {
     if (localStorage.getItem('name')) {
       setName(localStorage.getItem('name'))
     }
@@ -128,6 +129,8 @@ const VideoCallProvider: React.FC<VideoCallProviderProps> = ({ children }) => {
     })
 
     socket.on('callUser', ({ from, name: callerName, signal }) => {
+      console.log('that call coming from ', from)
+      console.log('the signal received is = ', signal)
       setCall({ isReceivingCall: true, from, name: callerName, signal })
     })
 
@@ -158,7 +161,9 @@ const VideoCallProvider: React.FC<VideoCallProviderProps> = ({ children }) => {
 
   const answerCall = () => {
     setCallAccepted(true)
-    // setOtherUser(call.from)
+    console.log('this call from ', call.from)
+    console.log()
+    setOtherUser(call.from)
     const peer = new Peer({ initiator: false, trickle: false, stream })
 
     peer.on('signal', (data) => {
@@ -172,33 +177,35 @@ const VideoCallProvider: React.FC<VideoCallProviderProps> = ({ children }) => {
     })
 
     peer.on('stream', (currentStream) => {
+      console.log('here current stream of the other user  ' + currentStream)
       userVideo.current.srcObject = currentStream
     })
 
+    console.log('the signal to send is = ', call.signal)
     peer.signal(call.signal)
 
     connectionRef.current = peer
-    console.log(connectionRef.current)
+    console.log('your connectionRef is ', connectionRef.current)
   }
 
   const callUser = (id: string) => {
     console.log('we will call', id, ' and me is ', me)
+    console.log('stream is= ', stream)
+
     const peer = new Peer({ initiator: true, trickle: false, stream })
     setOtherUser(id)
     peer.on('signal', (data) => {
+      console.log('the data to send ')
       socket.emit('callUser', {
         userToCall: id,
         signalData: data,
-        from: me,
+        // from:
         name,
       })
     })
 
-    peer.on('stream', (currentStream) => {
-      if (userVideo.current) userVideo.current.srcObject = currentStream
-    })
-
     socket.on('callAccepted', ({ signal, userName }) => {
+      console.log('the signal is equal to = ', signal)
       setCallAccepted(true)
       setUserName(userName)
       peer.signal(signal)
@@ -206,6 +213,14 @@ const VideoCallProvider: React.FC<VideoCallProviderProps> = ({ children }) => {
         type: 'both',
         currentMediaStatus: [myMicStatus, myVdoStatus],
       })
+    })
+    console.log('the other user is = ', otherUser)
+    peer.on('stream', (currentStream) => {
+      console.log('here current stream of the other user  ' + currentStream)
+      //wait second
+      setTimeout(() => {
+        userVideo.current.srcObject = currentStream
+      }, 1000)
     })
 
     connectionRef.current = peer
@@ -330,7 +345,7 @@ const VideoCallProvider: React.FC<VideoCallProviderProps> = ({ children }) => {
   useEffect(() => {
     console.log('videos')
     // console.log(myVideo.current?.srcObject)
-    console.log(userVideo.current)
+    console.log(userVideo)
   }, [myVideo, userVideo])
 
   return (

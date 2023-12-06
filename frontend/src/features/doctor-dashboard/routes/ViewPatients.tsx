@@ -53,7 +53,6 @@ export function ViewPatients() {
       flex: 3,
       renderCell: (params) => (
         <Stack spacing={1} direction="row">
-          <VideoCallButton otherUsername={params.row.username} />
           <Button
             variant="contained"
             color="primary"
@@ -66,6 +65,7 @@ export function ViewPatients() {
             View Patient
           </Button>
           <ChatButton otherUsername={params.row.username} />
+          <VideoCallButton otherUsername={params.row.username} />
         </Stack>
       ),
     },

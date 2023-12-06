@@ -45,7 +45,15 @@ export function initializeSocket(expressServer: Server) {
     socket.join(socket.data.username)
     console.log('Socket.io client connected')
     console.log('socket.id    ', socket.id)
-    if (socket.id) updateSocketIdForUser(socket.data.username, socket.id)
+    if (!socket.id) throw new Error('Socket id not found')
+
+    updateSocketIdForUser(socket.data.username, socket.id)
+    console.log(
+      'before  id for user= ',
+      socket.data.username,
+      ' is id=',
+      socket.id
+    )
 
     socket.emit('me', socket.id)
 
@@ -60,16 +68,26 @@ export function initializeSocket(expressServer: Server) {
         signalData: any
         name: string
       }) => {
+        console.log('signal in back is ', signalData)
         console.log('callUser', userToCall)
-        getSocketIdForUser(userToCall).then((id) => {
-          console.log('id', id)
-          if (id)
+        getSocketIdForUser(userToCall)
+          .then((id) => {
+            console.log(
+              'after    id for user= ',
+              socket.data.username,
+              ' is id=',
+              id
+            )
+            if (!id) throw new Error('Socket id not found')
             socketIOServer.to(id).emit('callUser', {
               signal: signalData,
               from: socket.id,
               name,
             })
-        })
+          })
+          .catch((err) => {
+            console.log(err)
+          })
       }
     )
 
@@ -109,6 +127,8 @@ export function initializeSocket(expressServer: Server) {
         type: data.type,
         currentMediaStatus: data.myMediaStatus,
       })
+      console.log('answerCall', data.to)
+      console.log(' data signal is ', data.signal)
       socketIOServer.to(data.to).emit('callAccepted', data)
     })
     socket.on<any>('endCall', ({ id }: { id: string }) => {
