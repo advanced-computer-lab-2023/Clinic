@@ -120,22 +120,7 @@ export function ApprovedDoctors() {
                   </Typography>
                   <Typography variant="body1">{doctor.speciality}</Typography>
                 </Stack>
-                <Stack spacing={-1}>
-                  <Typography variant="overline" color="text.secondary">
-                    Available Times
-                  </Typography>
-                  <Stack spacing={-1}>
-                    {doctor.availableTimes
-                      .map((data) => new Date(data))
-                      .filter((data) => data.getTime() > Date.now())
-                      .sort((a, b) => a.getTime() - b.getTime())
-                      .map((data, i) => (
-                        <Typography variant="body1" key={i}>
-                          {new Date(data).toLocaleString()}
-                        </Typography>
-                      ))}
-                  </Stack>
-                </Stack>
+
                 <Stack spacing={-1}>
                   <Typography variant="overline" color="text.secondary">
                     Session Rate <small>(Markup + Discount If Any)</small>
