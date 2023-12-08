@@ -175,23 +175,23 @@ appointmentsRouter.post(
       throw new NotFoundError()
     }
 
-    //appointment.date = req.body.rescheduleDate
-    appointment.status = AppointmentStatus.Rescheduled
-    appointment.save()
-    const newAppointment = new AppointmentModel({
-      patientID: appointment.patientID,
-      doctorID: appointment.doctorID,
-      date: req.body.rescheduleDate,
-      familyID: appointment.familyID,
-      reservedFor: appointment.reservedFor,
-      status: AppointmentStatus.Upcoming,
-      paidByPatient: appointment.paidByPatient,
-      paidToDoctor: appointment.paidToDoctor,
-    })
-    await newAppointment.save()
+    appointment.date = req.body.rescheduleDate
+    //appointment.status = AppointmentStatus.Rescheduled
+    //appointment.save()
+    // const newAppointment = new AppointmentModel({
+    //   patientID: appointment.patientID,
+    //   doctorID: appointment.doctorID,
+    //   date: req.body.rescheduleDate,
+    //   familyID: appointment.familyID,
+    //   reservedFor: appointment.reservedFor,
+    //   status: AppointmentStatus.Upcoming,
+    //   paidByPatient: appointment.paidByPatient,
+    //   paidToDoctor: appointment.paidToDoctor,
+    // })
+    await appointment.save()
     sendAppointmentNotificationToPatient(appointment, 'rescheduled')
 
-    res.send(newAppointment)
+    res.send(appointment)
   })
 )
 appointmentsRouter.post(
