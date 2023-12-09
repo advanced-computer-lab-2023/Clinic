@@ -39,6 +39,16 @@ export async function getPatient(id: string): Promise<GetAPatientResponse> {
   })
 }
 
+export async function getPatientByUsername(
+  username: string
+): Promise<GetAPatientResponse> {
+  return await api
+    .get<GetAPatientResponse>('/patients/username/' + username)
+    .then((res) => {
+      return res.data
+    })
+}
+
 export async function getWalletMoney(
   username: string
 ): Promise<GetWalletMoneyResponse> {
