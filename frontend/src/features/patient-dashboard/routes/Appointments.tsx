@@ -271,14 +271,6 @@ export function Appointments() {
                 {user?.type === UserType.Patient &&
                   appointment.status === 'upcoming' && (
                     <Stack spacing={2}>
-                      <Button
-                        variant="contained"
-                        size="small"
-                        onClick={() => handleRescheduleButton(appointment)}
-                      >
-                        Reschedule Appointment
-                      </Button>
-
                       {/* Dropdown for selecting available timings */}
                       <Select
                         value={rescheduleDate}
@@ -295,11 +287,17 @@ export function Appointments() {
                           </MenuItem>
                         ))}
                       </Select>
+                      <Button
+                        variant="contained"
+                        size="small"
+                        onClick={() => handleRescheduleButton(appointment)}
+                      >
+                        Reschedule Appointment
+                      </Button>
                     </Stack>
                   )}
                 {user?.type === UserType.Doctor &&
-                  appointment.status !== 'completed' &&
-                  appointment.status !== 'cancelled' && (
+                  appointment.status === 'upcoming' && (
                     <Stack spacing={2}>
                       <TextField
                         type="datetime-local"
