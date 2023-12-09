@@ -6,7 +6,6 @@ import {
   Healing,
   MedicalInformation,
   VpnKey,
-  Wallet,
 } from '@mui/icons-material'
 import { UserType } from 'clinic-common/types/user.types'
 import { Container } from '@mui/material'
@@ -43,11 +42,6 @@ export function PatientDashboardLayout() {
         to: '/patient-dashboard/health-packages',
         text: 'Health Packages',
         icon: <Healing />,
-      },
-      {
-        to: '/patient-dashboard/wallet',
-        text: 'Wallet',
-        icon: <Wallet />,
       },
       {
         to: '/patient-dashboard/MyHealthRecords',
