@@ -7,9 +7,10 @@ import { ContractStatus } from 'clinic-common/types/doctor.types'
 import { Copyright } from '@mui/icons-material'
 import { Container, Grid, Paper } from '@mui/material'
 import Chart from '../components/Chart'
-import Orders from '../components/Orders'
+
 import Deposits from '../components/Deposits'
 import { useEffect } from 'react'
+import { EmploymentContract } from './EmploymentContract'
 
 export function DoctorDashboardHome() {
   const { user } = useAuth()
@@ -36,9 +37,14 @@ export function DoctorDashboardHome() {
     <>
       {doctorQuery.data?.contractStatus === ContractStatus.Pending && (
         <div>
-          <h1>
-            Your Request is approved please review your employment contract.
-          </h1>
+          <div>
+            <h1>
+              Your Request is approved please review your employment contract.
+            </h1>
+          </div>
+          <div>
+            <EmploymentContract />
+          </div>
         </div>
       )}
       {doctorQuery.data?.contractStatus === ContractStatus.Rejected && (
@@ -82,7 +88,7 @@ export function DoctorDashboardHome() {
               {/* Recent Orders */}
               <Grid item xs={12}>
                 <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
-                  <Orders />
+                  <EmploymentContract />
                 </Paper>
               </Grid>
             </Grid>
