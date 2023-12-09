@@ -54,6 +54,31 @@ export async function getPrescriptions(
   return prescription
 }
 
+export async function editPrescription(
+  request: CreatePrescriptionRequest,
+  id: string
+): Promise<void> {
+  const prescription = await PrescriptionModel.findOne({
+    _id: id,
+  })
+
+  if (prescription == null) {
+    throw new NotFoundError()
+  }
+
+  await PrescriptionModel.updateOne(
+    {
+      _id: id,
+    },
+    {
+      $set: {
+        date: request.date,
+        medicine: request.medicine,
+      },
+    }
+  )
+}
+
 export async function createPrescription(
   request: CreatePrescriptionRequest,
   doctorUsername: string
@@ -133,4 +158,17 @@ export async function getSinglePrescription(
   }
 
   return prescription
+}
+
+export async function getSinglePrescriptionForDoctor(id: string): Promise<any> {
+  const prescription = await PrescriptionModel.findOne({
+    _id: id,
+  })
+  console.log('PRESCRIPTION', prescription)
+
+  if (prescription == null) {
+    throw new NotFoundError()
+  }
+
+  return prescription.medicine
 }

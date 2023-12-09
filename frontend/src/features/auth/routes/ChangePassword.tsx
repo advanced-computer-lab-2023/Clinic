@@ -11,7 +11,11 @@ interface ChangePasswordFormValues {
   newPassword: string
 }
 
-export default function ChangePassword() {
+export default function ChangePassword({
+  onSuccess,
+}: {
+  onSuccess?: () => void
+}) {
   const [isLoading, setIsLoading] = useState(false)
   const [passwordError, setPasswordError] = useState<string | null>(null)
 
@@ -44,6 +48,7 @@ export default function ChangePassword() {
           position: 'top-right',
         })
         navigate('/auth/login')
+        onSuccess?.()
       } else {
         console.log('hwere')
 

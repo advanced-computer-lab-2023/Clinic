@@ -61,9 +61,10 @@ appointmentsRouter.get(
           familyID: appointment.familyID || '',
           reservedFor: appointment.reservedFor || 'Me',
           status:
-            new Date(appointment.date) > new Date()
-              ? (appointment.status as AppointmentStatus)
-              : AppointmentStatus.Completed,
+            new Date(appointment.date) < new Date() &&
+            appointment.status === AppointmentStatus.Upcoming
+              ? AppointmentStatus.Completed
+              : (appointment.status as AppointmentStatus),
         }
       })
     )
@@ -74,7 +75,8 @@ appointmentsRouter.get(
 appointmentsRouter.post(
   '/makeappointment',
   asyncWrapper(async (req, res) => {
-    const { date, familyID, reservedFor, toPayUsingWallet } = req.body // Assuming the date is sent in the request body intype DaTe
+    const { date, familyID, reservedFor, toPayUsingWallet, sessionPrice } =
+      req.body // Assuming the date is sent in the request body intype DaTe
 
     const user = await UserModel.findOne({ username: req.username })
 
@@ -94,7 +96,7 @@ appointmentsRouter.post(
             patient.walletMoney -= toPayUsingWallet
             await patient.save()
 
-            doctor.walletMoney! += doctor.hourlyRate
+            doctor.walletMoney += doctor.hourlyRate
             await doctor.save()
 
             const appointment = await createAndRemoveTime(
@@ -102,7 +104,9 @@ appointmentsRouter.post(
               doctorID,
               date,
               familyID,
-              reservedFor
+              reservedFor,
+              sessionPrice,
+              doctor.hourlyRate
             )
 
             if (appointment) {
@@ -111,7 +115,7 @@ appointmentsRouter.post(
               patient.walletMoney += toPayUsingWallet //reverting the wallet money
               await patient.save()
 
-              doctor.walletMoney! -= doctor.hourlyRate
+              doctor.walletMoney -= doctor.hourlyRate
               await doctor.save()
 
               res.status(500).send('Appointment creation failed')
@@ -172,8 +176,19 @@ appointmentsRouter.post(
     }
 
     appointment.date = req.body.rescheduleDate
-    appointment.status = AppointmentStatus.Rescheduled
-    appointment.save()
+    //appointment.status = AppointmentStatus.Rescheduled
+    //appointment.save()
+    // const newAppointment = new AppointmentModel({
+    //   patientID: appointment.patientID,
+    //   doctorID: appointment.doctorID,
+    //   date: req.body.rescheduleDate,
+    //   familyID: appointment.familyID,
+    //   reservedFor: appointment.reservedFor,
+    //   status: AppointmentStatus.Upcoming,
+    //   paidByPatient: appointment.paidByPatient,
+    //   paidToDoctor: appointment.paidToDoctor,
+    // })
+    await appointment.save()
     sendAppointmentNotificationToPatient(appointment, 'rescheduled')
 
     res.send(appointment)
@@ -190,13 +205,17 @@ appointmentsRouter.post(
   })
 )
 
-appointmentsRouter.delete(
+appointmentsRouter.post(
   '/delete/:appointmentId',
   asyncWrapper(async (req, res) => {
     const appointmentId = req.params.appointmentId
+    const cancelledByDoctor = req.body.cancelledByDoctor
 
     try {
-      const deletedAppointment = await deleteAppointment(appointmentId)
+      const deletedAppointment = await deleteAppointment(
+        appointmentId,
+        cancelledByDoctor
+      )
 
       if (!deletedAppointment) {
         res.status(404).send('Error in the DeleteAppointment function')

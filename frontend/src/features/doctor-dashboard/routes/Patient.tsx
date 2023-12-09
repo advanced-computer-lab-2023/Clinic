@@ -121,7 +121,9 @@ export function Patient() {
             </Typography>
             {patient.appointments.appointments.map((appointment) => (
               <Typography variant="body1" key={appointment.date}>
-                {`${appointment.date} - ${appointment.status}`}
+                {`${new Date(appointment.date).toLocaleString()} - ${
+                  appointment.status
+                }`}
               </Typography>
             ))}
           </Stack>

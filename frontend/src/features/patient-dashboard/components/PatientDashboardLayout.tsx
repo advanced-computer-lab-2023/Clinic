@@ -6,7 +6,6 @@ import {
   Healing,
   MedicalInformation,
   VpnKey,
-  Wallet,
 } from '@mui/icons-material'
 import { UserType } from 'clinic-common/types/user.types'
 import { Container } from '@mui/material'
@@ -45,11 +44,6 @@ export function PatientDashboardLayout() {
         icon: <Healing />,
       },
       {
-        to: '/patient-dashboard/wallet',
-        text: 'Wallet',
-        icon: <Wallet />,
-      },
-      {
         to: '/patient-dashboard/MyHealthRecords',
         text: 'Health Records',
         icon: <DocumentScannerOutlined />,
@@ -63,11 +57,6 @@ export function PatientDashboardLayout() {
         to: '/patient-dashboard/change-password',
         text: 'Change Password',
         icon: <VpnKey />,
-      },
-      {
-        to: '/patient-dashboard/my-doctors',
-        text: 'My Doctors',
-        icon: <Healing />,
       },
     ])
   }, [setSidebarLinks])

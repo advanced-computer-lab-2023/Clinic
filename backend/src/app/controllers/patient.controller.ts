@@ -47,6 +47,8 @@ import { changePassowrd } from '../services/changePassword'
 import { ERROR, SUCCESS } from '../utils/httpStatusText'
 import AppError from '../utils/appError'
 import { sendOTP, updatePassword, verifyOTP } from '../services/forgotPassword'
+import { PrescriptionModel } from '../models/prescription.model'
+import { AppointmentModel } from '../models/appointment.model'
 
 export const requestOTP = asyncWrapper(async (req, res) => {
   const { email } = req.body
@@ -378,6 +380,66 @@ patientRouter.get(
 )
 
 patientRouter.get(
+  '/username/:username',
+  asyncWrapper(async (req, res) => {
+    const patient = await getPatientByUsername(req.params.username)
+    if (!patient) throw new NotFoundError()
+
+    const appointments = await AppointmentModel.find({ patientID: patient.id })
+
+    const appointmentResponse = await Promise.all(
+      appointments.map(async (appointment) => {
+        const doctor = await getApprovedDoctorById(
+          appointment.doctorID.toString()
+        )
+
+        return {
+          id: appointment.id,
+          patientID: appointment.patientID.toString(),
+          doctorID: appointment.doctorID.toString(),
+          doctorName: doctor.name,
+          doctorTimes: doctor.availableTimes.map((date) => date.toISOString()),
+          date: appointment.date,
+          familyID: appointment.familyID || '',
+          reservedFor: appointment.reservedFor || 'Me',
+          status:
+            appointment.status == AppointmentStatus.Cancelled
+              ? AppointmentStatus.Cancelled
+              : new Date(appointment.date) > new Date()
+              ? AppointmentStatus.Upcoming
+              : AppointmentStatus.Completed,
+        }
+      })
+    )
+
+    const appointmentsRefactored = new GetFilteredAppointmentsResponse(
+      appointmentResponse
+    )
+
+    res.send(
+      new GetAPatientResponse(
+        patient.id,
+        req.params.username,
+        patient.name,
+        patient.email,
+        patient.mobileNumber,
+        patient.dateOfBirth,
+        patient.gender as Gender,
+        {
+          name: patient.emergencyContact?.fullName ?? '',
+          mobileNumber: patient.emergencyContact?.mobileNumber ?? '',
+        },
+        patient.documents,
+        appointmentsRefactored,
+        await PrescriptionModel.find({ patientID: patient.id }),
+        patient.notes,
+        patient.walletMoney
+      )
+    )
+  })
+)
+
+patientRouter.get(
   '/:id',
   // asyncWrapper(allowApprovedDoctorOfPatient),
   asyncWrapper(async (req, res) => {
@@ -390,7 +452,7 @@ patientRouter.get(
     const filteredAppointments = appointments.filter(
       (appointment) => appointment.doctorID.toString() === doctor?.id
     )
-    const appointmentResponses = await Promise.all(
+    const appointmentResponse = await Promise.all(
       filteredAppointments.map(async (appointment) => {
         const doctor = await getApprovedDoctorById(
           appointment.doctorID.toString()
@@ -406,7 +468,9 @@ patientRouter.get(
           familyID: appointment.familyID || '',
           reservedFor: appointment.reservedFor || 'Me',
           status:
-            new Date(appointment.date) > new Date()
+            appointment.status == AppointmentStatus.Cancelled
+              ? AppointmentStatus.Cancelled
+              : new Date(appointment.date) > new Date()
               ? AppointmentStatus.Upcoming
               : AppointmentStatus.Completed,
         }
@@ -414,7 +478,7 @@ patientRouter.get(
     )
 
     const appointmentsRefactored = new GetFilteredAppointmentsResponse(
-      appointmentResponses
+      appointmentResponse
     )
     res.send(
       new GetAPatientResponse(

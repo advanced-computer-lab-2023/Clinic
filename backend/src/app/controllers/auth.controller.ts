@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import { asyncWrapper } from '../utils/asyncWrapper'
 import {
+  getEmailAndNameForUsername,
   getUserByUsername,
   isAdmin,
   login,
@@ -23,7 +24,7 @@ import { NotAuthorizedError } from '../errors/auth.errors'
 import {
   GetCurrentUserResponse,
   GetUserByUsernameResponse,
-  type UserType,
+  UserType,
 } from 'clinic-common/types/user.types'
 
 import {
@@ -65,13 +66,16 @@ authRouter.get(
   '/me',
   allowAuthenticated,
   asyncWrapper(async (req, res) => {
-    const user = await getUserByUsername(req.username as string)
+    const user = await getUserByUsername(req.username!)
+    const { email, name } = await getEmailAndNameForUsername(req.username!)
 
     res.send({
       id: user.id,
       username: user.username,
       type: user.type as UserType,
       modelId: await getModelIdForUsername(user.username),
+      email,
+      name,
     } satisfies GetCurrentUserResponse)
   })
 )
@@ -89,12 +93,17 @@ authRouter.get(
     }
 
     const user = await getUserByUsername(req.params.username)
+    const { email, name } = await getEmailAndNameForUsername(
+      req.params.username
+    )
 
     res.send({
       id: user.id,
       username: user.username,
       type: user.type as UserType,
       modelId: await getModelIdForUsername(user.username),
+      email,
+      name,
     } satisfies GetUserByUsernameResponse)
   })
 )

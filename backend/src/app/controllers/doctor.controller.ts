@@ -316,7 +316,7 @@ doctorsRouter.get(
     const doctor = await getDoctorByUsername(req.params.username)
     if (!doctor) throw new NotFoundError()
     res.send({
-      money: doctor.walletMoney ?? 0,
+      money: doctor.walletMoney,
     } satisfies GetWalletMoneyResponse)
   })
 )
@@ -354,7 +354,7 @@ doctorsRouter.post(
       })) satisfies GetDoctorsForPatientsResponse
     )
   })
- )
+)
 doctorsRouter.get(
   '/followupRequests',
   asyncWrapper(async (req, res) => {
@@ -444,6 +444,7 @@ doctorsRouter.get(
       contractStatus: doctor.contractStatus as ContractStatus,
       employmentContract: doctor.employmentContract as [string],
       documents: doctor.documents as [string],
+      wallet: doctor.walletMoney,
     } satisfies GetDoctorResponse)
   })
 )

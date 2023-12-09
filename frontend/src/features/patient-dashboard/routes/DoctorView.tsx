@@ -180,7 +180,8 @@ export function DoctorView() {
                       date,
                       selectedFamilyMemberName!,
                       selectedFamilyMemberId!,
-                      sessionRate!
+                      sessionRate!, //amount to pay using wallet
+                      sessionRate! // general session rate
                     )
                       .then(() => {
                         setLoading(false)
@@ -229,32 +230,31 @@ export function DoctorView() {
           <DialogTitle>
             {' '}
             {
-              /* create a spinner */
-              loading ? (
-                <div className="spinner-border text-primary" role="status">
-                  <span className="visually-hidden">Loading...</span>
-                </div>
-              ) : null
+              /* create a loading spinner */
+              loading ? <LoadingButton loading={true}></LoadingButton> : null
             }
-            <Checkout
-              handleSubmit={() => {
-                console.log('handleSubmit')
-                setLoading(true)
-                reserveTime(
-                  date,
-                  selectedFamilyMemberName!,
-                  selectedFamilyMemberId!,
-                  0
-                )
-                  .then(() => {
-                    setCreditMethod(false)
-                    setLoading(false)
-                  })
-                  .catch(() => {
-                    setLoading(false)
-                  })
-              }}
-            />
+            {!loading ? (
+              <Checkout
+                handleSubmit={() => {
+                  console.log('handleSubmit')
+                  setLoading(true)
+                  reserveTime(
+                    date,
+                    selectedFamilyMemberName!,
+                    selectedFamilyMemberId!,
+                    0, //amount to pay using wallet
+                    sessionRate! // general session rate
+                  )
+                    .then(() => {
+                      setCreditMethod(false)
+                      setLoading(false)
+                    })
+                    .catch(() => {
+                      setLoading(false)
+                    })
+                }}
+              />
+            ) : null}
           </DialogTitle>
         </Dialog>
       </>
@@ -265,7 +265,8 @@ export function DoctorView() {
     selectedTime: Date | null,
     familyName: string,
     selectedFamilyMember: string,
-    payUsingWallet: number
+    payUsingWallet: number,
+    sessionPrice: number
   ) => {
     try {
       let response = null
@@ -280,7 +281,8 @@ export function DoctorView() {
             selectedTime,
             selectedFamilyMember,
             familyName,
-            payUsingWallet
+            payUsingWallet,
+            sessionPrice
           )
         }
         // Check if id is defined
@@ -290,7 +292,8 @@ export function DoctorView() {
             selectedTime,
             '',
             'Me',
-            payUsingWallet
+            payUsingWallet,
+            sessionPrice
           )
         }
 
@@ -324,7 +327,7 @@ export function DoctorView() {
     } catch (error) {
       // Handle errors
 
-      toast.error(`Error reserving appointment ${error}`, {
+      toast.error(`Error reserving appointment.`, {
         position: 'top-right',
         autoClose: 5000,
         hideProgressBar: false,
@@ -355,16 +358,6 @@ export function DoctorView() {
                 </Typography>
                 <Typography variant="body1">
                   {query.data?.speciality}
-                </Typography>
-              </Stack>
-              <Stack spacing={-1}>
-                <Typography variant="overline" color="text.secondary">
-                  Available Times
-                </Typography>
-                <Typography variant="body1">
-                  {query.data?.availableTimes
-                    .map((data) => `${data}`)
-                    .join(', ')}
                 </Typography>
               </Stack>
               <Stack spacing={-1}>

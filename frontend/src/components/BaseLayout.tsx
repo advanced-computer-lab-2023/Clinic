@@ -17,10 +17,15 @@ import React, { useState } from 'react'
 import { Link, Outlet, useLocation } from 'react-router-dom'
 import { OnlyAuthenticated } from './OnlyAuthenticated'
 import { NotificationsList } from './Notifications'
-
+import ArrowBackIcon from '@mui/icons-material/ArrowBack'
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
 import { ChatsList } from './chats/ChatsList'
 import { ChatsProvider } from '@/providers/ChatsProvider'
 import { useAuth } from '@/hooks/auth'
+import { VideoCallProvider } from '@/providers/VideoCallProvider'
+
+import { useNavigate } from 'react-router-dom'
+import { ProfileMenu } from './ProfileMenu'
 
 interface ListItemLinkProps {
   icon?: React.ReactElement
@@ -72,6 +77,18 @@ export function BaseLayout() {
     setOpenDrawer(false)
   }
 
+  const navigate = useNavigate()
+
+  // Function to handle the back button click
+  const handleBackButtonClick = () => {
+    navigate(-1) // This will navigate back one step in the browser history
+  }
+
+  // Function to handle the forward button click
+  const handleForwardButtonClick = () => {
+    navigate(1) // This will navigate forward one step in the browser history
+  }
+
   const layout = (
     <Box sx={{ display: 'flex' }}>
       <CssBaseline />
@@ -92,6 +109,26 @@ export function BaseLayout() {
           >
             <MenuIcon />
           </IconButton>
+          <IconButton
+            color="inherit"
+            aria-label="open drawer"
+            edge="start"
+            onClick={handleBackButtonClick}
+            sx={{ mr: 2 }}
+          >
+            <ArrowBackIcon />
+          </IconButton>
+
+          <IconButton
+            color="inherit"
+            aria-label="open drawer"
+            edge="start"
+            onClick={handleForwardButtonClick}
+            sx={{ mr: 2 }}
+          >
+            <ArrowForwardIcon />
+          </IconButton>
+
           <Typography variant="h6" noWrap component="div">
             Clinic
           </Typography>
@@ -99,6 +136,7 @@ export function BaseLayout() {
           <OnlyAuthenticated>
             <NotificationsList />
             <ChatsList />
+            <ProfileMenu />
           </OnlyAuthenticated>
         </Toolbar>
       </AppBar>
@@ -153,7 +191,11 @@ export function BaseLayout() {
   )
 
   if (user) {
-    return <ChatsProvider>{layout}</ChatsProvider>
+    return (
+      <VideoCallProvider>
+        <ChatsProvider>{layout}</ChatsProvider>
+      </VideoCallProvider>
+    )
   } else {
     return layout
   }

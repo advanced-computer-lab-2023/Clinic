@@ -9,6 +9,7 @@ import {
   Select,
   MenuItem,
 } from '@mui/material'
+import { LoadingButton } from '@mui/lab'
 import { DateRange, FilteredList } from '@/components/FilteredList'
 import {
   AppointmentResponseBase,
@@ -23,7 +24,6 @@ import { useEffect, useState } from 'react'
 import { useAuth } from '@/hooks/auth'
 import { UserType } from 'clinic-common/types/user.types'
 import { toast } from 'react-toastify'
-import { useNavigate } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
 import {
   checkForFollowUp,
@@ -39,11 +39,11 @@ export function Appointments() {
   const [rescheduleDate, setRescheduleDate] = useState('')
   const [rescheduleDateError, setRescheduleDateError] = useState(false)
 
-  const navigate = useNavigate()
   interface FollowUpStatusMap {
     [appointmentId: string]: boolean
   }
   const [followUpStatus, setFollowUpStatus] = useState<FollowUpStatusMap>({})
+  const [isLoading, setIsLoading] = useState<string | null>(null)
 
   useEffect(() => {
     const fetchAppointmentsAndUpdateStatus = async () => {
@@ -153,22 +153,18 @@ export function Appointments() {
   const currentDate = new Date().toISOString().slice(0, 16)
 
   async function handleCancelAppointment(appointmentId: string) {
-    try {
-      const response = await cancelAppointment(appointmentId)
-
-      if (response) {
-        // Handle success, e.g., update the component state or show a message
-        toast.success('Appointment canceled successfully')
-        navigate('/patient-dashboard/approved-doctors')
-      } else {
-        // Handle the case where the response is falsy (indicating an error)
-        toast.error('Error canceling appointment')
-      }
-    } catch (error: any) {
-      // Handle errors from the API call
-      console.error('Error canceling appointment:', error.message)
-      toast.error('Error canceling appointment')
-    }
+    await cancelAppointment(
+      appointmentId,
+      user?.type === UserType.Doctor ? true : false
+    )
+      .then(() => {
+        queryClient.refetchQueries(['appointments'])
+        toast.success('Appointment cancelled successfully')
+      })
+      .catch((err: any) => {
+        toast.error('Error in canceling appointment')
+        console.log(err)
+      })
   }
 
   return (
@@ -273,17 +269,8 @@ export function Appointments() {
                   )}
 
                 {user?.type === UserType.Patient &&
-                  appointment.status !== 'completed' &&
-                  appointment.status !== 'cancelled' && (
+                  appointment.status === 'upcoming' && (
                     <Stack spacing={2}>
-                      <Button
-                        variant="contained"
-                        size="small"
-                        onClick={() => handleRescheduleButton(appointment)}
-                      >
-                        Reschedule Appointment
-                      </Button>
-
                       {/* Dropdown for selecting available timings */}
                       <Select
                         value={rescheduleDate}
@@ -300,11 +287,17 @@ export function Appointments() {
                           </MenuItem>
                         ))}
                       </Select>
+                      <Button
+                        variant="contained"
+                        size="small"
+                        onClick={() => handleRescheduleButton(appointment)}
+                      >
+                        Reschedule Appointment
+                      </Button>
                     </Stack>
                   )}
                 {user?.type === UserType.Doctor &&
-                  appointment.status !== 'completed' &&
-                  appointment.status !== 'cancelled' && (
+                  appointment.status === 'upcoming' && (
                     <Stack spacing={2}>
                       <TextField
                         type="datetime-local"
@@ -327,7 +320,7 @@ export function Appointments() {
 
                 {/* New Cancel Appointment Button */}
                 {user && appointment.status === 'upcoming' && (
-                  <Button
+                  <LoadingButton
                     variant="contained"
                     size="small"
                     fullWidth
@@ -336,11 +329,26 @@ export function Appointments() {
                       color: 'white',
                       marginTop: 2,
                     }}
-                    onClick={() => handleCancelAppointment(appointment.id)}
+                    onClick={() => {
+                      setIsLoading(appointment.id)
+                      handleCancelAppointment(appointment.id).finally(() =>
+                        setIsLoading(null)
+                      )
+                    }}
+                    loading={isLoading == appointment.id}
                   >
                     Cancel Appointment
-                  </Button>
+                  </LoadingButton>
                 )}
+
+                {user &&
+                  appointment.status === 'upcoming' &&
+                  user.type === UserType.Patient && (
+                    <Typography variant="caption" color="warning">
+                      Appointments cancelled less than 24 hours before their
+                      date do not receive a refund.
+                    </Typography>
+                  )}
                 {user?.type === UserType.Patient &&
                   appointment.status === 'completed' && (
                     <TextField

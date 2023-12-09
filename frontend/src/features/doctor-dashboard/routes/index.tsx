@@ -6,8 +6,6 @@ import { Appointments } from '@/features/patient-dashboard/routes/Appointments'
 import { ViewPatients } from './ViewPatients'
 import { Patient } from '@/features/doctor-dashboard/routes/Patient'
 import { ViewMyAvailableTimeSlots } from './ViewMyAvailableTimeSlots'
-
-import { Wallet } from './Wallet'
 import { EmploymentContract } from './EmploymentContract'
 import AddHealthRecord from './AddHealthRecord'
 import ChangePassword from '@/features/auth/routes/ChangePassword'
@@ -42,10 +40,6 @@ export const doctorDashboardRoutes: RouteObject[] = [
       {
         path: 'view-my-available-time-slots',
         element: <ViewMyAvailableTimeSlots />,
-      },
-      {
-        path: 'wallet',
-        element: <Wallet />,
       },
       {
         path: 'employmentContract',

@@ -319,3 +319,75 @@ export async function getModelIdForUsername(username: string): Promise<string> {
       throw new Error('Invalid user type')
   }
 }
+
+export async function updateSocketIdForUser(
+  username: string,
+  socketId: string
+): Promise<void> {
+  const user = await getUserByUsername(username)
+  user.socketId = socketId
+  console.log(
+    'user socket id updated usrname:',
+    username,
+    ' socketId=',
+    socketId
+  )
+  await user.save()
+}
+
+export async function getSocketIdForUser(
+  username: string
+): Promise<string | undefined> {
+  const user = await getUserByUsername(username)
+
+  return user.socketId
+}
+
+export async function getEmailAndNameForUsername(username: string) {
+  const user = await getUserByUsername(username)
+  let email: string
+  let name: string
+
+  switch (user.type) {
+    case UserType.Doctor: {
+      const doctor = await DoctorModel.findOne({ user: user.id })
+
+      if (!doctor) {
+        throw new APIError('Doctor not found', 400)
+      }
+
+      email = doctor.email
+      name = doctor.name
+      break
+    }
+
+    case UserType.Patient: {
+      const patient = await PatientModel.findOne({ user: user.id })
+
+      if (!patient) {
+        throw new APIError('Patient not found', 400)
+      }
+
+      email = patient.email
+      name = patient.name
+      break
+    }
+
+    case UserType.Admin: {
+      const admin = await AdminModel.findOne({ user: user.id })
+
+      if (!admin) {
+        throw new APIError('Admin not found', 400)
+      }
+
+      email = admin.email
+      name = user.username
+      break
+    }
+
+    default:
+      throw new APIError('Invalid user type', 400)
+  }
+
+  return { email, name }
+}
