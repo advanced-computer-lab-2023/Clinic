@@ -6,6 +6,8 @@ interface AuthContextUser {
   type: UserType
   username: string
   modelId: string
+  name: string
+  email: string
 }
 
 interface AuthContextData {
