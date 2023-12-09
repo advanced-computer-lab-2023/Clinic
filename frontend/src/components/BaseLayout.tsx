@@ -77,9 +77,12 @@ export function BaseLayout() {
       <CssBaseline />
       <AppBar
         position="fixed"
-        sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        sx={{
+          zIndex: (theme) => theme.zIndex.drawer + 1,
+          bgcolor: 'transparent',
+        }}
       >
-        <Toolbar>
+        <Toolbar sx={{ bgcolor: 'transparent ', color: 'primary.main' }}>
           <IconButton
             color="inherit"
             aria-label="open drawer"
