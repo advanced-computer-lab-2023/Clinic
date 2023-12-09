@@ -1,4 +1,4 @@
-import { getApprovedDoctors } from '@/api/doctor'
+import { getApprovedDoctors, getDoctorsForPatient } from '@/api/doctor'
 import {
   Button,
   Card,
@@ -13,13 +13,24 @@ import { useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { DiscountedPrice } from '@/components/DiscountedPrice'
 import { VideoCallButton } from '@/components/video-call/VideoCallButton'
+import { ChatButton } from '@/components/chats/ChatButton'
+import { useAuth } from '@/hooks/auth'
 
 export function ApprovedDoctors() {
   const navigate = useNavigate()
+  const { user } = useAuth()
 
   function handleView(id: string) {
     navigate(`/patient-dashboard/view-doctor/${id}`)
   }
+
+  const doctorsQuery = useQuery({
+    queryKey: ['my-doctors'],
+    queryFn: () =>
+      getDoctorsForPatient({
+        patientUsername: user!.username,
+      }),
+  })
 
   const specialities = useQuery({
     queryKey: ['specialities'],
@@ -28,6 +39,16 @@ export function ApprovedDoctors() {
         .then((data) => data.map((v) => v.speciality))
         .then((data) => [...new Set(data)]),
   })
+
+  const isMyDoctor = (id: string) => {
+    if (doctorsQuery.data) {
+      const doctorFound = doctorsQuery.data.find((doctor) => doctor.id === id)
+
+      return !!doctorFound
+    }
+
+    return false
+  }
 
   return (
     <FilteredList
@@ -94,8 +115,32 @@ export function ApprovedDoctors() {
       queryKey={['approved-doctors']}
       component={(doctor) => (
         <Grid item xl={3}>
-          <Card variant="outlined">
+          <Card
+            variant="outlined"
+            style={{
+              height: '350px',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+          >
             <CardContent>
+              {isMyDoctor(doctor.id) && (
+                <div>
+                  <h5
+                    style={{
+                      color: '#1976D2',
+                      textAlign: 'center',
+                      width: '100%',
+                      margin: '10px 0px 10px 0px',
+                      fontSize: '18px',
+                    }}
+                  >
+                    YOUR DOCTOR
+                  </h5>
+                  <hr style={{ opacity: '0.7', marginBottom: '10px' }} />
+                </div>
+              )}
               <Stack spacing={2}>
                 <Stack spacing={-1}>
                   <div
@@ -109,7 +154,20 @@ export function ApprovedDoctors() {
                     <Typography variant="overline" color="text.secondary">
                       Doctor Name
                     </Typography>
-                    <VideoCallButton otherUsername={doctor.username} />
+                    <div
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '4px',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                      }}
+                    >
+                      <VideoCallButton otherUsername={doctor.username} />
+                      {isMyDoctor(doctor.id) && (
+                        <ChatButton otherUsername={doctor.username} />
+                      )}
+                    </div>
                   </div>
 
                   <Typography variant="body1">{doctor.name}</Typography>
@@ -133,7 +191,7 @@ export function ApprovedDoctors() {
                   </Typography>
                 </Stack>
               </Stack>
-              <CardActions>
+              <CardActions style={{ justifyContent: 'center' }}>
                 <Button
                   size="small"
                   onClick={() => {
@@ -142,6 +200,8 @@ export function ApprovedDoctors() {
                 >
                   View
                 </Button>
+
+                <Stack direction="row" spacing={1}></Stack>
               </CardActions>
             </CardContent>
           </Card>
