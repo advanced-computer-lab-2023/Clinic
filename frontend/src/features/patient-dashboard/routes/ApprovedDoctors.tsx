@@ -122,6 +122,7 @@ export function ApprovedDoctors() {
               display: 'flex',
               justifyContent: 'center',
               alignItems: 'center',
+              boxShadow: '-2px 2px 10px rgba(0, 0, 0, 0.15)',
             }}
           >
             <CardContent>
