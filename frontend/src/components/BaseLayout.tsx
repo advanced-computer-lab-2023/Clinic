@@ -25,6 +25,7 @@ import { useAuth } from '@/hooks/auth'
 import { VideoCallProvider } from '@/providers/VideoCallProvider'
 
 import { useNavigate } from 'react-router-dom'
+import { ProfileMenu } from './ProfileMenu'
 
 interface ListItemLinkProps {
   icon?: React.ReactElement
@@ -132,6 +133,7 @@ export function BaseLayout() {
           <OnlyAuthenticated>
             <NotificationsList />
             <ChatsList />
+            <ProfileMenu />
           </OnlyAuthenticated>
         </Toolbar>
       </AppBar>
