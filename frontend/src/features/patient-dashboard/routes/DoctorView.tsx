@@ -362,22 +362,6 @@ export function DoctorView() {
               </Stack>
               <Stack spacing={-1}>
                 <Typography variant="overline" color="text.secondary">
-                  Available Times
-                </Typography>
-                <Stack spacing={-1}>
-                  {query.data?.availableTimes
-                    .map((data) => new Date(data))
-                    .filter((data) => data.getTime() > Date.now())
-                    .sort((a, b) => a.getTime() - b.getTime())
-                    .map((data, i) => (
-                      <Typography variant="body1" key={i}>
-                        {new Date(data).toLocaleString()}
-                      </Typography>
-                    ))}
-                </Stack>
-              </Stack>
-              <Stack spacing={-1}>
-                <Typography variant="overline" color="text.secondary">
                   Hourly Rate
                 </Typography>
                 <Typography variant="body1">
