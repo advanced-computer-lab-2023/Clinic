@@ -17,10 +17,12 @@ import { useQuery } from '@tanstack/react-query'
 import { ContractStatus } from 'clinic-common/types/doctor.types'
 import { useNavigate } from 'react-router-dom'
 import { ToastContainer, toast } from 'react-toastify'
+import Title from '../components/Title'
 
 export function EmploymentContract() {
   const navigate = useNavigate()
   const { user } = useAuth()
+  const { refreshUser } = useAuth()
   const query = useQuery({
     queryKey: ['doctor', user!.username],
     queryFn: () => getDoctor(user!.username),
@@ -44,6 +46,8 @@ export function EmploymentContract() {
       success: 'Congrats, You are now a doctor in our system ',
       error: 'error',
     })
+
+    refreshUser()
   }
 
   function handleReject() {
@@ -55,6 +59,7 @@ export function EmploymentContract() {
       success: 'Your employment contract is rejected succefully ',
       error: 'error',
     })
+    refreshUser()
   }
 
   return (
@@ -69,9 +74,7 @@ export function EmploymentContract() {
               justifyContent="space-between"
               alignItems="center"
             >
-              <Typography variant="h6" color="text.secondary">
-                Your Employment Contract
-              </Typography>
+              <Title>Your Employment Contract</Title>
             </Stack>
             <Stack spacing={1}>
               {query.data?.employmentContract.map((field) => (
