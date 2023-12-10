@@ -19,6 +19,7 @@ import { toast } from 'react-toastify'
 import CloudUploadIcon from '@mui/icons-material/CloudUpload'
 import { styled } from '@mui/material/styles'
 import nodata from '@/assets/No data-cuate.png'
+import { LoadingButton } from '@mui/lab'
 
 const VisuallyHiddenInput = styled('input')({
   clip: 'rect(0 0 0 0)',
@@ -37,6 +38,7 @@ function FileViewer() {
   const [healthRecords, setHealthRecords] = useState([])
   const [healthRecordsFiles, setHealthRecordsFiles] = useState([])
   const [value, setValue] = useState(0)
+  const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
     const fetchDownloadURLs = async () => {
@@ -87,6 +89,7 @@ function FileViewer() {
     formData.append('medicalHistory', file)
 
     try {
+      setIsLoading(true)
       // Send a POST request with the uploaded file
       await addMedicalHistory(formData)
       // Fetch updated download URLs after the upload is complete
@@ -96,24 +99,21 @@ function FileViewer() {
     } catch (err) {
       console.error('Error uploading file:', err)
     }
+
+    setIsLoading(false)
   }
-
-  // if (downloadURLs.length === 0) {
-  //   return <div>Loading...</div>;
-  // }
-
-  // Render files using <img> elements with delete buttons
 
   return (
     <div>
-      <Button
+      <LoadingButton
         component="label"
         variant="contained"
         startIcon={<CloudUploadIcon />}
+        loading={isLoading}
       >
         Upload file
         <VisuallyHiddenInput type="file" onChange={handleFileInputChange} />
-      </Button>
+      </LoadingButton>
 
       {/* Tabs Section */}
       <Box sx={{ width: '100%' }}>
