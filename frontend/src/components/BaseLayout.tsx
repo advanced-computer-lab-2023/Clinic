@@ -1,4 +1,4 @@
-import { Logout as LogoutIcon } from '@mui/icons-material'
+import { DarkMode, LightMode, Logout as LogoutIcon } from '@mui/icons-material'
 import {
   CssBaseline,
   AppBar,
@@ -11,7 +11,7 @@ import {
   alpha,
   InputBase,
   Box,
-  Button,
+  createTheme,
 } from '@mui/material'
 import SearchIcon from '@mui/icons-material/Search'
 
@@ -30,6 +30,8 @@ import { ProfileMenu } from './ProfileMenu'
 import { styled } from '@mui/material/styles'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faStethoscope } from '@fortawesome/free-solid-svg-icons'
+import { ThemeProvider } from '@emotion/react'
+import { UserType } from 'clinic-common/types/user.types'
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -74,7 +76,6 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
     },
   },
 }))
-
 interface ListItemLinkProps {
   icon?: React.ReactElement
   primary: string
@@ -114,6 +115,23 @@ interface SidebarLink {
 export function BaseLayout() {
   const [sidebarLinks, setSidebarLinks] = useState<SidebarLink[]>([])
   const { user } = useAuth()
+  const [isDarkMode, setIsDarkMode] = useState(false)
+
+  const theme = createTheme({
+    palette: {
+      mode: isDarkMode ? 'dark' : 'light',
+      primary: {
+        main: user
+          ? {
+              [UserType.Admin]: '#F6BD60',
+              [UserType.Doctor]: '#F28482',
+              [UserType.Patient]: '#84A59D',
+            }[user.type]
+          : '#393E41',
+        contrastText: '#fff',
+      },
+    },
+  })
 
   const navigate = useNavigate()
 
@@ -128,155 +146,164 @@ export function BaseLayout() {
   }
 
   const layout = (
-    <Box sx={{ display: 'flex', width: '100%' }}>
-      <CssBaseline />
-
-      <Box
-        sx={{
-          flexDirection: 'row-reverse',
-          display: 'flex',
-          justifyContent: 'between',
-          width: '100%',
-          alignItems: 'start',
-          paddingBottom: 12,
-          bgcolor: 'white',
-          position: 'relative',
-        }}
-      >
-        <Box
-          sx={{
-            border: '0px',
-            bgcolor: 'white ',
-            color: 'primary.main',
-            zIndex: '1000',
-            flexGrow: 1,
-            flex: 4,
-            width: '85%',
-            flexWrap: 'wrap',
-          }}
-        >
-          <Toolbar sx={{ paddingY: 3, border: '0px' }}>
-            <IconButton
-              color="inherit"
-              aria-label="open drawer"
-              edge="start"
-              onClick={handleBackButtonClick}
-              sx={{ mr: 2 }}
-            >
-              <ArrowBackIcon />
-            </IconButton>
-
-            <IconButton
-              color="inherit"
-              aria-label="open drawer"
-              edge="start"
-              onClick={handleForwardButtonClick}
-              sx={{ mr: 2, marginRight: 2 }}
-            >
-              <ArrowForwardIcon />
-            </IconButton>
-
-            <OnlyAuthenticated>
-              <ProfileMenu />
-              <NotificationsList />
-              <ChatsList />
-            </OnlyAuthenticated>
-
-            <Box sx={{ flexGrow: 1 }} />
-            <OnlyAuthenticated>
-              <Search sx={{ marginRight: 20 }}>
-                <SearchIconWrapper>
-                  <SearchIcon />
-                </SearchIconWrapper>
-                <StyledInputBase
-                  placeholder="Search…"
-                  inputProps={{ 'aria-label': 'search' }}
-                />
-              </Search>
-            </OnlyAuthenticated>
-          </Toolbar>
-
-          <Box
-            component="main"
-            sx={{
-              display: 'flex',
-              bgcolor: 'background.default',
-              p: 3,
-              flexGrow: 1,
-            }}
-          >
-            <Outlet
-              context={
-                { setSidebarLinks, sidebarLinks } satisfies OutletContextType
-              }
-            />
-          </Box>
-        </Box>
+    <ThemeProvider theme={theme}>
+      <Box sx={{ display: 'flex', width: '100%' }}>
+        <CssBaseline />
 
         <Box
           sx={{
-            width: '15%',
+            flexDirection: 'row-reverse',
+            display: 'flex',
+            justifyContent: 'between',
+            width: '100%',
             alignItems: 'start',
-            bgcolor: '#F0F0F0',
+            paddingBottom: 12,
+            bgcolor: 'white',
             position: 'relative',
           }}
         >
-          <AppBar
-            style={{
-              width: '15%',
-              left: '0',
-              top: '0',
-              backgroundColor: '#F0F0F0',
+          <Box
+            sx={{
+              border: '0px',
+              bgcolor: 'white ',
+              color: 'primary.main',
+              zIndex: '1000',
+              flexGrow: 1,
+              flex: 4,
+              width: '85%',
+              flexWrap: 'wrap',
             }}
           >
-            <List
-              aria-label="main mailbox folders"
-              sx={{
-                zIndex: '99999',
-                paddingTop: 5,
-                bgcolor: '#F0F0F0',
-                color: 'darkgray',
-                height: '100vh',
-                width: '100%',
-              }}
-            >
-              <h3
-                style={{
-                  color: 'rgb(25, 118, 210)',
-                  textAlign: 'center',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  marginLeft: '-20px',
-                }}
+            <Toolbar sx={{ paddingY: 3, border: '0px' }}>
+              <IconButton
+                color="inherit"
+                aria-label="open drawer"
+                edge="start"
+                onClick={handleBackButtonClick}
+                sx={{ mr: 2 }}
               >
-                <FontAwesomeIcon
-                  icon={faStethoscope}
-                  style={{ marginRight: '15px' }}
-                />
-                Your Clinic
-              </h3>
-              {sidebarLinks.map((link) => (
-                <ListItemLink
-                  key={link.to}
-                  to={link.to}
-                  primary={link.text}
-                  icon={link.icon}
-                />
-              ))}
+                <ArrowBackIcon />
+              </IconButton>
+
+              <IconButton
+                color="inherit"
+                aria-label="open drawer"
+                edge="start"
+                onClick={handleForwardButtonClick}
+                sx={{ mr: 2, marginRight: 2 }}
+              >
+                <ArrowForwardIcon />
+              </IconButton>
+
+              <IconButton
+                onClick={() => setIsDarkMode(!isDarkMode)}
+                color="inherit"
+              >
+                {isDarkMode ? <DarkMode /> : <LightMode />}
+              </IconButton>
 
               <OnlyAuthenticated>
-                <ListItemLink
-                  to="/auth/logout"
-                  primary="Logout"
-                  icon={<LogoutIcon />}
-                />
+                <ProfileMenu />
+                <NotificationsList />
+                <ChatsList />
               </OnlyAuthenticated>
-            </List>
-          </AppBar>
+
+              <Box sx={{ flexGrow: 1 }} />
+              <OnlyAuthenticated>
+                <Search sx={{ marginRight: 20 }}>
+                  <SearchIconWrapper>
+                    <SearchIcon />
+                  </SearchIconWrapper>
+                  <StyledInputBase
+                    placeholder="Search…"
+                    inputProps={{ 'aria-label': 'search' }}
+                  />
+                </Search>
+              </OnlyAuthenticated>
+            </Toolbar>
+
+            <Box
+              component="main"
+              sx={{
+                display: 'flex',
+                bgcolor: 'background.default',
+                p: 3,
+                flexGrow: 1,
+              }}
+            >
+              <Outlet
+                context={
+                  { setSidebarLinks, sidebarLinks } satisfies OutletContextType
+                }
+              />
+            </Box>
+          </Box>
+
+          <Box
+            sx={{
+              width: '15%',
+              alignItems: 'start',
+              bgcolor: '#F0F0F0',
+              position: 'relative',
+            }}
+          >
+            <AppBar
+              style={{
+                width: '15%',
+                left: '0',
+                top: '0',
+                backgroundColor: '#F0F0F0',
+              }}
+            >
+              <List
+                aria-label="main mailbox folders"
+                sx={{
+                  zIndex: '99999',
+                  paddingTop: 5,
+                  bgcolor: '#F0F0F0',
+                  color: 'darkgray',
+                  height: '100vh',
+                  width: '100%',
+                }}
+              >
+                <h3
+                  style={{
+                    color: 'rgb(25, 118, 210)',
+                    textAlign: 'center',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginLeft: '-20px',
+                  }}
+                >
+                  <FontAwesomeIcon
+                    icon={faStethoscope}
+                    style={{ marginRight: '15px' }}
+                  />
+                  Your Clinic
+                </h3>
+                {sidebarLinks.map((link) => (
+                  <ListItemLink
+                    key={link.to}
+                    to={link.to}
+                    primary={link.text}
+                    icon={link.icon}
+                  />
+                ))}
+
+                <OnlyAuthenticated>
+                  <ListItemLink
+                    to="/auth/logout"
+                    primary="Logout"
+                    icon={<LogoutIcon />}
+                  />
+                </OnlyAuthenticated>
+              </List>
+            </AppBar>
+          </Box>
         </Box>
       </Box>
-    </Box>
+    </ThemeProvider>
   )
 
   if (user) {
