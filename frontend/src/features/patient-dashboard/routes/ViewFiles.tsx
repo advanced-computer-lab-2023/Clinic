@@ -11,17 +11,31 @@ import {
   Grid,
   Tab,
   Tabs,
-  TextField,
   Typography,
 } from '@mui/material'
 import { useEffect, useState } from 'react'
 import { getMyHealthRecordsFiles, getPatientHealthRecords } from '@/api/patient'
+import { toast } from 'react-toastify'
+import CloudUploadIcon from '@mui/icons-material/CloudUpload'
+import { styled } from '@mui/material/styles'
+//import nodata from '@/assets/No data-cuate.png'
+
+const VisuallyHiddenInput = styled('input')({
+  clip: 'rect(0 0 0 0)',
+  clipPath: 'inset(50%)',
+  height: 1,
+  overflow: 'hidden',
+  position: 'absolute',
+  bottom: 0,
+  left: 0,
+  whiteSpace: 'nowrap',
+  width: 1,
+})
 
 function FileViewer() {
   const [downloadURLs, setDownloadURLs] = useState([])
   const [healthRecords, setHealthRecords] = useState([])
   const [healthRecordsFiles, setHealthRecordsFiles] = useState([])
-  const [imageValue, setImageValue] = useState({ file: null } as any)
   const [value, setValue] = useState(0)
 
   useEffect(() => {
@@ -58,18 +72,19 @@ function FileViewer() {
   }
 
   const handleFileInputChange = (event: any) => {
-    setImageValue({ file: event.currentTarget.files[0] })
+    // setImageValue({ file: event.currentTarget.files[0] })
+    handleUpload(event.currentTarget.files[0])
   }
 
-  const handleUpload = async () => {
-    if (!imageValue.file) {
-      //alert('Please select a file to upload.')
+  const handleUpload = async (file: any) => {
+    if (!file) {
+      toast.error('Please select a file to upload')
 
       return
     }
 
     const formData = new FormData()
-    formData.append('medicalHistory', imageValue.file)
+    formData.append('medicalHistory', file)
 
     try {
       // Send a POST request with the uploaded file
@@ -91,20 +106,13 @@ function FileViewer() {
 
   return (
     <div>
-      {/* File Upload Section */}
-      <TextField
-        type="file"
-        onChange={handleFileInputChange}
-        variant="outlined"
-        style={{ marginBottom: '16px' }}
-      />
       <Button
-        onClick={handleUpload}
+        component="label"
         variant="contained"
-        color="primary"
-        style={{ margin: 10 }}
+        startIcon={<CloudUploadIcon />}
       >
-        Upload File
+        Upload file
+        <VisuallyHiddenInput type="file" onChange={handleFileInputChange} />
       </Button>
 
       {/* Tabs Section */}
