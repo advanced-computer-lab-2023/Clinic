@@ -25,6 +25,7 @@ import { useMemo, useState } from 'react'
 import dayjs from 'dayjs'
 import { v4 as uuidv4 } from 'uuid'
 import React from 'react'
+import nodata from '@/assets/No data-cuate.png'
 
 export interface Filter<T, V = any> {
   property: (obj: T) => V
@@ -347,7 +348,27 @@ export function FilteredList<T>({
               </Card>
             </Grid>
           )}
-
+          {filteredValues.length == 0 && (
+            <div
+              style={{
+                width: '100%',
+                height: '100%',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+            >
+              <img
+                style={{
+                  width: '500px', // Set your desired width
+                  height: '500px', // Set your desired height
+                  objectFit: 'cover',
+                }}
+                src={nodata}
+                alt="No data available"
+              />
+            </div>
+          )}
           {filteredValues.map((filteredValue, i) => (
             <React.Fragment key={i}>{component(filteredValue)}</React.Fragment>
           ))}

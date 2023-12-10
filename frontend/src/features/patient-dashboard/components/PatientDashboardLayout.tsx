@@ -44,13 +44,8 @@ export function PatientDashboardLayout() {
         icon: <Healing />,
       },
       {
-        to: '/patient-dashboard/MyHealthRecords',
-        text: 'Health Records',
-        icon: <DocumentScannerOutlined />,
-      },
-      {
         to: '/patient-dashboard/MyMedicalHistory',
-        text: 'Medical History',
+        text: 'Health Records',
         icon: <DocumentScannerOutlined />,
       },
       {

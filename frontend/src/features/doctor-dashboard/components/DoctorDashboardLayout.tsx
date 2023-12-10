@@ -1,7 +1,7 @@
 import { AuthenticatedRoute } from '@/components/AuthenticatedRoute'
 import { useSidebar } from '@/hooks/sidebar'
 import { UserType } from 'clinic-common/types/user.types'
-import { Person, VpnKey } from '@mui/icons-material'
+import { Home, Person, VpnKey } from '@mui/icons-material'
 import Container from '@mui/material/Container'
 import { useEffect } from 'react'
 import { Navigate, Outlet } from 'react-router-dom'
@@ -13,10 +13,11 @@ import { useQuery } from '@tanstack/react-query'
 import { CardPlaceholder } from '@/components/CardPlaceholder'
 import { Typography } from '@mui/material'
 import { getDoctor } from '@/api/doctor'
-import { ContractStatus, DoctorStatus } from 'clinic-common/types/doctor.types'
+import { DoctorStatus } from 'clinic-common/types/doctor.types'
 import VisibilityIcon from '@mui/icons-material/Visibility'
-import AssignmentIcon from '@mui/icons-material/Assignment'
+
 import AddAlarmIcon from '@mui/icons-material/AddAlarm'
+//import { EmploymentContract } from '../routes/EmploymentContract'
 
 export function DoctorDashboardLayout() {
   const { setSidebarLinks } = useSidebar()
@@ -39,19 +40,25 @@ export function DoctorDashboardLayout() {
       return
     }
 
-    if (doctorQuery.data?.contractStatus != ContractStatus.Accepted) {
-      setSidebarLinks([
-        {
-          to: '/doctor-dashboard/employmentContract',
-          text: 'Employment Contract',
-          icon: <AssignmentIcon />,
-        },
-      ])
+    // if (doctorQuery.data?.contractStatus != ContractStatus.Accepted) {
 
-      return
-    }
+    //   setSidebarLinks([
+    //     {
+    //       to: '/doctor-dashboard/employmentContract',
+    //       text: 'Employment Contract',
+    //       icon: <AssignmentIcon />,
+    //     },
+    //   ])
+
+    //   return
+    // }
 
     setSidebarLinks([
+      {
+        to: '/doctor-dashboard',
+        text: 'Home',
+        icon: <Home />,
+      },
       {
         to: '/doctor-dashboard/profile',
         text: 'Update Details',
@@ -72,11 +79,7 @@ export function DoctorDashboardLayout() {
         text: 'View My Available Time Slots',
         icon: <VisibilityIcon />,
       },
-      {
-        to: '/doctor-dashboard/employmentContract',
-        text: 'Employment Contract',
-        icon: <AssignmentIcon />,
-      },
+
       {
         to: '/doctor-dashboard/change-password',
         text: 'Change Password',

@@ -20,18 +20,18 @@ export const Register = () => {
       </Container>
       <ApiForm<RegisterRequest>
         fields={[
-          { label: 'Username', property: 'username' },
-          { label: 'Password', property: 'password' },
-          { label: 'Name', property: 'name' },
-          { label: 'Email', property: 'email' },
+          { label: 'Username*', property: 'username' },
+          { label: 'Password*', property: 'password' },
+          { label: 'Name*', property: 'name' },
+          { label: 'Email*', property: 'email' },
           {
-            label: 'Mobile Number',
+            label: 'Mobile Number*',
             property: 'mobileNumber',
             customError: 'Mobile number must be 10 digits.',
           },
-          { label: 'Date of Birth', property: 'dateOfBirth', type: 'date' },
+          { label: 'Date of Birth*', property: 'dateOfBirth', type: 'date' },
           {
-            label: 'Gender',
+            label: 'Gender*',
             property: 'gender',
             type: 'select',
             selectedValues: [
@@ -40,15 +40,15 @@ export const Register = () => {
             ],
           },
           {
-            label: 'Emergency Contact Name',
+            label: 'Emergency Contact Name*',
             property: 'emergencyContact.fullName',
           },
           {
-            label: 'Emergency Contact Relationship',
+            label: 'Emergency Contact Relationship*',
             property: 'emergencyContact.relation',
           },
           {
-            label: 'Emergency Contact Mobile Number',
+            label: 'Emergency Contact Mobile Number*',
             property: 'emergencyContact.mobileNumber',
             customError: 'Mobile number must be 10 digits.',
           },
