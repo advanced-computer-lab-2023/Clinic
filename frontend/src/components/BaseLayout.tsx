@@ -1,18 +1,19 @@
-import { Logout as LogoutIcon, Menu as MenuIcon } from '@mui/icons-material'
+import { Logout as LogoutIcon } from '@mui/icons-material'
 import {
-  Box,
   CssBaseline,
   AppBar,
   Toolbar,
-  Typography,
-  Drawer,
-  Divider,
   List,
   ListItemButton,
   ListItemIcon,
   ListItemText,
   IconButton,
+  alpha,
+  InputBase,
+  Box,
 } from '@mui/material'
+import SearchIcon from '@mui/icons-material/Search'
+
 import React, { useState } from 'react'
 import { Link, Outlet, useLocation } from 'react-router-dom'
 import { OnlyAuthenticated } from './OnlyAuthenticated'
@@ -26,6 +27,51 @@ import { VideoCallProvider } from '@/providers/VideoCallProvider'
 
 import { useNavigate } from 'react-router-dom'
 import { ProfileMenu } from './ProfileMenu'
+import { styled } from '@mui/material/styles'
+
+const Search = styled('div')(({ theme }) => ({
+  position: 'relative',
+  borderRadius: theme.shape.borderRadius,
+  backgroundColor: alpha(theme.palette.common.white, 0.15),
+  '&:hover': {
+    backgroundColor: alpha(theme.palette.common.white, 0.25),
+  },
+  marginLeft: 0,
+  width: '100%',
+  [theme.breakpoints.up('sm')]: {
+    marginLeft: theme.spacing(1),
+    width: 'auto',
+  },
+}))
+
+const SearchIconWrapper = styled('div')(({ theme }) => ({
+  padding: theme.spacing(0, 2),
+  height: '100%',
+  position: 'absolute',
+  pointerEvents: 'none',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+}))
+
+const StyledInputBase = styled(InputBase)(({ theme }) => ({
+  color: 'inherit',
+  width: '100%',
+  '& .MuiInputBase-input': {
+    padding: theme.spacing(1, 1, 1, 0),
+    border: '1px solid', // Add border property here
+    borderRadius: '18px',
+    // vertical padding + font size from searchIcon
+    paddingLeft: `calc(1em + ${theme.spacing(9)})`,
+    transition: theme.transitions.create('width'),
+    [theme.breakpoints.up('sm')]: {
+      width: '12ch',
+      '&:focus': {
+        width: '20ch',
+      },
+    },
+  },
+}))
 
 interface ListItemLinkProps {
   icon?: React.ReactElement
@@ -43,9 +89,10 @@ function ListItemLink(props: ListItemLinkProps) {
         component={Link}
         to={to}
         selected={location.pathname === to}
+        sx={{ width: '100%' }}
       >
         {icon ? <ListItemIcon>{icon}</ListItemIcon> : null}
-        <ListItemText primary={primary} />
+        <ListItemText primary={primary} sx={{ color: 'black' }} />
       </ListItemButton>
     </li>
   )
@@ -56,8 +103,6 @@ export type OutletContextType = {
   sidebarLinks: SidebarLink[]
 }
 
-const drawerWidth = 240
-
 interface SidebarLink {
   to: string
   text: string
@@ -66,16 +111,7 @@ interface SidebarLink {
 
 export function BaseLayout() {
   const [sidebarLinks, setSidebarLinks] = useState<SidebarLink[]>([])
-  const [openDrawer, setOpenDrawer] = useState(false)
   const { user } = useAuth()
-
-  const handleDrawerOpen = () => {
-    setOpenDrawer(true)
-  }
-
-  const handleDrawerClose = () => {
-    setOpenDrawer(false)
-  }
 
   const navigate = useNavigate()
 
@@ -90,102 +126,137 @@ export function BaseLayout() {
   }
 
   const layout = (
-    <Box sx={{ display: 'flex' }}>
+    <Box sx={{ display: 'flex', width: '100%' }}>
       <CssBaseline />
-      <AppBar
-        position="fixed"
-        sx={{
-          zIndex: (theme) => theme.zIndex.drawer + 1,
-          bgcolor: 'transparent',
-        }}
-      >
-        <Toolbar sx={{ bgcolor: 'transparent ', color: 'primary.main' }}>
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            edge="start"
-            onClick={!openDrawer ? handleDrawerOpen : handleDrawerClose}
-            sx={{ mr: 2 }}
-          >
-            <MenuIcon />
-          </IconButton>
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            edge="start"
-            onClick={handleBackButtonClick}
-            sx={{ mr: 2 }}
-          >
-            <ArrowBackIcon />
-          </IconButton>
 
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            edge="start"
-            onClick={handleForwardButtonClick}
-            sx={{ mr: 2 }}
-          >
-            <ArrowForwardIcon />
-          </IconButton>
-
-          <Typography variant="h6" noWrap component="div">
-            Clinic
-          </Typography>
-          <Box sx={{ flexGrow: 1 }} />
-          <OnlyAuthenticated>
-            <NotificationsList />
-            <ChatsList />
-            <ProfileMenu />
-          </OnlyAuthenticated>
-        </Toolbar>
-      </AppBar>
-
-      <Drawer
-        sx={{
-          width: drawerWidth,
-          flexShrink: 0,
-          '& .MuiDrawer-paper': {
-            width: drawerWidth,
-            boxSizing: 'border-box',
-          },
-        }}
-        variant="temporary"
-        anchor="left"
-        open={openDrawer}
-        onClose={handleDrawerClose}
-      >
-        <Toolbar />
-        <Divider />
-        <List aria-label="main mailbox folders">
-          {sidebarLinks.map((link) => (
-            <ListItemLink
-              key={link.to}
-              to={link.to}
-              primary={link.text}
-              icon={link.icon}
-            />
-          ))}
-
-          <OnlyAuthenticated>
-            <ListItemLink
-              to="/auth/logout"
-              primary="Logout"
-              icon={<LogoutIcon />}
-            />
-          </OnlyAuthenticated>
-        </List>
-      </Drawer>
       <Box
-        component="main"
-        sx={{ flexGrow: 1, bgcolor: 'background.default', p: 3 }}
+        sx={{
+          flexDirection: 'row-reverse',
+          display: 'flex',
+          justifyContent: 'between',
+          width: '100%',
+          alignItems: 'start',
+          paddingBottom: 12,
+          bgcolor: 'white',
+          position: 'relative',
+        }}
       >
-        <Toolbar />
-        <Outlet
-          context={
-            { setSidebarLinks, sidebarLinks } satisfies OutletContextType
-          }
-        />
+        <Box
+          sx={{
+            border: '0px',
+            bgcolor: 'white ',
+            color: 'primary.main',
+            zIndex: '1000',
+            flexGrow: 1,
+            flex: 4,
+            width: '85%',
+            flexWrap: 'wrap',
+          }}
+        >
+          <Toolbar sx={{ paddingY: 3, border: '0px' }}>
+            <IconButton
+              color="inherit"
+              aria-label="open drawer"
+              edge="start"
+              onClick={handleBackButtonClick}
+              sx={{ mr: 2 }}
+            >
+              <ArrowBackIcon />
+            </IconButton>
+
+            <IconButton
+              color="inherit"
+              aria-label="open drawer"
+              edge="start"
+              onClick={handleForwardButtonClick}
+              sx={{ mr: 2, marginRight: 2 }}
+            >
+              <ArrowForwardIcon />
+            </IconButton>
+
+            <OnlyAuthenticated>
+              <ProfileMenu />
+              <NotificationsList />
+              <ChatsList />
+            </OnlyAuthenticated>
+
+            <Box sx={{ flexGrow: 1 }} />
+            <OnlyAuthenticated>
+              <Search sx={{ marginRight: 20 }}>
+                <SearchIconWrapper>
+                  <SearchIcon />
+                </SearchIconWrapper>
+                <StyledInputBase
+                  placeholder="Search…"
+                  inputProps={{ 'aria-label': 'search' }}
+                />
+              </Search>
+            </OnlyAuthenticated>
+          </Toolbar>
+
+          <Box
+            component="main"
+            sx={{
+              display: 'flex',
+              bgcolor: 'background.default',
+              p: 3,
+              flexGrow: 1,
+            }}
+          >
+            <Outlet
+              context={
+                { setSidebarLinks, sidebarLinks } satisfies OutletContextType
+              }
+            />
+          </Box>
+        </Box>
+
+        <Box
+          sx={{
+            width: '15%',
+            alignItems: 'start',
+            bgcolor: '#F0F0F0',
+            position: 'relative',
+          }}
+        >
+          <AppBar
+            style={{
+              width: '15%',
+              left: '0',
+              top: '0',
+              backgroundColor: '#F0F0F0',
+            }}
+          >
+            <List
+              aria-label="main mailbox folders"
+              sx={{
+                zIndex: '99999',
+                paddingTop: 17,
+                bgcolor: '#F0F0F0',
+                color: 'darkgray',
+                height: '100vh',
+                width: '100%',
+              }}
+            >
+              {sidebarLinks.map((link) => (
+                <ListItemLink
+                  key={link.to}
+                  to={link.to}
+                  primary={link.text}
+                  icon={link.icon}
+                />
+              ))}
+
+              <OnlyAuthenticated>
+                <ListItemLink
+                  to="/auth/logout"
+                  primary="Logout"
+                  icon={<LogoutIcon />}
+                />
+              </OnlyAuthenticated>
+            </List>
+          </AppBar>
+        </Box>
       </Box>
     </Box>
   )

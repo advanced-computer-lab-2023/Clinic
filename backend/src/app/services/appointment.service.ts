@@ -86,7 +86,7 @@ export async function createAndRemoveTime(
   await removeTimeFromDoctorAvailability(doctorID, date)
   // Save the new appointment
   await newAppointment.save()
-  sendAppointmentNotificationToPatient(newAppointment, 'scheduled')
+  sendAppointmentNotificationToPatient(newAppointment, 'accepted')
 
   return newAppointment
 }
@@ -109,7 +109,7 @@ export async function createFollowUpAppointment(
     reservedFor: patientName,
   })
   await newAppointment.save()
-  sendAppointmentNotificationToPatient(newAppointment, 'scheduled')
+  sendAppointmentNotificationToPatient(newAppointment, 'confirmed')
 
   return newAppointment
 }
