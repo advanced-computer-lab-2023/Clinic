@@ -13,7 +13,7 @@ import { useQuery } from '@tanstack/react-query'
 import { CardPlaceholder } from '@/components/CardPlaceholder'
 import { Typography } from '@mui/material'
 import { getDoctor } from '@/api/doctor'
-import { DoctorStatus } from 'clinic-common/types/doctor.types'
+import { ContractStatus, DoctorStatus } from 'clinic-common/types/doctor.types'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 
 import AddAlarmIcon from '@mui/icons-material/AddAlarm'
@@ -40,18 +40,11 @@ export function DoctorDashboardLayout() {
       return
     }
 
-    // if (doctorQuery.data?.contractStatus != ContractStatus.Accepted) {
+    if (doctorQuery.data?.contractStatus != ContractStatus.Accepted) {
+      setSidebarLinks([])
 
-    //   setSidebarLinks([
-    //     {
-    //       to: '/doctor-dashboard/employmentContract',
-    //       text: 'Employment Contract',
-    //       icon: <AssignmentIcon />,
-    //     },
-    //   ])
-
-    //   return
-    // }
+      return
+    }
 
     setSidebarLinks([
       {
