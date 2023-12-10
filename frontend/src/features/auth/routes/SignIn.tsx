@@ -16,6 +16,7 @@ import { toast } from 'react-toastify'
 import { LoginRequestValidator } from 'clinic-common/validators/user.validator'
 import { useAuth } from '@/hooks/auth'
 import { Favorite } from '@mui/icons-material'
+import { Paper } from '@mui/material'
 
 function Copyright(props: any) {
   return (
@@ -69,13 +70,16 @@ export default function SignIn() {
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
-      <Box
+      <Paper
         sx={{
           marginTop: 8,
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
+          p: 5,
+          width: 500,
         }}
+        elevation={2}
       >
         <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
           <LockOutlinedIcon />
@@ -92,6 +96,7 @@ export default function SignIn() {
             label="Username"
             name="username"
             autoComplete="username"
+            color="secondary"
             autoFocus
           />
           <TextField
@@ -102,6 +107,7 @@ export default function SignIn() {
             label="Password"
             type="password"
             id="password"
+            color="secondary"
             autoComplete="current-password"
           />
           <FormControlLabel
@@ -118,19 +124,32 @@ export default function SignIn() {
           </Button>
           <Grid container>
             <Grid item xs>
-              <Link href={'/forgot-password'} variant="body2">
+              <Link
+                href={'/forgot-password'}
+                variant="body2"
+                color="text.primary"
+              >
                 Forgot password?
               </Link>
             </Grid>
             <Grid item>
-              <Link href="./signup" variant="body2">
+              <Link href="./signup" variant="body2" color="text.primary">
                 Don't have an account? Sign Up
               </Link>
             </Grid>
           </Grid>
         </Box>
+      </Paper>
+      <Box
+        sx={{
+          width: '100%',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        <Copyright sx={{ mt: 8, mb: 4 }} />
       </Box>
-      <Copyright sx={{ mt: 8, mb: 4 }} />
     </Container>
   )
 }
