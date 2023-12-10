@@ -18,7 +18,7 @@ import { getMyHealthRecordsFiles, getPatientHealthRecords } from '@/api/patient'
 import { toast } from 'react-toastify'
 import CloudUploadIcon from '@mui/icons-material/CloudUpload'
 import { styled } from '@mui/material/styles'
-//import nodata from '@/assets/No data-cuate.png'
+import nodata from '@/assets/No data-cuate.png'
 
 const VisuallyHiddenInput = styled('input')({
   clip: 'rect(0 0 0 0)',
@@ -127,149 +127,178 @@ function FileViewer() {
           <Tab label="Uploaded by doctor" />
         </Tabs>
 
-        {/* Content Section */}
-        <Box sx={{ p: 3 }}>
-          {value === 0 && (
-            <Grid container spacing={2}>
-              {downloadURLs.map((url, index) => (
-                <Grid item xs={12} sm={6} md={4} key={index}>
-                  <Card
-                    variant="outlined"
-                    style={{ width: '100%', height: 580 }}
-                  >
-                    <CardContent>
-                      <iframe
-                        title={`File${index}`}
-                        src={url}
-                        width="100%"
-                        height="500px"
-                      />
-
-                      <br />
-                      <Button
-                        color="error"
-                        variant="contained"
-                        fullWidth
-                        onClick={() => handleDelete(url)}
-                      >
-                        Delete
-                      </Button>
-                    </CardContent>
-                  </Card>
-                </Grid>
-              ))}
-              {healthRecordsFiles.map((url, index) => (
-                <Grid item xs={12} sm={6} md={4} key={index}>
-                  <Card
-                    variant="outlined"
-                    style={{ width: '100%', height: 580 }}
-                  >
-                    <CardContent>
-                      {/* <h2>{'File ' + (index + 1)}</h2> */}
-                      <iframe
-                        title={'File' + index}
-                        src={url}
-                        width="100%"
-                        height="500px"
-                      />
-                      <br />
-                    </CardContent>
-                  </Card>
-                </Grid>
-              ))}
-              <br />
-              <Grid
-                container
-                spacing={2}
-                direction="column"
-                style={{ marginTop: 10, marginLeft: 2 }}
-                className="health-record-container"
-              >
-                {healthRecords.map((record, index) => (
-                  <Grid item xs={1} sm={1} md={1} key={index}>
-                    <Card variant="outlined" style={{ width: '100%' }}>
+        {(downloadURLs.length === 0 &&
+          healthRecordsFiles.length === 0 &&
+          value === 0) ||
+        (value === 1 && downloadURLs.length === 0) ||
+        (value === 2 && healthRecordsFiles.length === 0) ? (
+          <div
+            style={{
+              width: '100%',
+              height: '100%',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+          >
+            <img
+              style={{
+                width: '500px', // Set your desired width
+                height: '500px', // Set your desired height
+                objectFit: 'cover',
+              }}
+              src={nodata}
+              alt="No data available"
+            />
+          </div>
+        ) : (
+          <Box sx={{ p: 3 }}>
+            {value === 0 && (
+              <Grid container spacing={2}>
+                {downloadURLs.map((url, index) => (
+                  <Grid item xs={12} sm={6} md={4} key={index}>
+                    <Card
+                      variant="outlined"
+                      style={{ width: '100%', height: 580 }}
+                    >
                       <CardContent>
-                        <Typography color="textSecondary">{record}</Typography>
+                        <iframe
+                          title={`File${index}`}
+                          src={url}
+                          width="100%"
+                          height="500px"
+                        />
+
+                        <br />
+                        <Button
+                          color="error"
+                          variant="contained"
+                          fullWidth
+                          onClick={() => handleDelete(url)}
+                        >
+                          Delete
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                ))}
+                {healthRecordsFiles.map((url, index) => (
+                  <Grid item xs={12} sm={6} md={4} key={index}>
+                    <Card
+                      variant="outlined"
+                      style={{ width: '100%', height: 580 }}
+                    >
+                      <CardContent>
+                        {/* <h2>{'File ' + (index + 1)}</h2> */}
+                        <iframe
+                          title={'File' + index}
+                          src={url}
+                          width="100%"
+                          height="500px"
+                        />
+                        <br />
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                ))}
+                <br />
+                <Grid
+                  container
+                  spacing={2}
+                  direction="column"
+                  style={{ marginTop: 10, marginLeft: 2 }}
+                  className="health-record-container"
+                >
+                  {healthRecords.map((record, index) => (
+                    <Grid item xs={1} sm={1} md={1} key={index}>
+                      <Card variant="outlined" style={{ width: '100%' }}>
+                        <CardContent>
+                          <Typography color="textSecondary">
+                            {record}
+                          </Typography>
+                        </CardContent>
+                      </Card>
+                    </Grid>
+                  ))}
+                </Grid>
+              </Grid>
+            )}
+            {value === 1 && (
+              <Grid container spacing={2}>
+                {downloadURLs.map((url, index) => (
+                  <Grid item xs={12} sm={6} md={4} key={index}>
+                    <Card
+                      variant="outlined"
+                      style={{ width: '100%', height: 580 }}
+                    >
+                      <CardContent>
+                        <iframe
+                          title={`File${index}`}
+                          src={url}
+                          width="100%"
+                          height="500px"
+                        />
+
+                        <br />
+                        <Button
+                          color="error"
+                          variant="contained"
+                          fullWidth
+                          onClick={() => handleDelete(url)}
+                        >
+                          Delete
+                        </Button>
                       </CardContent>
                     </Card>
                   </Grid>
                 ))}
               </Grid>
-            </Grid>
-          )}
-          {value === 1 && (
-            <Grid container spacing={2}>
-              {downloadURLs.map((url, index) => (
-                <Grid item xs={12} sm={6} md={4} key={index}>
-                  <Card
-                    variant="outlined"
-                    style={{ width: '100%', height: 580 }}
-                  >
-                    <CardContent>
-                      <iframe
-                        title={`File${index}`}
-                        src={url}
-                        width="100%"
-                        height="500px"
-                      />
-
-                      <br />
-                      <Button
-                        color="error"
-                        variant="contained"
-                        fullWidth
-                        onClick={() => handleDelete(url)}
-                      >
-                        Delete
-                      </Button>
-                    </CardContent>
-                  </Card>
-                </Grid>
-              ))}
-            </Grid>
-          )}
-          {value === 2 && (
-            <Grid container spacing={2}>
-              {healthRecordsFiles.map((url, index) => (
-                <Grid item xs={12} sm={6} md={4} key={index}>
-                  <Card
-                    variant="outlined"
-                    style={{ width: '100%', height: 580 }}
-                  >
-                    <CardContent>
-                      {/* <h2>{'File ' + (index + 1)}</h2> */}
-                      <iframe
-                        title={'File' + index}
-                        src={url}
-                        width="100%"
-                        height="500px"
-                      />
-                      <br />
-                    </CardContent>
-                  </Card>
-                </Grid>
-              ))}
-
-              <Grid
-                container
-                spacing={2}
-                direction="column"
-                style={{ marginTop: 10, marginLeft: 2 }}
-                className="health-record-container"
-              >
-                {healthRecords.map((record, index) => (
-                  <Grid item xs={1} sm={1} md={1} key={index}>
-                    <Card variant="outlined" style={{ width: '100%' }}>
+            )}
+            {value === 2 && (
+              <Grid container spacing={2}>
+                {healthRecordsFiles.map((url, index) => (
+                  <Grid item xs={12} sm={6} md={4} key={index}>
+                    <Card
+                      variant="outlined"
+                      style={{ width: '100%', height: 580 }}
+                    >
                       <CardContent>
-                        <Typography color="textSecondary">{record}</Typography>
+                        {/* <h2>{'File ' + (index + 1)}</h2> */}
+                        <iframe
+                          title={'File' + index}
+                          src={url}
+                          width="100%"
+                          height="500px"
+                        />
+                        <br />
                       </CardContent>
                     </Card>
                   </Grid>
                 ))}
+
+                <Grid
+                  container
+                  spacing={2}
+                  direction="column"
+                  style={{ marginTop: 10, marginLeft: 2 }}
+                  className="health-record-container"
+                >
+                  {healthRecords.map((record, index) => (
+                    <Grid item xs={1} sm={1} md={1} key={index}>
+                      <Card variant="outlined" style={{ width: '100%' }}>
+                        <CardContent>
+                          <Typography color="textSecondary">
+                            {record}
+                          </Typography>
+                        </CardContent>
+                      </Card>
+                    </Grid>
+                  ))}
+                </Grid>
               </Grid>
-            </Grid>
-          )}
-        </Box>
+            )}
+          </Box>
+        )}
       </Box>
     </div>
   )
