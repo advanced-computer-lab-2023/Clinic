@@ -45,7 +45,7 @@ function FileViewer() {
 
   const handleUpload = async () => {
     if (!imageValue.file) {
-      alert('Please select a file to upload.')
+      //alert('Please select a file to upload.')
 
       return
     }
