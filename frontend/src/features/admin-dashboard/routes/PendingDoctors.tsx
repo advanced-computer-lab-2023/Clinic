@@ -98,6 +98,7 @@ export function PendingDoctors() {
             onClick={() => {
               navigate(column.row.username)
             }}
+            style={{ marginLeft: 5 }}
           >
             View
           </Button>
@@ -108,6 +109,7 @@ export function PendingDoctors() {
             onClick={() => {
               handleApprove(column.row.id)
             }}
+            style={{ marginLeft: 5 }}
           >
             Approve
           </Button>
@@ -118,6 +120,7 @@ export function PendingDoctors() {
             onClick={() => {
               handleReject(column.row.id)
             }}
+            style={{ marginLeft: 5 }}
           >
             Reject
           </Button>
