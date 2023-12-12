@@ -97,7 +97,7 @@ export function EmploymentContract() {
 
           <List>
             <ListItem>
-              <strong>Doctor fees per hour:</strong> {query.data?.hourlyRate} E£
+              <strong>Doctor fees per hour:</strong> E£ {query.data?.hourlyRate}
             </ListItem>
             <ListItem>
               <strong>Clinic Markup : </strong>
@@ -106,25 +106,25 @@ export function EmploymentContract() {
           </List>
           <Divider light />
           <Typography variant="h6" gutterBottom>
-            Doctor Responsibilities:
+            Doctor's Responsibilities:
           </Typography>
           <List>
             <ListItem>
-              Doctor must be available for at least 20 hours per week.
+              The doctor must be available for at least 20 hours per week.
             </ListItem>
             <ListItem>
-              Doctor must maintain a professional appearance and attitude at all
-              times.
+              The doctor must maintain a professional appearance and attitude at
+              all times.
             </ListItem>
             <ListItem>
-              Doctor must ethically and professionally treat all patients.
+              The doctor must ethically and professionally treat all patients.
             </ListItem>
             <ListItem>
-              Doctor must maintain the confidentiality of all patient
+              The doctor must maintain the confidentiality of all patient
               information.
             </ListItem>
             <ListItem>
-              Doctor must maintain a valid license to practice medicine.
+              The doctor must maintain a valid license to practice medicine.
             </ListItem>
           </List>
           <Typography variant="body1">

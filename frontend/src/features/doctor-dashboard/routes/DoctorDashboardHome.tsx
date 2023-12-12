@@ -49,7 +49,7 @@ export function DoctorDashboardHome() {
       )}
       {doctorQuery.data?.contractStatus === ContractStatus.Rejected && (
         <div>
-          <h1>Sorry! But You have rejected your employment contract.</h1>
+          <h1>Sorry, but you have rejected your employment contract!</h1>
         </div>
       )}
       {doctorQuery.data?.contractStatus === ContractStatus.Accepted && (

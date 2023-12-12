@@ -150,7 +150,7 @@ export function HealthPackages() {
                           Price per year
                         </Typography>
                         <Typography variant="body1">
-                          {healthPackage.pricePerYear} EGP
+                          E£ {healthPackage.pricePerYear}
                         </Typography>
                       </Stack>
                       <Stack spacing={-1}>
