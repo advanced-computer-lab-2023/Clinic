@@ -137,28 +137,31 @@ doctorsRouter.get(
     const patient = await PatientModel.findOne({ user: user.id })
       .populate<{ healthPackage: HealthPackageDocument }>('healthPackage')
       .exec()
-    if (patient == null) throw new NotAuthenticatedError()
     const doctors = await getAllDoctors()
 
-    res.send({
-      doctors: doctors.map((doctor) => ({
-        id: doctor.id,
-        username: doctor.user.username,
-        name: doctor.name,
-        email: doctor.email,
-        dateOfBirth: doctor.dateOfBirth,
-        hourlyRate: doctor.hourlyRate,
-        hourlyRateWithMarkup: getDoctorSessionRateWithMarkup({ doctor }),
-        affiliation: doctor.affiliation,
-        speciality: doctor.speciality,
-        educationalBackground: doctor.educationalBackground,
-        sessionRate: getDoctorSessionRateForPatient({ doctor, patient }),
-        availableTimes: doctor.availableTimes as [Date],
-        requestStatus: doctor.requestStatus as DoctorStatus,
-        hasDiscount: hasDiscountOnDoctorSession({ patient }),
-        documents: doctor.documents as [string],
-      })),
-    } satisfies GetApprovedDoctorsResponse)
+    if (patient == null) {
+      res.send({ doctors })
+    } else {
+      res.send({
+        doctors: doctors.map((doctor) => ({
+          id: doctor.id,
+          username: doctor.user.username,
+          name: doctor.name,
+          email: doctor.email,
+          dateOfBirth: doctor.dateOfBirth,
+          hourlyRate: doctor.hourlyRate,
+          hourlyRateWithMarkup: getDoctorSessionRateWithMarkup({ doctor }),
+          affiliation: doctor.affiliation,
+          speciality: doctor.speciality,
+          educationalBackground: doctor.educationalBackground,
+          sessionRate: getDoctorSessionRateForPatient({ doctor, patient }),
+          availableTimes: doctor.availableTimes as [Date],
+          requestStatus: doctor.requestStatus as DoctorStatus,
+          hasDiscount: hasDiscountOnDoctorSession({ patient }),
+          documents: doctor.documents as [string],
+        })),
+      } satisfies GetApprovedDoctorsResponse)
+    }
   })
 )
 
