@@ -69,6 +69,8 @@ export function SubscribeToHealthPackages({
     null | string
   >()
 
+  const [showCancelConfirmation, setShowCancelConfirmation] = useState(false)
+
   const alerts = useAlerts()
   const { user } = useAuth()
   const queryClient = useQueryClient()
@@ -167,7 +169,7 @@ export function SubscribeToHealthPackages({
     <>
       <Grid container spacing={1}>
         {!isSubscribed && (
-          <Grid item xl={12}>
+          <Grid item xs={12}>
             <Alert severity="info">
               You are not subscribed to any health package. Please subscribe to
               a health package to get discounts on your appointments and
@@ -286,13 +288,9 @@ export function SubscribeToHealthPackages({
                     fullWidth
                     color="secondary"
                     startIcon={<AddModerator />} // Replace with cancel icon
-                    onClick={() =>
-                      cancelMutation.mutateAsync({
-                        subscriberId: id,
-                        payerUsername,
-                        isFamilyMember,
-                      })
-                    }
+                    onClick={() => {
+                      setShowCancelConfirmation(true)
+                    }}
                   >
                     Unsubscribe
                   </LoadingButton>
@@ -503,6 +501,38 @@ export function SubscribeToHealthPackages({
         <DialogActions>
           <Button autoFocus onClick={() => setCreditMethodIdPackage(null)}>
             Cancel
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={showCancelConfirmation}
+        onClose={() => setShowCancelConfirmation(false)}
+      >
+        <DialogTitle>Confirm Cancellation</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to cancel the subscription for this health
+            package?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setShowCancelConfirmation(false)}>
+            No, Go Back
+          </Button>
+          <Button
+            onClick={() => {
+              cancelMutation.mutateAsync({
+                subscriberId: id,
+
+                payerUsername,
+                isFamilyMember,
+              })
+              setShowCancelConfirmation(false)
+            }}
+            color="secondary"
+          >
+            Yes, Cancel
           </Button>
         </DialogActions>
       </Dialog>
