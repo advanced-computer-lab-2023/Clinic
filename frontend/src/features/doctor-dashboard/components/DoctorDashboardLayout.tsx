@@ -1,7 +1,7 @@
 import { AuthenticatedRoute } from '@/components/AuthenticatedRoute'
 import { useSidebar } from '@/hooks/sidebar'
 import { UserType } from 'clinic-common/types/user.types'
-import { Home, Person, VpnKey } from '@mui/icons-material'
+import { Home, Person } from '@mui/icons-material'
 import Container from '@mui/material/Container'
 import { useEffect } from 'react'
 import { Navigate, Outlet } from 'react-router-dom'
@@ -13,7 +13,7 @@ import { useQuery } from '@tanstack/react-query'
 import { CardPlaceholder } from '@/components/CardPlaceholder'
 import { Typography } from '@mui/material'
 import { getDoctor } from '@/api/doctor'
-import { DoctorStatus } from 'clinic-common/types/doctor.types'
+import { ContractStatus, DoctorStatus } from 'clinic-common/types/doctor.types'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 
 import AddAlarmIcon from '@mui/icons-material/AddAlarm'
@@ -40,18 +40,11 @@ export function DoctorDashboardLayout() {
       return
     }
 
-    // if (doctorQuery.data?.contractStatus != ContractStatus.Accepted) {
+    if (doctorQuery.data?.contractStatus != ContractStatus.Accepted) {
+      setSidebarLinks([])
 
-    //   setSidebarLinks([
-    //     {
-    //       to: '/doctor-dashboard/employmentContract',
-    //       text: 'Employment Contract',
-    //       icon: <AssignmentIcon />,
-    //     },
-    //   ])
-
-    //   return
-    // }
+      return
+    }
 
     setSidebarLinks([
       {
@@ -78,12 +71,6 @@ export function DoctorDashboardLayout() {
         to: '/doctor-dashboard/view-my-available-time-slots',
         text: 'View My Available Time Slots',
         icon: <VisibilityIcon />,
-      },
-
-      {
-        to: '/doctor-dashboard/change-password',
-        text: 'Change Password',
-        icon: <VpnKey />,
       },
       {
         to: '/doctor-dashboard/followup-requests',

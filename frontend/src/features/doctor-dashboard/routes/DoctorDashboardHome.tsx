@@ -49,7 +49,7 @@ export function DoctorDashboardHome() {
       )}
       {doctorQuery.data?.contractStatus === ContractStatus.Rejected && (
         <div>
-          <h1>Sorry! But You have rejected your employment contract.</h1>
+          <h1>Sorry, but you have rejected your employment contract!</h1>
         </div>
       )}
       {doctorQuery.data?.contractStatus === ContractStatus.Accepted && (
@@ -87,9 +87,7 @@ export function DoctorDashboardHome() {
               </Grid>
               {/* Recent Orders */}
               <Grid item xs={12}>
-                <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
-                  <EmploymentContract />
-                </Paper>
+                <EmploymentContract />
               </Grid>
             </Grid>
             <Copyright sx={{ pt: 4 }} />

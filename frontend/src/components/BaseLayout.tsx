@@ -24,10 +24,11 @@ import { ChatsList } from './chats/ChatsList'
 import { ChatsProvider } from '@/providers/ChatsProvider'
 import { useAuth } from '@/hooks/auth'
 import { VideoCallProvider } from '@/providers/VideoCallProvider'
-
 import { useNavigate } from 'react-router-dom'
 import { ProfileMenu } from './ProfileMenu'
 import { styled } from '@mui/material/styles'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faStethoscope } from '@fortawesome/free-solid-svg-icons'
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -231,13 +232,29 @@ export function BaseLayout() {
               aria-label="main mailbox folders"
               sx={{
                 zIndex: '99999',
-                paddingTop: 17,
+                paddingTop: 5,
                 bgcolor: '#F0F0F0',
                 color: 'darkgray',
                 height: '100vh',
                 width: '100%',
               }}
             >
+              <h3
+                style={{
+                  color: 'rgb(25, 118, 210)',
+                  textAlign: 'center',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginLeft: '-20px',
+                }}
+              >
+                <FontAwesomeIcon
+                  icon={faStethoscope}
+                  style={{ marginRight: '15px' }}
+                />
+                Your Clinic
+              </h3>
               {sidebarLinks.map((link) => (
                 <ListItemLink
                   key={link.to}

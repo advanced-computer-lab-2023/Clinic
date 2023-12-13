@@ -1,11 +1,11 @@
 import { AuthenticatedRoute } from '@/components/AuthenticatedRoute'
 import { useSidebar } from '@/hooks/sidebar'
 import {
+  Dashboard,
   DocumentScannerOutlined,
   Group,
   Healing,
   MedicalInformation,
-  VpnKey,
 } from '@mui/icons-material'
 import { UserType } from 'clinic-common/types/user.types'
 import { Container } from '@mui/material'
@@ -18,6 +18,11 @@ export function PatientDashboardLayout() {
 
   useEffect(() => {
     setSidebarLinks([
+      {
+        to: '/patient-dashboard',
+        text: 'Dashboard',
+        icon: <Dashboard />,
+      },
       {
         to: '/patient-dashboard/family-members',
         text: 'Family Members',
@@ -47,11 +52,6 @@ export function PatientDashboardLayout() {
         to: '/patient-dashboard/MyMedicalHistory',
         text: 'Health Records',
         icon: <DocumentScannerOutlined />,
-      },
-      {
-        to: '/patient-dashboard/change-password',
-        text: 'Change Password',
-        icon: <VpnKey />,
       },
     ])
   }, [setSidebarLinks])
