@@ -29,7 +29,7 @@ export function AuthLayout() {
 
       {
         to: '/auth/signup',
-        text: 'sign up',
+        text: 'Sign Up',
         icon: <AppRegistrationRounded />,
       },
     ])
