@@ -75,16 +75,24 @@ export function Appointments() {
     fetchAppointmentsAndUpdateStatus()
   }, [])
 
-  async function handleFollowUpButton(doctorID: string, patientID: string) {
+  async function handleFollowUpButton(
+    doctorID: string,
+    patientID: string,
+    appointmentID: string
+  ) {
     if (followUpDate === '') {
       setFollowUpDateError(true)
       toast.error('Please select a date')
     } else {
       setFollowUpDateError(false)
-      await createFollowup(doctorID, patientID, followUpDate)
+      await createFollowup(doctorID, patientID, followUpDate, appointmentID)
         .then(() => {
           toast.success('Follow-up scheduled successfully')
           queryClient.refetchQueries(['appointments'])
+          setFollowUpStatus((prevStatus) => ({
+            ...prevStatus,
+            [appointmentID]: true,
+          }))
         })
         .catch((err) => {
           toast.error('Error in scheduling follow-up')
@@ -257,18 +265,27 @@ export function Appointments() {
                     )}
                   {user?.type === UserType.Doctor &&
                     appointment.status === 'completed' && (
-                      <Button
-                        variant="contained"
-                        size="small"
-                        onClick={() =>
-                          handleFollowUpButton(
-                            appointment.doctorID,
-                            appointment.patientID
-                          )
-                        }
-                      >
-                        Schedule Follow-up
-                      </Button>
+                      <>
+                        <Button
+                          variant="contained"
+                          size="small"
+                          onClick={() =>
+                            handleFollowUpButton(
+                              appointment.doctorID,
+                              appointment.patientID,
+                              appointment.id
+                            )
+                          }
+                          disabled={followUpStatus[appointment.id] ?? false}
+                        >
+                          Schedule Follow-up
+                        </Button>
+                        {followUpStatus[appointment.id] && (
+                          <Typography variant="caption" color="error">
+                            A follow-up is already scheduled/requested.
+                          </Typography>
+                        )}
+                      </>
                     )}
 
                   {user?.type === UserType.Patient &&

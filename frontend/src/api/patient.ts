@@ -88,12 +88,16 @@ export async function getMyHealthRecordsFiles() {
 export async function createFollowup(
   doctorID: any,
   patientID: any,
-  followUpDate: any
+  followUpDate: any,
+  appointmentID: any
 ) {
   return await api.post(`/appointment/createFollowUp`, {
-    doctorID,
-    patientID,
-    date: followUpDate,
+    appointment: {
+      doctorID,
+      patientID,
+      date: followUpDate,
+    },
+    appointmentID,
   })
 }
 
