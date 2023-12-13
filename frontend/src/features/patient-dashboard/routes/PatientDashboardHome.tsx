@@ -5,10 +5,11 @@ import { useQuery } from '@tanstack/react-query'
 
 import { Copyright } from '@mui/icons-material'
 import { Container, Grid, Paper } from '@mui/material'
-//import Chart from '../components/Chart'
 import Orders from '../components/Orders'
 import Deposits from '../components/Deposits'
 import { getPatientByUsername } from '@/api/patient'
+import { AllChats } from '@/components/chats/AllChats'
+import { TopDoctors } from '../components/TopDoctors'
 
 export function PatientDashboardHome() {
   const { user } = useAuth()
@@ -28,43 +29,88 @@ export function PatientDashboardHome() {
   return (
     <>
       <div>
-        <h1>Recent Activity Dashboard</h1>
         <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-          <Grid container spacing={3}>
-            {/* Chart */}
-            {/* <Grid item xs={12} md={8} lg={9}>
-                <Paper
-                  sx={{
-                    p: 2,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    height: 240,
-                  }}
-                >
-                  <Chart
-                    availableTimeSlots={patientQuery.data?.}
-                  />
-                </Paper>
-              </Grid> */}
-            {/* Recent Deposits */}
-            <Grid item xs={12} md={4} lg={3}>
+          <Grid
+            container
+            spacing={4}
+            justifyContent="center"
+            paddingBottom={4}
+            paddingRight={6}
+          >
+            <Grid item xs={12} md={4} lg={4}>
               <Paper
                 sx={{
                   p: 2,
                   display: 'flex',
                   flexDirection: 'column',
-                  height: 240,
+                  height: 290,
+                  borderRadius: '17px',
+                  color: 'white ',
+                  bgcolor: 'primary.main',
                 }}
               >
                 <Deposits wallet={walletQuery?.data?.money} />
               </Paper>
             </Grid>
-            {/* Recent Orders */}
-            <Grid item xs={12}>
-              <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
-                <Orders />
+            <Grid item xs={12} md={4} lg={4}>
+              <Paper
+                sx={{
+                  paddingX: 2,
+                  paddingY: 1,
+                  height: 290,
+                  borderRadius: '17px',
+                  bgcolor: '#F0F0F0',
+                  overflow: 'auto',
+                  width: '100%',
+                  scrollbarWidth: 'thin', // For Firefox
+                  '&::-webkit-scrollbar': {
+                    width: '0em', // Set the width of the scrollbar
+                  },
+                }}
+              >
+                <AllChats />
               </Paper>
             </Grid>
+            <Grid item xs={12} md={4} lg={4}>
+              <Paper
+                sx={{
+                  paddingX: 2,
+                  paddingY: 1,
+                  paddingBottom: 2,
+                  height: 290,
+                  borderRadius: '17px',
+                  bgcolor: '#F0F0F0',
+                  overflow: 'hidden',
+                  width: '100%',
+                }}
+              >
+                <TopDoctors />
+              </Paper>
+            </Grid>
+          </Grid>
+
+          {/* Recent Orders */}
+          <Grid
+            item
+            xs={12}
+            paddingLeft={0}
+            justifyContent="center"
+            paddingBottom={4}
+            paddingRight={6}
+          >
+            <Paper
+              sx={{
+                m: 0,
+                p: 2,
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                borderRadius: '17px',
+                bgcolor: '#F0F0F0',
+              }}
+            >
+              <Orders />
+            </Paper>
           </Grid>
           <Copyright sx={{ pt: 4 }} />
         </Container>

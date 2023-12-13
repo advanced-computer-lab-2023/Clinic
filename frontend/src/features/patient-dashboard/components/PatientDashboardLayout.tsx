@@ -1,6 +1,7 @@
 import { AuthenticatedRoute } from '@/components/AuthenticatedRoute'
 import { useSidebar } from '@/hooks/sidebar'
 import {
+  Dashboard,
   DocumentScannerOutlined,
   Group,
   Healing,
@@ -17,6 +18,11 @@ export function PatientDashboardLayout() {
 
   useEffect(() => {
     setSidebarLinks([
+      {
+        to: '/patient-dashboard',
+        text: 'Dashboard',
+        icon: <Dashboard />,
+      },
       {
         to: '/patient-dashboard/family-members',
         text: 'Family Members',

@@ -38,20 +38,19 @@
     "!**/*.{js,ts,jsx,tsx}": "prettier --write -u"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-free": "^6.5.1",
+    "@fortawesome/free-solid-svg-icons": "^6.5.1",
+    "@fortawesome/react-fontawesome": "^0.2.0",
     "@mui/material": "^5.14.18",
     "@types/react-router-dom": "^5.3.3",
     "bcrypt": "^5.1.1",
     "formik": "^2.4.5",
     "install": "^0.13.0",
     "nodemailer": "^6.9.7",
-
-    "react-router-dom": "^6.20.1",
-
     "react-copy-to-clipboard": "^5.1.0",
-   
+    "react-router-dom": "^6.20.1",
     "react-share": "^5.0.3",
     "recharts": "^2.10.3",
     "web-vitals": "^3.5.0"
-
   }
 }
