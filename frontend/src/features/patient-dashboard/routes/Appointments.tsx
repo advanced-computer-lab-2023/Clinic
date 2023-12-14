@@ -282,7 +282,7 @@ export function Appointments() {
                         </Button>
                         {followUpStatus[appointment.id] && (
                           <Typography variant="caption" color="error">
-                            A follow-up is already scheduled/requested.
+                            A follow-up has already been scheduled or requested.
                           </Typography>
                         )}
                       </>
