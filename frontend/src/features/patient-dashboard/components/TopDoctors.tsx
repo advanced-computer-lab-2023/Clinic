@@ -32,7 +32,6 @@ export function TopDoctors() {
         >
           <h3
             style={{
-              color: 'black',
               marginBottom: '0px',
               marginTop: '0px',
               font: 'bold',
@@ -61,9 +60,9 @@ export function TopDoctors() {
         {doctorsQuery.data?.slice(0, 3).map((doctor, index) => (
           <ListItemButton
             sx={{
-              bgcolor: 'white',
               borderRadius: '12px',
               marginBottom: '8px',
+              backgroundColor: 'rgba(0, 0, 0, 0.1)',
             }}
           >
             <ListItemText

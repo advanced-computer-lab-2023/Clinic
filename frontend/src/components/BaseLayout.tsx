@@ -8,10 +8,10 @@ import {
   ListItemIcon,
   ListItemText,
   IconButton,
-  alpha,
   InputBase,
   Box,
   createTheme,
+  Typography,
 } from '@mui/material'
 import SearchIcon from '@mui/icons-material/Search'
 
@@ -36,10 +36,6 @@ import { UserType } from 'clinic-common/types/user.types'
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
   borderRadius: theme.shape.borderRadius,
-  backgroundColor: alpha(theme.palette.common.white, 0.15),
-  '&:hover': {
-    backgroundColor: alpha(theme.palette.common.white, 0.25),
-  },
   marginLeft: 0,
   width: '100%',
   [theme.breakpoints.up('sm')]: {
@@ -92,10 +88,17 @@ function ListItemLink(props: ListItemLinkProps) {
         component={Link}
         to={to}
         selected={location.pathname === to}
-        sx={{ width: '100%' }}
+        sx={{
+          width: '100%',
+          borderRadius: '20px',
+          '&.Mui-selected': {
+            backgroundColor: 'rgba(0, 0, 0, 0.2)',
+            color: 'primary.contrastText',
+          },
+        }}
       >
         {icon ? <ListItemIcon>{icon}</ListItemIcon> : null}
-        <ListItemText primary={primary} sx={{ color: 'black' }} />
+        <ListItemText primary={primary} />
       </ListItemButton>
     </li>
   )
@@ -118,6 +121,10 @@ export function BaseLayout() {
   const [isDarkMode, setIsDarkMode] = useState(false)
 
   const theme = createTheme({
+    typography: {
+      fontFamily: 'Quicksand Variable',
+      fontSize: 15,
+    },
     palette: {
       mode: isDarkMode ? 'dark' : 'light',
       primary: {
@@ -129,6 +136,9 @@ export function BaseLayout() {
             }[user.type]
           : '#393E41',
         contrastText: '#fff',
+      },
+      background: {
+        default: isDarkMode ? '#1e2122' : '#fafafa',
       },
     },
   })
@@ -158,14 +168,12 @@ export function BaseLayout() {
             width: '100%',
             alignItems: 'start',
             paddingBottom: 12,
-            bgcolor: 'white',
             position: 'relative',
           }}
         >
           <Box
             sx={{
               border: '0px',
-              bgcolor: 'white ',
               color: 'primary.main',
               zIndex: '1000',
               flexGrow: 1,
@@ -243,7 +251,6 @@ export function BaseLayout() {
             sx={{
               width: '15%',
               alignItems: 'start',
-              bgcolor: '#F0F0F0',
               position: 'relative',
             }}
           >
@@ -252,7 +259,6 @@ export function BaseLayout() {
                 width: '15%',
                 left: '0',
                 top: '0',
-                backgroundColor: '#F0F0F0',
               }}
             >
               <List
@@ -260,20 +266,20 @@ export function BaseLayout() {
                 sx={{
                   zIndex: '99999',
                   paddingTop: 5,
-                  bgcolor: '#F0F0F0',
-                  color: 'darkgray',
                   height: '100vh',
                   width: '100%',
                 }}
               >
-                <h3
-                  style={{
-                    color: 'rgb(25, 118, 210)',
+                <Typography
+                  variant="h5"
+                  sx={{
                     textAlign: 'center',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     marginLeft: '-20px',
+                    marginBottom: '40px',
+                    fontWeight: 'bold',
                   }}
                 >
                   <FontAwesomeIcon
@@ -281,7 +287,7 @@ export function BaseLayout() {
                     style={{ marginRight: '15px' }}
                   />
                   Your Clinic
-                </h3>
+                </Typography>
                 {sidebarLinks.map((link) => (
                   <ListItemLink
                     key={link.to}
