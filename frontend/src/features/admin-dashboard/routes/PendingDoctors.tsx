@@ -4,7 +4,7 @@ import {
   rejectDoctorRequest,
 } from '@/api/doctor'
 import { CardPlaceholder } from '@/components/CardPlaceholder'
-import { Box, Button, ButtonGroup } from '@mui/material'
+import { Button, ButtonGroup, Paper } from '@mui/material'
 import { useQuery } from '@tanstack/react-query'
 import { GridColDef, DataGrid } from '@mui/x-data-grid'
 import { GetPendingDoctorsResponse } from 'clinic-common/types/doctor.types'
@@ -98,6 +98,7 @@ export function PendingDoctors() {
             onClick={() => {
               navigate(column.row.username)
             }}
+            style={{ marginLeft: 5 }}
           >
             View
           </Button>
@@ -108,6 +109,7 @@ export function PendingDoctors() {
             onClick={() => {
               handleApprove(column.row.id)
             }}
+            style={{ marginLeft: 5 }}
           >
             Approve
           </Button>
@@ -118,6 +120,7 @@ export function PendingDoctors() {
             onClick={() => {
               handleReject(column.row.id)
             }}
+            style={{ marginLeft: 5 }}
           >
             Reject
           </Button>
@@ -127,9 +130,9 @@ export function PendingDoctors() {
   ]
 
   return (
-    <Box sx={{ height: 400, width: '100%' }}>
+    <Paper sx={{ height: 400, width: '100%' }}>
       <ToastContainer />
       <DataGrid rows={query.data?.doctors || []} columns={columns} autoHeight />
-    </Box>
+    </Paper>
   )
 }

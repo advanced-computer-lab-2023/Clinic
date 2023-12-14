@@ -14,6 +14,7 @@ import ChangePassword from '@/features/auth/routes/ChangePassword'
 import { OnlyAuthenticated } from './OnlyAuthenticated'
 import { UserType } from 'clinic-common/types/user.types'
 import { PatientProfile } from '@/features/patient-dashboard/components/PatientProfile'
+import { ArrowDropDownIcon } from '@mui/x-date-pickers'
 
 export function ProfileMenu() {
   const { user } = useAuth()
@@ -36,10 +37,21 @@ export function ProfileMenu() {
           setAnchorEl(event.currentTarget)
         }}
       >
-        <Typography variant="h6" noWrap component="div">
-          {user?.name}
+        <Avatar sx={{ marginRight: 1 }}>{user?.name[0].toUpperCase()}</Avatar>
+
+        <Typography
+          variant="body2"
+          noWrap
+          component="div"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            fontWeight: 'bold',
+            fontSize: 16,
+          }}
+        >
+          Hi, {user?.name}! <ArrowDropDownIcon />
         </Typography>
-        <Avatar sx={{ marginLeft: 1 }}>{user?.name[0].toUpperCase()}</Avatar>
       </Button>
       <Popover
         open={open}

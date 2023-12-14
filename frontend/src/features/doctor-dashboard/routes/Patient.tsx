@@ -1,28 +1,21 @@
 import { getPatient } from '@/api/patient'
 import { AlertsBox } from '@/components/AlertsBox'
 import { CardPlaceholder } from '@/components/CardPlaceholder'
-import {
-  Card,
-  CardContent,
-  Stack,
-  Typography,
-  Button,
-  TextField,
-} from '@mui/material'
+import { Card, CardContent, Stack, Typography, Button } from '@mui/material'
 import { useQuery } from '@tanstack/react-query'
 import { Link, useParams } from 'react-router-dom'
-import AddIcon from '@mui/icons-material/Add'
-import { useState } from 'react'
-import { toast } from 'react-toastify'
-import { AddNotes } from '@/api/doctor'
+// import AddIcon from '@mui/icons-material/Add'
+// import { useState } from 'react'
+// import { toast } from 'react-toastify'
+// import { AddNotes } from '@/api/doctor'
 
 export function Patient() {
-  const [showTextField, setShowTextField] = useState(false)
-  const [showButton, setShowButton] = useState(false)
+  // const [showTextField, setShowTextField] = useState(false)
+  // const [showButton, setShowButton] = useState(false)
 
-  const [notes, setNotes] = useState('')
+  // const [notes, setNotes] = useState('')
 
-  const [notesError, setNotesError] = useState(false)
+  // const [notesError, setNotesError] = useState(false)
 
   const { id } = useParams()
   const query = useQuery({
@@ -40,31 +33,31 @@ export function Patient() {
     return <AlertsBox />
   }
 
-  const handleButtonClick = () => {
-    setShowTextField(true)
-    setShowButton(true)
-  }
+  // const handleButtonClick = () => {
+  //   setShowTextField(true)
+  //   setShowButton(true)
+  // }
 
-  async function submit() {
-    if (notes === '') {
-      setNotesError(true)
-      toast.error('Please enter a health record')
-    } else {
-      setNotesError(false)
-      setShowTextField(false)
-      setShowButton(false)
-      await AddNotes(id, notes)
-        .then(() => {
-          toast.success('Note added successfully')
-          query.refetch()
-        })
-        .catch((err) => {
-          console.log(err)
-        })
+  // async function submit() {
+  //   if (notes === '') {
+  //     setNotesError(true)
+  //     toast.error('Please enter a health record')
+  //   } else {
+  //     setNotesError(false)
+  //     setShowTextField(false)
+  //     setShowButton(false)
+  //     await AddNotes(id, notes)
+  //       .then(() => {
+  //         toast.success('Note added successfully')
+  //         query.refetch()
+  //       })
+  //       .catch((err) => {
+  //         console.log(err)
+  //       })
 
-      setNotes('')
-    }
-  }
+  //     setNotes('')
+  //   }
+  // }
 
   return (
     <Card variant="outlined">
@@ -121,7 +114,9 @@ export function Patient() {
             </Typography>
             {patient.appointments.appointments.map((appointment) => (
               <Typography variant="body1" key={appointment.date}>
-                {`${appointment.date} - ${appointment.status}`}
+                {`${new Date(appointment.date).toLocaleString()} - ${
+                  appointment.status
+                }`}
               </Typography>
             ))}
           </Stack>
@@ -135,7 +130,7 @@ export function Patient() {
               alt="showing screen capture"
             />
           </Stack> */}
-          <Stack spacing={-1}>
+          {/* <Stack spacing={-1}>
             <Typography variant="overline" color="text.secondary">
               Medical Records
               <Button onClick={handleButtonClick}>
@@ -160,22 +155,22 @@ export function Patient() {
             <Button type="submit" onClick={submit} variant="contained">
               ADD
             </Button>
-          )}
+          )} */}
           <Link to={'../healthRecords/' + id}>
-            <Button variant="contained" color="primary">
+            <Button variant="contained" fullWidth color="primary">
               Health Records Files
             </Button>
           </Link>
           <Link to={'../Prescriptions/' + patient.username}>
-            <Button variant="contained" color="primary">
+            <Button variant="contained" fullWidth color="primary">
               view Prescriptions
             </Button>
           </Link>
-          <Link to={'../medicalHistory/' + id}>
+          {/* <Link to={'../medicalHistory/' + id}>
             <Button variant="contained" color="primary">
               Medical History Files
             </Button>
-          </Link>
+          </Link> */}
         </Stack>
       </CardContent>
     </Card>

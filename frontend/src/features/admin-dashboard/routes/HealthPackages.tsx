@@ -71,7 +71,7 @@ export function HealthPackages() {
       handleClose()
 
       if (
-        message == "Can't Delete!there are patients subscribed to this package"
+        message == "Can't delete! There are patients subscribed to this package"
       ) {
         toast.error(message)
       }
@@ -90,7 +90,7 @@ export function HealthPackages() {
         <DialogTitle id="responsive-dialog-title">{'Alert'}</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Are you sure,you want to delete this package?
+            Are you sure, you want to delete this package?
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -150,7 +150,7 @@ export function HealthPackages() {
                           Price per year
                         </Typography>
                         <Typography variant="body1">
-                          {healthPackage.pricePerYear}
+                          E£ {healthPackage.pricePerYear}
                         </Typography>
                       </Stack>
                       <Stack spacing={-1}>
@@ -158,7 +158,7 @@ export function HealthPackages() {
                           Session Discount
                         </Typography>
                         <Typography variant="body1">
-                          {healthPackage.sessionDiscount}
+                          {healthPackage.sessionDiscount}%
                         </Typography>
                       </Stack>
                       <Stack spacing={-1}>
@@ -166,7 +166,7 @@ export function HealthPackages() {
                           Medicine From Our Pharmacy Discount
                         </Typography>
                         <Typography variant="body1">
-                          {healthPackage.medicineDiscount}
+                          {healthPackage.medicineDiscount}%
                         </Typography>
                       </Stack>
                       <Stack spacing={-1}>
@@ -174,7 +174,7 @@ export function HealthPackages() {
                           Family Member Subscription Discount
                         </Typography>
                         <Typography variant="body1">
-                          {healthPackage.familyMemberSubscribtionDiscount}
+                          {healthPackage.familyMemberSubscribtionDiscount}%
                         </Typography>
                       </Stack>
                     </Stack>

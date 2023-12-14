@@ -8,13 +8,13 @@ function preventDefault(event: React.MouseEvent) {
 }
 
 export default function Deposits({ wallet }: { wallet?: number }) {
-  console.log(wallet)
+  console.log('Wallet' + wallet)
 
   return (
     <React.Fragment>
       <Title>Balance</Title>
       <Typography component="p" variant="h4">
-        {wallet ? `$${wallet.toFixed(2)}` : 'N/A'}
+        {wallet != null ? `E£ ${wallet.toFixed(2)}` : 'N/A'}
       </Typography>
       <Typography color="text.secondary" sx={{ flex: 1 }}>
         on 15 March, 2019

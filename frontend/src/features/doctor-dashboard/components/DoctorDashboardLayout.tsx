@@ -1,7 +1,7 @@
 import { AuthenticatedRoute } from '@/components/AuthenticatedRoute'
 import { useSidebar } from '@/hooks/sidebar'
 import { UserType } from 'clinic-common/types/user.types'
-import { Person, VpnKey, Wallet } from '@mui/icons-material'
+import { Home, Person } from '@mui/icons-material'
 import Container from '@mui/material/Container'
 import { useEffect } from 'react'
 import { Navigate, Outlet } from 'react-router-dom'
@@ -15,8 +15,9 @@ import { Typography } from '@mui/material'
 import { getDoctor } from '@/api/doctor'
 import { ContractStatus, DoctorStatus } from 'clinic-common/types/doctor.types'
 import VisibilityIcon from '@mui/icons-material/Visibility'
-import AssignmentIcon from '@mui/icons-material/Assignment'
+
 import AddAlarmIcon from '@mui/icons-material/AddAlarm'
+//import { EmploymentContract } from '../routes/EmploymentContract'
 
 export function DoctorDashboardLayout() {
   const { setSidebarLinks } = useSidebar()
@@ -40,18 +41,17 @@ export function DoctorDashboardLayout() {
     }
 
     if (doctorQuery.data?.contractStatus != ContractStatus.Accepted) {
-      setSidebarLinks([
-        {
-          to: '/doctor-dashboard/employmentContract',
-          text: 'Employment Contract',
-          icon: <AssignmentIcon />,
-        },
-      ])
+      setSidebarLinks([])
 
       return
     }
 
     setSidebarLinks([
+      {
+        to: '/doctor-dashboard',
+        text: 'Home',
+        icon: <Home />,
+      },
       {
         to: '/doctor-dashboard/profile',
         text: 'Update Details',
@@ -71,21 +71,6 @@ export function DoctorDashboardLayout() {
         to: '/doctor-dashboard/view-my-available-time-slots',
         text: 'View My Available Time Slots',
         icon: <VisibilityIcon />,
-      },
-      {
-        to: '/doctor-dashboard/wallet',
-        text: 'Wallet',
-        icon: <Wallet />,
-      },
-      {
-        to: '/doctor-dashboard/employmentContract',
-        text: 'Employment Contract',
-        icon: <AssignmentIcon />,
-      },
-      {
-        to: '/doctor-dashboard/change-password',
-        text: 'Change Password',
-        icon: <VpnKey />,
       },
       {
         to: '/doctor-dashboard/followup-requests',

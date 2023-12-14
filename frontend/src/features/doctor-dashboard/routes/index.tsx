@@ -6,12 +6,9 @@ import { Appointments } from '@/features/patient-dashboard/routes/Appointments'
 import { ViewPatients } from './ViewPatients'
 import { Patient } from '@/features/doctor-dashboard/routes/Patient'
 import { ViewMyAvailableTimeSlots } from './ViewMyAvailableTimeSlots'
-
-import { Wallet } from './Wallet'
 import { EmploymentContract } from './EmploymentContract'
 import AddHealthRecord from './AddHealthRecord'
 import ChangePassword from '@/features/auth/routes/ChangePassword'
-import ViewMedicalHistory from './viewPatientMedicalHistory'
 import ViewPrescription from './viewPrescription'
 import { FollowupRequests } from './FollowupRequests'
 
@@ -44,10 +41,6 @@ export const doctorDashboardRoutes: RouteObject[] = [
         element: <ViewMyAvailableTimeSlots />,
       },
       {
-        path: 'wallet',
-        element: <Wallet />,
-      },
-      {
         path: 'employmentContract',
         element: <EmploymentContract />,
       },
@@ -58,10 +51,6 @@ export const doctorDashboardRoutes: RouteObject[] = [
       {
         path: 'change-password',
         element: <ChangePassword />,
-      },
-      {
-        path: 'medicalHistory/:id',
-        element: <ViewMedicalHistory />,
       },
       {
         path: 'Prescriptions/:username',

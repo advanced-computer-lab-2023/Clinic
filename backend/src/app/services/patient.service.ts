@@ -21,6 +21,7 @@ type PatientDocumentWithUser = WithUser<PatientDocument>
 const storage = getStorage(FireBase)
 const storageRef = ref(storage, 'petients/medicalHistory')
 const storageRef2 = ref(storage, 'petients/HealthRecord')
+import { AppointmentStatus } from 'clinic-common/types/appointment.types'
 
 export async function getPatientByName(
   name: string
@@ -143,6 +144,7 @@ export async function filterPatientByAppointment(
   const appointments = (
     await AppointmentModel.find({
       doctorID: doctorId,
+      status: AppointmentStatus.Upcoming,
       // Since date is stored as a string (by mistake), as a workaround, we can fetch all then filter using JS
       // date: { $gte: new Date() },
     })

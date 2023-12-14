@@ -39,6 +39,16 @@ export async function getPatient(id: string): Promise<GetAPatientResponse> {
   })
 }
 
+export async function getPatientByUsername(
+  username: string
+): Promise<GetAPatientResponse> {
+  return await api
+    .get<GetAPatientResponse>('/patients/username/' + username)
+    .then((res) => {
+      return res.data
+    })
+}
+
 export async function getWalletMoney(
   username: string
 ): Promise<GetWalletMoneyResponse> {
@@ -78,12 +88,16 @@ export async function getMyHealthRecordsFiles() {
 export async function createFollowup(
   doctorID: any,
   patientID: any,
-  followUpDate: any
+  followUpDate: any,
+  appointmentID: any
 ) {
   return await api.post(`/appointment/createFollowUp`, {
-    doctorID,
-    patientID,
-    date: followUpDate,
+    appointment: {
+      doctorID,
+      patientID,
+      date: followUpDate,
+    },
+    appointmentID,
   })
 }
 

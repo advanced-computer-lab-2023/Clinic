@@ -136,8 +136,13 @@ appointmentsRouter.post(
 appointmentsRouter.post(
   '/createFollowUp',
   asyncWrapper(async (req, res) => {
-    const appointment = req.body
-    const newAppointment = await createFollowUpAppointment(appointment)
+    const appointment = req.body.appointment
+    const appointmentID = req.body.appointmentID
+
+    const newAppointment = await createFollowUpAppointment(
+      appointment,
+      appointmentID
+    )
     res.send(newAppointment)
   })
 )

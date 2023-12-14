@@ -75,16 +75,24 @@ export function Appointments() {
     fetchAppointmentsAndUpdateStatus()
   }, [])
 
-  async function handleFollowUpButton(doctorID: string, patientID: string) {
+  async function handleFollowUpButton(
+    doctorID: string,
+    patientID: string,
+    appointmentID: string
+  ) {
     if (followUpDate === '') {
       setFollowUpDateError(true)
       toast.error('Please select a date')
     } else {
       setFollowUpDateError(false)
-      await createFollowup(doctorID, patientID, followUpDate)
+      await createFollowup(doctorID, patientID, followUpDate, appointmentID)
         .then(() => {
           toast.success('Follow-up scheduled successfully')
           queryClient.refetchQueries(['appointments'])
+          setFollowUpStatus((prevStatus) => ({
+            ...prevStatus,
+            [appointmentID]: true,
+          }))
         })
         .catch((err) => {
           toast.error('Error in scheduling follow-up')
@@ -168,224 +176,235 @@ export function Appointments() {
   }
 
   return (
-    <FilteredList
-      dataFetcher={getAppointments}
-      filters={[
-        {
-          label: 'Date',
-          property: (v) => v.date, //will replace with name
-          filter: (actual: string, required: DateRange) => {
-            if (required.from && required.to) {
-              return (
-                new Date(actual).getTime() >= required.from.getTime() &&
-                new Date(actual).getTime() <= required.to.getTime()
-              )
-            }
+    <>
+      <FilteredList
+        dataFetcher={getAppointments}
+        filters={[
+          {
+            label: 'Date',
+            property: (v) => v.date, //will replace with name
+            filter: (actual: string, required: DateRange) => {
+              if (required.from && required.to) {
+                return (
+                  new Date(actual).getTime() >= required.from.getTime() &&
+                  new Date(actual).getTime() <= required.to.getTime()
+                )
+              }
 
-            if (required.from) {
-              return new Date(actual).getTime() >= required.from.getTime()
-            }
+              if (required.from) {
+                return new Date(actual).getTime() >= required.from.getTime()
+              }
 
-            if (required.to) {
-              return new Date(actual).getTime() <= required.to.getTime()
-            }
+              if (required.to) {
+                return new Date(actual).getTime() <= required.to.getTime()
+              }
 
-            return true
+              return true
+            },
+            type: 'dateRange',
           },
-          type: 'dateRange',
-        },
-        {
-          label: 'Status',
-          property: (v) => v.status,
-          selectValues: Object.keys(AppointmentStatus).map((key) => ({
-            label: key,
-            value: key,
-          })),
-          filter: (actual: string, required: string) =>
-            actual.toLowerCase().includes(required.toLowerCase()),
-          type: 'select',
-        },
-      ]}
-      queryKey={['appointments']}
-      component={(appointment) => (
-        <Grid item xl={3}>
-          <Card variant="outlined">
-            <CardContent>
-              <Stack spacing={2}>
-                <Stack spacing={-1}>
-                  <Typography variant="overline" color="text.secondary">
-                    Doctor Name
-                  </Typography>
-                  <Typography variant="body1">
-                    {appointment.doctorName}
-                  </Typography>
-                </Stack>
-                <Stack spacing={-1}>
-                  <Typography variant="overline" color="text.secondary">
-                    reserved For
-                  </Typography>
-                  <Typography variant="body1">
-                    {appointment.reservedFor}
-                  </Typography>
-                </Stack>
-                <Stack spacing={-1}>
-                  <Typography variant="overline" color="text.secondary">
-                    Date
-                  </Typography>
-                  <Typography variant="body1">
-                    {new Date(appointment.date).toLocaleString()}
-                  </Typography>
-                </Stack>
-                <Stack spacing={-1}>
-                  <Typography variant="overline" color="text.secondary">
-                    Status
-                  </Typography>
-                  <Typography variant="body1">{appointment.status}</Typography>
-                </Stack>
+          {
+            label: 'Status',
+            property: (v) => v.status,
+            selectValues: Object.keys(AppointmentStatus).map((key) => ({
+              label: key,
+              value: key,
+            })),
+            filter: (actual: string, required: string) =>
+              actual.toLowerCase().includes(required.toLowerCase()),
+            type: 'select',
+          },
+        ]}
+        queryKey={['appointments']}
+        component={(appointment) => (
+          <Grid item xl={3}>
+            <Card variant="outlined">
+              <CardContent>
+                <Stack spacing={2}>
+                  <Stack spacing={-1}>
+                    <Typography variant="overline" color="text.secondary">
+                      Doctor Name
+                    </Typography>
+                    <Typography variant="body1">
+                      {appointment.doctorName}
+                    </Typography>
+                  </Stack>
+                  <Stack spacing={-1}>
+                    <Typography variant="overline" color="text.secondary">
+                      reserved For
+                    </Typography>
+                    <Typography variant="body1">
+                      {appointment.reservedFor}
+                    </Typography>
+                  </Stack>
+                  <Stack spacing={-1}>
+                    <Typography variant="overline" color="text.secondary">
+                      Date
+                    </Typography>
+                    <Typography variant="body1">
+                      {new Date(appointment.date).toLocaleString()}
+                    </Typography>
+                  </Stack>
+                  <Stack spacing={-1}>
+                    <Typography variant="overline" color="text.secondary">
+                      Status
+                    </Typography>
+                    <Typography variant="body1">
+                      {appointment.status}
+                    </Typography>
+                  </Stack>
 
-                {user?.type === UserType.Doctor &&
-                  appointment.status === 'completed' && (
-                    <TextField
-                      type="datetime-local"
-                      onChange={(e) => setFollowUpDate(e.target.value)}
-                      inputProps={{ min: currentDate }}
-                      error={followUpDateError}
-                    />
-                  )}
-                {user?.type === UserType.Doctor &&
-                  appointment.status === 'completed' && (
-                    <Button
-                      variant="contained"
-                      size="small"
-                      onClick={() =>
-                        handleFollowUpButton(
-                          appointment.doctorID,
-                          appointment.patientID
-                        )
-                      }
-                    >
-                      Schedule Follow-up
-                    </Button>
-                  )}
-
-                {user?.type === UserType.Patient &&
-                  appointment.status === 'upcoming' && (
-                    <Stack spacing={2}>
-                      <Button
-                        variant="contained"
-                        size="small"
-                        onClick={() => handleRescheduleButton(appointment)}
-                      >
-                        Reschedule Appointment
-                      </Button>
-
-                      {/* Dropdown for selecting available timings */}
-                      <Select
-                        value={rescheduleDate}
-                        onChange={(e) => setRescheduleDate(e.target.value)}
-                        displayEmpty
-                        error={rescheduleDateError}
-                      >
-                        <MenuItem value="" disabled>
-                          Select Time
-                        </MenuItem>
-                        {appointment.doctorTimes.map((time) => (
-                          <MenuItem key={time} value={time}>
-                            {time}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </Stack>
-                  )}
-                {user?.type === UserType.Doctor &&
-                  appointment.status !== 'completed' &&
-                  appointment.status !== 'cancelled' && (
-                    <Stack spacing={2}>
+                  {user?.type === UserType.Doctor &&
+                    appointment.status === 'completed' && (
                       <TextField
                         type="datetime-local"
-                        onChange={(e) => setRescheduleDate(e.target.value)}
+                        onChange={(e) => setFollowUpDate(e.target.value)}
                         inputProps={{ min: currentDate }}
-                        error={rescheduleDateError}
+                        error={followUpDateError}
                       />
+                    )}
+                  {user?.type === UserType.Doctor &&
+                    appointment.status === 'completed' && (
+                      <>
+                        <Button
+                          variant="contained"
+                          size="small"
+                          onClick={() =>
+                            handleFollowUpButton(
+                              appointment.doctorID,
+                              appointment.patientID,
+                              appointment.id
+                            )
+                          }
+                          disabled={followUpStatus[appointment.id] ?? false}
+                        >
+                          Schedule Follow-up
+                        </Button>
+                        {followUpStatus[appointment.id] && (
+                          <Typography variant="caption" color="error">
+                            A follow-up has already been scheduled or requested.
+                          </Typography>
+                        )}
+                      </>
+                    )}
 
-                      <Button
-                        variant="contained"
-                        size="small"
-                        onClick={() => handleRescheduleButton(appointment)}
-                      >
-                        Reschedule Appointment
-                      </Button>
+                  {user?.type === UserType.Patient &&
+                    appointment.status === 'upcoming' && (
+                      <Stack spacing={2}>
+                        {/* Dropdown for selecting available timings */}
+                        <Select
+                          value={rescheduleDate}
+                          onChange={(e) => setRescheduleDate(e.target.value)}
+                          displayEmpty
+                          error={rescheduleDateError}
+                        >
+                          <MenuItem value="" disabled>
+                            Select Time
+                          </MenuItem>
+                          {appointment.doctorTimes.map((time) => (
+                            <MenuItem key={time} value={time}>
+                              {time}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                        <Button
+                          variant="contained"
+                          size="small"
+                          onClick={() => handleRescheduleButton(appointment)}
+                        >
+                          Reschedule Appointment
+                        </Button>
+                      </Stack>
+                    )}
+                  {user?.type === UserType.Doctor &&
+                    appointment.status === 'upcoming' && (
+                      <Stack spacing={2}>
+                        <TextField
+                          type="datetime-local"
+                          onChange={(e) => setRescheduleDate(e.target.value)}
+                          inputProps={{ min: currentDate }}
+                          error={rescheduleDateError}
+                        />
 
-                      {/* ADD DATE TIME PICKER HERE THAT IS SET TO THE RESCHDULE DATE STATE VARIABLE */}
-                    </Stack>
+                        <Button
+                          variant="contained"
+                          size="small"
+                          onClick={() => handleRescheduleButton(appointment)}
+                        >
+                          Reschedule Appointment
+                        </Button>
+
+                        {/* ADD DATE TIME PICKER HERE THAT IS SET TO THE RESCHDULE DATE STATE VARIABLE */}
+                      </Stack>
+                    )}
+
+                  {/* New Cancel Appointment Button */}
+                  {user && appointment.status === 'upcoming' && (
+                    <LoadingButton
+                      variant="contained"
+                      size="small"
+                      fullWidth
+                      sx={{
+                        backgroundColor: 'red',
+                        color: 'white',
+                        marginTop: 2,
+                      }}
+                      onClick={() => {
+                        setIsLoading(appointment.id)
+                        handleCancelAppointment(appointment.id).finally(() =>
+                          setIsLoading(null)
+                        )
+                      }}
+                      loading={isLoading == appointment.id}
+                    >
+                      Cancel Appointment
+                    </LoadingButton>
                   )}
 
-                {/* New Cancel Appointment Button */}
-                {user && appointment.status === 'upcoming' && (
-                  <LoadingButton
-                    variant="contained"
-                    size="small"
-                    fullWidth
-                    sx={{
-                      backgroundColor: 'red',
-                      color: 'white',
-                      marginTop: 2,
-                    }}
-                    onClick={() => {
-                      setIsLoading(appointment.id)
-                      handleCancelAppointment(appointment.id).finally(() =>
-                        setIsLoading(null)
-                      )
-                    }}
-                    loading={isLoading == appointment.id}
-                  >
-                    Cancel Appointment
-                  </LoadingButton>
-                )}
+                  {user &&
+                    appointment.status === 'upcoming' &&
+                    user.type === UserType.Patient && (
+                      <Typography variant="caption" color="warning">
+                        Appointments cancelled less than 24 hours before their
+                        date do not receive a refund.
+                      </Typography>
+                    )}
+                  {user?.type === UserType.Patient &&
+                    appointment.status === 'completed' && (
+                      <TextField
+                        type="datetime-local"
+                        onChange={(e) => setFollowUpDate(e.target.value)}
+                        inputProps={{ min: currentDate }}
+                        error={followUpDateError}
+                      />
+                    )}
 
-                {user &&
-                  appointment.status === 'upcoming' &&
-                  user.type === UserType.Patient && (
-                    <Typography variant="caption" color="warning">
-                      Appointments cancelled less than 24 hours before their
-                      date do not receive a refund.
-                    </Typography>
-                  )}
-                {user?.type === UserType.Patient &&
-                  appointment.status === 'completed' && (
-                    <TextField
-                      type="datetime-local"
-                      onChange={(e) => setFollowUpDate(e.target.value)}
-                      inputProps={{ min: currentDate }}
-                      error={followUpDateError}
-                    />
-                  )}
-
-                {user?.type === UserType.Patient &&
-                  appointment.status === 'completed' && (
-                    <>
-                      <Button
-                        variant="contained"
-                        size="small"
-                        onClick={() =>
-                          handleRequestFollowUpButton(appointment.id)
-                        }
-                        disabled={followUpStatus[appointment.id] ?? false}
-                      >
-                        Request Follow-up
-                      </Button>
-                      {followUpStatus[appointment.id] && (
-                        <Typography variant="caption" color="error">
-                          A follow-up request already submitted.
-                        </Typography>
-                      )}
-                    </>
-                  )}
-              </Stack>
-            </CardContent>
-          </Card>
-        </Grid>
-      )}
-    />
+                  {user?.type === UserType.Patient &&
+                    appointment.status === 'completed' && (
+                      <>
+                        <Button
+                          variant="contained"
+                          size="small"
+                          onClick={() =>
+                            handleRequestFollowUpButton(appointment.id)
+                          }
+                          disabled={followUpStatus[appointment.id] ?? false}
+                        >
+                          Request Follow-up
+                        </Button>
+                        {followUpStatus[appointment.id] && (
+                          <Typography variant="caption" color="error">
+                            A follow-up request already submitted.
+                          </Typography>
+                        )}
+                      </>
+                    )}
+                </Stack>
+              </CardContent>
+            </Card>
+          </Grid>
+        )}
+      />
+    </>
   )
 }

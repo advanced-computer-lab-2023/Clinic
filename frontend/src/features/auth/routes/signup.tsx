@@ -159,7 +159,6 @@ const Signup: React.FC = () => {
           boxShadow: '0 0 10px rgba(0, 0, 0, 0.2)',
           textAlign: 'center',
           borderRadius: '10px',
-          background: 'rgba(255, 255, 255, 0.9)',
           width: '150%',
         }}
       >

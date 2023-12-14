@@ -1,24 +1,29 @@
 import { AuthenticatedRoute } from '@/components/AuthenticatedRoute'
 import { useSidebar } from '@/hooks/sidebar'
 import {
+  Dashboard,
   DocumentScannerOutlined,
   Group,
   Healing,
   MedicalInformation,
-  VpnKey,
-  Wallet,
 } from '@mui/icons-material'
 import { UserType } from 'clinic-common/types/user.types'
 import { Container } from '@mui/material'
 import { useEffect } from 'react'
 import { Outlet } from 'react-router-dom'
 import AccessTimeIcon from '@mui/icons-material/AccessTime'
+import MedicationLiquidIcon from '@mui/icons-material/MedicationLiquid'
 
 export function PatientDashboardLayout() {
   const { setSidebarLinks } = useSidebar()
 
   useEffect(() => {
     setSidebarLinks([
+      {
+        to: '/patient-dashboard',
+        text: 'Dashboard',
+        icon: <Dashboard />,
+      },
       {
         to: '/patient-dashboard/family-members',
         text: 'Family Members',
@@ -27,7 +32,7 @@ export function PatientDashboardLayout() {
       {
         to: '/patient-dashboard/prescriptions',
         text: 'Prescriptions',
-        icon: <MedicalInformation />,
+        icon: <MedicationLiquidIcon />,
       },
       {
         to: '/patient-dashboard/approved-doctors',
@@ -42,32 +47,12 @@ export function PatientDashboardLayout() {
       {
         to: '/patient-dashboard/health-packages',
         text: 'Health Packages',
-        icon: <Healing />,
-      },
-      {
-        to: '/patient-dashboard/wallet',
-        text: 'Wallet',
-        icon: <Wallet />,
-      },
-      {
-        to: '/patient-dashboard/MyHealthRecords',
-        text: 'Health Records',
-        icon: <DocumentScannerOutlined />,
+        icon: <MedicalInformation />,
       },
       {
         to: '/patient-dashboard/MyMedicalHistory',
-        text: 'Medical History',
+        text: 'Health Records',
         icon: <DocumentScannerOutlined />,
-      },
-      {
-        to: '/patient-dashboard/change-password',
-        text: 'Change Password',
-        icon: <VpnKey />,
-      },
-      {
-        to: '/patient-dashboard/my-doctors',
-        text: 'My Doctors',
-        icon: <Healing />,
       },
     ])
   }, [setSidebarLinks])

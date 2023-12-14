@@ -9,8 +9,6 @@ import { DoctorView } from './DoctorView'
 import { FamilyMemberDetails } from './FamilyMemberDetails'
 import { PrescriptionView } from './PrescriptionView'
 import { SubscribeToHealthPackages } from './SubscribeToHealthPackages'
-import { Wallet } from './Wallet'
-import HealthRecords from './HealthRecords'
 import FileViewer from './ViewFiles'
 import ChangePassword from '@/features/auth/routes/ChangePassword'
 import { MyDoctors } from './MyDoctors'
@@ -60,14 +58,7 @@ export const patientDashboardRoutes: RouteObject[] = [
         path: 'health-packages',
         element: <SubscribeToHealthPackages />,
       },
-      {
-        path: 'wallet',
-        element: <Wallet />,
-      },
-      {
-        path: 'MyHealthRecords',
-        element: <HealthRecords />,
-      },
+
       {
         path: 'MyMedicalHistory',
         element: <FileViewer />,
