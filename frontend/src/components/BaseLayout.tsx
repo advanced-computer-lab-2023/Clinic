@@ -174,7 +174,7 @@ export function BaseLayout() {
           <Box
             sx={{
               border: '0px',
-              color: 'primary.main',
+              color: isDarkMode ? 'primary.textContrast' : 'primary.main',
               zIndex: '1000',
               flexGrow: 1,
               flex: 4,
