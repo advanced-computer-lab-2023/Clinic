@@ -22,7 +22,6 @@ export function AllChats() {
       <List>
         <h3
           style={{
-            color: 'black',
             marginTop: '0',
             marginBottom: '8px',
             font: 'bold',
@@ -34,9 +33,9 @@ export function AllChats() {
           <React.Fragment key={i}>
             <ListItemButton
               sx={{
-                bgcolor: 'white',
                 borderRadius: '12px',
                 marginBottom: '8px',
+                backgroundColor: 'rgba(0, 0, 0, 0.1)',
               }}
               onClick={() => {
                 setSelectedChatId(chat!.id)

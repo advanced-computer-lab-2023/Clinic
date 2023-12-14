@@ -181,7 +181,11 @@ export function ApiForm<Request extends ObjectWithStringKeys>({
               )
             })}
 
-            <LoadingButton loading={mutation.isLoading} type="submit">
+            <LoadingButton
+              loading={mutation.isLoading}
+              type="submit"
+              variant="contained"
+            >
               {buttonText ?? 'Submit'}
             </LoadingButton>
           </Stack>
