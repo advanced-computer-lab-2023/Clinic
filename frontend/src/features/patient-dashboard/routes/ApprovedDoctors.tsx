@@ -15,6 +15,7 @@ import { DiscountedPrice } from '@/components/DiscountedPrice'
 import { VideoCallButton } from '@/components/video-call/VideoCallButton'
 import { ChatButton } from '@/components/chats/ChatButton'
 import { useAuth } from '@/hooks/auth'
+import VisibilityIcon from '@mui/icons-material/Visibility'
 
 export function ApprovedDoctors() {
   const navigate = useNavigate()
@@ -195,6 +196,7 @@ export function ApprovedDoctors() {
               <CardActions style={{ justifyContent: 'center' }}>
                 <Button
                   size="small"
+                  startIcon={<VisibilityIcon />}
                   onClick={() => {
                     handleView(doctor.id)
                   }}
