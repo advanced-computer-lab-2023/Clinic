@@ -12,6 +12,7 @@ import { Container } from '@mui/material'
 import { useEffect } from 'react'
 import { Outlet } from 'react-router-dom'
 import AccessTimeIcon from '@mui/icons-material/AccessTime'
+import MedicationLiquidIcon from '@mui/icons-material/MedicationLiquid'
 
 export function PatientDashboardLayout() {
   const { setSidebarLinks } = useSidebar()
@@ -31,7 +32,7 @@ export function PatientDashboardLayout() {
       {
         to: '/patient-dashboard/prescriptions',
         text: 'Prescriptions',
-        icon: <MedicalInformation />,
+        icon: <MedicationLiquidIcon />,
       },
       {
         to: '/patient-dashboard/approved-doctors',
@@ -46,7 +47,7 @@ export function PatientDashboardLayout() {
       {
         to: '/patient-dashboard/health-packages',
         text: 'Health Packages',
-        icon: <Healing />,
+        icon: <MedicalInformation />,
       },
       {
         to: '/patient-dashboard/MyMedicalHistory',
