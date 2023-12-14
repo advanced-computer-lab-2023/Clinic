@@ -68,7 +68,17 @@ export default function SignIn() {
   }
 
   return (
-    <Container component="main" maxWidth="xs">
+    <Container
+      component="main"
+      maxWidth="xs"
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignContent: 'center',
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}
+    >
       <CssBaseline />
       <Paper
         sx={{
