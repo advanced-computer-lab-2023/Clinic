@@ -88,7 +88,10 @@ healthPackagesRouter.delete(
     const canDelete = await removeHealthPackage(req.params.id)
 
     if (!canDelete) {
-      res.send("Can't Delete!there are patients subscribed to this package")
+      throw new APIError(
+        "Can't Delete! There are patients already subscribed to this package",
+        404
+      )
     }
 
     res.send('Package deleted successfuly')
