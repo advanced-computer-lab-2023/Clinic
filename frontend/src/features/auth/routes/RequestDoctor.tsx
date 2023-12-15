@@ -79,6 +79,16 @@ export const RequestDoctor = () => {
       return
     }
 
+    // Check if all files are uploaded, if not error
+    for (let i = 0; i < fieldValue.files.length; i++) {
+      if (fieldValue.files[i] === undefined) {
+        toast.error('Please upload all required documents.')
+        setIsLoading(false)
+
+        return
+      }
+    }
+
     // Check if any file is selected
     if (
       fieldValue.files.some(
@@ -86,7 +96,6 @@ export const RequestDoctor = () => {
       )
     ) {
       toast.error('Please choose files for document upload.')
-      setIsLoading(false)
 
       return
     }
@@ -248,7 +257,7 @@ export const RequestDoctor = () => {
             </Grid>
 
             <Grid item xs={12}>
-              <label>Select your educational background </label>
+              <label>Select your educational background *</label>
 
               <RadioGroup
                 onChange={(e) => {
@@ -294,7 +303,7 @@ export const RequestDoctor = () => {
                   }}
                 >
                   <label style={{ marginBottom: '5px', textAlign: 'left' }}>
-                    Upload your {docType}
+                    Upload your {docType} *
                   </label>
                   <div style={{ display: 'flex', alignItems: 'center' }}>
                     <input
