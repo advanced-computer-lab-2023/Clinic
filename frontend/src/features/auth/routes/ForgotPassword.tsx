@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useFormik } from 'formik'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
-import { TextField, Button, Typography } from '@mui/material'
+import { TextField, Button, Typography, Stack } from '@mui/material'
 import { toast } from 'react-toastify'
 import CircularProgress from '@mui/material/CircularProgress'
 import { api } from '@/api'
@@ -156,7 +156,7 @@ export default function ForgotPassword() {
   })
 
   return (
-    <>
+    <Stack>
       <Typography variant="h6">
         {showPasswordForm
           ? 'Please enter your new password'
@@ -262,6 +262,6 @@ export default function ForgotPassword() {
           </form>
         )}
       </div>
-    </>
+    </Stack>
   )
 }
