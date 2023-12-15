@@ -102,7 +102,14 @@ export function ViewMyAvailableTimeSlots() {
                 .sort((a, b) => a.getTime() - b.getTime())
                 .map((data, i) => (
                   <Typography variant="body1" key={i}>
-                    {new Date(data).toLocaleString()}
+                    {new Date(data).toLocaleString('en-US', {
+                      year: 'numeric',
+                      month: 'numeric',
+                      day: 'numeric',
+                      hour: 'numeric',
+                      minute: 'numeric',
+                      hour12: true,
+                    })}
                   </Typography>
                 ))}
             </Stack>
