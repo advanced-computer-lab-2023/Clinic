@@ -16,10 +16,7 @@ import { PatientModel } from '../models/patient.model'
 import { DoctorModel } from '../models/doctor.model'
 import { type HydratedDocument } from 'mongoose'
 import { type UserDocument, UserModel } from '../models/user.model'
-import {
-  changeAvailableTimeSlot,
-  getApprovedDoctorById,
-} from '../services/doctor.service'
+import { changeAvailableTimeSlot } from '../services/doctor.service'
 import { AppointmentModel } from '../models/appointment.model'
 import { NotFoundError } from '../errors'
 import { sendAppointmentNotificationToPatient } from '../services/sendNotificationForAppointment'
@@ -48,16 +45,15 @@ appointmentsRouter.get(
     console.log(filterAppointments)
     const appointmentResponses = await Promise.all(
       filterAppointments.map(async (appointment) => {
-        const doctor = await getApprovedDoctorById(
-          appointment.doctorID.toString()
-        )
+        const doctor = await DoctorModel.findById(appointment.doctorID)
 
         return {
           id: appointment.id,
           patientID: appointment.patientID.toString(),
           doctorID: appointment.doctorID.toString(),
-          doctorName: doctor.name,
-          doctorTimes: doctor.availableTimes.map((date) => date.toISOString()),
+          doctorName: doctor?.name || '',
+          doctorTimes:
+            doctor?.availableTimes.map((date) => date.toISOString()) || [],
           date: appointment.date,
           familyID: appointment.familyID || '',
           reservedFor: appointment.reservedFor || 'Me',
