@@ -89,7 +89,7 @@ function AddHealthRecord() {
 
   const handleUpload = async () => {
     if (!imageValue.file) {
-      alert('Please select a file to upload.')
+      toast.error('Please select a file to upload.')
 
       return
     }

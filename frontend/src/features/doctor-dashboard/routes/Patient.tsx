@@ -108,15 +108,20 @@ export function Patient() {
               {patient.emergencyContact.mobileNumber}
             </Typography>
           </Stack>
-          <Stack spacing={-1}>
+          <Stack spacing={1}>
             <Typography variant="overline" color="text.secondary">
               Appointments
             </Typography>
             {patient.appointments.appointments.map((appointment) => (
               <Typography variant="body1" key={appointment.date}>
-                {`${new Date(appointment.date).toLocaleString()} - ${
-                  appointment.status
-                }`}
+                {`${new Date(appointment.date).toLocaleString('en-US', {
+                  year: 'numeric',
+                  month: 'numeric',
+                  day: 'numeric',
+                  hour: 'numeric',
+                  minute: 'numeric',
+                  hour12: true,
+                })} - ${appointment.status}`}
               </Typography>
             ))}
           </Stack>
