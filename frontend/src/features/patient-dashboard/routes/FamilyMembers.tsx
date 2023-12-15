@@ -251,8 +251,10 @@ export function FamilyMembers() {
         Add Family Member
       </Button>
       <Divider sx={{ my: 2 }} />
+      <h2>Family Members</h2>
       <DataGrid rows={query.data || []} columns={columns} autoHeight />
       <Divider sx={{ my: 2 }} />
+      <h2>Linked Family Members</h2>
       <LinkedFamilyMembers />
       <Divider sx={{ my: 2 }} />
       <DataGrid
