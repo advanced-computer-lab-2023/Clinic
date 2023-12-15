@@ -25,6 +25,14 @@ export function NotificationsList() {
       }),
   })
 
+  useEffect(() => {
+    const refetchInterval = setInterval(() => {
+      query.refetch()
+    }, 5000)
+
+    return () => clearInterval(refetchInterval)
+  }, [])
+
   const removeMutation = useMutation({
     mutationFn: (notificationId: string) =>
       removeNotification({
