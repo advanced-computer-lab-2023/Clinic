@@ -45,6 +45,7 @@ appointmentsRouter.get(
     }
 
     const filterAppointments = await getfilteredAppointments(query)
+    console.log(filterAppointments)
     const appointmentResponses = await Promise.all(
       filterAppointments.map(async (appointment) => {
         const doctor = await getApprovedDoctorById(

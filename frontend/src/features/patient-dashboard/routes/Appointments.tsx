@@ -48,10 +48,10 @@ export function Appointments() {
   useEffect(() => {
     const fetchAppointmentsAndUpdateStatus = async () => {
       try {
-        const appointments = await getAppointments() // Replace with actual API call
+        const appointments = await getAppointments()
 
         const followUpChecks = appointments.map(async (appointment) => {
-          const followUpExists = await checkForFollowUp(appointment.id) // Replace with actual API call
+          const followUpExists = await checkForFollowUp(appointment.id)
 
           return { id: appointment.id, exists: followUpExists.exists }
         })
