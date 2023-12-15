@@ -151,7 +151,7 @@ function AddHealthRecord() {
           centered
         >
           <Tab label="All" />
-          <Tab label="Uploaded by me" />
+          <Tab label="Uploaded by a doctor" />
           <Tab label="Uploaded by patient " />
         </Tabs>
 
