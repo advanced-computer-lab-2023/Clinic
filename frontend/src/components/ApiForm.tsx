@@ -151,7 +151,9 @@ export function ApiForm<Request extends ObjectWithStringKeys>({
                           fieldState={fieldState}
                           fieldItem={fieldItem}
                           defaultValue={
-                            query.data && query.data[field.property]
+                            initialDataFetcher
+                              ? query.data && query.data[field.property]
+                              : null
                           }
                         />
                       ) : field.type === 'date' ? (
@@ -160,7 +162,9 @@ export function ApiForm<Request extends ObjectWithStringKeys>({
                           fieldState={fieldState}
                           fieldItem={fieldItem}
                           defaultValue={
-                            query.data && query.data[field.property]
+                            initialDataFetcher
+                              ? query.data && query.data[field.property]
+                              : null
                           }
                         />
                       ) : field.customComponent ? (
@@ -171,7 +175,9 @@ export function ApiForm<Request extends ObjectWithStringKeys>({
                           fieldState={fieldState}
                           fieldItem={fieldItem}
                           defaultValue={
-                            query.data && query.data[field.property]
+                            initialDataFetcher
+                              ? query.data && query.data[field.property]
+                              : null
                           }
                         />
                       ) : null}
