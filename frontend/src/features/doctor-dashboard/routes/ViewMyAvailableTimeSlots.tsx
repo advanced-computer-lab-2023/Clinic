@@ -45,7 +45,6 @@ export function ViewMyAvailableTimeSlots() {
 
     if (
       currentDate.getMonth() !== fromTime.getMonth() ||
-
       currentDate.getFullYear() !== fromTime.getFullYear()
     )
       toast.error('You should enter dates within this month and year')
@@ -66,17 +65,16 @@ export function ViewMyAvailableTimeSlots() {
         Math.floor((toTime.getTime() - fromTime.getTime()) / (1000 * 60 * 60));
         i++
       ) {
-        const startDateTime = new Date(
-          fromTime.getTime() + (i + 2) * 1000 * 60 * 60
-        )
+        const startDateTime = new Date(fromTime.getTime() + i * 1000 * 60 * 60)
         timeSlots.push(startDateTime)
       }
 
       timeSlots.forEach((time) => {
-        addAvailableTimeSlots({ time })
+        addAvailableTimeSlots({ time }).then(() => {
+          query.refetch()
+        })
       })
 
-      query.refetch()
       toast.success('Time slot(s) added successfully')
     }
   }
