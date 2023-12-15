@@ -66,10 +66,7 @@ export function EmploymentContract() {
   return (
     <>
       <ToastContainer />
-      <Card
-        variant="outlined"
-        sx={{ boxShadow: 2, borderRadius: 2, backgroundColor: '#f5f5f5' }}
-      >
+      <Card variant="outlined" sx={{ boxShadow: 2, borderRadius: 2 }}>
         <CardContent>
           <Typography variant="h4" align="center" color="primary" gutterBottom>
             <strong>Employment Contract</strong>
