@@ -95,7 +95,7 @@ export function ViewMyAvailableTimeSlots() {
                 Your Available Time Slots in this month
               </Typography>
             </Stack>
-            <Stack spacing={-1}>
+            <Stack spacing={1}>
               {query.data?.availableTimes
                 .map((data) => new Date(data))
                 .filter((data) => data.getTime() > Date.now())
