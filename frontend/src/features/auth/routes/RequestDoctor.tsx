@@ -208,7 +208,7 @@ export const RequestDoctor = () => {
                 onChange={(e) => {
                   setHourlyRate(e.target.value)
                 }}
-                placeholder="Enter hourly rate in $"
+                placeholder="Enter hourly rate in EGP"
                 value={hourlyRate}
                 required
               />
