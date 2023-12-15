@@ -12,7 +12,7 @@ export async function getUserNotifications({
 
   if (!user) throw new NotFoundError()
 
-  return user.notifications
+  return user.notifications.reverse()
 }
 
 export async function addUserNotification({

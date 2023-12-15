@@ -4,7 +4,6 @@ import { Box, Container } from '@mui/material'
 
 import { AccountBalanceWallet } from '@mui/icons-material'
 import { Link } from 'react-router-dom'
-import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
 
 function preventDefault(event: React.MouseEvent) {
   event.preventDefault()
@@ -50,8 +49,8 @@ export default function Deposits({ wallet }: { wallet?: number }) {
         >
           <AccountBalanceWallet sx={{ color: 'black' }} />
         </Container>
-        <Typography color="lightgray" sx={{ flex: 1, paddingTop: 2 }}>
-          on 15 March, 2019
+        <Typography color="lightgray" sx={{ flex: 1, paddingTop: 0 }}>
+          EGP
         </Typography>
         <Link
           style={{
@@ -65,10 +64,8 @@ export default function Deposits({ wallet }: { wallet?: number }) {
           to="#"
         >
           <Typography variant="body1" component="span">
-            View Your Balance
+            Your Balance
           </Typography>
-          <ArrowForwardIcon fontSize="small" sx={{ ml: 1 }} />{' '}
-          {/* Adjust icon size */}
         </Link>
       </Box>
     </React.Fragment>
