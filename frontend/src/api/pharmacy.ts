@@ -15,3 +15,16 @@ export async function addPrescriptionTocart(id: any, token: any) {
     }
   )
 }
+
+export async function getMedicineByName(name: string, token: any) {
+  const res = await axios.get(
+    `http://localhost:4000/api/admin/getMedicineByName/${name}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  )
+
+  return res.data
+}

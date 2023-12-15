@@ -17,6 +17,7 @@ import jsPDF from 'jspdf'
 import { useEffect, useRef, useState } from 'react'
 import { addPrescriptionTocart } from '@/api/pharmacy'
 import { toast } from 'react-toastify'
+import { GridColDef, DataGrid } from '@mui/x-data-grid'
 
 export function PrescriptionView() {
   const { id } = useParams()
@@ -24,6 +25,7 @@ export function PrescriptionView() {
   const pdfRef = useRef(null)
   const [buttonVisible, setButtonVisible] = useState(true)
   const [filled, setfilled] = useState(false)
+
   const query = useQuery({
     queryKey: [`PrescriptionView/${id}`],
     queryFn: () => getSinglePrescription(id!),
@@ -110,21 +112,43 @@ export function PrescriptionView() {
     )
   }
 
+  const columns: GridColDef[] = [
+    {
+      field: 'name',
+      headerName: 'Medicine Name',
+      flex: 1,
+      editable: false,
+    },
+    {
+      field: 'dosage',
+      headerName: 'Dosage',
+      editable: false,
+      flex: 1,
+    },
+    {
+      field: 'quantity',
+      headerName: 'Quantity',
+      editable: false,
+      flex: 1,
+    },
+  ]
+
   return (
     <Card variant="outlined">
       <CardContent ref={pdfRef}>
         <Stack spacing={2}>
-          <Stack
-            direction="row"
-            spacing={1}
-            justifyContent="space-between"
-            alignItems="center"
-          >
-            <Typography variant="h6" color="text.secondary">
-              {prescription.medicine
-                .map((medicine) => medicine.name)
-                .join(', ')}
-            </Typography>
+          <Stack direction="row" justifyContent={'space-between'}>
+            <Stack spacing={-1}>
+              <Typography
+                variant="overline"
+                fontSize={18}
+                color="text.secondary"
+              >
+                Doctor Name
+              </Typography>
+
+              <Typography variant="body1">{prescription.doctor}</Typography>
+            </Stack>
             <Chip
               label={filled ? 'Filled' : 'Unfilled'}
               color={filled ? 'success' : 'warning'}
@@ -133,24 +157,40 @@ export function PrescriptionView() {
           </Stack>
 
           <Stack spacing={-1}>
-            <Typography variant="overline" color="text.secondary">
-              Doctor Name
-            </Typography>
-            <Typography variant="body1">{prescription.doctor}</Typography>
-          </Stack>
-          <Stack spacing={-1}>
-            <Typography variant="overline" color="text.secondary">
+            <Typography variant="overline" fontSize={15} color="text.secondary">
               Patient Name
             </Typography>
             <Typography variant="body1">{prescription.patient}</Typography>
           </Stack>
           <Stack spacing={-1}>
-            <Typography variant="overline" color="text.secondary">
+            <Typography variant="overline" fontSize={15} color="text.secondary">
               Date
             </Typography>
             <Typography variant="body1">
               {new Date(prescription.date).toLocaleString()}
             </Typography>
+          </Stack>
+          <Stack>
+            <Typography variant="overline" fontSize={15} color="text.secondary">
+              Medicines
+            </Typography>
+          </Stack>
+          <Stack direction="row" alignItems="center">
+            <DataGrid
+              autoHeight
+              rows={
+                prescription.medicine.map((medicine) => {
+                  return {
+                    id: medicine.name,
+                    name: medicine.name,
+                    dosage: medicine.dosage,
+                    quantity: medicine.quantity,
+                  }
+                }) || []
+              }
+              columns={columns}
+              style={{ display: 'flex', width: '100%' }}
+            />
           </Stack>
         </Stack>
       </CardContent>
