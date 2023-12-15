@@ -7,7 +7,6 @@ import {
   getPatientByID,
   getPatientByName,
   getMyPatients,
-  addNoteToPatient,
   getPatientByUsername,
   getPatientNotes,
   getMyMedicalHistory,
@@ -18,6 +17,7 @@ import {
   deleteMedicalHistory,
   deleteHealthRecord,
   getMedicalHistoryFiles,
+  calculateDateOfBirthFromAge,
 } from '../services/patient.service'
 import {
   GetAPatientResponse,
@@ -49,6 +49,7 @@ import AppError from '../utils/appError'
 import { sendOTP, updatePassword, verifyOTP } from '../services/forgotPassword'
 import { PrescriptionModel } from '../models/prescription.model'
 import { AppointmentModel } from '../models/appointment.model'
+import { FamilyMemberModel } from '../models/familyMember.model'
 
 export const requestOTP = asyncWrapper(async (req, res) => {
   const { email } = req.body
@@ -227,43 +228,60 @@ patientRouter.get(
   })
 )
 
-patientRouter.patch(
-  '/addNote/:id',
-  asyncWrapper(async (req, res) => {
-    const id = req.params.id
-    const newNote = req.body.newNote
-    const result = await addNoteToPatient(id, newNote)
-    res.send(result)
-  })
-)
-
 patientRouter.get(
-  '/myPatients', //  allowAuthenticated,
+  '/myPatients',
   asyncWrapper(async (req, res) => {
     const user: HydratedDocument<UserDocument> | null = await UserModel.findOne(
-      { username: req.username }
+      {
+        username: req.username,
+      }
     )
     if (user == null) throw new NotAuthenticatedError()
     const doctor = await DoctorModel.findOne({ user: user.id })
     if (doctor == null) throw new NotAuthenticatedError()
     const patients = await getMyPatients(doctor.id)
+    const patientArray = Array.from(patients.keys())
+
+    const patientResponses = await Promise.all(
+      patientArray.map(async (key) => {
+        const patient = patients.get(key)
+        const isFamilyMember = await FamilyMemberModel.findOne({
+          name: key,
+        })
+
+        return {
+          id:
+            key === patient?.name
+              ? patient?.id ?? ''
+              : isFamilyMember
+              ? isFamilyMember.id ?? ''
+              : '',
+          name: key,
+          username: patient?.user.username ?? '',
+          email: patient?.email ?? '',
+          mobileNumber: patient?.mobileNumber ?? '',
+          dateOfBirth:
+            key === patient?.name
+              ? patient?.dateOfBirth.toDateString() ?? ''
+              : isFamilyMember
+              ? new Date(
+                  calculateDateOfBirthFromAge(isFamilyMember.age)
+                ).toDateString() ?? ''
+              : '',
+          gender: (patient?.gender as Gender) ?? '',
+          emergencyContact: {
+            name: patient?.emergencyContact?.fullName ?? '',
+            mobileNumber: patient?.emergencyContact?.mobileNumber ?? '',
+          },
+          familyMembers:
+            patient?.familyMembers?.map((familyMember) =>
+              familyMember.toString()
+            ) ?? [],
+        }
+      })
+    )
     res.send({
-      patients: patients.map((patient) => ({
-        id: patient.id,
-        name: patient.name,
-        username: patient.user.username,
-        email: patient.email,
-        mobileNumber: patient.mobileNumber,
-        dateOfBirth: patient.dateOfBirth.toDateString(),
-        gender: patient.gender as Gender,
-        emergencyContact: {
-          name: patient.emergencyContact?.fullName ?? '',
-          mobileNumber: patient.emergencyContact?.mobileNumber ?? '',
-        },
-        familyMembers: patient.familyMembers.map((familyMember) =>
-          familyMember.toString()
-        ),
-      })),
+      patients: patientResponses,
     } satisfies GetMyPatientsResponse)
   })
 )

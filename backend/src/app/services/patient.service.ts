@@ -22,6 +22,7 @@ const storage = getStorage(FireBase)
 const storageRef = ref(storage, 'petients/medicalHistory')
 const storageRef2 = ref(storage, 'petients/HealthRecord')
 import { AppointmentStatus } from 'clinic-common/types/appointment.types'
+import dayjs from 'dayjs'
 
 export async function getPatientByName(
   name: string
@@ -170,11 +171,11 @@ export async function filterPatientByAppointment(
 // Define the function to get all patients of a doctor
 export async function getMyPatients(
   doctorId: ObjectId
-): Promise<Array<WithUser<PatientDocument>>> {
+): Promise<Map<string, WithUser<PatientDocument>>> {
   // Find all appointments with the given doctorId
   const appointments = await AppointmentModel.find({ doctorID: doctorId })
   // Create a map of unique patient IDs to their corresponding patient documents
-  const patientMap = new Map<string, PatientDocument>()
+  const patientMap = new Map<string, WithUser<PatientDocument>>()
 
   for (const appointment of appointments) {
     const patientId = appointment.patientID.toString()
@@ -184,26 +185,41 @@ export async function getMyPatients(
         await PatientModel.findById(patientId)
 
       if (patient != null) {
-        patientMap.set(patientId, patient)
+        patientMap.set(
+          appointment.reservedFor,
+          await patient.populate<{
+            user: HydratedDocument<UserDocument>
+          }>('user')
+        )
       }
     }
   }
 
-  // Return the list of unique patients
-  const uniquePatients = Array.from(patientMap.values())
-  // Filter out null values
-  const filteredPatients = uniquePatients.filter(
-    (patient) => patient !== null
-  ) as Array<HydratedDocument<PatientDocument>>
+  return patientMap
 
-  // Return the list of patients
-  return Promise.all(
-    filteredPatients.map((p) =>
-      p.populate<{
-        user: HydratedDocument<UserDocument>
-      }>('user')
-    )
-  )
+  // // Return the list of unique patients
+  // const uniquePatients = Array.from(patientMap.values())
+  // // Filter out null values
+  // const filteredPatients = uniquePatients.filter(
+  //   (patient) => patient !== null
+  // ) as Array<HydratedDocument<PatientDocument>>
+
+  // // Return the list of patients
+  // return Promise.all(
+  //   filteredPatients.map((p) =>
+  //     p.populate<{
+  //       user: HydratedDocument<UserDocument>
+  //     }>('user')
+  //   )
+  // )
+}
+
+export function calculateDateOfBirthFromAge(age: number): Date {
+  const currentYear = dayjs().year()
+  const estimatedYearOfBirth = currentYear - age
+  // Assuming a specific date, like January 1st, for simplicity
+
+  return dayjs(`${estimatedYearOfBirth}-01-01`).toDate()
 }
 
 export async function addNoteToPatient(
