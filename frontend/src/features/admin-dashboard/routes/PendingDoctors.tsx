@@ -9,7 +9,7 @@ import { useQuery } from '@tanstack/react-query'
 import { GridColDef, DataGrid } from '@mui/x-data-grid'
 import { GetPendingDoctorsResponse } from 'clinic-common/types/doctor.types'
 import { useNavigate } from 'react-router-dom'
-import { toast, ToastContainer } from 'react-toastify'
+import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 
 export function PendingDoctors() {
@@ -131,7 +131,6 @@ export function PendingDoctors() {
 
   return (
     <Paper sx={{ height: 400, width: '100%' }}>
-      <ToastContainer />
       <DataGrid rows={query.data?.doctors || []} columns={columns} autoHeight />
     </Paper>
   )
