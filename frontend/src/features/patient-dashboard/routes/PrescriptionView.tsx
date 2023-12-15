@@ -53,6 +53,7 @@ export function PrescriptionView() {
 
   const downloadPDF = () => {
     const input = pdfRef.current
+    console.log(input)
     html2canvas(input! as HTMLElement).then((canvas) => {
       const imgData = canvas.toDataURL('image/png')
       const pdf = new jsPDF('p', 'mm', 'a4', true)
