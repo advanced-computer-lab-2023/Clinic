@@ -45,7 +45,6 @@ export function ViewMyAvailableTimeSlots() {
 
     if (
       currentDate.getMonth() !== fromTime.getMonth() ||
-
       currentDate.getFullYear() !== fromTime.getFullYear()
     )
       toast.error('You should enter dates within this month and year')
@@ -66,17 +65,16 @@ export function ViewMyAvailableTimeSlots() {
         Math.floor((toTime.getTime() - fromTime.getTime()) / (1000 * 60 * 60));
         i++
       ) {
-        const startDateTime = new Date(
-          fromTime.getTime() + (i + 2) * 1000 * 60 * 60
-        )
+        const startDateTime = new Date(fromTime.getTime() + i * 1000 * 60 * 60)
         timeSlots.push(startDateTime)
       }
 
       timeSlots.forEach((time) => {
-        addAvailableTimeSlots({ time })
+        addAvailableTimeSlots({ time }).then(() => {
+          query.refetch()
+        })
       })
 
-      query.refetch()
       toast.success('Time slot(s) added successfully')
     }
   }
@@ -97,14 +95,21 @@ export function ViewMyAvailableTimeSlots() {
                 Your Available Time Slots in this month
               </Typography>
             </Stack>
-            <Stack spacing={-1}>
+            <Stack spacing={1}>
               {query.data?.availableTimes
                 .map((data) => new Date(data))
                 .filter((data) => data.getTime() > Date.now())
                 .sort((a, b) => a.getTime() - b.getTime())
                 .map((data, i) => (
                   <Typography variant="body1" key={i}>
-                    {new Date(data).toLocaleString()}
+                    {new Date(data).toLocaleString('en-US', {
+                      year: 'numeric',
+                      month: 'numeric',
+                      day: 'numeric',
+                      hour: 'numeric',
+                      minute: 'numeric',
+                      hour12: true,
+                    })}
                   </Typography>
                 ))}
             </Stack>
