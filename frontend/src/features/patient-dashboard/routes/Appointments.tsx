@@ -42,7 +42,9 @@ export function Appointments() {
   const [followUpDate, setFollowUpDate] = useState('')
   const [followUpDateError, setFollowUpDateError] = useState(false)
   const { user } = useAuth()
-  const [rescheduleDate, setRescheduleDate] = useState('')
+  const [rescheduleDates, setRescheduleDates] = useState<{
+    [key: string]: string
+  }>({})
   const [rescheduleDateError, setRescheduleDateError] = useState(false)
 
   interface FollowUpStatusMap {
@@ -113,12 +115,14 @@ export function Appointments() {
   }
 
   async function handleRescheduleButton(appointment: AppointmentResponseBase) {
-    if (rescheduleDate === '') {
+    const appointmentID = appointment.id
+
+    if (rescheduleDates[appointmentID] === '') {
       setRescheduleDateError(true)
       toast.error('Please select a date')
     } else {
       setRescheduleDateError(false)
-      await reschedule(appointment, rescheduleDate)
+      await reschedule(appointment, rescheduleDates[appointmentID])
         .then(() => {
           toast.success('Appointment rescheduled successfully')
           queryClient.refetchQueries(['appointments'])
@@ -128,7 +132,10 @@ export function Appointments() {
           console.log(err)
         })
 
-      setRescheduleDate('')
+      setRescheduleDates((prevDates) => ({
+        ...prevDates,
+        [appointmentID]: '',
+      }))
     }
   }
 
@@ -307,8 +314,13 @@ export function Appointments() {
                       <Stack spacing={2}>
                         {/* Dropdown for selecting available timings */}
                         <Select
-                          value={rescheduleDate}
-                          onChange={(e) => setRescheduleDate(e.target.value)}
+                          value={rescheduleDates[appointment.id] || ''}
+                          onChange={(e) =>
+                            setRescheduleDates((prevDates) => ({
+                              ...prevDates,
+                              [appointment.id]: e.target.value,
+                            }))
+                          }
                           displayEmpty
                           error={rescheduleDateError}
                         >
@@ -321,6 +333,7 @@ export function Appointments() {
                             </MenuItem>
                           ))}
                         </Select>
+
                         <Button
                           variant="contained"
                           size="small"
@@ -335,7 +348,12 @@ export function Appointments() {
                       <Stack spacing={2}>
                         <TextField
                           type="datetime-local"
-                          onChange={(e) => setRescheduleDate(e.target.value)}
+                          onChange={(e) =>
+                            setRescheduleDates((prevDates) => ({
+                              ...prevDates,
+                              [appointment.id]: e.target.value,
+                            }))
+                          }
                           inputProps={{ min: currentDate }}
                           error={rescheduleDateError}
                         />
