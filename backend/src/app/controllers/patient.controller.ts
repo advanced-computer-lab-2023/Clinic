@@ -50,6 +50,7 @@ import { sendOTP, updatePassword, verifyOTP } from '../services/forgotPassword'
 import { PrescriptionModel } from '../models/prescription.model'
 import { AppointmentModel } from '../models/appointment.model'
 import { FamilyMemberModel } from '../models/familyMember.model'
+import { userExists } from '../services/auth.service'
 
 export const requestOTP = asyncWrapper(async (req, res) => {
   const { email } = req.body
@@ -405,33 +406,41 @@ patientRouter.get(
 
     const appointments = await AppointmentModel.find({ patientID: patient.id })
 
-    const appointmentResponse = await Promise.all(
-      appointments.map(async (appointment) => {
-        const doctor = await getApprovedDoctorById(
-          appointment.doctorID.toString()
-        )
+    const appointmentResponse = (
+      await Promise.all(
+        appointments.map(async (appointment) => {
+          if (!(await userExists(appointment.doctorID.toString()))) {
+            return null
+          }
 
-        return {
-          id: appointment.id,
-          patientID: appointment.patientID.toString(),
-          doctorID: appointment.doctorID.toString(),
-          doctorName: doctor.name,
-          doctorTimes: doctor.availableTimes.map((date) => date.toISOString()),
-          date: appointment.date,
-          familyID: appointment.familyID || '',
-          reservedFor: appointment.reservedFor || 'Me',
-          status:
-            appointment.status == AppointmentStatus.Cancelled
-              ? AppointmentStatus.Cancelled
-              : new Date(appointment.date) > new Date()
-              ? AppointmentStatus.Upcoming
-              : AppointmentStatus.Completed,
-        }
-      })
-    )
+          const doctor = await getApprovedDoctorById(
+            appointment.doctorID.toString()
+          )
+
+          return {
+            id: appointment.id,
+            patientID: appointment.patientID.toString(),
+            doctorID: appointment.doctorID.toString(),
+            doctorName: doctor.name,
+            doctorTimes: doctor.availableTimes.map((date) =>
+              date.toISOString()
+            ),
+            date: appointment.date,
+            familyID: appointment.familyID || '',
+            reservedFor: appointment.reservedFor || 'Me',
+            status:
+              appointment.status == AppointmentStatus.Cancelled
+                ? AppointmentStatus.Cancelled
+                : new Date(appointment.date) > new Date()
+                ? AppointmentStatus.Upcoming
+                : AppointmentStatus.Completed,
+          }
+        })
+      )
+    ).filter((appointment) => appointment !== null)
 
     const appointmentsRefactored = new GetFilteredAppointmentsResponse(
-      appointmentResponse
+      appointmentResponse as any
     )
 
     res.send(

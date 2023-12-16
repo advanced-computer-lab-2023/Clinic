@@ -6,6 +6,7 @@ import pp1 from '../../../../public/doctors/pp1.jpg'
 import pp2 from '../../../../public/doctors/pp2.jpg'
 import pp3 from '../../../../public/doctors/pp3.jpg'
 import Link from '@mui/material/Link'
+import { ProgressCircle } from '@/components/ProgressCircle'
 
 export function TopDoctors() {
   const { user } = useAuth()
@@ -18,6 +19,10 @@ export function TopDoctors() {
       }),
   })
   const doctorImages = [pp1, pp2, pp3]
+
+  if (doctorsQuery.isLoading) {
+    return <ProgressCircle />
+  }
 
   return (
     <>
