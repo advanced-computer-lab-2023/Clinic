@@ -12,4 +12,4 @@ jobs:
         run: npm install
 
       - name: Run tests
-        run: cd server; npm test
+        run: cd backend; npm test
