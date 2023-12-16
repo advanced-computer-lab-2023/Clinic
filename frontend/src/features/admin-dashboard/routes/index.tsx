@@ -10,6 +10,15 @@ import { Users } from './Users'
 import { PendingDoctorDetails } from './PendingDoctorDetails'
 import ChangePassword from '@/features/auth/routes/ChangePassword'
 
+// eslint-disable-next-line react-refresh/only-export-components
+const RedirectToPharmacy = () => {
+  const token = localStorage.getItem('token')
+
+  window.location.href = `http://localhost:5174/admin-dashboard?token=${token}`
+
+  return null // This component doesn't render anything, it just redirects
+}
+
 export const adminDashboardRoutes: RouteObject[] = [
   {
     element: <AdminDashboardLayout />,
@@ -54,6 +63,10 @@ export const adminDashboardRoutes: RouteObject[] = [
       {
         path: 'users',
         element: <Users />,
+      },
+      {
+        path: 'pharmacy',
+        element: <RedirectToPharmacy />,
       },
     ],
   },

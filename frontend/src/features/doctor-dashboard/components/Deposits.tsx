@@ -13,7 +13,7 @@ export default function Deposits({ wallet }: { wallet?: number }) {
     <React.Fragment>
       <Title>Balance</Title>
       <Typography component="p" variant="h4">
-        {wallet != null ? `${wallet.toFixed(2)}` : 'N/A'}
+        {wallet != null ? `${wallet.toFixed(2)}` : 0}
       </Typography>
       <Typography color="text.secondary" sx={{ flex: 1 }}>
         EGP

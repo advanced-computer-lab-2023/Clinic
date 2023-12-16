@@ -31,7 +31,7 @@ export default function Deposits({ wallet }: { wallet?: number }) {
           marginX={'auto'}
           fontWeight={'bold'}
         >
-          {wallet ? `${wallet.toFixed(2)} ` : 'N/A'}
+          {wallet ? `${wallet.toFixed(2)} ` : 0}
         </Typography>
         <Container
           style={{

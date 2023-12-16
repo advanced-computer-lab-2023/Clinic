@@ -6,6 +6,8 @@ import { Container } from '@mui/material'
 import { useEffect } from 'react'
 import { Outlet } from 'react-router-dom'
 import PersonIcon from '@mui/icons-material/Person'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faCapsules } from '@fortawesome/free-solid-svg-icons'
 
 export function AdminDashboardLayout() {
   const { setSidebarLinks } = useSidebar()
@@ -31,6 +33,13 @@ export function AdminDashboardLayout() {
         to: '/admin-dashboard/users',
         text: 'Users',
         icon: <PersonIcon />,
+      },
+      {
+        to: '/admin-dashboard/pharmacy',
+        text: 'Your Pharmacy',
+        icon:   <FontAwesomeIcon
+        icon={faCapsules}
+      />,
       },
     ])
   }, [setSidebarLinks])
