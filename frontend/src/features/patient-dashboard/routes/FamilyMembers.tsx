@@ -23,7 +23,7 @@ import {
 } from '@/api/familyMembers'
 import { useState } from 'react'
 import { AddFamilyMember } from './AddFamilyMember'
-import { useNavigate } from 'react-router-dom'
+//import { useNavigate } from 'react-router-dom'
 import { SubscribeToHealthPackages } from './SubscribeToHealthPackages'
 
 function ManageHealthPackagesButton({
@@ -138,7 +138,7 @@ function LinkedFamilyMembers() {
 }
 
 export function FamilyMembers() {
-  const navigate = useNavigate()
+  //const navigate = useNavigate()
   const [addFamilyMemberModalOpen, setAddFamilyMemberModalOpen] =
     useState(false)
 
@@ -197,7 +197,7 @@ export function FamilyMembers() {
       width: 300,
       renderCell: (column) => (
         <Stack direction="row" spacing={1}>
-          <Button
+          {/* <Button
             variant="contained"
             size="small"
             color="primary"
@@ -206,7 +206,7 @@ export function FamilyMembers() {
             }}
           >
             View
-          </Button>
+          </Button> */}
           <ManageHealthPackagesButton
             patientId={column.row.id}
             isFamilyMember={true}
@@ -251,8 +251,10 @@ export function FamilyMembers() {
         Add Family Member
       </Button>
       <Divider sx={{ my: 2 }} />
+      <h2>Family Members</h2>
       <DataGrid rows={query.data || []} columns={columns} autoHeight />
       <Divider sx={{ my: 2 }} />
+      <h2>Patients Linked as Family Members</h2>
       <LinkedFamilyMembers />
       <Divider sx={{ my: 2 }} />
       <DataGrid

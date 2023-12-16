@@ -28,7 +28,7 @@ import {
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useMemo, useState } from 'react'
 import { LoadingButton } from '@mui/lab'
-import { AddModerator } from '@mui/icons-material'
+import { AddModerator, Cancel } from '@mui/icons-material'
 import { useAlerts } from '@/hooks/alerts'
 import Checkout from '@/components/StripeCheckout'
 import { useAuth } from '@/hooks/auth'
@@ -67,6 +67,9 @@ export function SubscribeToHealthPackages({
   >()
   const [creditMethodIdPackage, setCreditMethodIdPackage] = useState<
     null | string
+  >()
+  const [unsubscribeToPackageId, setUnsubscribeToPackageId] = useState<
+    string | null
   >()
 
   const alerts = useAlerts()
@@ -116,7 +119,10 @@ export function SubscribeToHealthPackages({
 
   const cancelMutation = useMutation({
     mutationFn: unsubscribeToHealthPackage,
-    onSuccess: onSuccess('Unsubscribed from health package successfully.'),
+    onSuccess: () => {
+      onSuccess('Unsubscribed from health package successfully.')()
+      setUnsubscribeToPackageId(null)
+    },
   })
 
   const subscribeWalletMutation = useMutation({
@@ -167,7 +173,7 @@ export function SubscribeToHealthPackages({
     <>
       <Grid container spacing={1}>
         {!isSubscribed && (
-          <Grid item xl={12}>
+          <Grid item xs={12}>
             <Alert severity="info">
               You are not subscribed to any health package. Please subscribe to
               a health package to get discounts on your appointments and
@@ -281,18 +287,11 @@ export function SubscribeToHealthPackages({
                 {subscribedPackage?.id == healthPackage.id &&
                 new Date(subscribedPackage?.renewalDate) > new Date() ? (
                   <LoadingButton
-                    loading={cancelMutation.isLoading}
                     variant="contained"
                     fullWidth
-                    color="secondary"
-                    startIcon={<AddModerator />} // Replace with cancel icon
-                    onClick={() =>
-                      cancelMutation.mutateAsync({
-                        subscriberId: id,
-                        payerUsername,
-                        isFamilyMember,
-                      })
-                    }
+                    color="error"
+                    startIcon={<Cancel />}
+                    onClick={() => setUnsubscribeToPackageId(healthPackage.id)}
                   >
                     Unsubscribe
                   </LoadingButton>
@@ -504,6 +503,42 @@ export function SubscribeToHealthPackages({
           <Button autoFocus onClick={() => setCreditMethodIdPackage(null)}>
             Cancel
           </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog
+        open={!!unsubscribeToPackageId}
+        onClose={() => setUnsubscribeToPackageId(null)}
+      >
+        <DialogTitle>Are you sure?</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            <Alert severity="error">
+              Are you sure you want to cancel your current health package?{' '}
+              <u>
+                The remaining {subscribedPackage?.remainingMonths} months will
+                not be refunded.
+              </u>
+            </Alert>
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button autoFocus onClick={() => setSelectedHealthPackageId(null)}>
+            Cancel
+          </Button>
+          <LoadingButton
+            loading={cancelMutation.isLoading}
+            variant="contained"
+            color="error"
+            onClick={() =>
+              cancelMutation.mutateAsync({
+                subscriberId: id,
+                payerUsername,
+                isFamilyMember,
+              })
+            }
+          >
+            Unsubscribe
+          </LoadingButton>
         </DialogActions>
       </Dialog>
     </>

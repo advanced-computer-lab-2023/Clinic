@@ -11,12 +11,14 @@ export function DiscountedPrice({
     <Typography variant="body1">
       {discountedPrice != originalPrice ? (
         <Stack direction="row" spacing={1}>
-          <Typography variant="body1">{discountedPrice.toFixed(2)}$</Typography>
+          <Typography variant="body1">
+            {discountedPrice.toFixed(2)} EGP
+          </Typography>
           <Typography
             variant="body1"
             sx={{ textDecoration: 'line-through', color: 'text.disabled' }}
           >
-            {originalPrice.toFixed(2)}$
+            {originalPrice.toFixed(2)}EGP
           </Typography>
         </Stack>
       ) : (

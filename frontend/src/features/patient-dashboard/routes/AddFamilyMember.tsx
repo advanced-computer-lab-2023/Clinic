@@ -75,11 +75,7 @@ export function AddFamilyMember({ onSuccess }: { onSuccess: () => void }) {
         </Stack>
       )}
 
-      {isLinkingExistingAccount && (
-        <LinkFamilyMember
-          onSuccess={() => alert('Family member linked successfully')}
-        />
-      )}
+      {isLinkingExistingAccount && <LinkFamilyMember onSuccess={onSuccess} />}
     </>
   )
 }

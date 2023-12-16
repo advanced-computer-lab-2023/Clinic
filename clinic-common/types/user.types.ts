@@ -2,6 +2,7 @@ export enum UserType {
   Doctor = 'Doctor',
   Patient = 'Patient',
   Admin = 'Admin',
+  Pharmacist = 'Pharmacist',
 }
 
 export interface GetUserResponse {

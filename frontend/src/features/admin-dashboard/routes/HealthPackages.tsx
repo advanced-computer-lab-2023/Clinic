@@ -1,4 +1,9 @@
-import { deleteHealthPackage, getAllHealthPackages } from '@/api/healthPackages'
+import {
+  addHealthPackage,
+  deleteHealthPackage,
+  getAllHealthPackages,
+  updateHealthPackage,
+} from '@/api/healthPackages'
 import { CardPlaceholder } from '@/components/CardPlaceholder'
 import {
   Button,
@@ -7,6 +12,7 @@ import {
   CardContent,
   Grid,
   Stack,
+  TextField,
   Typography,
 } from '@mui/material'
 import Dialog from '@mui/material/Dialog'
@@ -19,7 +25,7 @@ import UpgradeIcon from '@mui/icons-material/Upgrade'
 import DeleteIcon from '@mui/icons-material/Delete'
 import AddIcon from '@mui/icons-material/Add'
 import { useQuery } from '@tanstack/react-query'
-import { useNavigate } from 'react-router-dom'
+
 // import { useAlerts } from '@/hooks/alerts'
 // import { Alert } from '@/providers/AlertsProvider'
 import {
@@ -29,17 +35,60 @@ import {
 import { LoadingButton } from '@mui/lab'
 import { ToastContainer, toast } from 'react-toastify'
 
+import { createHealthPackageRequest } from 'clinic-common/types/healthPackage.types'
+
 export function HealthPackages() {
-  const navigate = useNavigate()
   const query = useQuery({
     queryKey: ['health-packages'],
     queryFn: () => getAllHealthPackages(),
   })
-  // const { addAlert } = useAlerts()
-  // const alertScope = useMemo(() => uuidv4(), [])
+
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const [packageId, setPackageId] = useState('')
+
+  const [addDialogOpen, setAddDialogOpen] = useState(false)
+  const [EditDialogOpen, setEditDialogOpen] = useState(false)
+  const [healthPackage, setHealthPackage] =
+    useState<createHealthPackageRequest>({
+      name: '',
+      pricePerYear: 0,
+      sessionDiscount: 0,
+      medicineDiscount: 0,
+      familyMemberSubscribtionDiscount: 0,
+    })
+
+  const handleEditHealthPackage = () => {
+    updateHealthPackage(packageId, healthPackage)
+      .then(() => {
+        toast.success('Health Package updated successfully')
+        query.refetch()
+        closeEditDialog()
+        setHealthPackage({
+          name: '',
+          pricePerYear: 0,
+          sessionDiscount: 0,
+          medicineDiscount: 0,
+          familyMemberSubscribtionDiscount: 0,
+        })
+        setPackageId('')
+      })
+      .catch((err) => {
+        toast.error(err.message)
+      })
+  }
+
+  const handleAddHealthPackage = () => {
+    addHealthPackage(healthPackage)
+      .then(() => {
+        toast.success('Health Package added successfully')
+        query.refetch()
+        closeAddDialog()
+      })
+      .catch((err) => {
+        toast.error(err.message)
+      })
+  }
 
   if (query.isLoading) {
     return <CardPlaceholder />
@@ -49,8 +98,35 @@ export function HealthPackages() {
     return <h1>error</h1>
   }
 
-  function handleUpdate(id: string) {
-    navigate(`/admin-dashboard/update-health-package/${id}`)
+  const openAddDialog = () => {
+    setAddDialogOpen(true)
+  }
+
+  const closeAddDialog = () => {
+    setAddDialogOpen(false)
+    setHealthPackage({
+      name: '',
+      pricePerYear: 0,
+      sessionDiscount: 0,
+      medicineDiscount: 0,
+      familyMemberSubscribtionDiscount: 0,
+    })
+  }
+
+  const openEditDialog = () => {
+    setEditDialogOpen(true)
+  }
+
+  const closeEditDialog = () => {
+    setEditDialogOpen(false)
+    setHealthPackage({
+      name: '',
+      pricePerYear: 0,
+      sessionDiscount: 0,
+      medicineDiscount: 0,
+      familyMemberSubscribtionDiscount: 0,
+    })
+    setPackageId('')
   }
 
   const handleClickOpen = () => {
@@ -63,21 +139,17 @@ export function HealthPackages() {
   }
 
   function handleDelelte() {
-    // addAlert(new Alert("successMessage", 'success',alertScope))
     setLoading(true)
-    const q = deleteHealthPackage(packageId)
-    console.log(q)
-    q.then((message) => {
-      handleClose()
-
-      if (
-        message == "Can't Delete!there are patients subscribed to this package"
-      ) {
-        toast.error(message)
-      }
-
-      query.refetch()
-    })
+    deleteHealthPackage(packageId)
+      .then(() => {
+        handleClose()
+        query.refetch()
+        toast.success('Package deleted successfully')
+      })
+      .catch((err) => {
+        handleClose()
+        toast.error(err.message)
+      })
   }
 
   return (
@@ -90,7 +162,7 @@ export function HealthPackages() {
         <DialogTitle id="responsive-dialog-title">{'Alert'}</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Are you sure,you want to delete this package?
+            Are you sure, you want to delete this package?
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -107,13 +179,178 @@ export function HealthPackages() {
           </LoadingButton>
         </DialogActions>
       </Dialog>
-      <Grid container spacing={1}>
-        <Grid item xl={12}>
+
+      <Dialog open={addDialogOpen} onClose={closeAddDialog}>
+        <DialogTitle>Add Health Package</DialogTitle>
+        <DialogContent>
+          <TextField
+            label="Name"
+            variant="outlined"
+            value={healthPackage.name}
+            onChange={(e) => {
+              setHealthPackage({
+                ...healthPackage,
+                name: e.target.value,
+              })
+            }}
+            fullWidth
+            margin="normal"
+          />
+          <TextField
+            label="Price Per Year"
+            variant="outlined"
+            value={healthPackage.pricePerYear}
+            onChange={(e) => {
+              setHealthPackage({
+                ...healthPackage,
+                pricePerYear: Number(e.target.value),
+              })
+            }}
+            fullWidth
+            margin="normal"
+          />
+          <TextField
+            label="Session Discount Percentage"
+            variant="outlined"
+            value={healthPackage.sessionDiscount}
+            onChange={(e) => {
+              setHealthPackage({
+                ...healthPackage,
+                sessionDiscount: Number(e.target.value),
+              })
+            }}
+            fullWidth
+            margin="normal"
+          />
+          <TextField
+            label="Medicine Discount Percentage"
+            variant="outlined"
+            value={healthPackage.medicineDiscount}
+            onChange={(e) => {
+              setHealthPackage({
+                ...healthPackage,
+                medicineDiscount: Number(e.target.value),
+              })
+            }}
+            fullWidth
+            margin="normal"
+          />
+          <TextField
+            label="Family Member Subscribtion Discount Percentage"
+            variant="outlined"
+            value={healthPackage.familyMemberSubscribtionDiscount}
+            onChange={(e) => {
+              setHealthPackage({
+                ...healthPackage,
+                familyMemberSubscribtionDiscount: Number(e.target.value),
+              })
+            }}
+            fullWidth
+            margin="normal"
+          />
+        </DialogContent>
+        <DialogActions>
+          <LoadingButton onClick={closeAddDialog}>Cancel</LoadingButton>
+          <LoadingButton
+            variant="contained"
+            color="primary"
+            onClick={handleAddHealthPackage}
+            loading={loading}
+          >
+            Add
+          </LoadingButton>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog open={EditDialogOpen} onClose={closeEditDialog}>
+        <DialogTitle>Edit Health Package</DialogTitle>
+        <DialogContent>
+          <TextField
+            label="Name"
+            variant="outlined"
+            value={healthPackage.name}
+            onChange={(e) => {
+              setHealthPackage({
+                ...healthPackage,
+                name: e.target.value,
+              })
+            }}
+            fullWidth
+            margin="normal"
+          />
+          <TextField
+            label="Price Per Year"
+            variant="outlined"
+            value={healthPackage.pricePerYear}
+            onChange={(e) => {
+              setHealthPackage({
+                ...healthPackage,
+                pricePerYear: Number(e.target.value),
+              })
+            }}
+            fullWidth
+            margin="normal"
+          />
+          <TextField
+            label="Session Discount Percentage"
+            variant="outlined"
+            value={healthPackage.sessionDiscount}
+            onChange={(e) => {
+              setHealthPackage({
+                ...healthPackage,
+                sessionDiscount: Number(e.target.value),
+              })
+            }}
+            fullWidth
+            margin="normal"
+          />
+          <TextField
+            label="Medicine Discount Percentage"
+            variant="outlined"
+            value={healthPackage.medicineDiscount}
+            onChange={(e) => {
+              setHealthPackage({
+                ...healthPackage,
+                medicineDiscount: Number(e.target.value),
+              })
+            }}
+            fullWidth
+            margin="normal"
+          />
+          <TextField
+            label="Family Member Subscribtion Discount Percentage"
+            variant="outlined"
+            value={healthPackage.familyMemberSubscribtionDiscount}
+            onChange={(e) => {
+              setHealthPackage({
+                ...healthPackage,
+                familyMemberSubscribtionDiscount: Number(e.target.value),
+              })
+            }}
+            fullWidth
+            margin="normal"
+          />
+        </DialogContent>
+        <DialogActions>
+          <LoadingButton onClick={closeEditDialog}>Cancel</LoadingButton>
+          <LoadingButton
+            variant="contained"
+            color="primary"
+            onClick={handleEditHealthPackage}
+            loading={loading}
+          >
+            Edit
+          </LoadingButton>
+        </DialogActions>
+      </Dialog>
+
+      <Grid container spacing={4}>
+        <Grid item xs={16}>
           <Button
-            size="small"
+            size="large"
             variant="contained"
             startIcon={<AddIcon />}
-            href="/admin-dashboard/add-health-Package"
+            onClick={openAddDialog}
           >
             Add Health Package
           </Button>
@@ -150,7 +387,7 @@ export function HealthPackages() {
                           Price per year
                         </Typography>
                         <Typography variant="body1">
-                          {healthPackage.pricePerYear}
+                          E£ {healthPackage.pricePerYear}
                         </Typography>
                       </Stack>
                       <Stack spacing={-1}>
@@ -158,7 +395,7 @@ export function HealthPackages() {
                           Session Discount
                         </Typography>
                         <Typography variant="body1">
-                          {healthPackage.sessionDiscount}
+                          {healthPackage.sessionDiscount}%
                         </Typography>
                       </Stack>
                       <Stack spacing={-1}>
@@ -166,7 +403,7 @@ export function HealthPackages() {
                           Medicine From Our Pharmacy Discount
                         </Typography>
                         <Typography variant="body1">
-                          {healthPackage.medicineDiscount}
+                          {healthPackage.medicineDiscount}%
                         </Typography>
                       </Stack>
                       <Stack spacing={-1}>
@@ -174,7 +411,7 @@ export function HealthPackages() {
                           Family Member Subscription Discount
                         </Typography>
                         <Typography variant="body1">
-                          {healthPackage.familyMemberSubscribtionDiscount}
+                          {healthPackage.familyMemberSubscribtionDiscount}%
                         </Typography>
                       </Stack>
                     </Stack>
@@ -184,7 +421,9 @@ export function HealthPackages() {
                       size="small"
                       startIcon={<UpgradeIcon />}
                       onClick={() => {
-                        handleUpdate(healthPackage.id)
+                        setHealthPackage(healthPackage)
+                        openEditDialog()
+                        setPackageId(healthPackage.id)
                       }}
                     >
                       Update

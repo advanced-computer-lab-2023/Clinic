@@ -1,5 +1,4 @@
 import * as React from 'react'
-import Link from '@mui/material/Link'
 import Typography from '@mui/material/Typography'
 import Title from './Title'
 
@@ -14,15 +13,15 @@ export default function Deposits({ wallet }: { wallet?: number }) {
     <React.Fragment>
       <Title>Balance</Title>
       <Typography component="p" variant="h4">
-        {wallet != null ? `E£ ${wallet.toFixed(2)}` : 'N/A'}
+        {wallet != null ? `${wallet.toFixed(2)}` : 'N/A'}
       </Typography>
       <Typography color="text.secondary" sx={{ flex: 1 }}>
-        on 15 March, 2019
+        EGP
       </Typography>
       <div>
-        <Link color="primary" href="#" onClick={preventDefault}>
-          View balance
-        </Link>
+        <Typography color="primary" onClick={preventDefault}>
+          Your balance
+        </Typography>
       </div>
     </React.Fragment>
   )

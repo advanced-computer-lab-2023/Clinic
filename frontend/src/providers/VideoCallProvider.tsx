@@ -4,6 +4,8 @@ import { message } from 'antd'
 import Ringing from '@/components/video-call/Ringing'
 import VideoCallScreen from '@/components/video-call/VideoCallScreen'
 import { socket } from '@/api/socket'
+import { toast } from 'react-toastify'
+
 interface VideoContextType {
   call: any
   callAccepted: boolean
@@ -69,8 +71,12 @@ const VideoCallProvider: React.FC<VideoCallProviderProps> = ({ children }) => {
   const screenTrackRef = useRef<any>()
 
   useEffect(() => {
-    if (!navigator.mediaDevices)
-      return alert('Your browser does not support media devices.')
+    if (!navigator.mediaDevices) {
+      toast.error('Your browser does not support media devices.')
+
+      return
+    }
+
     navigator.mediaDevices
       .getUserMedia({ video: true, audio: true })
       .then((currentStream) => {

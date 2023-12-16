@@ -90,6 +90,7 @@ export function ChatsProvider({ children }: { children: React.ReactNode }) {
 
   const onMessageReceived = useCallback(
     async (data: SocketMessage) => {
+      console.log(data)
       const chat = await loadChatMessages(data.chatId)
 
       setChats({

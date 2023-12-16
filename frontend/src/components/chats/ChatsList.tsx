@@ -8,12 +8,15 @@ import {
   ListItemButton,
   ListItemText,
   Popover,
+  Stack,
+  Typography,
 } from '@mui/material'
 import React, { useState } from 'react'
 import { useChats } from '@/hooks/chats'
 import { Message } from '@mui/icons-material'
 import { useAuth } from '@/hooks/auth'
 import { Chat } from './Chat'
+import { UserBadge } from '../UserBadge'
 
 export function ChatsList() {
   const [selectedChatId, setSelectedChatId] = useState<string | null>(null)
@@ -69,10 +72,19 @@ export function ChatsList() {
                 }}
               >
                 <ListItemText
-                  primary={chat?.users
-                    .filter((u) => u.username != user?.username)
-                    .map((u) => u.username)
-                    .join(', ')}
+                  primary={
+                    <Stack direction="row" spacing={1}>
+                      {chat?.users
+                        .filter((u) => u.username != user?.username)
+                        .map((u) => (
+                          <React.Fragment key={u.username}>
+                            <Typography>{u.name}</Typography>
+
+                            <UserBadge label={u.type} userType={u.type} />
+                          </React.Fragment>
+                        ))}
+                    </Stack>
+                  }
                   secondary={chat?.lastMessage}
                 />
               </ListItemButton>
@@ -97,3 +109,5 @@ export function ChatsList() {
     </>
   )
 }
+
+//astyup hdfy
