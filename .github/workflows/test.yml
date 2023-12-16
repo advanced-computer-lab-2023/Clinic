@@ -14,9 +14,7 @@ jobs:
           node-version: '14'
 
       - name: Install packages
-        run: |
-          cd backend
-          npm ci
+        run: cd backend && npm ci
 
       - name: Build TypeScript
         run: cd backend && npm run build

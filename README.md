@@ -27,7 +27,7 @@ Welcome to Copilot & Sons El7a2ny Clinic, a cutting-edge virtual clinic manageme
 
 ![example workflow](https://github.com/Advanced-Computer-Lab-2023/Copilot-and-Sons-Clinic/actions/workflows/compile.yml/badge.svg)
 ![example workflow](https://github.com/Advanced-Computer-Lab-2023/Copilot-and-Sons-Clinic/actions/workflows/lint.yml/badge.svg)
-![example workflow](https://github.com/Advanced-Computer-Lab-2023/Copilot-and-Sons-Clinic/.github/workflows/test.yml/badge.svg)
+![example workflow](https://github.com/Advanced-Computer-Lab-2023/Copilot-and-Sons-Clinic/actions/workflows/test.yml/badge.svg)
 
 - This project is under development and should not be used in a production settings
 - Check **Issues** for a list of all the reported issues
