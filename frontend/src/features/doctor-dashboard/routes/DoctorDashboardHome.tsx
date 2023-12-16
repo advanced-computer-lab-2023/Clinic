@@ -5,18 +5,38 @@ import { useQuery } from '@tanstack/react-query'
 import { ContractStatus } from 'clinic-common/types/doctor.types'
 
 import { Copyright } from '@mui/icons-material'
-import { Container, Grid, Paper } from '@mui/material'
+import {
+  Button,
+  Container,
+  Grid,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+} from '@mui/material'
 import Chart from '../components/Chart'
 
 import Deposits from '../components/Deposits'
 import { useEffect } from 'react'
-import { EmploymentContract } from './EmploymentContract'
+import EmploymentContract from './EmploymentContract'
+import { getAppointments } from '@/api/appointments'
+import { useNavigate } from 'react-router-dom'
+import Title from '../components/Title'
 
 export function DoctorDashboardHome() {
   const { user } = useAuth()
   const doctorQuery = useQuery({
     queryFn: () => getDoctor(user!.username),
   })
+
+  const appointmentsQuery = useQuery({
+    queryKey: ['get-appointments'],
+    queryFn: () => getAppointments(),
+  })
+
+  const navigate = useNavigate()
 
   const walletQuery = useQuery({
     queryKey: ['get-wallet-money'],
@@ -32,6 +52,17 @@ export function DoctorDashboardHome() {
   if (doctorQuery.isLoading) {
     return <CardPlaceholder />
   }
+
+  const filteredAppointments = appointmentsQuery.data?.filter((appointment) => {
+    const appointmentDate = new Date(appointment.date)
+    const currentDate = new Date()
+
+    return (
+      appointmentDate.getDate() === currentDate.getDate() &&
+      appointmentDate.getMonth() === currentDate.getMonth() &&
+      appointmentDate.getFullYear() === currentDate.getFullYear()
+    )
+  })
 
   return (
     <>
@@ -87,7 +118,50 @@ export function DoctorDashboardHome() {
               </Grid>
               {/* Recent Orders */}
               <Grid item xs={12}>
-                <EmploymentContract />
+                <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
+                  <Title>Today's Appointments</Title>
+                  <Table>
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>
+                          <strong>Patient Name</strong>
+                        </TableCell>
+                        <TableCell>
+                          <strong>Appointment Time</strong>
+                        </TableCell>
+                        <TableCell> </TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {filteredAppointments?.map((appointment) => (
+                        <TableRow key={appointment.id}>
+                          <TableCell>{appointment.reservedFor}</TableCell>
+                          <TableCell>
+                            {new Date(appointment.date).toLocaleTimeString([], {
+                              hour: '2-digit',
+                              minute: '2-digit',
+                            })}
+                          </TableCell>
+                          <TableCell>
+                            {' '}
+                            <Button
+                              variant="contained"
+                              color="primary"
+                              size="small"
+                              onClick={() => {
+                                navigate(
+                                  `/doctor-dashboard/patient/${appointment.patientID}`
+                                )
+                              }}
+                            >
+                              View Patient
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </Paper>
               </Grid>
             </Grid>
             <Copyright sx={{ pt: 4 }} />
