@@ -30,7 +30,6 @@ const router = createBrowserRouter(routes)
 const currentUrl = new URL(window.location.href)
 
 const token = currentUrl.searchParams.get('token')
-console.log(token)
 
 if (token) {
   localStorage.setItem('token', token)
