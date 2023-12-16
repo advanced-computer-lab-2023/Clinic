@@ -108,7 +108,7 @@ export function ViewPatients() {
           autoHeight
           rows={
             queryUpComing.data?.filter((user) => {
-              return user.name.includes(searchKey)
+              return user.name.toLowerCase().includes(searchKey.toLowerCase())
             }) || []
           }
           columns={columns}
@@ -117,8 +117,8 @@ export function ViewPatients() {
         <DataGrid
           autoHeight
           rows={
-            query.data?.filter((user: { name: string | string[] }) => {
-              return user.name.includes(searchKey)
+            query.data?.filter((user) => {
+              return user.name.toLowerCase().includes(searchKey.toLowerCase())
             }) || []
           }
           columns={columns}
