@@ -28,11 +28,6 @@ export function ViewPatients() {
       flex: 1,
     },
     {
-      field: 'username',
-      headerName: 'Username',
-      flex: 2,
-    },
-    {
       field: 'email',
       headerName: 'Email',
       flex: 1,
@@ -113,7 +108,7 @@ export function ViewPatients() {
           autoHeight
           rows={
             queryUpComing.data?.filter((user) => {
-              return user.name.includes(searchKey)
+              return user.name.toLowerCase().includes(searchKey.toLowerCase())
             }) || []
           }
           columns={columns}
@@ -122,8 +117,8 @@ export function ViewPatients() {
         <DataGrid
           autoHeight
           rows={
-            query.data?.filter((user: { name: string | string[] }) => {
-              return user.name.includes(searchKey)
+            query.data?.filter((user) => {
+              return user.name.toLowerCase().includes(searchKey.toLowerCase())
             }) || []
           }
           columns={columns}
