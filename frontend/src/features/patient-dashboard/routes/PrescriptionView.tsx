@@ -135,7 +135,7 @@ export function PrescriptionView() {
   ]
 
   return (
-    <Card variant="outlined">
+    <Card variant="outlined" style={{ paddingBottom: '10px' }}>
       <CardContent ref={pdfRef}>
         <Stack spacing={2}>
           <Stack direction="row" justifyContent={'space-between'}>
