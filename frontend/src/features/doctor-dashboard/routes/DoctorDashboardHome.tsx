@@ -60,7 +60,8 @@ export function DoctorDashboardHome() {
     return (
       appointmentDate.getDate() === currentDate.getDate() &&
       appointmentDate.getMonth() === currentDate.getMonth() &&
-      appointmentDate.getFullYear() === currentDate.getFullYear()
+      appointmentDate.getFullYear() === currentDate.getFullYear() &&
+      appointment.status !== 'cancelled'
     )
   })
 
