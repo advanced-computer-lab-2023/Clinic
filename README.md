@@ -8,15 +8,15 @@
 2. [🧱 Build Status](#-build-status)
 3. [🎨 Code Style](#-code-style)
 4. [🎥 Screenshots & Video](#-screenshots--video)
-5. [⚒️ Tech and Framework used](#-tech-and-framework-used)
+5. [⚒️ Tech and Frameworks used](#-tech-and-framework-used)
 6. [🔥 Features](#-features)
 7. [💻 Code Examples](#-code-examples)
-8. [🪛 Installation](#-installation)
+8. [⚙️ Installation](#-installation)
 9. [📚 API Reference](#-api-reference)
 10. [🧪 Tests](#-tests)
 11. [🧑🏻‍🏫 How to Use](#-how-to-use)
 12. [🤝 Contribute](#-contribute)
-13. [🫡 Credits](#-credits)
+13. [©️ Credits](#-credits)
 14. [📜 License](#-license)
 
 ## 🚀 Motivation
@@ -76,7 +76,7 @@ npm run compile:all
 
 ## 🎥 Screenshots & Video
 
-## ⚒️ Tech and Framework used
+## ⚒️ Tech and Frameworks used
 
 - [NodeJs](https://nodejs.org/en/)
 - [Express](https://expressjs.com/)
@@ -433,7 +433,7 @@ export function AddHealthPackage() {
 
 </details>
 
-## 🪛 Installation
+## ⚙️ Installation
 
 - Make sure you have [Node](https://nodejs.org/en) and [Git](https://git-scm.com/) installed
 
@@ -1828,7 +1828,7 @@ npm start
 
 ## 🤝 Contribute
 
-We welcome contributions to Copilot&Sons El7a2ny Clinic. If you want to contribute, it's as easy as:
+We welcome contributions to Copilot & Sons El7a2ny Clinic. If you want to contribute, it's as easy as:
 
 1. Fork the repo
 2. Create a new branch (`git checkout -b my-new-feature`)
@@ -1842,7 +1842,7 @@ We welcome contributions to Copilot&Sons El7a2ny Clinic. If you want to contribu
 >
 > We welcome all contributions, but please make sure to follow our code style and linting rules. You can check the [Code Style](#-code-style) section for more details.
 
-## 🫡 Credits
+## ⚙️ Credits
 
 ### Docs
 
