@@ -9,7 +9,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Install packages
-        run: npm jest
+        run: npm install
 
       - name: Run tests
         run: cd server; npm test
