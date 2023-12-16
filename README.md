@@ -1426,8 +1426,7 @@ npm install
     }
     ```
 - `POST /health-packages/cancellation-date/:healthPackageId` - Get cancellation date for health package of user - **Request Body**:
-  `         { id: string; isFamilyMember: boolean }
-  ` - **Reponse Body**: `string` -> Date of cancellation
+  `        { id: string; isFamilyMember: boolean }` - **Reponse Body**: `string` -> Date of cancellation
   </details>
 
 <details>
@@ -1780,6 +1779,21 @@ npm install
 </details>
 
 ## 🧪 Tests
+
+We use `jest` to aumtomatically test parts of our code.
+To run the tests, run the following command
+
+```bash
+> cd backend && npm run test
+```
+
+![image](images\jest.png)
+
+We also use `Postman` to manually test all our api references and make sure the response is as expected. We use it as some kind of a sanity-check.
+
+Here is an example of testing one of our endpoints using Postman:
+
+![image](images\postman.PNG)
 
 ## 🧑🏻‍🏫 How to Use
 

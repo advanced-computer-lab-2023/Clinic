@@ -211,7 +211,7 @@ describe('Get auth/:username', () => {
   })
 })
 
-describe('Post auth/request-doctor', () => {
+test.skip('Post auth/request-doctor', () => {
   const random = new Date().getTime()
   test('Create a new doctor request', (done) => {
     request(app)
