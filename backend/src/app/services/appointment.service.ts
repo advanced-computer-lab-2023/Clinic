@@ -92,26 +92,42 @@ export async function createAndRemoveTime(
 }
 
 export async function createFollowUpAppointment(
-  appointment: AppointmentDocument
+  appointment: AppointmentDocument,
+  appointmentID: string
 ): Promise<AppointmentDocument> {
-  const patient = await PatientModel.findById(appointment.patientID)
+  const hasExistingFollowUp = await checkForExistingFollowUp(appointmentID)
 
-  if (patient == null) {
-    throw new NotFoundError()
+  if (!hasExistingFollowUp) {
+    const patient = await PatientModel.findById(appointment.patientID)
+
+    if (patient == null) {
+      throw new NotFoundError()
+    }
+
+    const patientName = patient?.name
+
+    const newAppointment = new AppointmentModel({
+      ...appointment,
+      date: new Date(appointment.date),
+      status: AppointmentStatus.Upcoming,
+      reservedFor: patientName,
+    })
+    await newAppointment.save()
+    sendAppointmentNotificationToPatient(newAppointment, 'confirmed')
+
+    // save the appointment also as a follow-up to make sure we don't make more than one follow-up
+    const followUp = new FollowupRequestModel({
+      appointment: appointmentID,
+      date: new Date(appointment.date),
+      status: 'accepted',
+    })
+
+    await followUp.save()
+
+    return newAppointment
+  } else {
+    throw new Error('A follow-up already exists for this appointment.')
   }
-
-  const patientName = patient?.name
-
-  const newAppointment = new AppointmentModel({
-    ...appointment,
-    date: new Date(appointment.date),
-    status: AppointmentStatus.Upcoming,
-    reservedFor: patientName,
-  })
-  await newAppointment.save()
-  sendAppointmentNotificationToPatient(newAppointment, 'confirmed')
-
-  return newAppointment
 }
 
 export async function checkForExistingFollowUp(appointmentID: string) {

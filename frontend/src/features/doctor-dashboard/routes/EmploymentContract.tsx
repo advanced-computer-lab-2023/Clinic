@@ -66,10 +66,7 @@ export function EmploymentContract() {
   return (
     <>
       <ToastContainer />
-      <Card
-        variant="outlined"
-        sx={{ boxShadow: 2, borderRadius: 2, backgroundColor: '#f5f5f5' }}
-      >
+      <Card variant="outlined" sx={{ boxShadow: 2, borderRadius: 2 }}>
         <CardContent>
           <Typography variant="h4" align="center" color="primary" gutterBottom>
             <strong>Employment Contract</strong>
@@ -79,11 +76,12 @@ export function EmploymentContract() {
           </Typography>
           <List sx={{ mb: 2 }}>
             <ListItem>
-              <strong>Clinic, </strong> El7a2ni.
+              <strong>Clinic, &nbsp;</strong> El7a2ni.
             </ListItem>
             <ListItem>
-              <strong>{query.data?.name}, </strong> a licensed physician with a
-              practice at El7a2ni clinic in {query.data?.speciality} department.
+              <strong>{query.data?.name}, &nbsp;</strong> a licensed physician
+              with a practice at El7a2ni clinic in {query.data?.speciality}{' '}
+              department.
             </ListItem>
           </List>
 

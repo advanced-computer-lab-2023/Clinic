@@ -68,9 +68,7 @@ function preventDefault(event: React.MouseEvent) {
 export default function Orders() {
   return (
     <React.Fragment>
-      <h2 style={{ fontWeight: 'bold', color: 'rgb(25, 118, 210) ' }}>
-        Recent Orders
-      </h2>
+      <h2 style={{ fontWeight: 'bold' }}>Recent Orders</h2>
 
       <Table size="small">
         <TableHead>

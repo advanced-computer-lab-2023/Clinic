@@ -22,7 +22,7 @@ export function AddHealthPackage() {
           valueAsNumber: true,
         },
         {
-          label: 'medicine Discount Percentage',
+          label: 'Medicine Discount Percentage',
           property: 'medicineDiscount',
           valueAsNumber: true,
         },

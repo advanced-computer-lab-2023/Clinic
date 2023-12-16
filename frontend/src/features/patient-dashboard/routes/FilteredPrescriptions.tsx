@@ -34,13 +34,6 @@ export const FilteredPrescriptions = () => {
           type: 'text',
         },
         {
-          label: 'Medicine Name',
-          property: (v) => v.medicine,
-          filter: (actual: string, required: string) =>
-            actual.toLowerCase().includes(required.toLowerCase()),
-          type: 'text',
-        },
-        {
           label: 'From Date',
           property: (v) => v.date,
           filter: (actual: Date, required: Date) =>
@@ -74,7 +67,16 @@ export const FilteredPrescriptions = () => {
       queryKey={['prescriptions', user!.username]}
       component={(prescription) => (
         <Grid item xl={3}>
-          <Card variant="outlined">
+          <Card
+            variant="outlined"
+            style={{
+              height: '350px',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              boxShadow: '-2px 2px 10px rgba(0, 0, 0, 0.15)',
+            }}
+          >
             <CardContent>
               <Stack spacing={2}>
                 <Stack
@@ -83,11 +85,6 @@ export const FilteredPrescriptions = () => {
                   justifyContent="space-between"
                   alignItems="center"
                 >
-                  <Typography variant="h6" color="text.secondary">
-                    {prescription.medicine
-                      .map((medicine) => medicine.name)
-                      .join(', ')}
-                  </Typography>
                   <Chip
                     label={prescription.isFilled ? 'Filled' : 'Unfilled'}
                     color={prescription.isFilled ? 'success' : 'warning'}
@@ -118,18 +115,20 @@ export const FilteredPrescriptions = () => {
                   </Typography>
                 </Stack>
               </Stack>
+
+              <CardActions style={{ justifyContent: 'center' }}>
+                <Button
+                  size="small"
+                  startIcon={<VisibilityIcon />}
+                  onClick={() => {
+                    handleView(prescription.id)
+                  }}
+                >
+                  view
+                </Button>
+                {/* <Stack direction="row" spacing={1}></Stack> */}
+              </CardActions>
             </CardContent>
-            <CardActions>
-              <Button
-                size="small"
-                startIcon={<VisibilityIcon />}
-                onClick={() => {
-                  handleView(prescription.id)
-                }}
-              >
-                view
-              </Button>
-            </CardActions>
           </Card>
         </Grid>
       )}

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import Button from '@mui/material/Button'
-import { ToastContainer, toast } from 'react-toastify'
+import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import {
   TextField,
@@ -79,6 +79,16 @@ export const RequestDoctor = () => {
       return
     }
 
+    // Check if all files are uploaded, if not error
+    for (let i = 0; i < fieldValue.files.length; i++) {
+      if (fieldValue.files[i] === undefined) {
+        toast.error('Please upload all required documents.')
+        setIsLoading(false)
+
+        return
+      }
+    }
+
     // Check if any file is selected
     if (
       fieldValue.files.some(
@@ -86,7 +96,6 @@ export const RequestDoctor = () => {
       )
     ) {
       toast.error('Please choose files for document upload.')
-      setIsLoading(false)
 
       return
     }
@@ -208,7 +217,7 @@ export const RequestDoctor = () => {
                 onChange={(e) => {
                   setHourlyRate(e.target.value)
                 }}
-                placeholder="Enter hourly rate in $"
+                placeholder="Enter hourly rate in EGP"
                 value={hourlyRate}
                 required
               />
@@ -248,7 +257,7 @@ export const RequestDoctor = () => {
             </Grid>
 
             <Grid item xs={12}>
-              <label>Select your educational background </label>
+              <label>Select your educational background *</label>
 
               <RadioGroup
                 onChange={(e) => {
@@ -294,7 +303,7 @@ export const RequestDoctor = () => {
                   }}
                 >
                   <label style={{ marginBottom: '5px', textAlign: 'left' }}>
-                    Upload your {docType}
+                    Upload your {docType} *
                   </label>
                   <div style={{ display: 'flex', alignItems: 'center' }}>
                     <input
@@ -345,7 +354,6 @@ export const RequestDoctor = () => {
         <Typography variant="h4" align="center" gutterBottom>
           Register
         </Typography>
-        <ToastContainer />
         {/* Progress Bar */}
         <LinearProgress
           variant="determinate"

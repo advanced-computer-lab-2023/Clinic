@@ -63,21 +63,17 @@ export function HealthPackages() {
   }
 
   function handleDelelte() {
-    // addAlert(new Alert("successMessage", 'success',alertScope))
     setLoading(true)
-    const q = deleteHealthPackage(packageId)
-    console.log(q)
-    q.then((message) => {
-      handleClose()
-
-      if (
-        message == "Can't delete! There are patients subscribed to this package"
-      ) {
-        toast.error(message)
-      }
-
-      query.refetch()
-    })
+    deleteHealthPackage(packageId)
+      .then(() => {
+        handleClose()
+        query.refetch()
+        toast.success('Package deleted successfully')
+      })
+      .catch((err) => {
+        handleClose()
+        toast.error(err.message)
+      })
   }
 
   return (

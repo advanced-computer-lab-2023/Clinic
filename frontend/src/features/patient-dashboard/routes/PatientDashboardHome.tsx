@@ -43,7 +43,7 @@ export function PatientDashboardHome() {
                   p: 2,
                   display: 'flex',
                   flexDirection: 'column',
-                  height: 290,
+                  height: 310,
                   borderRadius: '17px',
                   color: 'white ',
                   bgcolor: 'primary.main',
@@ -57,9 +57,8 @@ export function PatientDashboardHome() {
                 sx={{
                   paddingX: 2,
                   paddingY: 1,
-                  height: 290,
+                  height: 310,
                   borderRadius: '17px',
-                  bgcolor: '#F0F0F0',
                   overflow: 'auto',
                   width: '100%',
                   scrollbarWidth: 'thin', // For Firefox
@@ -77,9 +76,8 @@ export function PatientDashboardHome() {
                   paddingX: 2,
                   paddingY: 1,
                   paddingBottom: 2,
-                  height: 290,
+                  height: 310,
                   borderRadius: '17px',
-                  bgcolor: '#F0F0F0',
                   overflow: 'hidden',
                   width: '100%',
                 }}
@@ -106,7 +104,6 @@ export function PatientDashboardHome() {
                 flexDirection: 'column',
                 justifyContent: 'center',
                 borderRadius: '17px',
-                bgcolor: '#F0F0F0',
               }}
             >
               <Orders />

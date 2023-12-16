@@ -124,7 +124,7 @@ function FileViewer() {
         >
           <Tab label="All" />
           <Tab label="Uploaded by me" />
-          <Tab label="Uploaded by doctor" />
+          <Tab label="Uploaded by a doctor" />
         </Tabs>
 
         {(downloadURLs.length === 0 &&

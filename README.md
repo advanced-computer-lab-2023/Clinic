@@ -1,4 +1,19 @@
-# Copilot-and-Sons-Clinic
+# Copilot&Sons El7a2ny Clinic
+
+## Motivation
+
+Welcome to Copilot&Sons El7a2ny Clinic , a cutting-edge virtual clinic management software. This project is driven by the vision to enhance the healthcare experience for clinics, doctors, and patients by introducing a comprehensive platform that simplifies and automates key interactions within the healthcare ecosystem.
+
+### Build Status
+
+![example workflow](https://github.com/Advanced-Computer-Lab-2023/Copilot-and-Sons-Pharmacy/actions/workflows/compile.yml/badge.svg)
+![example workflow](https://github.com/Advanced-Computer-Lab-2023/Copilot-and-Sons-Pharmacy/actions/workflows/lint.yml/badge.svg)
+
+### Code Style
+
+### Tech and Framework used
+
+###
 
 ## Running using Docker (Recommended)
 

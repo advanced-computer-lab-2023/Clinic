@@ -1,14 +1,23 @@
-import { Typography, Container, Button, CardContent, Card } from '@mui/material'
+import {
+  Typography,
+  Container,
+  Button,
+  CardContent,
+  Card,
+  CardActions,
+} from '@mui/material'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
-
+import html2canvas from 'html2canvas'
+import jsPDF from 'jspdf'
 import { getPrescriptions } from '@/api/doctor'
 
 function ViewPrescription() {
   const { username } = useParams()
   const token = localStorage.getItem('token')
   const [prescriptions, setPrescriptions] = useState([])
+  const pdfRef = useRef(null)
 
   const fetchPresciptions = async () => {
     try {
@@ -23,6 +32,32 @@ function ViewPrescription() {
   useEffect(() => {
     fetchPresciptions()
   }, [username])
+
+  const downloadPDF = () => {
+    console.log('in pdf')
+    const input = pdfRef.current
+    console.log(input)
+    html2canvas(input! as HTMLElement).then((canvas) => {
+      const imgData = canvas.toDataURL('image/png')
+      const pdf = new jsPDF('p', 'mm', 'a4', true)
+      const pdfWidth = pdf.internal.pageSize.getWidth()
+      const pdfHeight = pdf.internal.pageSize.getHeight()
+      const imgWidth = canvas.width
+      const imgHeight = canvas.height
+      const ratio = Math.min(pdfWidth / imgWidth, pdfHeight, imgHeight)
+      const imgX = (pdfWidth - imgWidth * ratio) / 2
+      const imgY = 30
+      pdf.addImage(
+        imgData,
+        'PNG',
+        imgX,
+        imgY,
+        imgWidth * ratio,
+        imgHeight * ratio
+      )
+      pdf.save('prescription.pdf')
+    })
+  }
 
   return (
     <>
@@ -57,7 +92,7 @@ function ViewPrescription() {
             }}
             elevation={4}
           >
-            <CardContent>
+            <CardContent ref={pdfRef}>
               <Typography
                 variant="h5"
                 component="h2"
@@ -89,7 +124,8 @@ function ViewPrescription() {
                     </Typography>
                   )
                 )}
-
+            </CardContent>
+            <CardActions>
               <Button
                 type="submit"
                 fullWidth
@@ -102,7 +138,19 @@ function ViewPrescription() {
               >
                 Edit Prescription
               </Button>
-            </CardContent>
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                color="primary"
+                style={{ marginTop: 20 }}
+                onClick={() => {
+                  downloadPDF()
+                }}
+              >
+                download as pdf
+              </Button>
+            </CardActions>
           </Card>
         ))}
       </Container>
