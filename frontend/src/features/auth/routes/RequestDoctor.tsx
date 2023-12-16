@@ -15,6 +15,8 @@ import {
 } from '@mui/material'
 import { sendDoctorRequest } from '@/api/doctor'
 import { LoadingButton } from '@mui/lab'
+import { z } from 'zod'
+import { CommonSchema } from 'clinic-common/validators/doctorRegister.validator'
 
 export const RequestDoctor = () => {
   const [activeStep, setActiveStep] = useState(0)
@@ -30,6 +32,19 @@ export const RequestDoctor = () => {
   const [educationalBackground, setEducationalBackground] = useState('')
   const [speciality, setSpeciality] = useState('')
   const [fieldValue, setFieldValue] = useState({ files: new Array(3) })
+
+  // Field-specific error messages
+  const [nameError, setNameError] = useState('')
+  const [emailError, setEmailError] = useState('')
+  const [usernameError, setUsernameError] = useState('')
+  const [passwordError, setPasswordError] = useState('')
+  const [dateOfBirthError, setDateOfBirthError] = useState('')
+  const [hourlyRateError, setHourlyRateError] = useState('')
+  const [affiliationError, setAffiliationError] = useState('')
+  const [educationalBackgroundError, setEducationalBackgroundError] =
+    useState('')
+  const [specialityError, setSpecialityError] = useState('')
+
   const steps = [
     'Personal Information',
     'Educational Background',
@@ -46,8 +61,132 @@ export const RequestDoctor = () => {
     })
   }
 
+  const Step1Schema = CommonSchema.pick({
+    name: true,
+    email: true,
+    username: true,
+    password: true,
+    dateOfBirth: true,
+    hourlyRate: true,
+    affiliation: true,
+  }).partial()
+  const Step2Schema = CommonSchema.pick({
+    educationalBackground: true,
+    speciality: true,
+  }).partial()
+  // const Step3Schema = CommonSchema.pick({ documents: true }).partial();
+
+  const validateStep1 = () => {
+    try {
+      Step1Schema.parse({
+        name,
+        email,
+        username,
+        password,
+        dateOfBirth: new Date(dateOfBirth),
+        hourlyRate: Number(hourlyRate),
+        affiliation: affilation,
+      })
+      setNameError('')
+      setEmailError('')
+      setUsernameError('')
+      setPasswordError('')
+      setHourlyRateError('')
+      setAffiliationError('')
+
+      console.log(hourlyRate == '')
+
+      if (hourlyRate === '') {
+        setHourlyRateError('Enter  hourly Rate')
+
+        return false
+      }
+
+      return true
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        setNameError(
+          error.errors.find((err) => err.path[0] === 'name')?.message || ''
+        )
+        setEmailError(
+          error.errors.find((err) => err.path[0] === 'email')?.message || ''
+        )
+        setUsernameError(
+          error.errors.find((err) => err.path[0] === 'username')?.message || ''
+        )
+        setPasswordError(
+          error.errors.find((err) => err.path[0] === 'password')?.message || ''
+        )
+        setHourlyRateError(
+          error.errors.find((err) => err.path[0] === 'hourlyRate')?.message ||
+            ''
+        )
+        setAffiliationError(
+          error.errors.find((err) => err.path[0] === 'affiliation')?.message ||
+            ''
+        )
+        setDateOfBirthError(
+          error.errors.find((err) => err.path[0] === 'dateOfBirth')?.message ||
+            ''
+        )
+
+        if (hourlyRate === '') {
+          setHourlyRateError('Enter  hourly Rate')
+        }
+      }
+
+      return false
+    }
+  }
+
+  const validateStep2 = () => {
+    try {
+      Step2Schema.parse({
+        educationalBackground,
+        speciality,
+      })
+      setEducationalBackgroundError('')
+      setSpecialityError('')
+
+      return true
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        setEducationalBackgroundError(
+          error.errors.find((err) => err.path[0] === 'educationalBackground')
+            ?.message || ''
+        )
+        console.log(error.errors)
+        setSpecialityError(
+          error.errors.find((err) => err.path[0] === 'speciality')?.message ||
+            ''
+        )
+      }
+
+      return false
+    }
+  }
+
   const handleNext = () => {
-    setActiveStep((prevStep) => prevStep + 1)
+    switch (activeStep) {
+      case 0:
+        if (validateStep1()) {
+          setActiveStep((prevStep) => prevStep + 1)
+        }
+
+        break
+      case 1:
+        if (validateStep2()) {
+          setActiveStep((prevStep) => prevStep + 1)
+        }
+
+        break
+      case 2:
+        setActiveStep((prevStep) => prevStep + 1)
+
+        break
+      default:
+        break
+    }
   }
 
   const handleBack = () => {
@@ -147,6 +286,8 @@ export const RequestDoctor = () => {
                 placeholder="Enter your Name"
                 value={name}
                 required
+                error={!!nameError}
+                helperText={nameError}
               />
             </Grid>
             <Grid item xs={12}>
@@ -161,6 +302,8 @@ export const RequestDoctor = () => {
                 placeholder="Enter your email address"
                 value={email}
                 required
+                error={!!emailError}
+                helperText={emailError}
               />
             </Grid>
             <Grid item xs={12}>
@@ -175,6 +318,8 @@ export const RequestDoctor = () => {
                 placeholder="Enter userrname"
                 value={username}
                 required
+                error={!!usernameError}
+                helperText={usernameError}
               />
             </Grid>
             <Grid item xs={12}>
@@ -189,6 +334,8 @@ export const RequestDoctor = () => {
                 placeholder="Enter password"
                 value={password}
                 required
+                error={!!passwordError}
+                helperText={passwordError}
               />
             </Grid>
 
@@ -205,6 +352,8 @@ export const RequestDoctor = () => {
                 placeholder="Enter date of birth"
                 value={dateOfBirth}
                 required
+                error={!!dateOfBirthError}
+                helperText={dateOfBirthError}
               />
             </Grid>
 
@@ -220,6 +369,8 @@ export const RequestDoctor = () => {
                 placeholder="Enter hourly rate in EGP"
                 value={hourlyRate}
                 required
+                error={!!hourlyRateError}
+                helperText={hourlyRateError}
               />
             </Grid>
             <Grid item xs={12}>
@@ -234,6 +385,8 @@ export const RequestDoctor = () => {
                 placeholder="Enter affiliation"
                 value={affilation}
                 required
+                error={!!affiliationError}
+                helperText={affiliationError}
               />
             </Grid>
           </Grid>
@@ -253,6 +406,8 @@ export const RequestDoctor = () => {
                 }}
                 placeholder="Enter your speciality"
                 value={speciality}
+                error={!!specialityError}
+                helperText={specialityError}
               />
             </Grid>
 
@@ -286,6 +441,11 @@ export const RequestDoctor = () => {
                   label="Doctoral degree"
                 />
               </RadioGroup>
+              {educationalBackgroundError && (
+                <Typography variant="body2" color="error">
+                  {educationalBackgroundError}
+                </Typography>
+              )}
             </Grid>
           </Grid>
         )

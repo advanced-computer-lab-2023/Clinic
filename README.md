@@ -1781,6 +1781,21 @@ npm install
 
 ## 🧪 Tests
 
+We use `jest` to automatically test parts of our code.
+To run the tests, run the following command
+
+```bash
+> cd backend && npm run test
+```
+
+![image](https://github.com/advanced-computer-lab-2023/Copilot-and-Sons-Clinic/blob/main/images/jest.PNG)
+
+We also use `Postman` to manually test all our api references by making sure the response is as expected. We use it as some kind of sanity-check.
+
+Here is an example of testing one of our endpoints using Postman:
+
+![image](https://github.com/advanced-computer-lab-2023/Copilot-and-Sons-Clinic/blob/main/images/postman.PNG)
+
 ## 🧑🏻‍🏫 How to Use
 
 - Make sure to follow the [Installation](#-installation) steps first
