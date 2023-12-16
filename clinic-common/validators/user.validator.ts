@@ -6,7 +6,23 @@ export const RegisterRequestValidator = zod.object({
     .min(3)
     .max(255)
     .regex(/^[a-zA-Z0-9_]+$/),
-  password: zod.string().min(6).max(255),
+  password: zod
+    .string()
+    .min(8)
+    .refine(
+      (password: any) => {
+        const hasLowercase = /[a-z]/.test(password)
+        const hasUppercase = /[A-Z]/.test(password)
+        const hasDigit = /\d/.test(password)
+        const hasSymbol = /[!@#$%^&*()_+{}[\]:;<>,.?~\\-]/.test(password)
+
+        return hasLowercase && hasUppercase && hasDigit && hasSymbol
+      },
+      {
+        message:
+          'Password must contain at least one lowercase letter, one uppercase letter, one digit, and one special character.',
+      }
+    ),
   name: zod.string().min(3).max(255),
   email: zod.string().email(),
   mobileNumber: zod.string().min(11).max(11),

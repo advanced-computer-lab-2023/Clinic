@@ -21,7 +21,7 @@
 
 ## 🚀 Motivation
 
-Welcome to Copilot&Sons El7a2ny Clinic, a cutting-edge virtual clinic management software. This project is driven by the vision to enhance the healthcare experience for clinics, doctors, and patients by introducing a comprehensive platform that simplifies and automates key interactions within the healthcare ecosystem.
+Welcome to Copilot & Sons El7a2ny Clinic, a cutting-edge virtual clinic management software. This project is driven by the vision to enhance the healthcare experience for clinics, doctors, and patients by introducing a comprehensive platform that simplifies and automates key interactions within the healthcare ecosystem.
 
 ## 🧱 Build Status
 

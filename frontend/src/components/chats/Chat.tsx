@@ -15,6 +15,7 @@ import { useAuth } from '@/hooks/auth'
 import { Send as SendIcon } from '@mui/icons-material'
 import { LoadingButton } from '@mui/lab'
 import { UserBadge } from '../UserBadge'
+import { ProgressCircle } from '../ProgressCircle'
 
 interface FormData {
   content: string
@@ -67,6 +68,10 @@ export function Chat({ chatId }: { chatId: string }) {
       username: user!.username,
     })
   }, [chat.hasUnreadMessages, chat.isMessagesLoaded, chatId, markAsRead, user])
+
+  if (!chat.isMessagesLoaded) {
+    return <ProgressCircle />
+  }
 
   return (
     <Stack spacing={1} p={1}>

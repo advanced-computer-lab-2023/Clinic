@@ -25,6 +25,7 @@ import FireBase from '../../../../firebase.config'
 import { getStorage, ref, uploadBytes } from 'firebase/storage'
 import { getDownloadURL } from 'firebase/storage'
 import Pharmacist from '../models/pharmacist'
+
 const jwtSecret = process.env.JWT_TOKEN ?? 'secret'
 
 export const bcryptSalt =
@@ -73,6 +74,10 @@ export async function registerPatient(
 
   if (await isUsernameTaken(request.username)) {
     throw new UsernameAlreadyTakenError()
+  }
+
+  if (await isEmailTaken(request.email)) {
+    throw new EmailAlreadyTakenError()
   }
 
   const hashedPassword = await bcrypt.hash(request.password, bcryptSalt)
@@ -390,7 +395,7 @@ export async function getEmailAndNameForUsername(username: string) {
       const pharmacist = await Pharmacist.findOne({ user: user.id })
 
       if (!pharmacist) {
-        throw new APIError('Admin not found', 400)
+        throw new APIError('Pharmacist not found with id ' + user.id, 400)
       }
 
       email = pharmacist.email
@@ -413,4 +418,27 @@ export async function isEmailTaken(email: string) {
   count = count + (await AdminModel.countDocuments({ email: emailRegex }))
 
   return count > 0
+}
+
+export async function userExists(userId?: string) {
+  if (!userId) return false
+
+  const user = await UserModel.findById(userId)
+
+  if (!user) return false
+
+  const patient = await PatientModel.count({
+    user: user.id,
+  })
+  const doctor = await DoctorModel.count({
+    user: user.id,
+  })
+  const admin = await AdminModel.count({
+    user: user.id,
+  })
+  const pharmacist = await Pharmacist.count({
+    user: user.id,
+  })
+
+  return patient + doctor + admin + pharmacist > 0
 }

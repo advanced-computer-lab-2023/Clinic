@@ -11,11 +11,16 @@ import React, { useState } from 'react'
 import { useChats } from '@/hooks/chats'
 import { useAuth } from '@/hooks/auth'
 import { Chat } from './Chat'
+import { ProgressCircle } from '../ProgressCircle'
 
 export function AllChats() {
   const [selectedChatId, setSelectedChatId] = useState<string | null>(null)
-  const { chats } = useChats()
+  const { chats, isLoading } = useChats()
   const { user } = useAuth()
+
+  if (isLoading) {
+    return <ProgressCircle />
+  }
 
   return (
     <>

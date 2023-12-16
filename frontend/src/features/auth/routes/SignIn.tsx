@@ -1,6 +1,5 @@
 import * as React from 'react'
 import Avatar from '@mui/material/Avatar'
-import Button from '@mui/material/Button'
 import CssBaseline from '@mui/material/CssBaseline'
 import TextField from '@mui/material/TextField'
 import FormControlLabel from '@mui/material/FormControlLabel'
@@ -17,6 +16,7 @@ import { LoginRequestValidator } from 'clinic-common/validators/user.validator'
 import { useAuth } from '@/hooks/auth'
 import { Favorite } from '@mui/icons-material'
 import { Paper } from '@mui/material'
+import { LoadingButton } from '@mui/lab'
 
 function Copyright(props: any) {
   return (
@@ -27,10 +27,7 @@ function Copyright(props: any) {
       {...props}
     >
       Built with <Favorite sx={{ fontSize: 12 }} color="error" /> by{' '}
-      <Link
-        color="inherit"
-        href="https://github.com/advanced-computer-lab-2023/Copilot-and-Sons-Clinic/"
-      >
+      <Link color="inherit" href="https://github.com/features/copilot">
         Copilot and Sons
       </Link>{' '}
       &copy; {new Date().getFullYear()}.
@@ -40,9 +37,11 @@ function Copyright(props: any) {
 
 export default function SignIn() {
   const { refreshUser } = useAuth()
+  const [loading, setLoading] = React.useState(false)
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
+    setLoading(true)
     const data = new FormData(event.currentTarget)
 
     const username = data.get('username') as string | null
@@ -63,6 +62,8 @@ export default function SignIn() {
         // Handle the response from the API as needed
       } catch (error: any) {
         toast.error(error.message)
+      } finally {
+        setLoading(false)
       }
     }
   }
@@ -124,14 +125,15 @@ export default function SignIn() {
             control={<Checkbox value="remember" color="primary" />}
             label="Remember me"
           />
-          <Button
+          <LoadingButton
+            loading={loading}
             type="submit"
             fullWidth
             variant="contained"
             sx={{ mt: 3, mb: 2 }}
           >
             Sign In
-          </Button>
+          </LoadingButton>
           <Grid container>
             <Grid item xs>
               <Link

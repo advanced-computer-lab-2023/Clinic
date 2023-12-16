@@ -22,7 +22,10 @@ import { GetChatsForUserResponse } from 'clinic-common/types/chat.types'
 import { CreateOrGetChatRequest } from 'clinic-common/types/chat.types'
 import { APIError, NotFoundError } from '../errors'
 import { socketIOServer } from '../../app'
-import { getEmailAndNameForUsername } from '../services/auth.service'
+import {
+  getEmailAndNameForUsername,
+  userExists,
+} from '../services/auth.service'
 
 export const chatsRouter = Router()
 
@@ -60,6 +63,29 @@ function hasUnreadMessages(
   )
 }
 
+export async function removeChatsOfDeletedUsers(
+  chats: (Omit<ChatDocument, 'users'> & PopulatedUsers)[]
+) {
+  const filteredChats = []
+
+  for (const chat of chats) {
+    let foundDeletedUser = false
+
+    for (const user of chat.users) {
+      if (!(await userExists(user.id))) {
+        foundDeletedUser = true
+        break
+      }
+    }
+
+    if (!foundDeletedUser) {
+      filteredChats.push(chat)
+    }
+  }
+
+  return filteredChats
+}
+
 chatsRouter.post(
   CHATS_GET_FOR_USER_ROUTE,
   asyncWrapper<GetChatsForUserRequest>(async (req, res) => {
@@ -73,9 +99,11 @@ chatsRouter.post(
       throw new NotFoundError()
     }
 
-    const chats = await ChatModel.find({
+    const allChats = await ChatModel.find({
       users: { $in: [user.id] },
     }).populate<PopulatedUsers>('users')
+
+    const chats = await removeChatsOfDeletedUsers(allChats)
 
     res.json(
       (await Promise.all(

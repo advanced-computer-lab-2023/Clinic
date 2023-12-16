@@ -1,5 +1,6 @@
 import {
   Badge,
+  CircularProgress,
   Dialog,
   Divider,
   IconButton,
@@ -20,7 +21,7 @@ import { UserBadge } from '../UserBadge'
 
 export function ChatsList() {
   const [selectedChatId, setSelectedChatId] = useState<string | null>(null)
-  const { chats } = useChats()
+  const { chats, isLoading } = useChats()
   const { user } = useAuth()
 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
@@ -63,40 +64,48 @@ export function ChatsList() {
           horizontal: 'left',
         }}
       >
-        <List>
-          {Object.values(chats).map((chat, i) => (
-            <React.Fragment key={i}>
-              <ListItemButton
-                onClick={() => {
-                  setSelectedChatId(chat!.id)
-                }}
-              >
-                <ListItemText
-                  primary={
-                    <Stack direction="row" spacing={1}>
-                      {chat?.users
-                        .filter((u) => u.username != user?.username)
-                        .map((u) => (
-                          <React.Fragment key={u.username}>
-                            <Typography>{u.name}</Typography>
+        {isLoading ? (
+          <CircularProgress
+            sx={{
+              m: 2,
+            }}
+          />
+        ) : (
+          <List>
+            {Object.values(chats).map((chat, i) => (
+              <React.Fragment key={i}>
+                <ListItemButton
+                  onClick={() => {
+                    setSelectedChatId(chat!.id)
+                  }}
+                >
+                  <ListItemText
+                    primary={
+                      <Stack direction="row" spacing={1}>
+                        {chat?.users
+                          .filter((u) => u.username != user?.username)
+                          .map((u) => (
+                            <React.Fragment key={u.username}>
+                              <Typography>{u.name}</Typography>
 
-                            <UserBadge label={u.type} userType={u.type} />
-                          </React.Fragment>
-                        ))}
-                    </Stack>
-                  }
-                  secondary={chat?.lastMessage}
-                />
-              </ListItemButton>
-              {i < Object.keys(chats).length - 1 && <Divider />}
-            </React.Fragment>
-          ))}
-          {Object.keys(chats).length == 0 && (
-            <ListItem>
-              <ListItemText primary="No chats" />
-            </ListItem>
-          )}
-        </List>
+                              <UserBadge label={u.type} userType={u.type} />
+                            </React.Fragment>
+                          ))}
+                      </Stack>
+                    }
+                    secondary={chat?.lastMessage}
+                  />
+                </ListItemButton>
+                {i < Object.keys(chats).length - 1 && <Divider />}
+              </React.Fragment>
+            ))}
+            {Object.keys(chats).length == 0 && (
+              <ListItem>
+                <ListItemText primary="No chats" />
+              </ListItem>
+            )}
+          </List>
+        )}
       </Popover>
       <Dialog
         fullWidth
