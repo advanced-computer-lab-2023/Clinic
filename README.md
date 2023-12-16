@@ -142,6 +142,7 @@ npm run compile:all
 - Add available time slots for appointments.
 - View information and health records of registered patients.
 - View a list of all patients.
+
 </details>
 
 <details>
@@ -1786,7 +1787,7 @@ To run the tests, run the following command
 > cd backend && npm run test
 ```
 
-![image](https://github.com/advanced-computer-lab-2023/Copilot-and-Sons-Clinic/blob/main/images/jest.PNG)
+![image](https://github.com/advanced-computer-lab-2023/Copilot-and-Sons-Clinic/blob/main/images/patients.png)
 
 We also use `Postman` to manually test all our api references by making sure the response is as expected. We use it as some kind of sanity-check.
 
