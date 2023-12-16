@@ -1787,13 +1787,13 @@ To run the tests, run the following command
 > cd backend && npm run test
 ```
 
-![image](images\jest.png)
+![image](https://github.com/advanced-computer-lab-2023/Copilot-and-Sons-Clinic/blob/main/images/jest.PNG)
 
 We also use `Postman` to manually test all our api references and make sure the response is as expected. We use it as some kind of a sanity-check.
 
 Here is an example of testing one of our endpoints using Postman:
 
-![image](images\postman.PNG)
+![image](https://github.com/advanced-computer-lab-2023/Copilot-and-Sons-Clinic/blob/main/images/postman.PNG)
 
 ## 🧑🏻‍🏫 How to Use
 
