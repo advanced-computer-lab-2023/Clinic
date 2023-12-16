@@ -27,6 +27,7 @@ Welcome to Copilot&Sons El7a2ny Clinic, a cutting-edge virtual clinic management
 
 ![example workflow](https://github.com/Advanced-Computer-Lab-2023/Copilot-and-Sons-Clinic/actions/workflows/compile.yml/badge.svg)
 ![example workflow](https://github.com/Advanced-Computer-Lab-2023/Copilot-and-Sons-Clinic/actions/workflows/lint.yml/badge.svg)
+![example workflow](https://github.com/Advanced-Computer-Lab-2023/Copilot-and-Sons-Clinic/actions/workflows/tests.yml/badge.svg)
 
 - This project is under development and should not be used in a production settings
 - Check **Issues** for a list of all the reported issues
@@ -1426,8 +1427,7 @@ npm install
     }
     ```
 - `POST /health-packages/cancellation-date/:healthPackageId` - Get cancellation date for health package of user - **Request Body**:
-  `         { id: string; isFamilyMember: boolean }
-  ` - **Reponse Body**: `string` -> Date of cancellation
+  `        { id: string; isFamilyMember: boolean }` - **Reponse Body**: `string` -> Date of cancellation
   </details>
 
 <details>
