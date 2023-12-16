@@ -1,7 +1,10 @@
-import { UsernameAlreadyTakenError } from '../errors/auth.errors'
+import {
+  EmailAlreadyTakenError,
+  UsernameAlreadyTakenError,
+} from '../errors/auth.errors'
 import * as bcrypt from 'bcrypt'
 import { type UserDocument, UserModel } from '../models/user.model'
-import { isUsernameTaken } from './auth.service'
+import { isEmailTaken, isUsernameTaken } from './auth.service'
 import { type AddAdminRequest } from 'clinic-common/types/admin.types'
 import { UserType } from 'clinic-common/types/user.types'
 import { AddAdminResponse } from 'clinic-common/validators/admin.validation'
@@ -19,6 +22,10 @@ export async function addAdmin(
 
   if (await isUsernameTaken(request.username)) {
     throw new UsernameAlreadyTakenError()
+  }
+
+  if (await isEmailTaken(request.email)) {
+    throw new EmailAlreadyTakenError()
   }
 
   const hashedPassword = await bcrypt.hash(password, bcryptSalt)

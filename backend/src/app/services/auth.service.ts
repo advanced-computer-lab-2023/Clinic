@@ -391,3 +391,13 @@ export async function getEmailAndNameForUsername(username: string) {
 
   return { email, name }
 }
+
+export async function isEmailTaken(email: string) {
+  const emailRegex = new RegExp(`^${email}$`, 'i')
+
+  let count = await DoctorModel.countDocuments({ email: emailRegex })
+  count = count + (await PatientModel.countDocuments({ email: emailRegex }))
+  count = count + (await AdminModel.countDocuments({ email: emailRegex }))
+
+  return count > 0
+}
