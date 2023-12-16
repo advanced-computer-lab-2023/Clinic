@@ -453,7 +453,7 @@ export function Appointments() {
               }
             }}
           >
-            Cancel Appiontment
+            Confirm
           </LoadingButton>
         </DialogActions>
       </Dialog>
