@@ -12,17 +12,12 @@ import { SubscribeToHealthPackages } from './SubscribeToHealthPackages'
 import FileViewer from './ViewFiles'
 import ChangePassword from '@/features/auth/routes/ChangePassword'
 import { MyDoctors } from './MyDoctors'
-import { useEffect } from 'react'
-
-
-const token = localStorage.getItem('token')
 
 // eslint-disable-next-line react-refresh/only-export-components
 const RedirectToPharmacy = () => {
-  useEffect(() => {
-    // Navigate to the clinic URL
-    window.location.href = `http://localhost:5174/patient-dashboard?token=${token}`
-  })
+  // Navigate to the clinic URL
+  const token = localStorage.getItem('token')
+  window.location.href = `http://localhost:5174/patient-dashboard?token=${token}`
 
   return null // This component doesn't render anything, it just redirects
 }
