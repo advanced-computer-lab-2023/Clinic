@@ -166,9 +166,11 @@ export function ApprovedDoctors() {
                         alignItems: 'center',
                       }}
                     >
-                      <VideoCallButton otherUsername={doctor.username} />
                       {isMyDoctor(doctor.id) && (
-                        <ChatButton otherUsername={doctor.username} />
+                        <>
+                          <VideoCallButton otherUsername={doctor.username} />
+                          <ChatButton otherUsername={doctor.username} />
+                        </>
                       )}
                     </div>
                   </div>
