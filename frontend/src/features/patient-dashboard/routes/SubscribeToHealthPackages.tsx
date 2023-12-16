@@ -173,7 +173,7 @@ export function SubscribeToHealthPackages({
     <>
       <Grid container spacing={1}>
         {!isSubscribed && (
-          <Grid item xl={12}>
+          <Grid item xs={12}>
             <Alert severity="info">
               You are not subscribed to any health package. Please subscribe to
               a health package to get discounts on your appointments and
