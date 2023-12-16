@@ -8,6 +8,12 @@ import {
   TextField,
   Select,
   MenuItem,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  Alert,
+  DialogActions,
 } from '@mui/material'
 import { LoadingButton } from '@mui/lab'
 import { DateRange, FilteredList } from '@/components/FilteredList'
@@ -44,6 +50,9 @@ export function Appointments() {
   }
   const [followUpStatus, setFollowUpStatus] = useState<FollowUpStatusMap>({})
   const [isLoading, setIsLoading] = useState<string | null>(null)
+  const [cancelAppointmentId, setCancelAppointmentId] = useState<
+    string | null
+  >()
 
   useEffect(() => {
     const fetchAppointmentsAndUpdateStatus = async () => {
@@ -161,17 +170,22 @@ export function Appointments() {
   const currentDate = new Date().toISOString().slice(0, 16)
 
   async function handleCancelAppointment(appointmentId: string) {
+    setIsLoading(appointmentId)
     await cancelAppointment(
       appointmentId,
       user?.type === UserType.Doctor ? true : false
     )
       .then(() => {
+        setIsLoading(null)
         queryClient.refetchQueries(['appointments'])
         toast.success('Appointment cancelled successfully')
+        setCancelAppointmentId(null)
       })
       .catch((err: any) => {
+        setIsLoading(null)
         toast.error('Error in canceling appointment')
         console.log(err)
+        setCancelAppointmentId(null)
       })
   }
 
@@ -350,25 +364,26 @@ export function Appointments() {
                         marginTop: 2,
                       }}
                       onClick={() => {
-                        setIsLoading(appointment.id)
-                        handleCancelAppointment(appointment.id).finally(() =>
-                          setIsLoading(null)
-                        )
+                        //setIsLoading(appointment.id)
+                        setCancelAppointmentId(appointment.id)
+                        // handleCancelAppointment(appointment.id).finally(() =>
+                        //   setIsLoading(null)
+                        // )
                       }}
-                      loading={isLoading == appointment.id}
+                      //loading={isLoading == appointment.id}
                     >
                       Cancel Appointment
                     </LoadingButton>
                   )}
 
-                  {user &&
+                  {/* {user &&
                     appointment.status === 'upcoming' &&
                     user.type === UserType.Patient && (
                       <Typography variant="caption" color="warning">
                         Appointments cancelled less than 24 hours before their
-                        date do not receive a refund.
+                        date do not receive a refund. 
                       </Typography>
-                    )}
+                    )} */}
                   {user?.type === UserType.Patient &&
                     appointment.status === 'completed' && (
                       <TextField
@@ -405,6 +420,43 @@ export function Appointments() {
           </Grid>
         )}
       />
+      <Dialog
+        open={cancelAppointmentId != null}
+        onClose={() => setCancelAppointmentId(null)}
+      >
+        <DialogTitle>Are you sure?</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            <Alert severity="error">
+              Are you sure you want to cancel this appointment?{' '}
+              <u>
+                This action cannot be undone. Appointments cancelled less than
+                24 hours before their date do not receive a refund.
+              </u>
+            </Alert>
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button autoFocus onClick={() => setCancelAppointmentId(null)}>
+            Cancel
+          </Button>
+          <LoadingButton
+            loading={isLoading == cancelAppointmentId}
+            //loading={handleCancelAppointment.isLoading}
+            variant="contained"
+            color="error"
+            onClick={() => {
+              if (cancelAppointmentId) {
+                handleCancelAppointment(cancelAppointmentId)
+              } else {
+                setCancelAppointmentId(null)
+              }
+            }}
+          >
+            Cancel Appiontment
+          </LoadingButton>
+        </DialogActions>
+      </Dialog>
     </>
   )
 }
