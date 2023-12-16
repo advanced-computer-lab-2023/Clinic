@@ -95,7 +95,260 @@ npm run compile:all
 
 ## 💻 Code Examples
 
+<details>
+<summary>BE Routes Example</summary>
+
+```js
+router.use('/auth', authRouter)
+router.use('/doctors', doctorsRouter)
+
+router.use('/debug', debugRouter)
+
+router.use('/prescriptions', prescriptionsRouter)
+router.use('/family-members', familyMemberRouter)
+router.use('/health-packages', healthPackagesRouter)
+router.use('/patients', patientRouter)
+router.use('/appointment', appointmentsRouter)
+router.use('/admins', asyncWrapper(allowAdmins), adminRouter)
+```
+
+</details>
+
+<details>
+<summary>BE Add Health Package Controller Example</summary>
+
+```js
+export const healthPackagesRouter = Router()
+
+healthPackagesRouter.post(
+  '/',
+  asyncWrapper(allowAdmins),
+  validate(CreateHealthPackageRequestValidator),
+  asyncWrapper<createHealthPackageRequest>(async (req, res) => {
+    const healthPackage = await addHealthPackages(req.body)
+
+    res.send({
+      name: healthPackage.name,
+      id: healthPackage.id,
+      pricePerYear: healthPackage.pricePerYear,
+      sessionDiscount: healthPackage.sessionDiscount,
+      medicineDiscount: healthPackage.medicineDiscount,
+      familyMemberSubscribtionDiscount:
+        healthPackage.familyMemberSubscribtionDiscount,
+    } satisfies AddHealthPackageResponse)
+  })
+)
+```
+
+</details>
+
+<details>
+<summary>BE Add Health Package Service Example</summary>
+
+```js
+
+export async function addHealthPackages(
+  request: createHealthPackageRequest
+): Promise<HydratedDocument<HealthPackageDocument>> {
+  const healthPackage = await HealthPackageModel.create({
+    name: request.name,
+    pricePerYear: request.pricePerYear,
+    sessionDiscount: request.sessionDiscount,
+    medicineDiscount: request.medicineDiscount,
+    familyMemberSubscribtionDiscount: request.familyMemberSubscribtionDiscount,
+  })
+
+  return healthPackage
+}
+```
+
+</details>
+
+<details>
+<summary>BE Health Package Model Example</summary>
+
+```js
+import mongoose from 'mongoose'
+const Schema = mongoose.Schema
+const healthPackageSchema = new Schema(
+  {
+    name: { type: String, required: true, unique: true },
+    pricePerYear: { type: Number, required: true },
+    sessionDiscount: { type: Number, required: true },
+    medicineDiscount: { type: Number, required: true },
+    familyMemberSubscribtionDiscount: {
+      type: Number,
+      required: true,
+    },
+  },
+  { timestamps: true }
+)
+
+export type HealthPackageDocument = mongoose.InferSchemaType<
+  typeof healthPackageSchema
+>
+
+export const HealthPackageModel = mongoose.model(
+  'HealthPackage',
+  healthPackageSchema
+)
+```
+
+</details>
+
+<details>
+<summary>Add Health Package Validator Example</summary>
+
+```js
+import * as zod from 'zod'
+
+export const CreateHealthPackageRequestValidator = zod.object({
+  name: zod.string().min(1),
+  pricePerYear: zod.number(),
+  sessionDiscount: zod.number(),
+  medicineDiscount: zod.number(),
+  familyMemberSubscribtionDiscount: zod.number(),
+})
+```
+
+</details>
+
+<details>
+<summary>Health Package TypeScript Types Example</summary>
+
+```js
+export type createHealthPackageRequest = z.infer<
+  typeof CreateHealthPackageRequestValidator
+>
+
+export type UpdateHealthPackageRequest = z.infer<
+  typeof UpdateHealthPackageRequestValidator
+>
+
+export interface HealthPackageResponseBase {
+  name: string
+  id: string
+  pricePerYear: number
+  sessionDiscount: number
+  medicineDiscount: number
+  familyMemberSubscribtionDiscount: number
+}
+
+export interface UpdateHealthPackageResponse
+  extends HealthPackageResponseBase {}
+
+export interface AddHealthPackageResponse extends HealthPackageResponseBase {}
+```
+
+</details>
+
+<details>
+<summary>FE Admin Dashboard Routes Example</summary>
+
+```js
+
+export const adminDashboardRoutes: RouteObject[] = [
+  {
+    element: <AdminDashboardLayout />,
+    children: [
+      {
+        path: '',
+        element: <AdminDashboardHome />,
+      },
+      {
+        path: 'change-password',
+        element: <ChangePassword />,
+      },
+
+      {
+        path: 'pending-doctors',
+        element: <PendingDoctors />,
+      },
+      {
+        path: 'pending-doctors/:username',
+        element: <PendingDoctorDetails />,
+      },
+      {
+        path: 'health-packages',
+        element: <HealthPackages />,
+      },
+      {
+        path: 'add-health-package',
+        element: <AddHealthPackage />,
+      },
+      {
+        path: 'update-health-package/:id',
+        element: <UpdateHealthPackage />,
+      },
+      {
+        path: 'add-admin',
+        element: <AddAdmin />,
+      },
+      {
+        path: 'add-admin',
+        element: <AddAdmin />,
+      },
+      {
+        path: 'users',
+        element: <Users />,
+      },
+    ],
+  },
+]
+```
+
+</details>
+
+<details>
+<summary>FE Add Health Package Page Example</summary>
+
+```js
+
+export function AddHealthPackage() {
+  const navigate = useNavigate()
+
+  return (
+    <ApiForm<createHealthPackageRequest>
+      fields={[
+        { label: 'Name', property: 'name' },
+        {
+          label: 'Price Per Year',
+          property: 'pricePerYear',
+          valueAsNumber: true,
+        },
+        {
+          label: 'Session Discount Percentage',
+          property: 'sessionDiscount',
+          valueAsNumber: true,
+        },
+        {
+          label: 'Medicine Discount Percentage',
+          property: 'medicineDiscount',
+          valueAsNumber: true,
+        },
+        {
+          label: 'Family Member Subscribtion Discount Percentage',
+          property: 'familyMemberSubscribtionDiscount',
+          valueAsNumber: true,
+        },
+      ]}
+      validator={CreateHealthPackageRequestValidator}
+      successMessage="Added health package successfully"
+      action={(data) => addHealthPackage(data)}
+      onSuccess={() => {
+        navigate('/admin-dashboard/health-packages')
+      }}
+    />
+  )
+}
+```
+
+</details>
+
 ## 🪛 Installation
+
+<details>
+<summary>Without Docker (Recommended)</summary>
 
 ### Running without Docker (Recommended)
 
@@ -119,6 +372,11 @@ npm install
 npm start
 ```
 
+</details>
+
+<details>
+<summary>Running with Docker</summary>
+
 ### Running using Docker
 
 - Make sure you have [Docker](https://www.docker.com/), [Node](https://nodejs.org/en) and [Git](https://git-scm.com/) installed
@@ -139,6 +397,8 @@ npm install
 ```bash
 docker compose up
 ```
+
+</details>
 
 ## 📚 API Reference
 
