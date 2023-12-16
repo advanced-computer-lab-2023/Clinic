@@ -143,7 +143,7 @@ npm run compile:all
 - View information and health records of registered patients.
 - View a list of all patients.
 
-![image](https://github.com/advanced-computer-lab-2023/Copilot-and-Sons-Clinic/blob/readmescreenshots/images/patients.PNG)
+![image](https://github.com/advanced-computer-lab-2023/Copilot-and-Sons-Clinic/blob/main/images/patients.PNG)
 
 </details>
 
