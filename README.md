@@ -616,6 +616,7 @@ npm install
 - `GET /auth/me` - Retrieve information about the currently authenticated user.
 
 - **Response Body:**
+
   ```json
   {
     "id": "string",
@@ -631,7 +632,45 @@ npm install
     }
   }
   ```
-  </details>
+
+- `POST /patient/requestOtp` - Request to send OTP for forgetting password
+
+  - **Request Body:**
+
+  ```
+  {
+      email: string
+  }
+  ```
+
+  - **Response Body:**: N/A
+
+- `POST /patient/verifyOtp` - Verify OTP for forgetting password
+
+  - **Request Body:**
+
+  ```
+  {
+      email: string,
+      otp: string,
+  }
+  ```
+
+  - **Response Body:**: N/A
+
+- `POST /patient/updatePassword` - Update patient password after forgetting password
+
+      - **Request Body:**
+      ```
+      {
+          email: string,
+          newPassword: string
+      }
+      ```
+
+      - **Response Body:**: N/A
+
+</details>
 
 <details>
 <summary>Chat Endpoints</summary>
@@ -1388,7 +1427,7 @@ npm install
     ```
 - `POST /health-packages/cancellation-date/:healthPackageId` - Get cancellation date for health package of user - **Request Body**:
   `         { id: string; isFamilyMember: boolean }
-    ` - **Reponse Body**: `string` -> Date of cancellation
+  ` - **Reponse Body**: `string` -> Date of cancellation
   </details>
 
 <details>
@@ -1415,12 +1454,16 @@ npm install
     }
     ```
 
-- `DELETE /notifications'` - Delete a notification - **Request Body**:
-`         {
-            username: string,
-            notificationId: string,
-        }
-        ` - **Reponse Body**: N/A
+- `DELETE /notifications'` - Delete a notification
+  - **Request Body**:
+  ```
+  {
+    username: string,
+    notificationId: string,
+  }
+  ```
+  - **Reponse Body**: N/A
+
 </details>
 
 <details>
@@ -1689,28 +1732,51 @@ npm install
     ]
     ```
 
-- `POST /prescriptions` - Add a prescription to a patient - **Request Body**:
-`         {
-            patient: string,
-            medicine: string,
-            date: string,
+- `POST /prescriptions` - Add a prescription to a patient
+
+  - **Request Body**:
+    ```
+    {
+        patient: string,
+        medicine: string,
+        date: string,
+    }
+    ```
+    - **Reponse Body**:
+      ```
+        {
+          'id': string,
+          'doctor': string,
+          'patient': string,
+          'date': Date,
+          'isFilled': boolean,
+          'medicine': [
+              {
+                  'name': string
+                  'dosage': string
+                  'quantity': number
+              }
+          ]
+      }
+      ```
+
+- `PUT /prescriptions/edit/:id` - Edit a prescription by id
+  - **Request Body**:
+    ```
+    {
+      medicine: [
+        {
+          name: string,
+          dosage: string,
+          quantity: number,
         }
-        ` - **Reponse Body**:
-`         {
-            'id': string,
-            'doctor': string,
-            'patient': string,
-            'date': Date,
-            'isFilled': boolean,
-            'medicine': [
-                {
-                    'name': string
-                    'dosage': string
-                    'quantity': number
-                }
-            ]
-        }
-        `
+      ],
+      date: Date,
+      patient: string // Id of patient
+    }
+    ```
+    - **Reponse Body**: N/A
+
 </details>
 
 ## 🧪 Tests
