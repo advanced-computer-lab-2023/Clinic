@@ -12,7 +12,7 @@ export function AddAdmin() {
         { label: 'Password', property: 'password' },
       ]}
       validator={AddAdminValidator}
-      successMessage="Register successfully."
+      successMessage="Admin registered successfully."
       action={AddAdminApi}
       buttonText="Add Admin"
     />
