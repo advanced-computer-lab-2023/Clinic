@@ -32,6 +32,9 @@ Welcome to Copilot&Sons El7a2ny Clinic, a cutting-edge virtual clinic management
 
 We use [Prettier](https://prettier.io/) and [ESLint](https://eslint.org/) to enforce a consistent code style. We use an edited version of the default ESLint TypeScript config. You can check the config in the [.eslintrc.js](.eslintrc.js) file.
 
+<details>
+<summary>Useful Commands</summary>
+
 ### Useful Commands
 
 - Check formatting using Prettier
@@ -64,6 +67,8 @@ npm run lint:fix
 npm run compile:all
 ```
 
+</details>
+
 ## 🎥 Screenshots & Video
 
 ## ⚒️ Tech and Framework used
@@ -92,6 +97,84 @@ npm run compile:all
 - [Postman](https://www.postman.com/)
 
 ## 🔥 Features
+
+<details>
+<summary>User Registration 📝</summary>
+
+- Register as a patient with essential details.
+- Upload/remove medical documents (PDF, JPEG, JPG, PNG).
+- Submit a request to register as a doctor with professional details.
+- Upload required documents for doctor registration.
+</details>
+
+<details>
+<summary>User Authentication 🔐</summary>
+- Login and logout securely.
+</details>
+
+<details>
+<summary>Administrator Functions 👩‍💼</summary>
+- Add/remove another administrator.
+- Manage doctors and patients.
+- Accept or reject doctor registration requests.
+- View information uploaded by doctors.
+</details>
+
+<details>
+<summary>Health Packages 💼</summary>
+- Administrators can add/update/delete health packages with different price ranges.
+</details>
+
+<details>
+<summary>Account Management 🔄</summary>
+- Change password.
+- Reset forgotten password via email.
+- Edit/update email, hourly rate, or affiliation.
+</details>
+
+<details>
+<summary>Doctor Functions 🩺</summary>
+- Accept employment contract.
+- Add available time slots for appointments.
+- View information and health records of registered patients.
+- View a list of all patients.
+</details>
+
+<details>
+<summary>Patient Functions 🤒</summary>
+- Add family members and link accounts.
+- Pay for appointments using wallet or credit card.
+- Subscribe to health packages for self and family.
+- View subscribed health packages and subscription status.
+- Cancel a subscription.
+</details>
+
+<details>
+<summary>Appointment Management 📅</summary>
+- Filter appointments by date/status.
+- View upcoming/past appointments.
+- Patient can reschedule or cancel appointments.
+- Doctor can reschedule appointments for patients.
+</details>
+
+<details>
+<summary>Prescription Management 💊</summary>
+- Doctor can add/delete medicine to/from prescriptions.
+- Doctor can add/update dosage for each medicine.
+- Patients can view and filter prescriptions based on various criteria.
+</details>
+
+<details>
+<summary>Wallet Management 💰</summary>
+- Receive a refund in the wallet for canceled appointments.
+- View the amount in the wallet.
+</details>
+
+<details>
+<summary>Communication 📬</summary>
+- Patients and doctors can chat with each other.
+- Doctors and Patients can start/end video calls.
+</details>
 
 ## 💻 Code Examples
 
