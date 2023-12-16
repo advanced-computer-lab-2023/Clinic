@@ -4,12 +4,22 @@ import { useAuth } from '@/hooks/auth'
 import { useQuery } from '@tanstack/react-query'
 
 import { Copyright } from '@mui/icons-material'
-import { Container, Grid, Paper } from '@mui/material'
-import Orders from '../components/Orders'
+import {
+  Container,
+  Grid,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+} from '@mui/material'
+import Title from '../components/Title'
 import Deposits from '../components/Deposits'
 import { getPatientByUsername } from '@/api/patient'
 import { AllChats } from '@/components/chats/AllChats'
 import { TopDoctors } from '../components/TopDoctors'
+import { getAppointments } from '@/api/appointments'
 
 export function PatientDashboardHome() {
   const { user } = useAuth()
@@ -20,6 +30,23 @@ export function PatientDashboardHome() {
   const walletQuery = useQuery({
     queryKey: ['get-wallet-money'],
     queryFn: () => getWalletMoney(user!.username),
+  })
+
+  const appointmentsQuery = useQuery({
+    queryKey: ['get-appointments-patient'],
+    queryFn: () => getAppointments(),
+  })
+
+  const filteredAppointments = appointmentsQuery.data?.filter((appointment) => {
+    const appointmentDate = new Date(appointment.date)
+    const currentDate = new Date()
+
+    return (
+      appointmentDate.getDate() === currentDate.getDate() &&
+      appointmentDate.getMonth() === currentDate.getMonth() &&
+      appointmentDate.getFullYear() === currentDate.getFullYear() &&
+      appointment.status !== 'cancelled'
+    )
   })
 
   if (patientQuery.isLoading) {
@@ -106,7 +133,33 @@ export function PatientDashboardHome() {
                 borderRadius: '17px',
               }}
             >
-              <Orders />
+              <Title>Today's Appointments</Title>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>
+                      <strong>Reserved For</strong>
+                    </TableCell>
+                    <TableCell>
+                      <strong>Appointment Time</strong>
+                    </TableCell>
+                    <TableCell> </TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {filteredAppointments?.map((appointment) => (
+                    <TableRow key={appointment.id}>
+                      <TableCell>{appointment.reservedFor}</TableCell>
+                      <TableCell>
+                        {new Date(appointment.date).toLocaleTimeString([], {
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
             </Paper>
           </Grid>
           <Copyright sx={{ pt: 4 }} />
