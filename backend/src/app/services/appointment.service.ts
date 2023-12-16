@@ -86,7 +86,7 @@ export async function createAndRemoveTime(
   await removeTimeFromDoctorAvailability(doctorID, date)
   // Save the new appointment
   await newAppointment.save()
-  sendAppointmentNotificationToPatient(newAppointment, 'accepted')
+  sendAppointmentNotificationToPatient(newAppointment, 'scheduled')
 
   return newAppointment
 }
@@ -119,7 +119,7 @@ export async function createFollowUpAppointment(
     const followUp = new FollowupRequestModel({
       appointment: appointmentID,
       date: new Date(appointment.date),
-      status: 'accepted',
+      status: 'scheduled',
     })
 
     await followUp.save()
