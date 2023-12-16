@@ -8,8 +8,13 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '14'
+
       - name: Install packages
-        run: npm jest
+        run: npm ci
 
       - name: Run tests
-        run: cd server; npm test
+        run: cd backend && npm test
