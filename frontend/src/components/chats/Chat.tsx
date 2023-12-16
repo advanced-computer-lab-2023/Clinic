@@ -14,6 +14,7 @@ import { useForm } from 'react-hook-form'
 import { useAuth } from '@/hooks/auth'
 import { Send as SendIcon } from '@mui/icons-material'
 import { LoadingButton } from '@mui/lab'
+import { UserBadge } from '../UserBadge'
 
 interface FormData {
   content: string
@@ -79,7 +80,15 @@ export function Chat({ chatId }: { chatId: string }) {
             }}
           >
             <CardContent>
-              <Typography variant="h6">{message.sender}</Typography>
+              <Stack direction="row" spacing={1}>
+                <Typography variant="h6">
+                  {message.senderDetails.name}
+                </Typography>
+                <UserBadge
+                  userType={message.senderType}
+                  label={message.senderType}
+                />
+              </Stack>{' '}
               <Typography variant="body1" fontSize={20}>
                 {message.content}
               </Typography>

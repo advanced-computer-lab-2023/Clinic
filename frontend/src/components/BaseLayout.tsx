@@ -133,6 +133,7 @@ export function BaseLayout() {
               [UserType.Admin]: '#F6BD60',
               [UserType.Doctor]: '#F28482',
               [UserType.Patient]: '#84A59D',
+              [UserType.Pharmacist]: '#5893e0',
             }[user.type]
           : '#393E41',
         contrastText: '#fff',
