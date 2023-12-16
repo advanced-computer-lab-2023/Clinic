@@ -4,14 +4,15 @@
     "bcrypt": "^5.1.1",
     "clinic-common": "*",
     "cors": "^2.8.5",
+    "dayjs": "^1.11.10",
     "express": "^4.18.2",
     "firebase": "^10.6.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^7.5.3",
     "multer": "^1.4.5-lts.1",
     "nodemailer": "^6.9.7",
-    "validator": "^13.11.0",
     "socket.io": "^4.7.2",
+    "validator": "^13.11.0",
     "zod": "^3.22.4"
   },
   "devDependencies": {

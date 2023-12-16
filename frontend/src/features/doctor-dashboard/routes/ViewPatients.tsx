@@ -28,11 +28,6 @@ export function ViewPatients() {
       flex: 1,
     },
     {
-      field: 'username',
-      headerName: 'Username',
-      flex: 2,
-    },
-    {
       field: 'email',
       headerName: 'Email',
       flex: 1,
