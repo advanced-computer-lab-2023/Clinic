@@ -12,6 +12,7 @@ import { useParams } from 'react-router-dom'
 import html2canvas from 'html2canvas'
 import jsPDF from 'jspdf'
 import { getPrescriptions } from '@/api/doctor'
+import { Add, DocumentScanner, Edit, Healing } from '@mui/icons-material'
 
 function ViewPrescription() {
   const { username } = useParams()
@@ -75,9 +76,10 @@ function ViewPrescription() {
           sx={{
             marginBottom: '40px',
             textAlign: 'center',
-            color: '#3f51b5',
+            fontWeight: 'bold',
           }}
         >
+          <Healing fontSize="large" sx={{ marginRight: 2 }} />
           Prescriptions
         </Typography>
 
@@ -87,8 +89,8 @@ function ViewPrescription() {
             sx={{
               marginBottom: 5,
               animation: 'slideUp 0.5s ease',
-              backgroundColor: '#e3f2fd',
               borderRadius: '15px',
+              backgroundColor: 'background.default',
             }}
             elevation={4}
           >
@@ -96,7 +98,7 @@ function ViewPrescription() {
               <Typography
                 variant="h5"
                 component="h2"
-                sx={{ color: '#333', fontWeight: 'bold', marginBottom: '20px' }}
+                sx={{ fontWeight: 'bold', marginBottom: '20px' }}
               >
                 Prescription Date: {prescription.date.slice(0, 10)}
               </Typography>
@@ -104,7 +106,7 @@ function ViewPrescription() {
               <Typography
                 variant="h6"
                 component="h3"
-                sx={{ color: '#444', fontWeight: 'bold', marginBottom: '15px' }}
+                sx={{ fontWeight: 'bold', marginBottom: '15px' }}
               >
                 Medicines:
               </Typography>
@@ -116,7 +118,7 @@ function ViewPrescription() {
                       key={`medicine-${medicineIndex}`}
                       variant="body1"
                       component="p"
-                      style={{ margin: '5px 0', color: '#555' }}
+                      style={{ margin: '5px 0' }}
                     >
                       <strong>Name:</strong> {medicine.name},{' '}
                       <strong>Dosage:</strong> {medicine.dosage},{' '}
@@ -132,6 +134,7 @@ function ViewPrescription() {
                 variant="contained"
                 color="primary"
                 style={{ marginTop: 20 }}
+                startIcon={<Edit />}
                 onClick={() =>
                   (window.location.href = `http://localhost:5174/doctor-dashboard?PrescriptionId=${prescription._id}&token=${token}`)
                 }
@@ -144,6 +147,7 @@ function ViewPrescription() {
                 variant="contained"
                 color="primary"
                 style={{ marginTop: 20 }}
+                startIcon={<DocumentScanner />}
                 onClick={() => {
                   downloadPDF()
                 }}
@@ -168,9 +172,11 @@ function ViewPrescription() {
           variant="contained"
           color="primary"
           style={{ marginTop: 20 }}
+          size="large"
           onClick={() =>
             (window.location.href = `http://localhost:5174/doctor-dashboard?patientusername=${username}&token=${token}`)
           }
+          startIcon={<Add />}
         >
           Add Prescription
         </Button>
