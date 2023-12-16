@@ -14,6 +14,7 @@ import {
   DialogContentText,
   Alert,
   DialogActions,
+  Chip,
 } from '@mui/material'
 import { LoadingButton } from '@mui/lab'
 import { DateRange, FilteredList } from '@/components/FilteredList'
@@ -277,6 +278,17 @@ export function Appointments() {
                         error={followUpDateError}
                       />
                     )}
+
+                  {user?.type === UserType.Patient &&
+                    appointment.status === 'cancelled' && (
+                      <Chip
+                        sx={{ mt: 1 }}
+                        color="error"
+                        label="cancelled"
+                        style={{ marginTop: 40 }}
+                      />
+                    )}
+
                   {user?.type === UserType.Doctor &&
                     appointment.status === 'completed' && (
                       <>
