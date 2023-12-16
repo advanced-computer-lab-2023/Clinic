@@ -23,7 +23,8 @@
     "lint:fix": "eslint . --fix --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "format": "prettier -u --check .",
     "format:fix": "prettier -u --write .",
-    "compile:all": "npm run compile -ws --if-present"
+    "compile:all": "npm run compile -ws --if-present",
+    "build": "tsc"
   },
   "workspaces": [
     "backend",
