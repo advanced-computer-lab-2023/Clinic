@@ -13,6 +13,9 @@ import { useEffect } from 'react'
 import { Outlet } from 'react-router-dom'
 import AccessTimeIcon from '@mui/icons-material/AccessTime'
 import MedicationLiquidIcon from '@mui/icons-material/MedicationLiquid'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faCapsules } from '@fortawesome/free-solid-svg-icons'
+
 
 export function PatientDashboardLayout() {
   const { setSidebarLinks } = useSidebar()
@@ -53,6 +56,13 @@ export function PatientDashboardLayout() {
         to: '/patient-dashboard/MyMedicalHistory',
         text: 'Health Records',
         icon: <DocumentScannerOutlined />,
+      },
+      {
+        to: '/patient-dashboard/pharmacy',
+        text: 'Your Pharmacy',
+        icon:   <FontAwesomeIcon
+        icon={faCapsules}
+      />,
       },
     ])
   }, [setSidebarLinks])
