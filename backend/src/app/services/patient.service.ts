@@ -119,22 +119,41 @@ export async function getPatientByID(id: string): Promise<{
   patient: PatientDocumentWithUser
   appointments: Array<HydratedDocument<AppointmentDocument>>
   prescriptions: PrescriptionDocument[]
+  familyMember: any
 }> {
-  const patient = await PatientModel.findOne({ _id: id })
+  let patient = await PatientModel.findOne({ _id: id })
     .populate<{ user: UserDocument }>('user')
     .exec()
+
+  if (patient == null) {
+    patient = await PatientModel.findOne({
+      familyMembers: id,
+    })
+      .populate<{ user: UserDocument }>('user')
+      .exec()
+  }
+
   if (patient == null) throw new NotFoundError()
 
-  const appointments: Array<HydratedDocument<AppointmentDocument>> =
-    await AppointmentModel.find({
-      patientID: id,
+  const familyMember = await FamilyMemberModel.findById(id)
+
+  let appointments: Array<HydratedDocument<AppointmentDocument>> = []
+
+  if (familyMember) {
+    appointments = await AppointmentModel.find({
+      reservedFor: familyMember.name,
+    })
+  } else {
+    appointments = await AppointmentModel.find({
+      reservedFor: patient.name,
     }).exec()
+  }
 
   const prescriptions = await PrescriptionModel.find({
     patient: id,
   }).exec()
 
-  return { patient, appointments, prescriptions }
+  return { patient, appointments, prescriptions, familyMember }
 }
 
 export async function filterPatientByAppointment(

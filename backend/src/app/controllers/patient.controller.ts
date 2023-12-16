@@ -465,7 +465,8 @@ patientRouter.get(
     const user = await UserModel.findOne({ username: req.username })
     const doctor = await DoctorModel.findOne({ user: user?.id })
 
-    const { patient, appointments, prescriptions } = await getPatientByID(id)
+    const { patient, appointments, prescriptions, familyMember } =
+      await getPatientByID(id)
 
     const filteredAppointments = appointments.filter(
       (appointment) => appointment.doctorID.toString() === doctor?.id
@@ -498,25 +499,49 @@ patientRouter.get(
     const appointmentsRefactored = new GetFilteredAppointmentsResponse(
       appointmentResponse
     )
-    res.send(
-      new GetAPatientResponse(
-        patient.id,
-        patient.user.username,
-        patient.name,
-        patient.email,
-        patient.mobileNumber,
-        patient.dateOfBirth,
-        patient.gender as Gender,
-        {
-          name: patient.emergencyContact?.fullName ?? '',
-          mobileNumber: patient.emergencyContact?.mobileNumber ?? '',
-        },
-        patient.documents,
-        appointmentsRefactored,
-        prescriptions,
-        patient.notes,
-        patient.walletMoney
+
+    if (familyMember) {
+      res.send(
+        new GetAPatientResponse(
+          patient.id,
+          patient.user.username,
+          familyMember.name,
+          patient.email,
+          patient.mobileNumber,
+          new Date(calculateDateOfBirthFromAge(familyMember.age)),
+          familyMember.gender as Gender,
+          {
+            name: patient.emergencyContact?.fullName ?? '',
+            mobileNumber: patient.emergencyContact?.mobileNumber ?? '',
+          },
+          patient.documents,
+          appointmentsRefactored,
+          prescriptions,
+          patient.notes,
+          patient.walletMoney
+        )
       )
-    )
+    } else {
+      res.send(
+        new GetAPatientResponse(
+          patient.id,
+          patient.user.username,
+          patient.name,
+          patient.email,
+          patient.mobileNumber,
+          patient.dateOfBirth,
+          patient.gender as Gender,
+          {
+            name: patient.emergencyContact?.fullName ?? '',
+            mobileNumber: patient.emergencyContact?.mobileNumber ?? '',
+          },
+          patient.documents,
+          appointmentsRefactored,
+          prescriptions,
+          patient.notes,
+          patient.walletMoney
+        )
+      )
+    }
   })
 )
