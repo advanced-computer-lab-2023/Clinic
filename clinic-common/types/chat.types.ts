@@ -3,6 +3,11 @@ import { UserType } from './user.types'
 export type Message = {
   id: string
   sender: string
+  senderType: UserType
+  senderDetails: {
+    name: string
+    email: string
+  }
   content: string
   createdAt: string
 }
@@ -12,6 +17,8 @@ export interface ChatBase {
   users: Array<{
     id: string
     username: string
+    name: string
+    email: string
     type: UserType
   }>
   messages: Message[]
