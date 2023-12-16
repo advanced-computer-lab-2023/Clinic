@@ -76,6 +76,10 @@ export async function registerPatient(
     throw new UsernameAlreadyTakenError()
   }
 
+  if (await isEmailTaken(request.email)) {
+    throw new EmailAlreadyTakenError()
+  }
+
   const hashedPassword = await bcrypt.hash(request.password, bcryptSalt)
 
   const newUser = await UserModel.create({

@@ -27,7 +27,7 @@ export const Register = () => {
           {
             label: 'Mobile Number*',
             property: 'mobileNumber',
-            customError: 'Mobile number must be 10 digits.',
+            customError: 'Mobile number must be 11 digits.',
           },
           { label: 'Date of Birth*', property: 'dateOfBirth', type: 'date' },
           {
@@ -50,7 +50,7 @@ export const Register = () => {
           {
             label: 'Emergency Contact Mobile Number*',
             property: 'emergencyContact.mobileNumber',
-            customError: 'Mobile number must be 10 digits.',
+            customError: 'Mobile number must be 11 digits.',
           },
         ]}
         validator={RegisterRequestValidator}
