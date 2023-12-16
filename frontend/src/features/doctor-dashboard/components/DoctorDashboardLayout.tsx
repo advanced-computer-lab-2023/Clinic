@@ -17,6 +17,7 @@ import { ContractStatus, DoctorStatus } from 'clinic-common/types/doctor.types'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 
 import AddAlarmIcon from '@mui/icons-material/AddAlarm'
+import ReceiptIcon from '@mui/icons-material/Receipt'
 //import { EmploymentContract } from '../routes/EmploymentContract'
 
 export function DoctorDashboardLayout() {
@@ -41,7 +42,13 @@ export function DoctorDashboardLayout() {
     }
 
     if (doctorQuery.data?.contractStatus != ContractStatus.Accepted) {
-      setSidebarLinks([])
+      setSidebarLinks([
+        {
+          to: '/doctor-dashboard/employmentContract',
+          text: 'Employment Contract',
+          icon: <ReceiptIcon />,
+        },
+      ])
 
       return
     }
@@ -76,6 +83,11 @@ export function DoctorDashboardLayout() {
         to: '/doctor-dashboard/followup-requests',
         text: 'Follow-up Requests',
         icon: <AddAlarmIcon />,
+      },
+      {
+        to: '/doctor-dashboard/employmentContract',
+        text: 'Employment Contract',
+        icon: <ReceiptIcon />,
       },
     ])
   }, [
