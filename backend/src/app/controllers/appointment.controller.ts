@@ -42,7 +42,7 @@ appointmentsRouter.get(
     }
 
     const filterAppointments = await getfilteredAppointments(query)
-    console.log(filterAppointments)
+
     const appointmentResponses = await Promise.all(
       filterAppointments.map(async (appointment) => {
         const doctor = await DoctorModel.findById(appointment.doctorID)
@@ -65,6 +65,21 @@ appointmentsRouter.get(
         }
       })
     )
+
+    // Reorder filterAppointments based on appointment status
+    appointmentResponses.sort((a, b) => {
+      const statusOrder = {
+        [AppointmentStatus.Upcoming]: 1,
+        [AppointmentStatus.Completed]: 2,
+        [AppointmentStatus.Cancelled]: 3,
+      }
+
+      return (
+        statusOrder[a.status as keyof typeof statusOrder] -
+        statusOrder[b.status as keyof typeof statusOrder]
+      )
+    })
+
     res.send(new GetFilteredAppointmentsResponse(appointmentResponses))
   })
 )
