@@ -196,6 +196,7 @@ export function PrescriptionView() {
         </Stack>
       </CardContent>
       <Button
+        variant="contained"
         onClick={() => {
           downloadPDF()
         }}
@@ -204,6 +205,7 @@ export function PrescriptionView() {
       </Button>
       {!prescription.isFilled && buttonVisible && (
         <Button
+          variant="contained"
           onClick={() => {
             HandleCheckout()
           }}

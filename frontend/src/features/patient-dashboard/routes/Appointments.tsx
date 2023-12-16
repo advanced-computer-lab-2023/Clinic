@@ -14,6 +14,7 @@ import {
   DialogContentText,
   Alert,
   DialogActions,
+  Chip,
 } from '@mui/material'
 import { LoadingButton } from '@mui/lab'
 import { DateRange, FilteredList } from '@/components/FilteredList'
@@ -238,9 +239,12 @@ export function Appointments() {
         ]}
         queryKey={['appointments']}
         component={(appointment) => (
-          <Grid item xl={3}>
-            <Card variant="outlined">
-              <CardContent>
+          <Grid item xl={3} md={4}>
+            <Card
+              variant="outlined"
+              style={{ height: '470px', display: 'flex', alignItems: 'center' }}
+            >
+              <CardContent style={{ width: '100%' }}>
                 <Stack spacing={2}>
                   <Stack spacing={-1}>
                     <Typography variant="overline" color="text.secondary">
@@ -284,6 +288,16 @@ export function Appointments() {
                         error={followUpDateError}
                       />
                     )}
+
+                  {appointment.status === 'cancelled' && (
+                    <Chip
+                      sx={{ mt: 1 }}
+                      color="error"
+                      label="cancelled"
+                      style={{ marginTop: 40 }}
+                    />
+                  )}
+
                   {user?.type === UserType.Doctor &&
                     appointment.status === 'completed' && (
                       <>
@@ -438,43 +452,84 @@ export function Appointments() {
           </Grid>
         )}
       />
-      <Dialog
-        open={cancelAppointmentId != null}
-        onClose={() => setCancelAppointmentId(null)}
-      >
-        <DialogTitle>Are you sure?</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            <Alert severity="error">
-              Are you sure you want to cancel this appointment?{' '}
-              <u>
-                This action cannot be undone. Appointments cancelled less than
-                24 hours before their date do not receive a refund.
-              </u>
-            </Alert>
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button autoFocus onClick={() => setCancelAppointmentId(null)}>
-            Cancel
-          </Button>
-          <LoadingButton
-            loading={isLoading == cancelAppointmentId}
-            //loading={handleCancelAppointment.isLoading}
-            variant="contained"
-            color="error"
-            onClick={() => {
-              if (cancelAppointmentId) {
-                handleCancelAppointment(cancelAppointmentId)
-              } else {
-                setCancelAppointmentId(null)
-              }
-            }}
-          >
-            Confirm
-          </LoadingButton>
-        </DialogActions>
-      </Dialog>
+      {user?.type === UserType.Patient && (
+        <Dialog
+          open={cancelAppointmentId != null}
+          onClose={() => setCancelAppointmentId(null)}
+        >
+          <DialogTitle>Are you sure?</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              <Alert severity="error">
+                Are you sure you want to cancel this appointment?{' '}
+                <u>
+                  This action cannot be undone. Appointments cancelled less than
+                  24 hours before their date do not receive a refund.
+                </u>
+              </Alert>
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button autoFocus onClick={() => setCancelAppointmentId(null)}>
+              Cancel
+            </Button>
+            <LoadingButton
+              loading={isLoading == cancelAppointmentId}
+              //loading={handleCancelAppointment.isLoading}
+              variant="contained"
+              color="error"
+              onClick={() => {
+                if (cancelAppointmentId) {
+                  handleCancelAppointment(cancelAppointmentId)
+                } else {
+                  setCancelAppointmentId(null)
+                }
+              }}
+            >
+              Confirm
+            </LoadingButton>
+          </DialogActions>
+        </Dialog>
+      )}
+      {user?.type === UserType.Doctor && (
+        <Dialog
+          open={cancelAppointmentId != null}
+          onClose={() => setCancelAppointmentId(null)}
+        >
+          <DialogTitle>Are you sure?</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              <Alert severity="error">
+                Are you sure you want to cancel this appointment?{' '}
+                <u>
+                  This action cannot be undone. Patient will be notified that
+                  the appointment will be cancelled.
+                </u>
+              </Alert>
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button autoFocus onClick={() => setCancelAppointmentId(null)}>
+              Cancel
+            </Button>
+            <LoadingButton
+              loading={isLoading == cancelAppointmentId}
+              //loading={handleCancelAppointment.isLoading}
+              variant="contained"
+              color="error"
+              onClick={() => {
+                if (cancelAppointmentId) {
+                  handleCancelAppointment(cancelAppointmentId)
+                } else {
+                  setCancelAppointmentId(null)
+                }
+              }}
+            >
+              Confirm
+            </LoadingButton>
+          </DialogActions>
+        </Dialog>
+      )}
     </>
   )
 }
