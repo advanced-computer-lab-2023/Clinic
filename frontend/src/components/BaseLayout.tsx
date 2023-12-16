@@ -28,8 +28,7 @@ import { VideoCallProvider } from '@/providers/VideoCallProvider'
 import { useNavigate } from 'react-router-dom'
 import { ProfileMenu } from './ProfileMenu'
 import { styled } from '@mui/material/styles'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faStethoscope } from '@fortawesome/free-solid-svg-icons'
+
 import { ThemeProvider } from '@emotion/react'
 import { UserType } from 'clinic-common/types/user.types'
 
@@ -283,11 +282,11 @@ export function BaseLayout() {
                     fontWeight: 'bold',
                   }}
                 >
-                  <FontAwesomeIcon
-                    icon={faStethoscope}
-                    style={{ marginRight: '15px' }}
+                  <img
+                    src="../../src/assets/logo2.png"
+                    style={{ width: '50px', height: '40px' }}
                   />
-                  Your Clinic
+                  Clinic
                 </Typography>
                 {sidebarLinks.map((link) => (
                   <ListItemLink
