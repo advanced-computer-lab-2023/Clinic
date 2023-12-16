@@ -231,8 +231,8 @@ export function Appointments() {
         ]}
         queryKey={['appointments']}
         component={(appointment) => (
-          <Grid item xl={3}>
-            <Card variant="outlined">
+          <Grid item xl={3} md={4}>
+            <Card variant="outlined" style={{ height: '470px' }}>
               <CardContent>
                 <Stack spacing={2}>
                   <Stack spacing={-1}>
