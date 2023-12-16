@@ -24,6 +24,7 @@ import { AdminModel } from '../models/admin.model'
 import FireBase from '../../../../firebase.config'
 import { getStorage, ref, uploadBytes } from 'firebase/storage'
 import { getDownloadURL } from 'firebase/storage'
+import Pharmacist from '../models/pharmacist'
 const jwtSecret = process.env.JWT_TOKEN ?? 'secret'
 
 export const bcryptSalt =
@@ -382,6 +383,18 @@ export async function getEmailAndNameForUsername(username: string) {
 
       email = admin.email
       name = user.username
+      break
+    }
+
+    case UserType.Pharmacist: {
+      const pharmacist = await Pharmacist.findOne({ user: user.id })
+
+      if (!pharmacist) {
+        throw new APIError('Admin not found', 400)
+      }
+
+      email = pharmacist.email
+      name = pharmacist.name
       break
     }
 
