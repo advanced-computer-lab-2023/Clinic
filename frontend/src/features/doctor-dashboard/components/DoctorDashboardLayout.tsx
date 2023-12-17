@@ -76,7 +76,7 @@ export function DoctorDashboardLayout() {
       },
       {
         to: '/doctor-dashboard/view-my-available-time-slots',
-        text: 'View My Available Time Slots',
+        text: 'View Available Time Slots',
         icon: <VisibilityIcon />,
       },
       {

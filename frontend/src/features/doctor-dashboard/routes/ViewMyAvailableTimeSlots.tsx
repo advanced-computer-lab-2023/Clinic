@@ -16,6 +16,7 @@ import { useState } from 'react'
 import dayjs from 'dayjs'
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
+import { DataGrid, GridColDef } from '@mui/x-data-grid'
 
 export function ViewMyAvailableTimeSlots() {
   const [fromDate, setFromDate] = useState(dayjs)
@@ -79,45 +80,32 @@ export function ViewMyAvailableTimeSlots() {
     }
   }
 
+  const columns: GridColDef[] = [
+    {
+      field: 'day',
+      headerName: 'Day',
+      flex: 1,
+      editable: false,
+    },
+    {
+      field: 'date',
+      headerName: 'Date',
+      editable: false,
+      flex: 1,
+    },
+    {
+      field: 'time',
+      headerName: 'Time',
+      editable: false,
+      flex: 1,
+    },
+  ]
+
   return (
     <>
       <ToastContainer />
-      <Card variant="outlined">
-        <CardContent>
-          <Stack spacing={2}>
-            <Stack
-              direction="row"
-              spacing={1}
-              justifyContent="space-between"
-              alignItems="center"
-            >
-              <Typography variant="h6" color="text.secondary">
-                Your Available Time Slots in this month
-              </Typography>
-            </Stack>
-            <Stack spacing={1}>
-              {query.data?.availableTimes
-                .map((data) => new Date(data))
-                .filter((data) => data.getTime() > Date.now())
-                .sort((a, b) => a.getTime() - b.getTime())
-                .map((data, i) => (
-                  <Typography variant="body1" key={i}>
-                    {new Date(data).toLocaleString('en-US', {
-                      year: 'numeric',
-                      month: 'numeric',
-                      day: 'numeric',
-                      hour: 'numeric',
-                      minute: 'numeric',
-                      hour12: true,
-                    })}
-                  </Typography>
-                ))}
-            </Stack>
-          </Stack>
-        </CardContent>
-      </Card>
-      <Grid item xl={3}>
-        <Card>
+      <Stack direction="row" justifyContent="space-between" spacing={1}>
+        <Card variant="outlined" style={{ width: '70%' }}>
           <CardContent>
             <Stack spacing={2}>
               <Stack
@@ -127,44 +115,120 @@ export function ViewMyAvailableTimeSlots() {
                 alignItems="center"
               >
                 <Typography variant="h6" color="text.secondary">
-                  Add the Time Slots you are available in within this month
+                  Your available time slots in this month
                 </Typography>
               </Stack>
-              <Stack direction="row" spacing={1}>
-                <DateTimePicker
-                  label="From"
-                  value={fromDate}
-                  onChange={(newValue) => setFromDate(newValue!)}
-                  viewRenderers={{
-                    hours: renderTimeViewClock,
-                    minutes: renderTimeViewClock,
-                    seconds: renderTimeViewClock,
-                  }}
+
+              <Stack direction="row" alignItems="center">
+                <DataGrid
+                  autoHeight
+                  rows={
+                    query.data?.availableTimes
+                      .map((data) => new Date(data))
+                      .filter((data) => data.getTime() > Date.now())
+                      .sort((a, b) => a.getTime() - b.getTime())
+                      .map((data, i) => {
+                        const dateString = data.toLocaleString('en-US', {
+                          year: 'numeric',
+                          month: 'numeric',
+                          day: 'numeric',
+                          hour: 'numeric',
+                          minute: 'numeric',
+                          hour12: true,
+                        })
+                        const dateObj = new Date(dateString)
+                        const dayNumber = dateObj.getDay()
+                        const weekday = [
+                          'Sunday',
+                          'Monday',
+                          'Tuesday',
+                          'Wednesday',
+                          'Thursday',
+                          'Friday',
+                          'Saturday',
+                        ][dayNumber]
+                        const minutes = dateObj.getMinutes()
+                        let string = ' '
+
+                        if (minutes < 10) {
+                          string = '0'
+                        }
+
+                        return {
+                          id: i,
+                          day: weekday,
+                          date:
+                            dateObj.getMonth() +
+                            1 +
+                            '/' +
+                            dateObj.getDate() +
+                            '/' +
+                            dateObj.getFullYear(),
+                          time:
+                            dateObj.getHours() +
+                            ':' +
+                            string +
+                            dateObj.getMinutes(),
+                        }
+                      }) || []
+                  }
+                  columns={columns}
+                  style={{ display: 'flex', width: '100%' }}
                 />
-                <DateTimePicker
-                  label="To"
-                  value={ToDate}
-                  onChange={(newValue) => setToDate(newValue!)}
-                  viewRenderers={{
-                    hours: renderTimeViewClock,
-                    minutes: renderTimeViewClock,
-                    seconds: renderTimeViewClock,
-                  }}
-                />
-                <Button
-                  variant="contained"
-                  size="small"
-                  onClick={() => {
-                    handleAdd()
-                  }}
-                >
-                  Add Time Slot
-                </Button>
               </Stack>
             </Stack>
           </CardContent>
         </Card>
-      </Grid>
+        <Grid item xl={3}>
+          <Card>
+            <CardContent>
+              <Stack spacing={2}>
+                <Stack
+                  direction="row"
+                  spacing={1}
+                  justifyContent="space-between"
+                  alignItems="center"
+                >
+                  <Typography variant="h6" color="text.secondary">
+                    Add the time slots you are available in within this month
+                  </Typography>
+                </Stack>
+                <Stack direction="column" spacing={1}>
+                  <DateTimePicker
+                    label="From"
+                    value={fromDate}
+                    onChange={(newValue) => setFromDate(newValue!)}
+                    viewRenderers={{
+                      hours: renderTimeViewClock,
+                      minutes: renderTimeViewClock,
+                      seconds: renderTimeViewClock,
+                    }}
+                  />
+                  <DateTimePicker
+                    label="To"
+                    value={ToDate}
+                    onChange={(newValue) => setToDate(newValue!)}
+                    viewRenderers={{
+                      hours: renderTimeViewClock,
+                      minutes: renderTimeViewClock,
+                      seconds: renderTimeViewClock,
+                    }}
+                  />
+                  <Button
+                    variant="contained"
+                    size="small"
+                    onClick={() => {
+                      handleAdd()
+                    }}
+                  >
+                    Add Time Slot
+                  </Button>
+                </Stack>
+              </Stack>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Stack>
     </>
   )
 }
