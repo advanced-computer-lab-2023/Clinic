@@ -134,7 +134,9 @@ npm run compile:all
 <details>
 <summary>Health Packages 💼</summary>
 - Administrators can add/update/delete health packages with different price ranges.
+
 ![image](https://github.com/advanced-computer-lab-2023/Copilot-and-Sons-Clinic/blob/main/images/health-packages.png)
+
 </details>
 
 <details>
@@ -165,7 +167,9 @@ npm run compile:all
 - Subscribe to health packages for self and family.
 - View subscribed health packages and subscription status.
 - Cancel a subscription.
+
 ![image](https://github.com/advanced-computer-lab-2023/Copilot-and-Sons-Clinic/blob/main/images/patient-functions.png)
+
 </details>
 
 <details>
@@ -184,7 +188,9 @@ npm run compile:all
 - Doctor can add/delete medicine to/from prescriptions.
 - Doctor can add/update dosage for each medicine.
 - Patients can view and filter prescriptions based on various criteria.
+
 ![image](https://github.com/advanced-computer-lab-2023/Copilot-and-Sons-Clinic/blob/main/images/prescription-management.png)
+
 </details>
 
 <details>
