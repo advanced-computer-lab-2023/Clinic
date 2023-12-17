@@ -5,6 +5,7 @@ import {
   CardContent,
   Card,
   CardActions,
+  Chip,
 } from '@mui/material'
 
 import { useEffect, useRef, useState } from 'react'
@@ -95,6 +96,11 @@ function ViewPrescription() {
             elevation={4}
           >
             <CardContent ref={pdfRef}>
+              <Chip
+                label={prescription.isFilled ? 'Filled' : 'Unfilled'}
+                color={prescription.isFilled ? 'success' : 'warning'}
+                variant="outlined"
+              />
               <Typography
                 variant="h5"
                 component="h2"
@@ -128,19 +134,21 @@ function ViewPrescription() {
                 )}
             </CardContent>
             <CardActions>
-              <Button
-                type="submit"
-                fullWidth
-                variant="contained"
-                color="primary"
-                style={{ marginTop: 20 }}
-                startIcon={<Edit />}
-                onClick={() =>
-                  (window.location.href = `http://localhost:5174/doctor-dashboard?PrescriptionId=${prescription._id}&token=${token}`)
-                }
-              >
-                Edit Prescription
-              </Button>
+              {!prescription.isFilled && (
+                <Button
+                  type="submit"
+                  fullWidth
+                  variant="contained"
+                  color="primary"
+                  style={{ marginTop: 20 }}
+                  startIcon={<Edit />}
+                  onClick={() =>
+                    (window.location.href = `http://localhost:5174/doctor-dashboard?PrescriptionId=${prescription._id}&token=${token}`)
+                  }
+                >
+                  Edit Prescription
+                </Button>
+              )}
               <Button
                 type="submit"
                 fullWidth
