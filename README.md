@@ -1,24 +1,27 @@
-# Copilot & Sons: El7a2ny Clinic
+<p align="center">
+<img src="https://github.com/advanced-computer-lab-2023/Copilot-and-Sons-Pharmacy/blob/main/images/logo2.png" width="400" />
 
-[![Typing SVG](https://readme-typing-svg.herokuapp.com?font=Fira+Code&size=40&pause=1000&color=F7187F&center=true&vCenter=true&random=false&width=1000&height=200&lines=Welcome+to+Copilot+%26+Sons%3A+El7a2ni!!+%F0%9F%98%B1)](https://git.io/typing-svg)
+<a href="https://git.io/typing-svg"><img src="https://readme-typing-svg.herokuapp.com?font=Fira+Code&size=40&pause=1000&color=F7F7F7&center=true&vCenter=true&random=false&width=1200&height=100&lines=Welcome+to+Copilots+%26+Sons%3A+El7a2ni!!+%F0%9F%98%B1%F0%9F%94%A5" alt="Typing SVG" /></a>
+
+</p>
+
+# Copilot & Sons: El7a2ny Clinic
 
 ## Table of Contents
 
 1. [🚀 Motivation](#-motivation)
 2. [🧱 Build Status](#-build-status)
 3. [🎨 Code Style](#-code-style)
-4. [⚒️ Tech and Frameworks used](#-tech-and-framework-used)
-5. [🔥 Features](#-features)
+4. [⚒️ Tech and Frameworks used](#%EF%B8%8F-tech-and-frameworks-used)
+5. [🔥 Features & Screenshots](#-features--screenshots)
 6. [💻 Code Examples](#-code-examples)
-7. [⚙️ Installation](#-installation)
+7. [⚙️ Installation](#%EF%B8%8F-installation)
 8. [📚 API Reference](#-api-reference)
 9. [🧪 Tests](#-tests)
 10. [🧑🏻‍🏫 How to Use](#-how-to-use)
 11. [🤝 Contribute](#-contribute)
 12. [©️ Credits](#-credits)
 13. [📜 License](#-license)
-
-![image](https://github.com/advanced-computer-lab-2023/Copilot-and-Sons-Clinic/blob/main/images/logo.jpg)
 
 ## 🚀 Motivation
 
@@ -74,8 +77,6 @@ npm run compile:all
 
 </details>
 
-## 🎥 Screenshots & Video
-
 ## ⚒️ Tech and Frameworks used
 
 - [NodeJs](https://nodejs.org/en/)
@@ -101,7 +102,7 @@ npm run compile:all
 - [Bcrypt](https://www.npmjs.com/package/bcrypt)
 - [Postman](https://www.postman.com/)
 
-## 🔥 Features
+## 🔥 Features & Screenshots
 
 <details>
 <summary>User Registration 📝</summary>
@@ -1873,7 +1874,7 @@ We welcome contributions to Copilot & Sons El7a2ny Clinic. If you want to contri
 >
 > We welcome all contributions, but please make sure to follow our code style and linting rules. You can check the [Code Style](#-code-style) section for more details.
 
-## ⚙️ Credits
+## 🫡 Credits
 
 ### Docs
 
