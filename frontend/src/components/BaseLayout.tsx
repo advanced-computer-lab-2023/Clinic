@@ -8,12 +8,10 @@ import {
   ListItemIcon,
   ListItemText,
   IconButton,
-  InputBase,
   Box,
   createTheme,
   Typography,
 } from '@mui/material'
-import SearchIcon from '@mui/icons-material/Search'
 
 import React, { useState } from 'react'
 import { Link, Outlet, useLocation } from 'react-router-dom'
@@ -27,50 +25,10 @@ import { useAuth } from '@/hooks/auth'
 import { VideoCallProvider } from '@/providers/VideoCallProvider'
 import { useNavigate } from 'react-router-dom'
 import { ProfileMenu } from './ProfileMenu'
-import { styled } from '@mui/material/styles'
 
 import { ThemeProvider } from '@emotion/react'
 import { UserType } from 'clinic-common/types/user.types'
 
-const Search = styled('div')(({ theme }) => ({
-  position: 'relative',
-  borderRadius: theme.shape.borderRadius,
-  marginLeft: 0,
-  width: '100%',
-  [theme.breakpoints.up('sm')]: {
-    marginLeft: theme.spacing(1),
-    width: 'auto',
-  },
-}))
-
-const SearchIconWrapper = styled('div')(({ theme }) => ({
-  padding: theme.spacing(0, 2),
-  height: '100%',
-  position: 'absolute',
-  pointerEvents: 'none',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-}))
-
-const StyledInputBase = styled(InputBase)(({ theme }) => ({
-  color: 'inherit',
-  width: '100%',
-  '& .MuiInputBase-input': {
-    padding: theme.spacing(1, 1, 1, 0),
-    border: '1px solid', // Add border property here
-    borderRadius: '18px',
-    // vertical padding + font size from searchIcon
-    paddingLeft: `calc(1em + ${theme.spacing(9)})`,
-    transition: theme.transitions.create('width'),
-    [theme.breakpoints.up('sm')]: {
-      width: '12ch',
-      '&:focus': {
-        width: '20ch',
-      },
-    },
-  },
-}))
 interface ListItemLinkProps {
   icon?: React.ReactElement
   primary: string
@@ -212,22 +170,13 @@ export function BaseLayout() {
 
               <OnlyAuthenticated>
                 <ProfileMenu />
+                <Box sx={{ flexGrow: 10 }} />
                 <NotificationsList />
+                <Box sx={{ flexGrow: 0.1 }} />
                 <ChatsList />
               </OnlyAuthenticated>
 
               <Box sx={{ flexGrow: 1 }} />
-              <OnlyAuthenticated>
-                <Search sx={{ marginRight: 20 }}>
-                  <SearchIconWrapper>
-                    <SearchIcon />
-                  </SearchIconWrapper>
-                  <StyledInputBase
-                    placeholder="Search…"
-                    inputProps={{ 'aria-label': 'search' }}
-                  />
-                </Search>
-              </OnlyAuthenticated>
             </Toolbar>
 
             <Box
