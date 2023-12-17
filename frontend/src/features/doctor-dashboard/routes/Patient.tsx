@@ -74,46 +74,80 @@ export function Patient() {
             </Typography>
           </Stack>
           <Stack spacing={-1}>
-            <Typography variant="overline" color="text.secondary">
+            <Typography
+              variant="overline"
+              color="text.secondary"
+              fontSize={'20px'}
+            >
               Email
             </Typography>
-            <Typography variant="body1">{patient.email}</Typography>
+            <Typography variant="body1" fontSize={'20px'}>
+              {patient.email}
+            </Typography>
           </Stack>
           <Stack spacing={-1}>
-            <Typography variant="overline" color="text.secondary">
+            <Typography
+              variant="overline"
+              color="text.secondary"
+              fontSize={'20px'}
+            >
               Mobile Number
             </Typography>
-            <Typography variant="body1">{patient.mobileNumber}</Typography>
+            <Typography variant="body1" fontSize={'20px'}>
+              {patient.mobileNumber}
+            </Typography>
           </Stack>
           <Stack spacing={-1}>
-            <Typography variant="overline" color="text.secondary">
+            <Typography
+              variant="overline"
+              color="text.secondary"
+              fontSize={'20px'}
+            >
               Date of Birth
             </Typography>
-            <Typography variant="body1">
+            <Typography variant="body1" fontSize={'20px'}>
               {new Date(patient.dateOfBirth).toLocaleString()}
             </Typography>
           </Stack>
           <Stack spacing={-1}>
-            <Typography variant="overline" color="text.secondary">
+            <Typography
+              variant="overline"
+              color="text.secondary"
+              fontSize={'20px'}
+            >
               Gender
             </Typography>
-            <Typography variant="body1">{patient.gender}</Typography>
+            <Typography variant="body1" fontSize={'20px'}>
+              {patient.gender}
+            </Typography>
           </Stack>
           <Stack spacing={-1}>
-            <Typography variant="overline" color="text.secondary">
+            <Typography
+              variant="overline"
+              color="text.secondary"
+              fontSize={'20px'}
+            >
               Emergency Contact
             </Typography>
-            <Typography variant="body1">
+            <Typography variant="body1" fontSize={'20px'}>
               {patient.emergencyContact.name} -{' '}
               {patient.emergencyContact.mobileNumber}
             </Typography>
           </Stack>
           <Stack spacing={1}>
-            <Typography variant="overline" color="text.secondary">
+            <Typography
+              variant="overline"
+              color="text.secondary"
+              fontSize={'20px'}
+            >
               Appointments
             </Typography>
             {patient.appointments.appointments.map((appointment) => (
-              <Typography variant="body1" key={appointment.date}>
+              <Typography
+                variant="body1"
+                key={appointment.date}
+                fontSize={'20px'}
+              >
                 {`${new Date(appointment.date).toLocaleString('en-US', {
                   year: 'numeric',
                   month: 'numeric',
