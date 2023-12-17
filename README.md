@@ -115,7 +115,9 @@ npm run compile:all
 <details>
 <summary>User Authentication 🔐</summary>
 - Login and logout securely.
+
 ![image](https://github.com/advanced-computer-lab-2023/Copilot-and-Sons-Clinic/blob/main/images/user-authentication.png)
+
 </details>
 
 <details>
@@ -124,7 +126,9 @@ npm run compile:all
 - Manage doctors and patients.
 - Accept or reject doctor registration requests.
 - View information uploaded by doctors.
+
 ![image](https://github.com/advanced-computer-lab-2023/Copilot-and-Sons-Clinic/blob/main/images/administrator-functions.png)
+
 </details>
 
 <details>
@@ -138,7 +142,9 @@ npm run compile:all
 - Change password.
 - Reset forgotten password via email.
 - Edit/update email, hourly rate, or affiliation.
+
 ![image](https://github.com/advanced-computer-lab-2023/Copilot-and-Sons-Clinic/blob/main/images/account-management.png)
+
 </details>
 
 <details>
@@ -147,7 +153,9 @@ npm run compile:all
 - Add available time slots for appointments.
 - View information and health records of registered patients.
 - View a list of all patients.
+
 ![image](https://github.com/advanced-computer-lab-2023/Copilot-and-Sons-Clinic/blob/main/images/doctor-functions.png)
+
 </details>
 
 <details>
@@ -166,7 +174,9 @@ npm run compile:all
 - View upcoming/past appointments.
 - Patient can reschedule or cancel appointments.
 - Doctor can reschedule appointments for patients.
+
 ![image](https://github.com/advanced-computer-lab-2023/Copilot-and-Sons-Clinic/blob/main/images/appointment-management.png)
+
 </details>
 
 <details>
@@ -181,14 +191,18 @@ npm run compile:all
 <summary>Wallet Management 💰</summary>
 - Receive a refund in the wallet for canceled appointments.
 - View the amount in the wallet.
+
 ![image](https://github.com/advanced-computer-lab-2023/Copilot-and-Sons-Clinic/blob/main/images/wallet-management.png)
+
 </details>
 
 <details>
 <summary>Communication 📬</summary>
 - Patients and doctors can chat with each other.
 - Doctors and Patients can start/end video calls.
+
 ![image](https://github.com/advanced-computer-lab-2023/Copilot-and-Sons-Clinic/blob/main/images/communication.png)
+
 </details>
 
 ## 💻 Code Examples
