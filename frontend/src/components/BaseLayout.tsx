@@ -239,11 +239,27 @@ export function BaseLayout() {
                 flexGrow: 1,
               }}
             >
-              <Outlet
-                context={
-                  { setSidebarLinks, sidebarLinks } satisfies OutletContextType
-                }
-              />
+              {user ? (
+                <VideoCallProvider>
+                  <Outlet
+                    context={
+                      {
+                        setSidebarLinks,
+                        sidebarLinks,
+                      } satisfies OutletContextType
+                    }
+                  />
+                </VideoCallProvider>
+              ) : (
+                <Outlet
+                  context={
+                    {
+                      setSidebarLinks,
+                      sidebarLinks,
+                    } satisfies OutletContextType
+                  }
+                />
+              )}
             </Box>
           </Box>
 
@@ -314,9 +330,9 @@ export function BaseLayout() {
 
   if (user) {
     return (
-      <VideoCallProvider>
-        <ChatsProvider>{layout}</ChatsProvider>
-      </VideoCallProvider>
+      // <VideoCallProvider>
+      <ChatsProvider>{layout}</ChatsProvider>
+      // </VideoCallProvider>
     )
   } else {
     return layout

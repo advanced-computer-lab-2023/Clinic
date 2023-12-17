@@ -1,17 +1,13 @@
 import { useContext, useEffect, useState, useRef } from 'react'
 import { VideoContext } from '../../providers/VideoCallProvider'
 import '../../components/video-call/styles/Video.css' //"../Video.css";
-import { Modal, Input } from 'antd'
+import { Modal } from 'antd'
 import VideoIcon from '../../components/video-call/assests/video.svg'
 import VideoOff from '../../components/video-call/assests/video-off.svg'
-import Msg_Illus from '../../components/video-call/assests/msg_illus.svg'
-import Msg from '../../components/video-call/assests/msg.svg'
 import VideocamOffIcon from '@mui/icons-material/VideocamOff'
 import '../../components/video-call/styles/Video.css'
 import { socket } from '@/api/socket'
 import PhoneMissedIcon from '@mui/icons-material/PhoneMissed'
-
-const { Search } = Input
 
 const VideoCallScreen = () => {
   const {
@@ -20,7 +16,6 @@ const VideoCallScreen = () => {
     userVideo,
     callEnded,
     leaveCall,
-    sendMsg: sendMsgFunc,
     chat,
     setChat,
     myVdoStatus,
@@ -31,8 +26,6 @@ const VideoCallScreen = () => {
   } = useContext(VideoContext)
 
   const [isScreenVisible, setIsScreenVisible] = useState(false)
-  const [sendMsg, setSendMsg] = useState('')
-  const [isModalVisible, setIsModalVisible] = useState(false)
   socket.on('msgRcv', ({ msg: value, sender }) => {
     const msg = { msg: value, type: 'rcv', sender, timestamp: Date.now() }
     setChat([...chat, msg])
@@ -43,15 +36,6 @@ const VideoCallScreen = () => {
   useEffect(() => {
     if (dummy?.current) dummy.current.scrollIntoView({ behavior: 'smooth' })
   }, [chat])
-
-  const showModal = (showVal: any) => {
-    setIsModalVisible(showVal)
-  }
-
-  const onSearch = (value: any) => {
-    if (value && value.length) sendMsgFunc(value)
-    setSendMsg('')
-  }
 
   useEffect(() => {
     if (callAccepted) {
@@ -115,57 +99,6 @@ const VideoCallScreen = () => {
             }}
           >
             <div className="iconsDiv">
-              {callAccepted && !callEnded && (
-                <div
-                  className="icons"
-                  onClick={() => {
-                    setIsModalVisible(!isModalVisible)
-                  }}
-                  tabIndex={0}
-                >
-                  <img src={Msg} alt="chat icon" />
-                </div>
-              )}
-              <Modal
-                title="Chat"
-                footer={null}
-                visible={isModalVisible}
-                onOk={() => showModal(false)}
-                onCancel={() => showModal(false)}
-                style={{ maxHeight: '100px' }}
-              >
-                {chat.length ? (
-                  <div className="msg_flex">
-                    {chat.map((msg) => (
-                      <div
-                        className={msg.type === 'sent' ? 'msg_sent' : 'msg_rcv'}
-                      >
-                        {msg.msg}
-                      </div>
-                    ))}
-                    <div ref={dummy} id="no_border"></div>
-                  </div>
-                ) : (
-                  <div className="chat_img_div">
-                    <img
-                      src={Msg_Illus}
-                      alt="msg_illus"
-                      className="img_illus"
-                    />
-                  </div>
-                )}
-                <Search
-                  placeholder="your message"
-                  allowClear
-                  className="input_msg"
-                  enterButton="Send 🚀"
-                  onChange={(e) => setSendMsg(e.target.value)}
-                  value={sendMsg}
-                  size="large"
-                  onSearch={onSearch}
-                />
-              </Modal>
-
               <div className="icons" onClick={() => updateVideo()} tabIndex={0}>
                 {myVdoStatus ? (
                   <img src={VideoIcon} alt="video on icon" />
