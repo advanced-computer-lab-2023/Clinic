@@ -109,11 +109,13 @@ npm run compile:all
 - Upload/remove medical documents (PDF, JPEG, JPG, PNG).
 - Submit a request to register as a doctor with professional details.
 - Upload required documents for doctor registration.
+![image](https://github.com/advanced-computer-lab-2023/Copilot-and-Sons-Clinic/blob/main/images/user-registration.png)
 </details>
 
 <details>
 <summary>User Authentication 🔐</summary>
 - Login and logout securely.
+![image](https://github.com/advanced-computer-lab-2023/Copilot-and-Sons-Clinic/blob/main/images/user-authentication.png)
 </details>
 
 <details>
@@ -122,11 +124,13 @@ npm run compile:all
 - Manage doctors and patients.
 - Accept or reject doctor registration requests.
 - View information uploaded by doctors.
+![image](https://github.com/advanced-computer-lab-2023/Copilot-and-Sons-Clinic/blob/main/images/administrator-functions.png)
 </details>
 
 <details>
 <summary>Health Packages 💼</summary>
 - Administrators can add/update/delete health packages with different price ranges.
+![image](https://github.com/advanced-computer-lab-2023/Copilot-and-Sons-Clinic/blob/main/images/health-packages.png)
 </details>
 
 <details>
@@ -134,6 +138,7 @@ npm run compile:all
 - Change password.
 - Reset forgotten password via email.
 - Edit/update email, hourly rate, or affiliation.
+![image](https://github.com/advanced-computer-lab-2023/Copilot-and-Sons-Clinic/blob/main/images/account-management.png)
 </details>
 
 <details>
@@ -142,9 +147,7 @@ npm run compile:all
 - Add available time slots for appointments.
 - View information and health records of registered patients.
 - View a list of all patients.
-
-![image](https://github.com/advanced-computer-lab-2023/Copilot-and-Sons-Clinic/blob/main/images/patients.png)
-
+![image](https://github.com/advanced-computer-lab-2023/Copilot-and-Sons-Clinic/blob/main/images/doctor-functions.png)
 </details>
 
 <details>
@@ -154,6 +157,7 @@ npm run compile:all
 - Subscribe to health packages for self and family.
 - View subscribed health packages and subscription status.
 - Cancel a subscription.
+![image](https://github.com/advanced-computer-lab-2023/Copilot-and-Sons-Clinic/blob/main/images/patient-functions.png)
 </details>
 
 <details>
@@ -162,6 +166,7 @@ npm run compile:all
 - View upcoming/past appointments.
 - Patient can reschedule or cancel appointments.
 - Doctor can reschedule appointments for patients.
+![image](https://github.com/advanced-computer-lab-2023/Copilot-and-Sons-Clinic/blob/main/images/appointment-management.png)
 </details>
 
 <details>
@@ -169,18 +174,21 @@ npm run compile:all
 - Doctor can add/delete medicine to/from prescriptions.
 - Doctor can add/update dosage for each medicine.
 - Patients can view and filter prescriptions based on various criteria.
+![image](https://github.com/advanced-computer-lab-2023/Copilot-and-Sons-Clinic/blob/main/images/prescription-management.png)
 </details>
 
 <details>
 <summary>Wallet Management 💰</summary>
 - Receive a refund in the wallet for canceled appointments.
 - View the amount in the wallet.
+![image](https://github.com/advanced-computer-lab-2023/Copilot-and-Sons-Clinic/blob/main/images/wallet-management.png)
 </details>
 
 <details>
 <summary>Communication 📬</summary>
 - Patients and doctors can chat with each other.
 - Doctors and Patients can start/end video calls.
+![image](https://github.com/advanced-computer-lab-2023/Copilot-and-Sons-Clinic/blob/main/images/communication.png)
 </details>
 
 ## 💻 Code Examples
