@@ -17,6 +17,8 @@ import { useAuth } from '@/hooks/auth'
 import { Favorite } from '@mui/icons-material'
 import { Paper } from '@mui/material'
 import { LoadingButton } from '@mui/lab'
+import { useCustomTheme } from '@/providers/ThemeContext'
+import { useAlerts } from '@/hooks/alerts'
 
 function Copyright(props: any) {
   return (
@@ -38,6 +40,8 @@ function Copyright(props: any) {
 export default function SignIn() {
   const { refreshUser } = useAuth()
   const [loading, setLoading] = React.useState(false)
+  const { setFontSize, setIsDarkMode } = useCustomTheme() // Now you can access these values and setters
+  const { addAlert } = useAlerts()
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -162,6 +166,22 @@ export default function SignIn() {
       >
         <Copyright sx={{ mt: 8, mb: 4 }} />
       </Box>
+      <button
+        onClick={() => {
+          setFontSize(20) // Set the font size to 20 pixels
+          setIsDarkMode(true) // Set the dark mode to true (dark mode enabled
+          addAlert({
+            message: 'Take a break, Its late at night',
+            severity: 'info',
+            scope: 'global',
+            temporary: true,
+            duration: 3000,
+          })
+        }}
+      >
+        {' '}
+        CLICKKKKKKKKKKKK MEEEEEEEEEEEEEE
+      </button>
     </Container>
   )
 }

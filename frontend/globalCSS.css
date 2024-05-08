@@ -1,0 +1,14 @@
+:root {
+  --base-font-size: 16px;
+}
+
+body {
+  font-size: var(--base-font-size);
+}
+
+h1,
+h2,
+h3,
+p {
+  font-size: calc(1rem + var(--base-font-size) * 0.1);
+}

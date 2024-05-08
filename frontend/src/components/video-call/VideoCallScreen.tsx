@@ -4,6 +4,8 @@ import '../../components/video-call/styles/Video.css' //"../Video.css";
 import { Modal } from 'antd'
 import VideoIcon from '../../components/video-call/assests/video.svg'
 import VideoOff from '../../components/video-call/assests/video-off.svg'
+import micOff from '../../components/video-call/assests/microphone-off.svg'
+import micOn from '../../components/video-call/assests/microphone.svg'
 import VideocamOffIcon from '@mui/icons-material/VideocamOff'
 import '../../components/video-call/styles/Video.css'
 import { socket } from '@/api/socket'
@@ -23,6 +25,8 @@ const VideoCallScreen = () => {
     userVdoStatus,
     updateVideo,
     userMicStatus,
+    myMicStatus,
+    updateMic,
   } = useContext(VideoContext)
 
   const [isScreenVisible, setIsScreenVisible] = useState(false)
@@ -46,7 +50,6 @@ const VideoCallScreen = () => {
   const modalStyles = {
     body: {
       boxShadow: 'inset 0 0 5px #999',
-      borderRadius: 5,
       backgroundColor: '#000000',
     },
     mask: {
@@ -125,6 +128,13 @@ const VideoCallScreen = () => {
               >
                 <PhoneMissedIcon style={{ color: '#fff' }} />
               </div>
+              <div className="icons" onClick={() => updateMic()} tabIndex={0}>
+                {myMicStatus ? (
+                  <img src={micOn} alt="video on icon" />
+                ) : (
+                  <img src={micOff} alt="video off icon" />
+                )}
+              </div>
             </div>
           </div>
 
@@ -151,7 +161,6 @@ const VideoCallScreen = () => {
                   opacity: `${userVdoStatus ? '1' : '0'}`,
                   width: '100%',
                   height: '100%',
-                  borderRadius: '20px',
                   backgroundColor: '#000000',
                   border: '2px solid #fff',
                   // maxHeight: '100%',

@@ -28,6 +28,8 @@ import { ProfileMenu } from './ProfileMenu'
 
 import { ThemeProvider } from '@emotion/react'
 import { UserType } from 'clinic-common/types/user.types'
+import { useCustomTheme } from '@/providers/ThemeContext'
+import { SpeechRecognitionProvider } from '@/providers/SpeechRecognitionProvider'
 
 interface ListItemLinkProps {
   icon?: React.ReactElement
@@ -75,12 +77,12 @@ interface SidebarLink {
 export function BaseLayout() {
   const [sidebarLinks, setSidebarLinks] = useState<SidebarLink[]>([])
   const { user } = useAuth()
-  const [isDarkMode, setIsDarkMode] = useState(false)
+  const { fontSize, isDarkMode, setIsDarkMode } = useCustomTheme() // Now you can access these values and setters
 
   const theme = createTheme({
     typography: {
       fontFamily: 'Quicksand Variable',
-      fontSize: 15,
+      fontSize,
     },
     palette: {
       mode: isDarkMode ? 'dark' : 'light',
@@ -169,11 +171,13 @@ export function BaseLayout() {
               </IconButton>
 
               <OnlyAuthenticated>
-                <ProfileMenu />
-                <Box sx={{ flexGrow: 10 }} />
-                <NotificationsList />
-                <Box sx={{ flexGrow: 0.1 }} />
-                <ChatsList />
+                <SpeechRecognitionProvider>
+                  <ProfileMenu />
+                  <Box sx={{ flexGrow: 10 }} />
+                  <NotificationsList />
+                  <Box sx={{ flexGrow: 0.1 }} />
+                  <ChatsList />
+                </SpeechRecognitionProvider>
               </OnlyAuthenticated>
 
               <Box sx={{ flexGrow: 1 }} />

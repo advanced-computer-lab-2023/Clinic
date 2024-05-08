@@ -51,7 +51,9 @@
     "react-copy-to-clipboard": "^5.1.0",
     "react-router-dom": "^6.20.1",
     "react-share": "^5.0.3",
+    "react-speech-recognition": "^3.10.0",
     "recharts": "^2.10.3",
+    "regenerator-runtime": "^0.14.1",
     "web-vitals": "^3.5.0"
   }
 }
