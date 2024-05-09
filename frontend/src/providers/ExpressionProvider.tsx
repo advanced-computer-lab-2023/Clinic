@@ -12,6 +12,7 @@ import * as faceapi from 'face-api.js'
 import { Box } from '@mui/material'
 import { useAlerts } from '@/hooks/alerts'
 import { useSpeechRecognitionContext } from './SpeechRecognitionProvider'
+import { useCustomTheme } from './ThemeContext'
 
 const defaultExpressionData: FaceExpressionData = {
   expressions: {},
@@ -41,6 +42,8 @@ export const FaceExpressionProvider = ({
   const { startListening } = useSpeechRecognitionContext()
   const [initialized, setInitialized] = useState(false)
   const [switchedModality, setSwitchedModality] = useState(false)
+  const { setColor } = useCustomTheme()
+  const [switchedColors, setSwitchedColors] = useState(false)
   const handleWebcamRef = useCallback((node: any) => {
     if (node) {
       //@ts-expect-error - video is a property of the node
@@ -70,6 +73,47 @@ export const FaceExpressionProvider = ({
         // This function will execute after 3 seconds
         startListening()
       }, 3000)
+    }
+  }
+
+  const emotionToColor: { [key: string]: string } = {
+    sad: '#E6E6FA',
+    angry: '#66CDAA',
+    fearful: '#E6E6FA',
+    surprised: '#483C32',
+  }
+
+  function handleSwitchColors() {
+    if (
+      !switchedColors &&
+      Object.keys(expressions).length !== 0 &&
+      !expressions['happy'] &&
+      !expressions['neutral']
+    ) {
+      const detectedEmotion = Object.keys(expressions)[0]
+      const color = emotionToColor[detectedEmotion]
+
+      if (color) {
+        setColor(color)
+        setSwitchedColors(true)
+        setTimeout(() => {
+          // After 2 minutes, set switchedColors back to false
+          setSwitchedColors(false)
+        }, 120000) // 2 minutes in milliseconds
+        addAlert({
+          message: `We noticed you were ${detectedEmotion}, we changed UI colors to fix that. If you want to cancel that click HERE`,
+          severity: 'info',
+          scope: 'global',
+          temporary: true,
+          duration: 8000,
+          onClick: () => {
+            setColor('#D0D0D0')
+          },
+        })
+        console.log(`Detected ${detectedEmotion} emotion. Color: ${color}`)
+      } else {
+        console.log(`No color mapping found for ${detectedEmotion} emotion.`)
+      }
     }
   }
 
@@ -117,6 +161,7 @@ export const FaceExpressionProvider = ({
               })
               setEmotionCount(0) // Reset count after updating
               handleSwitchToAudio()
+              handleSwitchColors()
             } else {
               setEmotionCount(emotionCount + 1)
             }

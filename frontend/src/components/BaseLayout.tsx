@@ -78,7 +78,7 @@ interface SidebarLink {
 export function BaseLayout() {
   const [sidebarLinks, setSidebarLinks] = useState<SidebarLink[]>([])
   const { user } = useAuth()
-  const { fontSize, isDarkMode, setIsDarkMode } = useCustomTheme() // Now you can access these values and setters
+  const { fontSize, isDarkMode, setIsDarkMode, color } = useCustomTheme() // Now you can access these values and setters
 
   const theme = createTheme({
     typography: {
@@ -92,7 +92,7 @@ export function BaseLayout() {
           ? {
               [UserType.Admin]: '#F6BD60',
               [UserType.Doctor]: '#F28482',
-              [UserType.Patient]: '#84A59D',
+              [UserType.Patient]: color,
               [UserType.Pharmacist]: '#5893e0',
             }[user.type]
           : '#393E41',

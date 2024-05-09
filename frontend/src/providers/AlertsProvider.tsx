@@ -1,3 +1,4 @@
+import React from 'react'
 import { SnackbarKey, closeSnackbar, enqueueSnackbar } from 'notistack'
 import { createContext, useState } from 'react'
 import { v4 as uuid } from 'uuid'
@@ -11,6 +12,7 @@ export interface Alert {
   scope: string
   temporary: boolean
   duration: number
+  onClick?: (event: React.MouseEvent<HTMLSpanElement, MouseEvent>) => void
 }
 
 interface AlertsContextType {
@@ -43,15 +45,29 @@ export function AlertsProvider({ children }: { children: React.ReactNode }) {
     let snackbarId: SnackbarKey | null = null
 
     if (alert.scope == 'global') {
-      snackbarId = enqueueSnackbar(alert.message, {
+      const message = alert.onClick ? (
+        <span>
+          {alert.message.split(' ').slice(0, -1).join(' ')}{' '}
+          <span
+            onClick={alert.onClick}
+            style={{ cursor: 'pointer', color: 'blue' }}
+          >
+            {alert.message.split(' ').slice(-1)}
+          </span>
+        </span>
+      ) : (
+        alert.message
+      )
+
+      snackbarId = enqueueSnackbar(message, {
         variant: alert.severity,
-        persist: true,
+        persist: !alert.temporary,
       })
     }
 
     if (alert.temporary) {
       setTimeout(() => {
-        removeAlert(alert.id), alert.duration
+        removeAlert(alert.id)
         if (snackbarId) closeSnackbar(snackbarId)
       }, alert.duration)
     }
