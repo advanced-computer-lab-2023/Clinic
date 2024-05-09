@@ -77,7 +77,7 @@ export const SpeechRecognitionProvider = ({
       callback: (pageName: string) => handleNavigation(pageName),
     },
     {
-      command: 'Switch to dark mode',
+      command: ['Switch to dark mode', 'Switch to night mode'],
       callback: () => setIsDarkMode(true),
     },
     {
@@ -92,12 +92,11 @@ export const SpeechRecognitionProvider = ({
     },
     {
       command: [
-        'Increase font size',
-        'Increase font size by *',
-        'Increase font size to *',
-        'make font size bigger',
-        'make fonts bigger',
-        'make text bigger',
+        'Increase (the) font size',
+        'Increase (the) text size',
+        'make (the) font (a) size bigger',
+        'make (the) fonts bigger',
+        'make (the) text bigger',
       ],
       callback: () => {
         setFontSize(20)
@@ -105,19 +104,17 @@ export const SpeechRecognitionProvider = ({
     },
     {
       command: [
-        'decrease font size',
-        'decrease font size',
-        'decrease font size',
-        'make font size smaller',
-        'make fonts smaller',
-        'make text smaller',
+        'decrease (the) font size',
+        'make (the) font size smaller',
+        'make (the) fonts smaller',
+        'make (the) text smaller',
       ],
       callback: () => {
         setFontSize(12)
       },
     },
     {
-      command: ['reset font size', 'reset text (size)'],
+      command: ['reset font (size)', 'reset text (size)'],
       callback: () => {
         setFontSize(16)
       },
