@@ -30,6 +30,7 @@ import { ThemeProvider } from '@emotion/react'
 import { UserType } from 'clinic-common/types/user.types'
 import { useCustomTheme } from '@/providers/ThemeContext'
 import { SpeechRecognitionProvider } from '@/providers/SpeechRecognitionProvider'
+import { FaceExpressionProvider } from '@/providers/ExpressionProvider'
 
 interface ListItemLinkProps {
   icon?: React.ReactElement
@@ -172,11 +173,13 @@ export function BaseLayout() {
 
               <OnlyAuthenticated>
                 <SpeechRecognitionProvider>
-                  <ProfileMenu />
-                  <Box sx={{ flexGrow: 10 }} />
-                  <NotificationsList />
-                  <Box sx={{ flexGrow: 0.1 }} />
-                  <ChatsList />
+                  <FaceExpressionProvider>
+                    <ProfileMenu />
+                    <Box sx={{ flexGrow: 10 }} />
+                    <NotificationsList />
+                    <Box sx={{ flexGrow: 0.1 }} />
+                    <ChatsList />
+                  </FaceExpressionProvider>
                 </SpeechRecognitionProvider>
               </OnlyAuthenticated>
 

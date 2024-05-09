@@ -8,6 +8,13 @@ import { useNavigate } from 'react-router-dom'
 import MicIcon from '@mui/icons-material/Mic'
 import { useCustomTheme } from './ThemeContext'
 
+const defaultExpressionData: SpeechRecognitionContextType = {
+  transcript: '',
+  resetTranscript: () => {}, // Dummy function
+  startListening: () => {}, // Dummy function
+  handleStopListening: () => {}, // Dummy function
+}
+
 interface Urls {
   [key: string]: string // Index signature
   dashboard: string
@@ -23,11 +30,12 @@ interface Urls {
 interface SpeechRecognitionContextType {
   transcript: string
   resetTranscript: () => void
-  handleStartListening: (event: React.MouseEvent<HTMLButtonElement>) => void
+  startListening: () => void
   handleStopListening: (event: React.MouseEvent<HTMLButtonElement>) => void
 }
-const SpeechRecognitionContext =
-  createContext<SpeechRecognitionContextType | null>(null)
+const SpeechRecognitionContext = createContext<SpeechRecognitionContextType>(
+  defaultExpressionData
+)
 
 // Provider component
 export const SpeechRecognitionProvider = ({
@@ -127,9 +135,14 @@ export const SpeechRecognitionProvider = ({
     return null
   }
 
+  const startListening = () => {
+    setShowControls(true)
+    SpeechRecognition.startListening()
+  }
+
   const handleStartListening = (event: React.MouseEvent<HTMLButtonElement>) => {
     setErrorMessage('') // Clear any previous error message
-
+    setShowControls(true)
     event.preventDefault()
     SpeechRecognition.startListening()
   }
@@ -164,7 +177,7 @@ export const SpeechRecognitionProvider = ({
   const value = {
     transcript,
     resetTranscript,
-    handleStartListening,
+    startListening,
     handleStopListening,
   }
 
